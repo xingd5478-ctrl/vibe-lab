@@ -341,6 +341,124 @@
     $("meta-time").textContent = `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
     $("meta-allan").textContent = "log-log";
     $("meta-kf").textContent = `R=${state.r.toExponential(2)} · Q=${state.q.toExponential(2)}`;
+    try { syncURL(); } catch (e) { /* ignore */ }
+  }
+
+  function downloadBlob(blob, name) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  }
+
+  function flash(msg) {
+    const el = $("share-info");
+    if (!el) return;
+    el.textContent = msg;
+    clearTimeout(flash._t);
+    flash._t = setTimeout(() => { el.textContent = "—"; }, 2500);
+  }
+
+  function exportCSV() {
+    const clean = currentRows();
+    if (!clean.length) return;
+    const ch = state.channel;
+    const angle = integrate(clean.map((r) => r[ch]), state.fs);
+    const filtered = kf1d(angle, state.r, state.q, angle[0], 1);
+    const lines = ["t,gx_dps,gy_dps,gz_dps,angle_deg,kf_deg"];
+    clean.forEach((r, i) => {
+      lines.push([
+        r.t.toFixed(4),
+        r.gx.toFixed(6), r.gy.toFixed(6), r.gz.toFixed(6),
+        (angle[i] - angle[0]).toFixed(6),
+        (filtered[i] - filtered[0]).toFixed(6),
+      ].join(","));
+    });
+    downloadBlob(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }), "imu_lab_export.csv");
+    flash("CSV 已导出");
+  }
+
+  function exportPNG(el, name) {
+    const svg = el && el.querySelector("svg");
+    if (!svg) return;
+    const vb = svg.viewBox.baseVal;
+    const clone = svg.cloneNode(true);
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    clone.setAttribute("width", vb.width);
+    clone.setAttribute("height", vb.height);
+    const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+    style.textContent =
+      "text{font-family:'Segoe UI','Microsoft YaHei',sans-serif}" +
+      ".grid{stroke:#e7e3d8}.axis{stroke:#1b1d22}" +
+      ".tick-label{fill:#6d685d;font-size:10px;font-family:Consolas,monospace}" +
+      ".axis-label{fill:#6d685d;font-size:11px}.legend-label{fill:#1b1d22;font-size:11px}";
+    clone.insertBefore(style, clone.firstChild);
+    const xml = new XMLSerializer().serializeToString(clone);
+    const url = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml;charset=utf-8" }));
+    const img = new Image();
+    img.onload = () => {
+      const scale = 2;
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(vb.width * scale);
+      canvas.height = Math.round(vb.height * scale);
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#fffdf8";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob((b) => downloadBlob(b, name + ".png"), "image/png");
+      flash("PNG 已导出");
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); flash("PNG 导出失败"); };
+    img.src = url;
+  }
+
+  function syncURL() {
+    const p = new URLSearchParams();
+    p.set("r", Math.log10(state.r).toFixed(2));
+    p.set("q", Math.log10(state.q).toFixed(2));
+    p.set("ch", state.channel);
+    p.set("fs", String(state.fs));
+    try {
+      history.replaceState(null, "", location.pathname + "?" + p.toString());
+    } catch (e) { /* file:// 下忽略 */ }
+  }
+
+  function loadURL() {
+    const p = new URLSearchParams(location.search);
+    if (p.has("r")) {
+      const e = parseFloat(p.get("r"));
+      if (isFinite(e)) {
+        state.r = Math.pow(10, e);
+        $("logR").value = e.toFixed(1);
+        $("r-val").textContent = state.r.toExponential(2);
+      }
+    }
+    if (p.has("q")) {
+      const e = parseFloat(p.get("q"));
+      if (isFinite(e)) {
+        state.q = Math.pow(10, e);
+        $("logQ").value = e.toFixed(1);
+        $("q-val").textContent = state.q.toExponential(2);
+      }
+    }
+    if (p.has("ch")) {
+      const ch = p.get("ch");
+      if (["gx", "gy", "gz"].includes(ch)) {
+        state.channel = ch;
+        $("channel").value = ch;
+      }
+    }
+    if (p.has("fs")) {
+      const fs = parseFloat(p.get("fs"));
+      if (isFinite(fs) && fs > 0) {
+        state.fs = fs;
+        $("fs").value = fs;
+      }
+    }
   }
 
   function debounce(fn, ms) {
@@ -416,10 +534,29 @@
       draw();
     });
 
+    $("export-csv").addEventListener("click", exportCSV);
+
+    $("share").addEventListener("click", async () => {
+      syncURL();
+      try {
+        await navigator.clipboard.writeText(location.href);
+        flash("链接已复制");
+      } catch (e) {
+        prompt("复制链接：", location.href);
+      }
+    });
+
+    document.querySelectorAll("[data-export]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        exportPNG($(btn.getAttribute("data-export")), btn.getAttribute("data-name") || "chart");
+      });
+    });
+
     window.addEventListener("resize", debounce(draw, 150));
   }
 
   function init() {
+    loadURL();
     state.rows = synth();
     bind();
     draw();

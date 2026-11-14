@@ -55,6 +55,12 @@
           <div class="hint" id="fit-info">—</div>
         </div>
 
+        <div class="field" style="display:flex;gap:8px;">
+          <button id="export-csv" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">导出 CSV</button>
+          <button id="share" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">复制链接</button>
+        </div>
+        <div class="hint" id="share-info">—</div>
+
         <div class="stats">
           <div>总帧数<b id="stat-frames">0</b></div>
           <div>坏帧<b id="stat-bad">0</b></div>
@@ -73,7 +79,10 @@
         <div class="panel">
           <div class="panel-head">
             <h2>时域</h2>
-            <span class="meta" id="meta-time">—</span>
+            <div class="panel-actions">
+              <span class="meta" id="meta-time">—</span>
+              <button class="mini" data-export="chart-time" data-name="imu-time">PNG</button>
+            </div>
           </div>
           <div class="chart" id="chart-time"></div>
         </div>
@@ -81,7 +90,10 @@
         <div class="panel">
           <div class="panel-head">
             <h2>Allan 方差</h2>
-            <span class="meta" id="meta-allan">—</span>
+            <div class="panel-actions">
+              <span class="meta" id="meta-allan">—</span>
+              <button class="mini" data-export="chart-allan" data-name="imu-allan">PNG</button>
+            </div>
           </div>
           <div class="chart" id="chart-allan"></div>
         </div>
@@ -89,7 +101,10 @@
         <div class="panel">
           <div class="panel-head">
             <h2>滤波对比</h2>
-            <span class="meta" id="meta-kf">—</span>
+            <div class="panel-actions">
+              <span class="meta" id="meta-kf">—</span>
+              <button class="mini" data-export="chart-kf" data-name="imu-kf">PNG</button>
+            </div>
           </div>
           <div class="chart" id="chart-kf"></div>
         </div>
@@ -98,7 +113,7 @@
 
     <footer>
       vibe-lab · 数据与算法在浏览器内运行 · 工程近似：R=(ARW/60)²·Δt，Q=(RRW/60)²·Δt ·
-      仅用于教学/演示，真实标定以论文流程为准。
+      仅用于教学/演示，真实标定以论文流程为准。 · <a href="control/">Control Play →</a>
     </footer>
   </div>
 

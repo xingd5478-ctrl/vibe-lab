@@ -19,7 +19,10 @@ python -m http.server 8000 --directory imu-lab/static
 - 上传 CSV：`gx_dps/gy_dps/gz_dps`，可选 `crc_ok`、`t`
 - 原始 / 清洗后时域对比，坏帧计数
 - 三轴 Allan 标准差（log-log，1-2-5 刻度）
+- **Allan 自动拟合 ARW/RRW → 一键回填 R/Q**（短 τ 取 N，长 τ 取 K，图上叠加虚线拟合段）
 - log10(R)、log10(Q) 滑杆，实时看积分角度与 KF
+- **导出 CSV**（清洗后数据 + 角度 + KF 输出）与 **单图 PNG**（2× 分辨率）
+- **分享链接**：R/Q、通道、采样率写入 URL，复制即可复现
 - 全部在浏览器内计算，离线可用
 
 ## 部署到 GitHub Pages

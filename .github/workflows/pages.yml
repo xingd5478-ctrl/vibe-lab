@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "imu-lab/static/**"
+      - "control-play/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -26,8 +27,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp -r imu-lab/static/. _site/
+          mkdir -p _site/control
+          cp -r control-play/. _site/control/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: imu-lab/static
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
