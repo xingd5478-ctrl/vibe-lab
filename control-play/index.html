@@ -165,9 +165,10 @@
     (function () {
       if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
       var root = location.pathname.replace(/(imu|control|about)\/(index\.html)?$/, "");
-      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
+      navigator.serviceWorker.register(root + "sw.js").then(function (reg) { reg.addEventListener("updatefound", function () { var w = reg.installing; if (!w) return; w.addEventListener("statechange", function () { if (w.state === "installed" && navigator.serviceWorker.controller) { var d = document.createElement("div"); d.textContent = "站点已更新，点此刷新"; d.setAttribute("role", "status"); d.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:999;background:#1b1d22;color:#fff;padding:8px 12px;border-radius:3px;font:12px Segoe UI,sans-serif;cursor:pointer"; d.addEventListener("click", function () { location.reload(); }); document.body.appendChild(d); } }); }); }).catch(function () {});
     })();
   </script>
 </body>
 </html>
+
 
