@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v1";
+const CACHE = "vibe-lab-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -42,18 +42,15 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== location.origin) return;
   if (/\.csv(\.gz)?$/.test(url.pathname)) return; // 不缓存数据文件
 
-  event.respondWith(
-    caches.match(req).then((hit) => {
-      if (hit) return hit;
-      return fetch(req)
-        .then((res) => {
-          if (res.ok) {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => caches.match("./imu/"));
-    })
-  );
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const hit = await cache.match(req);
+    const network = fetch(req)
+      .then((res) => {
+        if (res.ok) cache.put(req, res.clone());
+        return res;
+      })
+      .catch(() => hit || caches.match("./imu/"));
+    return hit || network;
+  })());
 });
