@@ -43,11 +43,26 @@ npm run visual      # 截图对比基线
 npm run visual:update  # 有意改版后更新基线
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS 拟合、Worker；E2E 验证交互与下载；视觉回归对比 `tests/baselines/`（CI 用 `tests/baselines-ci/`）。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS 拟合、Worker、列式数据层；E2E 验证交互/下载并跑 **axe-core**（WCAG 2 A/AA），要求 0 serious/critical；视觉回归对比 `tests/baselines/`（CI 用 `tests/baselines-ci/`）。
 
 ## 键盘操作
 
 图表可用 Tab 聚焦，`←/→`（或 `↑/↓`）逐点移动，`Home/End` 跳到首尾，读数通过 `aria-live` 播报。
+
+## 前端模块
+
+```
+imu-lab/static/
+├── data.js     # 列式数据层：解析/清洗掩码/统计/Allan/KF/CSV
+├── chart.js    # 图表模块：SVG plot + Canvas 大图 + hover/键盘
+├── allan.js    # Allan 方差
+├── kf.js       # R/Q 映射与 KF
+├── fit.js      # WLS 拟合 + 回归区间
+├── app.js      # 交互/状态/导出
+└── index.html
+```
+
+`data.js` 与 `chart.js` 是独立模块，可被其它页面复用；`app.js` 只负责状态与交互。
 
 ## 数据层
 

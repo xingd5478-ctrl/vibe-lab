@@ -32,12 +32,18 @@ python -m http.server 8000
 - **列名映射**：未识别时可选列；时间戳非单调会自动重建并提示
 - **分片解析 + 进度**：>4 MB 文件按 2 万行分片，避免长任务冻结；上限 100 万行
 - 实时 KF：积分角度 vs 滤波输出
-- **加载真实样例**：2 h 静态实验中的 60 s 片段（含 3 个坏帧），观察 CRC 清洗前后差异
-- **悬浮/触摸/键盘十字线读数**：指针拖动，或 Tab 聚焦后用 `←/→`、`Home/End`
+- **加载真实样例**：10 min 真实片段（论文在审，仅演示）
+- **悬浮/触摸/键盘十字线读数**：指针拖动，或 Tab 聚焦后用 `←/→`、`Home/End`（Canvas 大图同样支持）
 - **导出 CSV / 单图 PNG**（2×）
 - **分享链接**：R/Q、通道、采样率写入 URL，可复现
-- **上传校验**：缺少 `gx_dps/gy_dps/gz_dps`、超过 20 万行或 20 MB 时给出提示
+- **上传校验**：缺列/超过 100 万行/20 MB 时提示
 - 页面顶部标注「演示数据」，避免把合成数据当标定结果
+
+## 模块
+
+- `data.js`：列式解析/清洗/统计/Allan/KF/CSV；
+- `chart.js`：SVG 图 + Canvas 大图 + hover/键盘；
+- `fit.js`：WLS 拟合；`allan.js`/`kf.js`：算法；`app.js`：交互与导出。
 
 ## 数据格式
 
@@ -50,9 +56,10 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test        # 算法单测
+npm test        # 算法/数据层单测
 npm run smoke   # DOM 冒烟
-npm run visual  # 截图检查
+npm run e2e     # Edge CDP + axe 无障碍
+npm run visual  # 截图回归
 ```
 
 ## 部署

@@ -9,5 +9,8 @@
     "visual": "pwsh -NoProfile -File scripts/visual.ps1",
     "visual:update": "pwsh -NoProfile -File scripts/visual.ps1 -Update",
     "e2e": "node scripts/e2e.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "^4.14.0"
   }
 }

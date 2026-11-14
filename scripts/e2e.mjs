@@ -10,6 +10,9 @@ const EDGE = [
   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
   "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
 ].find((p) => fs.existsSync(p));
+const AXE = fs.existsSync(path.join(ROOT, "node_modules/axe-core/axe.min.js"))
+  ? fs.readFileSync(path.join(ROOT, "node_modules/axe-core/axe.min.js"), "utf8")
+  : null;
 if (!EDGE) {
   console.log("E2E SKIP: Edge not found");
   process.exit(0);
@@ -98,7 +101,20 @@ async function main() {
       return r.result.value;
     };
 
+    const audit = async (label) => {
+      if (!AXE) return;
+      await evalJs(AXE);
+      const res = await evalJs(
+        'axe.run(document,{runOnly:{type:"tag",values:["wcag2a","wcag2aa"]}})' +
+        '.then(r=>r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.slice(0,3).map(n=>n.target)})))'
+      );
+      const bad = res.filter((v) => v.impact === "serious" || v.impact === "critical");
+      console.log("A11Y", label, "violations:", res.length, "serious/critical:", bad.length);
+      if (bad.length) throw new Error(`${label} a11y: ${JSON.stringify(bad)}`);
+    };
+
     await waitFor(() => evalJs("!!document.querySelector('#chart-time svg')"));
+    await audit("imu");
     const fit = await evalJs("document.querySelector('#fit-info').textContent");
     if (!/ARW=/.test(fit) || !/R²=/.test(fit)) throw new Error("fit info missing");
     const before = await evalJs("document.querySelector('#r-val').textContent");
@@ -123,6 +139,15 @@ async function main() {
     await sleep(250);
     const meta = await evalJs("document.querySelector('#meta-step').textContent");
     if (!/Kp=3\.00/.test(meta)) throw new Error("PID slider not wired");
+    await audit("control");
+
+    await client.send("Page.navigate", { url: `${base}/landing/index.html` });
+    await sleep(1000);
+    await audit("landing");
+
+    await client.send("Page.navigate", { url: `${base}/about/index.html` });
+    await sleep(800);
+    await audit("about");
 
     client.close();
     console.log("E2E OK");
