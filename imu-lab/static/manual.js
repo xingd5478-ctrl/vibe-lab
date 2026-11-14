@@ -121,4 +121,13 @@ window.IMU_MANUAL = {
     d.appendChild(body);
     grid.appendChild(d);
   });
+  const search = document.getElementById("manual-search");
+  if (search) {
+    search.addEventListener("input", () => {
+      const q = search.value.trim().toLowerCase();
+      grid.querySelectorAll(".manual-card").forEach((card) => {
+        card.style.display = !q || card.textContent.toLowerCase().includes(q) ? "" : "none";
+      });
+    });
+  }
 })();

@@ -57,5 +57,30 @@
     return lab;
   }
 
-  root.LabKit = { metrics, toPts, slider, toggle };
+  function buttons(label, options, value, onChange) {
+    const wrap = document.createElement("div");
+    wrap.className = "lab-buttons";
+    const head = document.createElement("div");
+    head.className = "lab-ctl-head";
+    head.appendChild(document.createTextNode(label || ""));
+    wrap.appendChild(head);
+    const row = document.createElement("div");
+    row.className = "btn-row";
+    options.forEach((o) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = o.label;
+      b.setAttribute("aria-pressed", String(o.value === value));
+      b.addEventListener("click", () => {
+        row.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false"));
+        b.setAttribute("aria-pressed", "true");
+        onChange(o.value);
+      });
+      row.appendChild(b);
+    });
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  root.LabKit = { metrics, toPts, slider, toggle, buttons };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -31,6 +31,7 @@
     const l = lessonById[id];
     if (!l) { $("links").innerHTML = ""; return; }
     $("links").innerHTML =
+      `<a href="course.html?id=${l.id}">本课讲义 →</a>` +
       `<a href="${REPO}/blob/main/${l.file}" target="_blank" rel="noreferrer">第 ${l.n} 课 · ${l.file}</a>` +
       `<a href="models/${l.model}" download>下载 ${l.model}（本站）</a>` +
       `<a href="${REPO}" target="_blank" rel="noreferrer">教程仓库</a>`;
@@ -1144,6 +1145,10 @@
         return;
       }
       if (d.type === "buttons") {
+        if (window.LabKit && window.LabKit.buttons) {
+          box.appendChild(window.LabKit.buttons(d.label, d.options, d.value, (v) => { d.value = v; onChange(); }));
+          return;
+        }
         const div = document.createElement("div");
         div.className = "ctl buttons";
         const head = document.createElement("div");
