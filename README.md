@@ -49,7 +49,16 @@ npm run visual:update  # 有意改版后更新基线
 
 图表可用 Tab 聚焦，`←/→`（或 `↑/↓`）逐点移动，`Home/End` 跳到首尾，读数通过 `aria-live` 播报。
 
-## 大文件路径
+## 数据层
+
+`imu-lab/static/data.js` 是列式核心（Float32Array/typed arrays）：
+
+- `parseText / parseWithMapping`：表头识别、别名、列映射；
+- `fromRows / toRows`：与现有 UI 的行对象互转；
+- `cleanMask / stats`：按 CRC 与物理阈值生成掩码、统计；
+- `allan / kf / csv`：Allan、KF、导出复用同一份列式数据。
+
+小文件路径已切到该层（统计/Allan/CSV）；大文件仍走 Worker/Canvas 分支，后续把解析与 KF 也迁入 Worker。
 
 - ≤100k 帧：全部 SVG 渲染；
 - >100k 帧：时域图改 Canvas（逐像素 min/max），>150k 帧时 Allan 交给 `allan-worker.js`，主线程不阻塞；
