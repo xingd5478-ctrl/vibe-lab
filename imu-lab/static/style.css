@@ -243,6 +243,22 @@ footer {
 
 footer a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 
+.manual { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); }
+.manual-head h2 { margin: 0 0 4px; font-size: 16px; }
+.manual-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin-top: 12px; }
+.manual-card { border: 1px solid var(--line); background: var(--panel); border-radius: 3px; padding: 8px 10px; }
+.manual-card summary { cursor: pointer; font-size: 13px; font-weight: 600; }
+.manual-body { margin-top: 8px; }
+.manual-hook { margin: 6px 0; padding: 6px 9px; border-left: 3px solid var(--accent); background: #eef2f6; font-size: 12.5px; }
+.manual-concepts { display: grid; gap: 6px; margin: 6px 0; }
+.manual-concept { border: 1px solid var(--line); background: #fff; padding: 6px 8px; font-size: 12px; }
+.manual-concept b { display: block; margin-bottom: 2px; }
+.manual-formula { font: 12px/1.6 var(--mono); background: #ece8dd; padding: 6px 8px; border-radius: 2px; margin: 6px 0; }
+.manual-steps { margin: 4px 0 0 16px; padding: 0; font-size: 12px; }
+.manual-steps li { margin: 2px 0; }
+.manual-pitfall { margin: 6px 0; border-left: 3px solid #b5651d; background: #fbf3ea; padding: 6px 8px; font-size: 12px; }
+.manual-anchor { font-size: 12px; }
+
 @media (max-width: 880px) {
   .layout { grid-template-columns: 1fr; }
   .controls { position: static; }

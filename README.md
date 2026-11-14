@@ -86,6 +86,12 @@ imu-lab/static/
 
 **模型下载**：43 个 `.slx` 已托管在 `simulink/models/`（约 3.8 MB，MIT，见 `NOTICE.md`），每课讲义页提供同源 `download` 链接，`npm run smoke/e2e` 会校验下载文件是 zip。更新模型用 `node scripts/vendor_models.mjs`。
 
+## 三个工具
+
+- **IMU 数据实验室**（`/imu/`）：CSV → CRC 清洗 → Allan → ARW/RRW → R/Q → KF，附 **10 章实验手册**；
+- **Control Play**（`/control/`）：Bode、阶跃、PID、状态空间/观测器/离散化讲解，附 **10 章实验手册**；
+- **Simulink 教程**（`/simulink/`）：43 课讲义 + 19 个交互实验 + 43 个 `.slx` 下载。
+
 ## 数据层
 
 `imu-lab/static/data.js` 是列式核心（Float32Array/typed arrays）：

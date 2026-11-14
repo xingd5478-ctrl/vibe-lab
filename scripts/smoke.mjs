@@ -78,6 +78,7 @@ async function main() {
       if (!(await e("document.body.textContent")).includes("仅作演示")) throw new Error("imu: disclosure missing");
       if (!(await e("!!document.querySelector('#load-real')"))) throw new Error("imu: sample button missing");
       if (!(await e("!!document.querySelector('#export-report')"))) throw new Error("imu: report missing");
+      if ((await e("document.querySelectorAll('#manual .manual-card').length")) !== 10) throw new Error("imu: manual chapters");
       if ((await e("document.querySelectorAll('[tabindex=\"0\"]').length")) < 1) throw new Error("imu: no keyboard focus");
     });
 
@@ -85,6 +86,7 @@ async function main() {
       await waitFor(() => e("!!document.querySelector('#bode svg')"));
       if (!/Kp=3\.00/.test(await e("document.querySelector('#meta-step').textContent"))) throw new Error("control: PID URL");
       if (!(await e("!!document.querySelector('#step svg')"))) throw new Error("control: step chart");
+      if ((await e("document.querySelectorAll('#manual .manual-card').length")) !== 10) throw new Error("control: manual chapters");
     });
 
     await check("landing", fileUrl("landing/index.html"), async (e) => {
