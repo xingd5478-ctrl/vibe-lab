@@ -1,8 +1,11 @@
-# Visual check: screenshot key pages (incl. mobile width) and verify they are non-blank.
+# Visual check / regression: screenshot key pages (desktop + narrow) and compare with baselines.
+param([switch]$Update)
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $out = Join-Path $root "artifacts\visual"
+$baseline = Join-Path $root "tests\baselines"
 New-Item -ItemType Directory -Force $out | Out-Null
+New-Item -ItemType Directory -Force $baseline | Out-Null
 $edge = @(
   "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
   "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
@@ -31,5 +34,14 @@ Shot $about "about" "1200,1600"
 Shot $imu "imu-narrow" "520,900"
 
 & "D:\Anaconda\python.exe" (Join-Path $PSScriptRoot "check_png.py") $out
-if ($LASTEXITCODE -ne 0) { throw "visual check failed" }
+if ($LASTEXITCODE -ne 0) { throw "blank/small screenshot" }
+
+if ($Update) {
+  Copy-Item (Join-Path $out "*.png") $baseline -Force
+  Write-Output "BASELINES UPDATED"
+  exit 0
+}
+
+& "D:\Anaconda\python.exe" (Join-Path $PSScriptRoot "compare_png.py") $baseline $out 0.003
+if ($LASTEXITCODE -ne 0) { throw "visual regression" }
 Write-Output "VISUAL OK"

@@ -20,6 +20,7 @@
     <p><strong>ARW / RRW 拟合。</strong>短 τ 段取 <code>N = median(σ√τ)</code>，长 τ 段取 <code>K = median(σ/√(τ/3))</code>；再用双项模型 σ=√(N²/τ + K²τ/3) 在 log 空间计算 R²，并用分位数给出 95% 区间。这是工程近似，不是最大似然拟合。</p>
     <p><strong>R/Q 映射。</strong>采用 <code>R=(ARW/60)²·Δt</code>、<code>Q=(RRW/60)²·Δt</code>；R/Q 与采样率无关。卡尔曼滤波是一维随机游走模型，只用于演示“Q 大更抖、Q 小更平滑”的定性关系。</p>
     <p><strong>数据来源。</strong>默认加载 60 s 合成数据；点“加载真实样例”会读取 2 h 静态实验中含 3 个坏帧的 60 s 片段（<code>sample_real_60s.csv</code>），用来观察 CRC 清洗前后的差异。</p>
+    <p><strong>键盘操作。</strong>图表可用 Tab 聚焦，`←/→` 或 `↑/↓` 逐点移动，`Home/End` 跳到首尾；当前读数通过屏幕阅读器播报。</p>
     <div class="note">示例数据是 60 s 合成数据，只能跑通流程；RRW 在短数据上区间很宽（0.63–2.05），真实标定请用 ≥2 h 静态数据。</div>
 
     <h2>2. Control Play</h2>

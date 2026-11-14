@@ -202,10 +202,8 @@
       return best;
     };
 
-    const onMove = (ev) => {
-      const rect = svg.getBoundingClientRect();
-      const frac = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
-      const xv = meta.xInv(frac);
+    const live = document.getElementById("chart-live");
+    const showAt = (xv) => {
       const first = nearest(meta.series[0].points, xv);
       const px = meta.X(first[0]);
       line.setAttribute("x1", px);
@@ -223,14 +221,37 @@
       tip.style.left = `${(px / meta.w) * 100}%`;
       tip.style.top = `${Math.max(8, (Number(dot.getAttribute("cy")) / meta.h) * 100 - 4)}%`;
       tip.style.opacity = "1";
+      if (live) live.textContent = text;
+    };
+    const hide = () => {
+      tip.style.opacity = "0";
+      line.setAttribute("opacity", "0");
+      dot.setAttribute("opacity", "0");
+    };
+    const onMove = (ev) => {
+      const rect = svg.getBoundingClientRect();
+      const frac = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
+      showAt(meta.xInv(frac));
+    };
+
+    svg.setAttribute("tabindex", "0");
+    let idx = 0;
+    const showIdx = (i) => {
+      const pts = meta.series[0].points;
+      idx = Math.max(0, Math.min(pts.length - 1, i));
+      showAt(pts[idx][0]);
     };
 
     svg.addEventListener("pointermove", onMove);
     svg.addEventListener("pointerdown", onMove);
-    svg.addEventListener("pointerleave", () => {
-      tip.style.opacity = "0";
-      line.setAttribute("opacity", "0");
-      dot.setAttribute("opacity", "0");
+    svg.addEventListener("pointerleave", hide);
+    svg.addEventListener("focus", () => showIdx(idx));
+    svg.addEventListener("blur", hide);
+    svg.addEventListener("keydown", (ev) => {
+      if (ev.key === "ArrowRight" || ev.key === "ArrowUp") { showIdx(idx + 1); ev.preventDefault(); }
+      else if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") { showIdx(idx - 1); ev.preventDefault(); }
+      else if (ev.key === "Home") { showIdx(0); ev.preventDefault(); }
+      else if (ev.key === "End") { showIdx(meta.series[0].points.length - 1); ev.preventDefault(); }
     });
   }
 
@@ -314,7 +335,7 @@
 
     svg += "</svg>";
     el.innerHTML = svg;
-    attachHover(el, { w, h, pad, series, X, Y, xInv, xLabel: cfg.xLabel || "x" });
+    attachHover(el, { w, h, pad, series, X, Y, xInv, xLabel: cfg.xLabel || "x", aria: cfg.aria || "" });
   }
 
   /* ---------- 主流程 ---------- */

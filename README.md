@@ -36,12 +36,17 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test        # 算法单测（8 个）
-npm run smoke   # Edge headless DOM 冒烟（四页渲染 + 拟合 + PID URL）
-npm run visual  # 截图检查（桌面 + 窄屏，非空白/尺寸校验）
+npm test            # 算法单测（8 个）
+npm run smoke       # Edge headless DOM 冒烟（四页渲染 + 拟合 + PID URL + 键盘可聚焦）
+npm run visual      # 截图对比基线（桌面 + 窄屏，差异 >0.3% 失败）
+npm run visual:update  # 有意改版后更新基线
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、拟合恢复 ARW/RRW 与 R²；冒烟测试检查页面 SVG、拟合信息、PID 参数与 Bode 轴；视觉检查输出到 `artifacts/visual/`。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、拟合恢复 ARW/RRW 与 R²；冒烟测试检查页面 SVG、拟合信息、PID 参数、Bode 轴与键盘焦点；视觉回归对比 `tests/baselines/`，截图输出到 `artifacts/visual/`。
+
+## 键盘操作
+
+图表可用 Tab 聚焦，`←/→`（或 `↑/↓`）逐点移动，`Home/End` 跳到首尾，读数通过 `aria-live` 播报。
 
 ## 线上结构
 
