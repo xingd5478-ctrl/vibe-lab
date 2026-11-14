@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v11";
+const CACHE = "vibe-lab-v12";
 const ASSETS = [
   "./",
   "./index.html",
@@ -43,9 +43,18 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(ASSETS);
+    try {
+      const res = await fetch("simulink/course-src/manifest.json");
+      if (res.ok) {
+        const files = await res.json();
+        await cache.addAll(files.map((f) => "simulink/course-src/" + f));
+      }
+    } catch (e) { /* 课程清单不可用时仍可安装 */ }
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener("activate", (event) => {

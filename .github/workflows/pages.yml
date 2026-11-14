@@ -47,6 +47,12 @@ jobs:
           if [ -d "$RUNNER_TEMP/simtut" ]; then
             cp "$RUNNER_TEMP"/simtut/t*.m _site/simulink/course-src/ 2>/dev/null || true
             cp "$RUNNER_TEMP"/simtut/docs/images/*.png _site/simulink/course-img/ 2>/dev/null || true
+            python3 - <<'PY'
+import json, os
+d = "_site/simulink/course-src"
+files = sorted(f for f in os.listdir(d) if f.endswith(".m"))
+json.dump(files, open(os.path.join(d, "manifest.json"), "w"))
+PY
           fi
           cp -r about/. _site/about/
           cp LICENSE _site/LICENSE
