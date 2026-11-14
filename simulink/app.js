@@ -140,6 +140,81 @@
       },
     },
 
+    kalman: {
+      title: "t12 · Kalman 滤波",
+      lesson: "t12",
+      note: "预测 P←P+Q，更新 K=P/(P+R)。R 是传感器噪声，Q 是模型噪声；调大 R 更信模型，调大 Q 更信测量。",
+      diagram: {
+        aria: "卡尔曼滤波：测量 z 与模型预测融合",
+        blocks: [{ label: "真值 1" }, { label: "测量 z", sub: "+噪声" }, { label: "Kalman", sub: "K=P/(P+R)" }, { label: "Scope" }],
+      },
+      params: [
+        { id: "R", label: "测量噪声 R", min: 0.01, max: 1, step: 0.01, value: 0.1 },
+        { id: "Q", label: "过程噪声 Q", min: 0.001, max: 0.1, step: 0.001, value: 0.005 },
+      ],
+      render(p) {
+        const r = S.kalmanDemo(p.R, p.Q);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "真值 / 测量 / 估计",
+          yMin: 0.4, yMax: 1.6,
+          aria: `卡尔曼估计，R=${p.R}，Q=${p.Q}`,
+          series: [
+            { name: "测量 z", color: "#d3ccba", width: 1.0, points: toPts(r.t, r.z) },
+            { name: "估计 x̂", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.x) },
+          ],
+        });
+        const e1 = new Float64Array(r.t.length), e2 = new Float64Array(r.t.length);
+        for (let i = 0; i < r.t.length; i++) { e1[i] = r.z[i] - 1; e2[i] = r.x[i] - 1; }
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "误差",
+          aria: "测量误差与滤波误差",
+          series: [
+            { name: "测量误差", color: "#b9b3a5", width: 1.0, points: toPts(r.t, e1) },
+            { name: "滤波误差", color: "#2f6b4f", width: 1.4, points: toPts(r.t, e2) },
+          ],
+        });
+        metrics([
+          ["测量 RMSE", r.rmseMeas.toFixed(4)],
+          ["滤波 RMSE", r.rmseKf.toFixed(4)],
+          ["R / Q", `${p.R.toFixed(2)} / ${p.Q.toFixed(3)}`],
+        ]);
+      },
+    },
+
+    bode: {
+      title: "t16 · 频域 Bode",
+      lesson: "t16",
+      note: "幅频看不同频率被放大/衰减多少（dB），相频看滞后。ζ 小会出现谐振峰；−3 dB 点近似带宽。",
+      diagram: {
+        aria: "频域分析：正弦扫频经系统到 Bode",
+        blocks: [{ label: "Sine Sweep" }, { label: "G(s)" }, { label: "Bode" }],
+      },
+      params: [
+        { id: "wn", label: "固有频率 ωn (rad/s)", min: 1, max: 15, step: 0.5, value: 5 },
+        { id: "zeta", label: "阻尼比 ζ", min: 0.05, max: 1.2, step: 0.05, value: 0.3 },
+      ],
+      render(p) {
+        const b = S.bodeDemo(p.wn, p.zeta);
+        plot($("chart-a"), {
+          height: 250, logX: true, xLabel: "ω (rad/s)", yLabel: "幅值 (dB)",
+          aria: `二阶系统 Bode 幅频，ωn=${p.wn}，ζ=${p.zeta}`,
+          series: [{ name: "|G|", color: "#1f4e79", width: 1.8, points: b.w.map((w, i) => [w, b.mag[i]]) }],
+        });
+        plot($("chart-b"), {
+          height: 250, logX: true, xLabel: "ω (rad/s)", yLabel: "相位 (°)",
+          yMin: -190, yMax: 5,
+          aria: "二阶系统 Bode 相频",
+          series: [{ name: "∠G", color: "#8a4a12", width: 1.6, points: b.w.map((w, i) => [w, b.phase[i]]) }],
+        });
+        metrics([
+          ["谐振峰值", b.peak.toFixed(2) + " dB"],
+          ["−3 dB 带宽", b.bw.toFixed(2) + " rad/s"],
+          ["ωn 处相位", b.phaseAtWn.toFixed(1) + "°"],
+          ["ζ", p.zeta.toFixed(2)],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",
@@ -328,7 +403,8 @@
     const a = Math.abs(v);
     if (a >= 10) return v.toFixed(0);
     if (a >= 1) return v.toFixed(1);
-    return v.toFixed(2);
+    if (a >= 0.01) return v.toFixed(2);
+    return v.toFixed(3);
   }
 
   function buildControls(params, onChange) {

@@ -18,7 +18,7 @@ window.SIMULINK_LESSONS = {
     {
       id: 2, title: "Phase 2 · 经典控制设计", range: "t16, t17, t22",
       items: [
-        { id: "t16", n: 16, title: "频域分析", desc: "Bode/Nyquist、增益/相位裕度", file: "t16_freq_domain.m", model: "tutorial16_freq.slx" },
+        { id: "t16", n: 16, title: "频域分析", desc: "Bode/Nyquist、增益/相位裕度", file: "t16_freq_domain.m", model: "tutorial16_freq.slx", demo: "bode" },
         { id: "t17", n: 17, title: "超前-滞后校正", desc: "Lead/Lag 补偿器、频率整形", file: "t17_lead_lag.m", model: "tutorial17_leadlag.slx" },
         { id: "t22", n: 22, title: "根轨迹法", desc: "rlocus、极点走向、补偿器", file: "t22_root_locus.m", model: "tutorial22_root_locus.slx" },
       ],
@@ -29,7 +29,7 @@ window.SIMULINK_LESSONS = {
         { id: "t09", n: 9, title: "状态空间模型", desc: "ẋ=Ax+Bu, y=Cx+Du", file: "t09_state_space.m", model: "tutorial09_state_space.slx" },
         { id: "t10", n: 10, title: "状态反馈 / LQR", desc: "极点配置、Riccati、Q/R 调参", file: "t10_state_feedback.m", model: "tutorial10_state_feedback.slx", demo: "state-feedback" },
         { id: "t11", n: 11, title: "状态观测器", desc: "Luenberger、(A-LC)、对偶性", file: "t11_observer.m", model: "tutorial11_observer.slx", demo: "observer" },
-        { id: "t12", n: 12, title: "Kalman 滤波", desc: "lqe()、Q/R 噪声建模", file: "t12_kalman_filter.m", model: "tutorial12_kalman.slx" },
+        { id: "t12", n: 12, title: "Kalman 滤波", desc: "lqe()、Q/R 噪声建模", file: "t12_kalman_filter.m", model: "tutorial12_kalman.slx", demo: "kalman" },
       ],
     },
     {

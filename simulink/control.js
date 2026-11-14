@@ -162,7 +162,48 @@
     return { t, y, u };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, metrics, poles };
+  function kalmanDemo(R, Q) {
+    const dt = 0.05, T = 10, n = Math.round(T / dt);
+    const t = new Float64Array(n), z = new Float64Array(n), x = new Float64Array(n);
+    const r = rng(23);
+    let est = 0, P = 1;
+    let sm = 0, sk = 0;
+    for (let i = 0; i < n; i++) {
+      t[i] = i * dt;
+      const truth = 1;
+      z[i] = truth + gauss(r) * 0.15;
+      P += Q;
+      const K = P / (P + R);
+      est += K * (z[i] - est);
+      P *= 1 - K;
+      x[i] = est;
+      sm += Math.pow(z[i] - truth, 2);
+      sk += Math.pow(x[i] - truth, 2);
+    }
+    return { t, z, x, rmseMeas: Math.sqrt(sm / n), rmseKf: Math.sqrt(sk / n) };
+  }
+
+  function bodeDemo(wn, zeta) {
+    const w = [], mag = [], phase = [];
+    for (let e = -1; e <= 2.001; e += 0.02) {
+      const wi = Math.pow(10, e);
+      const re = wn * wn - wi * wi;
+      const im = 2 * zeta * wn * wi;
+      w.push(wi);
+      mag.push(20 * Math.log10((wn * wn) / Math.hypot(re, im)));
+      phase.push((Math.atan2(-im, re) * 180) / Math.PI);
+    }
+    let peak = -Infinity;
+    for (const m of mag) if (m > peak) peak = m;
+    let bw = w[w.length - 1];
+    for (let i = 0; i < mag.length; i++) {
+      if (mag[i] <= -3) { bw = w[i]; break; }
+    }
+    const iw = w.findIndex((v) => v >= wn);
+    return { w, mag, phase, peak, bw, phaseAtWn: phase[iw < 0 ? phase.length - 1 : iw] };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

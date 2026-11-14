@@ -70,3 +70,16 @@ test("PID with integral removes steady-state error", () => {
   assert.ok(essPI < 0.02, `ess=${essPI}`);
   assert.ok(essPI < essP, `PI ${essPI} should beat P ${essP}`);
 });
+
+test("Kalman reduces measurement noise RMSE", () => {
+  const r = S.kalmanDemo(0.1, 0.005);
+  assert.ok(r.rmseKf < r.rmseMeas * 0.7, `kf=${r.rmseKf} meas=${r.rmseMeas}`);
+});
+
+test("Bode phase at wn is -90 and resonance grows as zeta drops", () => {
+  const low = S.bodeDemo(5, 0.3);
+  assert.ok(Math.abs(low.phaseAtWn + 90) < 3, `phase=${low.phaseAtWn}`);
+  assert.ok(low.peak > 3, `peak=${low.peak}`);
+  const high = S.bodeDemo(5, 0.7);
+  assert.ok(high.peak < low.peak, "higher damping should reduce resonance");
+});
