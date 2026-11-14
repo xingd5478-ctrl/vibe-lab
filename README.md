@@ -110,6 +110,10 @@ imu-lab/static/
 
 `?lang=en` 或 `localStorage("vibe-lang")` 启用 `shared/i18n.js`：翻译导航、控件标签、图表轴/图例、指标名与 43 课标题；讲义正文与部分长提示仍为中文，页面顶部有明确提示。英文首页 `/en/`、英文方法页 `/about/en.html`；中文页面顶部自动出现 EN/中文切换。`npm run e2e` 会验证英文 UI 与 axe。
 
+## 产品化
+
+已加反馈页（`/feedback.html` + GitHub Issue 模板）、404、WebSite JSON-LD、hreflang/Sitemap、PWA 预缓存。自定义域名与统计需要站外账号/DNS，步骤见 [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md)；真机/读屏验收也在该文件里列出。
+
 ## 数据层
 
 `imu-lab/static/data.js` 是列式核心（Float32Array/typed arrays）：
