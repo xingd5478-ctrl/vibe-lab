@@ -742,7 +742,7 @@
     const r = rng(61);
     let th = 0.3, om = 0, e1 = 0.5, e2 = 0;
     let P00 = 1, P01 = 0, P10 = 0, P11 = 1;
-    const Q = 1e-4;
+    const Q = 1e-2;
     for (let k = 0; k < n; k++) {
       t[k] = k * dt;
       const u = Math.max(-20, Math.min(20, -25 * th - 8 * om));
@@ -800,9 +800,12 @@
     return { ia, ib, ic, id, iq, ang, A, B, C };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, mracDemo, msdCompareDemo, suspensionDemo, ekfDemo, metrics, poles };
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, mracDemo, msdCompareDemo, suspensionDemo, ekfDemo, pendulumEkfDemo, focDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);
+
+
+
 
 
