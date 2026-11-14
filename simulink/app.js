@@ -611,6 +611,69 @@
       },
     },
 
+    motor: {
+      title: "t13 · DC 电机",
+      lesson: "t13",
+      note: "电压→电流→转矩→转速：电气时间常数 ~0.5s、机械 ~0.1s。速度 PI 调 Kp/Ki；负载加大后靠积分拉回。",
+      diagram: {
+        aria: "直流电机：电压经电气与机械动态到转速",
+        blocks: [{ label: "电压 u" }, { label: "电气 L/R", sub: "电流环" }, { label: "机械 J/b", sub: "转速" }, { label: "Scope" }],
+      },
+      params: [
+        { id: "kp", label: "速度环 Kp", min: 0.05, max: 2, step: 0.05, value: 0.5 },
+        { id: "ki", label: "速度环 Ki", min: 0, max: 10, step: 0.1, value: 2 },
+        { id: "load", label: "负载转矩", min: 0, max: 1, step: 0.05, value: 0.1 },
+      ],
+      render(p) {
+        const r = S.motorDemo(p.kp, p.ki, p.load);
+        const m = S.metrics(r.t, r.w, 50);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "转速 (rad/s)", yMin: 0, yMax: 60,
+          aria: "直流电机转速",
+          series: [{ name: "转速", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.w) }],
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "电流 (A)",
+          aria: "直流电机电流",
+          series: [{ name: "电流", color: "#8a4a12", width: 1.2, points: toPts(r.t, r.cur) }],
+        });
+        metrics([
+          ["超调", f2(m.overshoot) + "%"],
+          ["调节时间", f2(m.settle) + "s"],
+          ["稳态误差", m.ess.toFixed(2)],
+          ["负载", p.load.toFixed(2)],
+        ]);
+      },
+    },
+
+    triggered: {
+      title: "t37 · 触发子系统",
+      lesson: "t37",
+      note: "输入 1Hz 正弦；子系统只在触发沿执行一次，输出保持到下一次触发。改触发频率看阶梯疏密。",
+      diagram: {
+        aria: "触发子系统：正弦经触发采样保持输出",
+        blocks: [{ label: "Sine 1Hz" }, { label: "Triggered", sub: "rising" }, { label: "Hold/Scope" }],
+      },
+      params: [{ id: "fs", label: "触发频率 (Hz)", min: 2, max: 50, step: 1, value: 20 }],
+      render(p) {
+        const r = S.triggeredDemo(p.fs);
+        plot($("chart-a"), {
+          height: 260, xLabel: "时间 (s)", yLabel: "幅值", yMin: -1.3, yMax: 1.3,
+          aria: "触发采样保持",
+          series: [
+            { name: "连续输入", color: "#b9b3a5", width: 1.4, points: toPts(r.t, r.y) },
+            { name: "保持输出", color: "#1f4e79", width: 2.0, points: r.ts.map((t, i) => [t, r.z[i]]) },
+          ],
+        });
+        $("chart-b").innerHTML = "";
+        metrics([
+          ["采样次数", String(r.samples)],
+          ["保持周期", (1000 / p.fs).toFixed(0) + " ms"],
+          ["触发频率", p.fs + " Hz"],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",

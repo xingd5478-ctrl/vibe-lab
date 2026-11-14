@@ -497,7 +497,48 @@
     return { t, yc, yd, samples: Math.max(1, Math.round(T / Ts)) };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, metrics, poles };
+  /* DC 电机：速度 PI + 电气/机械动态 */
+  function motorDemo(kp, ki, load) {
+    const R = 1, L = 0.5, J = 0.01, b = 0.1, Kt = 0.1, Ke = 0.1;
+    const dt = 0.001, T = 4, n = Math.round(T / dt);
+    const t = new Float64Array(n), w = new Float64Array(n), cur = new Float64Array(n);
+    let i = 0, omega = 0, I = 0;
+    for (let k = 0; k < n; k++) {
+      t[k] = k * dt;
+      const ref = t[k] >= 0.2 ? 50 : 0;
+      const e = ref - omega;
+      I = Math.max(-100, Math.min(100, I + e * dt));
+      const u = Math.max(-100, Math.min(100, kp * e + ki * I));
+      i += ((u - R * i - Ke * omega) / L) * dt;
+      omega += ((Kt * i - b * omega - load) / J) * dt;
+      w[k] = omega;
+      cur[k] = i;
+    }
+    return { t, w, cur };
+  }
+
+  /* 触发子系统：采样保持 */
+  function triggeredDemo(fs) {
+    const dt = 0.001, T = 3, n = Math.round(T / dt);
+    const t = new Float64Array(n), y = new Float64Array(n);
+    const ts = [], z = [];
+    let hold = 0, next = 0;
+    for (let k = 0; k < n; k++) {
+      t[k] = k * dt;
+      y[k] = Math.sin(2 * Math.PI * t[k]);
+      if (t[k] >= next - 1e-9) {
+        hold = y[k];
+        next += 1 / fs;
+        ts.push(t[k]);
+        z.push(hold);
+      }
+    }
+    return { t, y, ts, z, samples: z.length };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);
+
+

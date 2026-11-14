@@ -200,3 +200,20 @@ test("root locus exposes K=20..50 segment", () => {
   r.highlight.forEach((br) => br.forEach(([, im]) => { if (Math.abs(im) > maxIm) maxIm = Math.abs(im); }));
   assert.ok(maxIm > 2, `maxIm=${maxIm}`);
 });
+
+test("DC motor tracks 50 rad/s under load", () => {
+  const r = S.motorDemo(0.5, 2, 0.1);
+  assert.ok(Math.abs(r.w[r.w.length - 1] - 50) < 2, `final=${r.w[r.w.length - 1]}`);
+  const heavy = S.motorDemo(0.5, 2, 0.8);
+  assert.ok(Math.abs(heavy.w[heavy.w.length - 1] - 50) < 2);
+});
+
+test("triggered subsystem holds samples", () => {
+  const r = S.triggeredDemo(20);
+  assert.equal(r.samples, 60);
+  assert.equal(r.z.length, 60);
+  for (let i = 1; i < r.z.length; i++) {
+    const dt = r.ts[i] - r.ts[i - 1];
+    assert.ok(Math.abs(dt - 0.05) < 1e-6);
+  }
+});

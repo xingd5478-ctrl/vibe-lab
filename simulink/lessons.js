@@ -50,7 +50,7 @@ window.SIMULINK_LESSONS = {
     {
       id: 5, title: "Phase 5 · 机电系统与部署", range: "t13–t15, t25",
       items: [
-        { id: "t13", n: 13, title: "DC 电机控制", desc: "电磁+机械耦合、级联 PI", file: "t13_dc_motor.m", model: "tutorial13_dc_motor.slx" },
+        { id: "t13", n: 13, title: "DC 电机控制", desc: "电磁+机械耦合、级联 PI", file: "t13_dc_motor.m", model: "tutorial13_dc_motor.slx", demo: "motor" },
         { id: "t14", n: 14, title: "PMSM + FOC", desc: "Clarke/Park、d-q 解耦", file: "t14_foc_pmsm.m", model: "tutorial14_foc.slx" },
         { id: "t25", n: 25, title: "Simscape 物理建模", desc: "多域耦合、自动推导", file: "t25_simscape.m", model: "tutorial25_simscape.slx" },
         { id: "t15", n: 15, title: "代码生成", desc: "c2d、dlqr、C 代码、FreeRTOS", file: "t15_code_generation.m", model: "tutorial15_codegen.slx" },
@@ -80,7 +80,7 @@ window.SIMULINK_LESSONS = {
       id: 8, title: "Phase 8 · Simulink 进阶", range: "t36–t43",
       items: [
         { id: "t36", n: 36, title: "Stateflow 状态机", desc: "状态/转移/条件动作", file: "t36_stateflow_basics.m", model: "tutorial36_stateflow.slx", demo: "stateflow" },
-        { id: "t37", n: 37, title: "触发/使能子系统", desc: "条件执行、采样保持", file: "t37_triggered_subsystem.m", model: "tutorial37_triggered.slx" },
+        { id: "t37", n: 37, title: "触发/使能子系统", desc: "条件执行、采样保持", file: "t37_triggered_subsystem.m", model: "tutorial37_triggered.slx", demo: "triggered" },
         { id: "t38", n: 38, title: "Bus 信号", desc: "打包拆解、按名提取", file: "t38_bus_signals.m", model: "tutorial38_bus.slx", demo: "bus" },
         { id: "t39", n: 39, title: "模型引用", desc: "Model block 子模型复用", file: "t39_model_referencing.m", model: "tutorial39_top.slx" },
         { id: "t40", n: 40, title: "变体子系统", desc: "一套模型多套方案", file: "t40_variant_subsystem.m", model: "tutorial40_variant.slx", demo: "variant" },
