@@ -101,8 +101,17 @@ async function main() {
       if (!(await e("!!document.querySelector('#lab-sf-a svg')"))) throw new Error("control: state feedback lab chart");
       if ((await e("document.querySelectorAll('#lab-rl-a svg circle').length")) < 3) throw new Error("control: root locus pole markers");
       const cy0 = await e("[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')");
-      await e("(() => { const i = document.querySelector('#lab-rl input[type=range]'); i.value = '10'; i.dispatchEvent(new Event('input', { bubbles: true })); })()");
-      await waitFor(async () => (await e("[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')")) !== cy0);
+      const setK = async (v) => {
+        await e(`(() => { const i = document.querySelector('#lab-rl input[type=range]'); i.value = '${v}'; i.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+        await waitFor(async () => (await e("document.querySelector('#lab-rl .lab-metrics').textContent")).length > 0);
+      };
+      await setK(50);
+      await waitFor(async () => (await e("document.querySelector('#lab-rl .lab-metrics').textContent")).includes("不稳定"));
+      const cy50 = await e("[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')");
+      await setK(1);
+      await waitFor(async () => !(await e("document.querySelector('#lab-rl .lab-metrics').textContent")).includes("不稳定"));
+      const cy1 = await e("[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')");
+      if (cy1 === cy50) throw new Error("control: root locus poles did not move with K");
     });
 
     await check("landing", fileUrl("landing/index.html"), async (e) => {
