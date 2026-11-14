@@ -114,6 +114,7 @@
   <script src="chart.js"></script>
   <script src="app.js"></script>
   <script src="../simulink/control.js"></script>
+  <script src="../simulink/lab-kit.js"></script>
   <script src="labs.js"></script>
   <script src="manual.js"></script>
   <script>
@@ -151,7 +152,8 @@
         }
         window.dispatchEvent(new Event("resize"));
       }
-      const h = location.hash.replace(/^#/, "");
+      const h = (location.hash.replace(/^#/, "").split("&")[0]) ||
+        new URLSearchParams(location.search).get("tab") || "";
       show(panels.some((p) => p.id === h) ? h : "lab", false);
     })();
   </script>

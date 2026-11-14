@@ -28,12 +28,15 @@ function Shot([string]$url, [string]$name, [string]$size) {
 $landing = ([uri](Join-Path $root "landing\index.html")).AbsoluteUri
 $imu = ([uri](Join-Path $root "imu-lab\static\index.html")).AbsoluteUri
 $control = ([uri](Join-Path $root "control-play\index.html")).AbsoluteUri + "?kp=3&ki=1&kd=0.1"
+$controlIndex = ([uri](Join-Path $root "control-play\index.html")).AbsoluteUri
 $about = ([uri](Join-Path $root "about\index.html")).AbsoluteUri
 $sim = ([uri](Join-Path $root "simulink\index.html")).AbsoluteUri
 
 Shot $landing "landing" "1400,1000"
 Shot $imu "imu" "1400,1400"
 Shot $control "control" "1400,1200"
+Shot ($controlIndex + "#labs&K=1") "control-k1" "1400,1400"
+Shot ($controlIndex + "#labs&K=50") "control-k50" "1400,1400"
 Shot $about "about" "1200,1600"
 Shot $sim "simulink" "1400,1400"
 Shot $imu "imu-narrow" "520,900"

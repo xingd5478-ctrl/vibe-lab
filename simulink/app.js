@@ -21,6 +21,7 @@
   const f2 = (v) => (Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2));
 
   function metrics(list) {
+    if (window.LabKit) return window.LabKit.metrics($("metrics"), list);
     $("metrics").innerHTML = list
       .map(([k, v]) => `<div class="metric"><span>${k}</span><b>${v}</b></div>`)
       .join("");

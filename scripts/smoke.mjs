@@ -56,10 +56,13 @@ async function main() {
     await waitFor(async () => (await fetch(`http://127.0.0.1:${port}/json/version`)).ok, 20000);
 
     async function check(name, url, fn) {
-      const target = await (await fetch(`http://127.0.0.1:${port}/json/new?${encodeURIComponent(url)}`, { method: "PUT" })).json();
+      const baseUrl = url.split("#")[0];
+      const target = await (await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: "PUT" })).json();
       const client = cdp(target.webSocketDebuggerUrl);
       await client.open;
+      await client.send("Page.enable");
       await client.send("Runtime.enable");
+      await client.send("Page.navigate", { url });
       const evalJs = async (expr) => {
         const r = await client.send("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true });
         if (r.exceptionDetails) throw new Error(r.exceptionDetails.text);
@@ -112,6 +115,12 @@ async function main() {
       await waitFor(async () => !(await e("document.querySelector('#lab-rl .lab-metrics').textContent")).includes("不稳定"));
       const cy1 = await e("[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')");
       if (cy1 === cy50) throw new Error("control: root locus poles did not move with K");
+    });
+
+    await check("control-state", fileUrl("control-play/index.html") + "#labs&K=50", async (e) => {
+      await waitFor(async () => (await e("document.getElementById('labs').hidden")) === false);
+      await waitFor(async () => (await e("document.querySelector('#lab-rl .lab-metrics').textContent")).includes("不稳定"));
+      if ((await e("document.querySelectorAll('#lab-rl-a svg circle').length")) < 3) throw new Error("control-state: poles missing");
     });
 
     await check("landing", fileUrl("landing/index.html"), async (e) => {

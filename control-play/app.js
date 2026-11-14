@@ -204,7 +204,7 @@
     p.set("kp", state.kp.toFixed(2));
     p.set("ki", state.ki.toFixed(2));
     p.set("kd", state.kd.toFixed(3));
-    try { history.replaceState(null, "", location.pathname + "?" + p.toString()); } catch (e) { /* file:// */ }
+    try { history.replaceState(null, "", location.pathname + "?" + p.toString() + (location.hash || "")); } catch (e) { /* file:// */ }
   }
 
   function loadURL() {

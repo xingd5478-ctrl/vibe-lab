@@ -52,6 +52,7 @@
   }
 
   function metrics(el, rows) {
+    if (window.LabKit) return window.LabKit.metrics(el, rows);
     el.innerHTML = rows.map(([k, v]) => `<span><i>${k}</i><b>${v}</b></span>`).join("");
   }
 
@@ -136,7 +137,13 @@
     id: "lab-rl",
     title: "根轨迹",
     note: "G(s)=1/(s(s+1)(s+2))。X=开环极点（0,−1,−2），实心点=当前闭环极点；蓝色虚线为 60° 渐近线，本系统无零点（无 O）。K 过 6 后进入右半平面。",
-    defaults: { K: 1 },
+    defaults: {
+      K: (() => {
+        const m = location.hash.match(/K=([0-9.]+)/);
+        const v = m ? parseFloat(m[1]) : 1;
+        return isFinite(v) && v > 0 ? v : 1;
+      })(),
+    },
     controls(box, s, refresh) {
       box.appendChild(slider("开环增益 K", 0.1, 50, 0.1, s.K, (v) => { s.K = v; refresh(); }));
     },
