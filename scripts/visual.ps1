@@ -1,9 +1,9 @@
 # Visual check / regression: screenshot key pages (desktop + narrow) and compare with baselines.
-param([switch]$Update, [double]$Threshold = 0.003)
+param([switch]$Update, [double]$Threshold = 0.003, [string]$BaselineDir = "tests\baselines")
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $out = Join-Path $root "artifacts\visual"
-$baseline = Join-Path $root "tests\baselines"
+$baseline = Join-Path $root $BaselineDir
 New-Item -ItemType Directory -Force $out | Out-Null
 New-Item -ItemType Directory -Force $baseline | Out-Null
 $edge = @(

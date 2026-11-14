@@ -24,4 +24,19 @@ jobs:
           python-version: "3.12"
       - run: pip install pillow
       - name: Visual regression (Edge)
-        run: pwsh -NoProfile -File scripts/visual.ps1 -Threshold 0.02
+        shell: pwsh
+        run: |
+          if (Test-Path "tests/baselines-ci") {
+            pwsh -NoProfile -File scripts/visual.ps1 -BaselineDir "tests/baselines-ci" -Threshold 0.02
+          } else {
+            pwsh -NoProfile -File scripts/visual.ps1 -BaselineDir "tests/baselines-ci" -Update
+            Write-Output "CI baselines bootstrapped (commit tests/baselines-ci from artifact)"
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-baselines
+          path: |
+            tests/baselines-ci
+            artifacts/visual
+          if-no-files-found: ignore
