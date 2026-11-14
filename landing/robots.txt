@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://xingd5478-ctrl.github.io/vibe-lab/sitemap.xml
