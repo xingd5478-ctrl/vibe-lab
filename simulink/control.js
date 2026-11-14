@@ -316,8 +316,11 @@
     const maxRe = Math.max(...cur.map((p) => p.re));
     const dom = cur.reduce((m, p) => (p.re > m.re ? p : m), cur[0]);
     const mag = Math.hypot(dom.re, dom.im) || 1;
+    const highlight = branches.map((br) => br.filter((_, i) => Ks[i] >= 20 && Ks[i] <= 50));
     return {
       branches,
+      highlight,
+      ks: Ks,
       current: cur,
       openPoles: [0, -1, -2],
       zeros: [],

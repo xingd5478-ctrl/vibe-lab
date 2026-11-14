@@ -373,7 +373,12 @@
           name: `分支 ${i + 1}`, color: i === 0 ? "#1f4e79" : i === 1 ? "#2f6b4f" : "#8a4a12",
           width: 1.4, legend: false, points: br,
         }));
-        series.push({ name: "虚轴", color: "#b9b3a5", width: 1, dash: "4 4", legend: false, points: [[0, -4.5], [0, 4.5]] });
+        b.highlight.forEach((br, i) => {
+          if (br.length > 1) {
+            series.push({ name: "K∈[20,50]", color: "#b5651d", width: 3.0, legend: i === 0, points: br });
+          }
+        });
+        series.push({ name: "y 轴 (x=0)", color: "#1b1d22", width: 1.3, legend: true, points: [[0, -4.5], [0, 4.5]] });
         [60, 180, 300].forEach((deg) => {
           const rad = (deg * Math.PI) / 180;
           series.push({ name: "渐近线", color: "#7a9cc6", width: 1, dash: "6 5", legend: false,

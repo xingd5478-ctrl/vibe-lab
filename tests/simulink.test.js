@@ -192,3 +192,11 @@ test("root locus branches are continuous (no zigzag)", () => {
     }
   }
 });
+
+test("root locus exposes K=20..50 segment", () => {
+  const r = S.rootLocusDemo(1);
+  assert.ok(r.highlight.some((br) => br.length > 1));
+  let maxIm = 0;
+  r.highlight.forEach((br) => br.forEach(([, im]) => { if (Math.abs(im) > maxIm) maxIm = Math.abs(im); }));
+  assert.ok(maxIm > 2, `maxIm=${maxIm}`);
+});
