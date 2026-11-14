@@ -808,6 +808,10 @@
     box.innerHTML = "";
     params.forEach((d) => {
       if (d.type === "toggle") {
+        if (window.LabKit) {
+          box.appendChild(window.LabKit.toggle(d.label, d.value, onChange, { id: "p-" + d.id }));
+          return;
+        }
         const lab = document.createElement("label");
         lab.className = "ctl toggle";
         lab.innerHTML = `<input type="checkbox" id="p-${d.id}" ${d.value ? "checked" : ""}> ${d.label}`;
@@ -841,6 +845,11 @@
         });
         div.appendChild(row);
         box.appendChild(div);
+        return;
+      }
+      if (window.LabKit && window.LabKit.slider) {
+        box.appendChild(window.LabKit.slider(d.label, d.min, d.max, d.step, d.value, onChange,
+          { id: "p-" + d.id, valueId: "v-" + d.id }));
         return;
       }
       const div = document.createElement("div");

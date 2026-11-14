@@ -34,9 +34,11 @@ $sim = ([uri](Join-Path $root "simulink\index.html")).AbsoluteUri
 
 Shot $landing "landing" "1400,1000"
 Shot $imu "imu" "1400,1400"
+Shot ($imu + "#manual") "imu-manual" "1400,1400"
 Shot $control "control" "1400,1200"
 Shot ($controlIndex + "#labs&K=1") "control-k1" "1400,1400"
 Shot ($controlIndex + "#labs&K=50") "control-k50" "1400,1400"
+Shot ($controlIndex + "#manual") "control-manual" "1400,1400"
 Shot $about "about" "1200,1600"
 Shot $sim "simulink" "1400,1400"
 Shot $imu "imu-narrow" "520,900"

@@ -16,6 +16,8 @@
   const f2 = (v) => (Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2));
 
   function slider(label, min, max, step, value, onChange) {
+    if (window.LabKit && window.LabKit.slider) return window.LabKit.slider(label, min, max, step, value, onChange);
+    // 回退实现（离线/旧缓存）
     const wrap = document.createElement("div");
     wrap.className = "lab-ctl";
     const head = document.createElement("div");
@@ -24,22 +26,18 @@
     name.textContent = label;
     const val = document.createElement("b");
     val.textContent = String(value);
-    head.appendChild(name);
-    head.appendChild(val);
+    head.appendChild(name); head.appendChild(val);
     const input = document.createElement("input");
     input.type = "range";
     input.min = min; input.max = max; input.step = step; input.value = value;
     input.setAttribute("aria-label", label);
-    input.addEventListener("input", () => {
-      val.textContent = String(input.value);
-      onChange(parseFloat(input.value));
-    });
-    wrap.appendChild(head);
-    wrap.appendChild(input);
+    input.addEventListener("input", () => { val.textContent = String(input.value); onChange(parseFloat(input.value)); });
+    wrap.appendChild(head); wrap.appendChild(input);
     return wrap;
   }
 
   function toggle(label, checked, onChange) {
+    if (window.LabKit && window.LabKit.toggle) return window.LabKit.toggle(label, checked, onChange);
     const lab = document.createElement("label");
     lab.className = "lab-toggle";
     const input = document.createElement("input");
