@@ -25,6 +25,8 @@ jobs:
       - run: npm ci
       - name: End-to-end (Edge CDP + axe)
         run: node scripts/e2e.mjs
+      - name: Big-file pipeline (Edge, 200k rows)
+        run: node scripts/bigtest.mjs
 
   visual:
     runs-on: windows-latest
