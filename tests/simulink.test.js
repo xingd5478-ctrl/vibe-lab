@@ -106,3 +106,26 @@ test("fuzzy P has steady error that shrinks with scale", () => {
   assert.ok(ea < 0.25, `ea=${ea}`);
   assert.ok(eb < ea, `larger scale should reduce error (${eb} < ${ea})`);
 });
+
+test("MSD settles to F/k and reports wn/zeta", () => {
+  const r = S.msdDemo(5, 1);
+  assert.ok(Math.abs(r.x[r.x.length - 1] - 0.2) < 0.02, `x=${r.x[r.x.length - 1]}`);
+  assert.ok(Math.abs(r.wn - Math.sqrt(5)) < 1e-9);
+  assert.ok(Math.abs(r.zeta - 1 / (2 * Math.sqrt(5))) < 1e-9);
+});
+
+test("two-link arm inverse kinematics reaches target", () => {
+  const a = S.armDemo(1.2, 0.6);
+  assert.equal(a.reachable, true);
+  assert.ok(Math.hypot(a.ex - 1.2, a.ey - 0.6) < 1e-9);
+  assert.equal(S.armDemo(2, 0).reachable, false);
+});
+
+test("sampling alias folds above Nyquist", () => {
+  const ok = S.dspDemo(5, 40);
+  assert.equal(ok.aliased, false);
+  assert.ok(Math.abs(ok.alias - 5) < 1e-9);
+  const bad = S.dspDemo(30, 40);
+  assert.equal(bad.aliased, true);
+  assert.ok(Math.abs(bad.alias - 10) < 1e-9, `alias=${bad.alias}`);
+});

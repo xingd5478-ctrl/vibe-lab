@@ -345,7 +345,61 @@
     return { t, y, u };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, metrics, poles };
+  /* ---------- 质量-弹簧-阻尼（m=1） ---------- */
+  function msdDemo(k, c) {
+    const dt = 0.002, T = 8, n = Math.round(T / dt);
+    const t = new Float64Array(n), x = new Float64Array(n), f = new Float64Array(n);
+    let pos = 0, vel = 0;
+    for (let i = 0; i < n; i++) {
+      t[i] = i * dt;
+      f[i] = t[i] >= 0.5 ? 1 : 0;
+      const acc = f[i] - c * vel - k * pos;
+      vel += acc * dt;
+      pos += vel * dt;
+      x[i] = pos;
+    }
+    return {
+      t, x, f,
+      wn: Math.sqrt(k),
+      zeta: c / (2 * Math.sqrt(k)),
+    };
+  }
+
+  /* ---------- 2 连杆正/逆运动学 ---------- */
+  function armDemo(tx, ty) {
+    const l1 = 1, l2 = 0.8;
+    const d = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+    const reachable = d >= -1 && d <= 1;
+    let th1 = Math.atan2(ty, tx), th2 = 0;
+    if (reachable) {
+      th2 = Math.acos(Math.max(-1, Math.min(1, d)));
+      th1 = Math.atan2(ty, tx) - Math.atan2(l2 * Math.sin(th2), l1 + l2 * Math.cos(th2));
+    }
+    const ex = l1 * Math.cos(th1) + l2 * Math.cos(th1 + th2);
+    const ey = l1 * Math.sin(th1) + l2 * Math.sin(th1 + th2);
+    return { l1, l2, th1, th2, ex, ey, reachable, maxReach: l1 + l2 };
+  }
+
+  /* ---------- 采样定理 / 混叠 ---------- */
+  function dspDemo(f, fs) {
+    const dtc = 0.001, T = 1, n = Math.round(T / dtc);
+    const t = new Float64Array(n), y = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      t[i] = i * dtc;
+      y[i] = Math.sin(2 * Math.PI * f * t[i]);
+    }
+    const m = Math.max(2, Math.floor(T * fs) + 1);
+    const ts = new Float64Array(m), z = new Float64Array(m);
+    for (let i = 0; i < m; i++) {
+      ts[i] = i / fs;
+      z[i] = Math.sin(2 * Math.PI * f * ts[i]);
+    }
+    let alias = Math.abs(f - Math.round(f / fs) * fs);
+    if (alias > fs / 2) alias = fs - alias;
+    return { t, y, ts, z, alias, nyquist: fs / 2, aliased: f > fs / 2 };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

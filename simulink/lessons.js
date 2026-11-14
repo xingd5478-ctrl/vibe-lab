@@ -55,9 +55,9 @@ window.SIMULINK_LESSONS = {
     {
       id: 6, title: "Phase 6 · 综合案例", range: "t26–t30",
       items: [
-        { id: "t26", n: 26, title: "机器人运动学", desc: "DH 参数、正逆运动学", file: "t26_robot_kinematics.m", model: "tutorial26_kinematics.slx" },
-        { id: "t27", n: 27, title: "MSD 系统建模", desc: "TF/SS/离散/数值积分对比", file: "t27_msd_modeling.m", model: "tutorial27_msd_models.slx" },
-        { id: "t28", n: 28, title: "DSP 基础", desc: "采样定理、FFT、窗函数", file: "t28_dsp_basics.m", model: "tutorial28_dsp.slx" },
+        { id: "t26", n: 26, title: "机器人运动学", desc: "DH 参数、正逆运动学", file: "t26_robot_kinematics.m", model: "tutorial26_kinematics.slx", demo: "arm" },
+        { id: "t27", n: 27, title: "MSD 系统建模", desc: "TF/SS/离散/数值积分对比", file: "t27_msd_modeling.m", model: "tutorial27_msd_models.slx", demo: "msd" },
+        { id: "t28", n: 28, title: "DSP 基础", desc: "采样定理、FFT、窗函数", file: "t28_dsp_basics.m", model: "tutorial28_dsp.slx", demo: "dsp" },
         { id: "t29", n: 29, title: "MSD 控制对比", desc: "PID vs LQR + 噪声", file: "t29_msd_control.m", model: "tutorial29_control_compare.slx" },
         { id: "t30", n: 30, title: "主动悬挂", desc: "1/4 车模型 + PID", file: "t30_active_suspension.m", model: "tutorial30_suspension.slx" },
       ],

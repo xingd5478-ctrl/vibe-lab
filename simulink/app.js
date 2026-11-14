@@ -68,6 +68,30 @@
     el.innerHTML = svg;
   }
 
+  function renderArm(el, a) {
+    const W = Math.max(el.clientWidth || 640, 320), H = 300;
+    const scale = Math.min((W * 0.55) / a.maxReach, (H * 0.72) / a.maxReach);
+    const ox = W * 0.2, oy = H * 0.8;
+    const x1 = ox + a.l1 * Math.cos(a.th1) * scale;
+    const y1 = oy - a.l1 * Math.sin(a.th1) * scale;
+    const x2 = x1 + a.l2 * Math.cos(a.th1 + a.th2) * scale;
+    const y2 = y1 - a.l2 * Math.sin(a.th1 + a.th2) * scale;
+    const tx = ox + a.ex * scale, ty = oy - a.ey * scale;
+    el.innerHTML =
+      `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="两连杆机械臂，末端 ${a.ex.toFixed(2)},${a.ey.toFixed(2)}">
+        <line x1="0" y1="${oy}" x2="${W}" y2="${oy}" stroke="#e7e3d8"/>
+        <line x1="${ox}" y1="0" x2="${ox}" y2="${H}" stroke="#e7e3d8"/>
+        <circle cx="${ox}" cy="${oy}" r="7" fill="#1b1d22"/>
+        <line x1="${ox}" y1="${oy}" x2="${x1}" y2="${y1}" stroke="#1f4e79" stroke-width="7" stroke-linecap="round"/>
+        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2f6b4f" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="${x1}" cy="${y1}" r="6" fill="#fff" stroke="#1f4e79" stroke-width="2"/>
+        <circle cx="${x2}" cy="${y2}" r="8" fill="${a.reachable ? "#1f4e79" : "#8a4a12"}"/>
+        <line x1="${tx - 7}" y1="${ty}" x2="${tx + 7}" y2="${ty}" stroke="#8a4a12" stroke-width="1.5"/>
+        <line x1="${tx}" y1="${ty - 7}" x2="${tx}" y2="${ty + 7}" stroke="#8a4a12" stroke-width="1.5"/>
+        <text x="${ox + 8}" y="${oy - 8}" font-size="11" fill="#5b564c" font-family="Consolas">base</text>
+      </svg>`;
+  }
+
   const DEMOS = {
     signal: {
       title: "t01 · 信号与增益",
@@ -321,6 +345,105 @@
           ["稳态误差", m.ess.toFixed(3)],
           ["控制峰值", maxOf(r.u).toFixed(2)],
           ["输出尺度", p.scale.toFixed(1)],
+        ]);
+      },
+    },
+
+    msd: {
+      title: "t27 · 质量-弹簧-阻尼",
+      lesson: "t27",
+      note: "m ẍ + c ẋ + k x = F。ωn=√(k/m)、ζ=c/(2√(km))：k 决定晃多快，c 决定多久停。",
+      diagram: {
+        aria: "质量弹簧阻尼系统：力作用于质量，经弹簧阻尼到示波器",
+        blocks: [{ label: "Force" }, { label: "m", sub: "质量" }, { label: "k / c", sub: "弹簧/阻尼" }, { label: "Scope" }],
+      },
+      params: [
+        { id: "k", label: "刚度 k (N/m)", min: 1, max: 20, step: 0.5, value: 5 },
+        { id: "c", label: "阻尼 c (N·s/m)", min: 0.1, max: 5, step: 0.1, value: 1 },
+      ],
+      render(p) {
+        const r = S.msdDemo(p.k, p.c);
+        const m = S.metrics(r.t, r.x, 1 / p.k);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "位移 x",
+          yMin: 0, yMax: Math.max(1 / p.k, maxOf(r.x)) * 1.2,
+          aria: `质量弹簧阻尼位移，k=${p.k}，c=${p.c}`,
+          series: [{ name: "x", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.x) }],
+        });
+        $("chart-b").innerHTML = "";
+        metrics([
+          ["ωn", r.wn.toFixed(2) + " rad/s"],
+          ["ζ", r.zeta.toFixed(2)],
+          ["超调量", f2(m.overshoot) + " %"],
+          ["2% 调节时间", f2(m.settle) + " s"],
+        ]);
+      },
+    },
+
+    arm: {
+      title: "t26 · 机器人运动学",
+      lesson: "t26",
+      note: "给目标点 (x,y)，用几何逆解算 θ1、θ2；目标超出 l1+l2=1.8 就不可达。红叉是目标，蓝点是末端。",
+      diagram: {
+        aria: "两连杆机械臂：关节角到末端位置",
+        blocks: [{ label: "θ1, θ2" }, { label: "正运动学", sub: "l1, l2" }, { label: "末端 (x,y)" }],
+      },
+      params: [
+        { id: "x", label: "目标 x (m)", min: 0.1, max: 1.7, step: 0.05, value: 1.2 },
+        { id: "y", label: "目标 y (m)", min: -1, max: 1, step: 0.05, value: 0.6 },
+      ],
+      render(p) {
+        const a = S.armDemo(p.x, p.y);
+        renderArm($("chart-a"), a);
+        $("chart-b").innerHTML = "";
+        metrics([
+          ["可达性", a.reachable ? "可达" : "不可达（>1.8 m）"],
+          ["θ1", ((a.th1 * 180) / Math.PI).toFixed(1) + "°"],
+          ["θ2", ((a.th2 * 180) / Math.PI).toFixed(1) + "°"],
+          ["末端", `(${a.ex.toFixed(2)}, ${a.ey.toFixed(2)})`],
+        ]);
+      },
+    },
+
+    dsp: {
+      title: "t28 · 采样与混叠",
+      lesson: "t28",
+      note: "采样定理要求 fs>2f。f 超过 fs/2 后，重建波形会折叠成低频假信号——这就是混叠。",
+      diagram: {
+        aria: "采样流程：正弦、采样、FFT",
+        blocks: [{ label: "正弦 f" }, { label: "采样 fs" }, { label: "重建/FFT" }],
+      },
+      params: [
+        { id: "f", label: "信号频率 f (Hz)", min: 1, max: 40, step: 1, value: 5 },
+        { id: "fs", label: "采样率 fs (Hz)", min: 10, max: 100, step: 5, value: 40 },
+      ],
+      render(p) {
+        const r = S.dspDemo(p.f, p.fs);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "幅值",
+          yMin: -1.3, yMax: 1.3,
+          aria: `采样演示，f=${p.f}，fs=${p.fs}`,
+          series: [
+            { name: "真实正弦", color: "#b9b3a5", width: 1.4, points: toPts(r.t, r.y) },
+            { name: "采样点连线", color: "#1f4e79", width: 1.6, points: toPts(r.ts, r.z) },
+          ],
+        });
+        const ya = new Float64Array(r.t.length);
+        for (let i = 0; i < r.t.length; i++) ya[i] = Math.sin(2 * Math.PI * r.alias * r.t[i]);
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "真实 / 混叠重建",
+          yMin: -1.3, yMax: 1.3,
+          aria: "真实频率与混叠频率对比",
+          series: [
+            { name: "真实", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.y) },
+            { name: "重建", color: "#8a4a12", width: 1.6, points: toPts(r.t, ya) },
+          ],
+        });
+        metrics([
+          ["奈奎斯特 fs/2", r.nyquist.toFixed(1) + " Hz"],
+          ["混叠频率", r.alias.toFixed(1) + " Hz"],
+          ["是否混叠", r.aliased ? "是" : "否"],
+          ["f / fs", (p.f / p.fs).toFixed(2)],
         ]);
       },
     },
