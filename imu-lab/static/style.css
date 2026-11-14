@@ -278,3 +278,16 @@ footer a { color: var(--accent); text-decoration: underline; text-underline-offs
   .controls { position: static; }
   .wrap { padding: 0 14px 30px; }
 }
+
+/* 深色模式：跟随系统 */
+:root { color-scheme: light dark; }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #15171c; --ink: #e7e2d6; --muted: #a49e90;
+    --line: #33363d; --grid: #23262c; --panel: #1b1e24;
+  }
+  body { background: var(--paper); color: var(--ink); }
+  .card, .panel, .manual-card, .lab-card, .metric, .ctl, .tabs-bar,
+  input, select, textarea { background-color: var(--panel); color: var(--ink); }
+  a { color: #8db3d8; }
+}
