@@ -594,7 +594,83 @@
     return { t, data, fit, Kfit, tauFit, rmse: Math.sqrt(se / n) };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, metrics, poles };
+  /* MRAC：MIT 规则，对象增益阶跃变化 */
+  function mracDemo(gamma) {
+    const dt = 0.002, T = 8, n = Math.round(T / dt);
+    const t = new Float64Array(n), y = new Float64Array(n), ym = new Float64Array(n), th = new Float64Array(n);
+    let p = 0, m = 0, theta = 1;
+    for (let i = 0; i < n; i++) {
+      t[i] = i * dt;
+      const r = t[i] >= 0.5 ? 1 : 0;
+      const b = t[i] >= 2 ? 2 : 1;
+      const e = p - m;
+      theta = Math.max(0.1, Math.min(5, theta - gamma * e * r * dt));
+      p += (-2 * p + b * theta * r) * dt;
+      m += (-2 * m + 2 * r) * dt;
+      y[i] = p; ym[i] = m; th[i] = theta;
+    }
+    return { t, y, ym, theta: th };
+  }
+
+  /* MSD：PID vs 离散 LQR（Q/R 调参） */
+  function msdCompareDemo(Q, R) {
+    const k = 4, c = 0.5, dt = 0.002, T = 8, n = Math.round(T / dt);
+    // 离散 LQR（Euler 离散 + Riccati 迭代）
+    const Ts = 0.01;
+    const A = [[0, 1], [-k, -c]], B = [0, 1];
+    const Ad = [[1, Ts], [-k * Ts, 1 - c * Ts]], Bd = [0, Ts];
+    let P = [[Q, 0], [0, 1]];
+    let K = [0, 0];
+    for (let it = 0; it < 300; it++) {
+      const pb0 = P[0][0] * Bd[0] + P[0][1] * Bd[1];
+      const pb1 = P[1][0] * Bd[0] + P[1][1] * Bd[1];
+      const den = R + Bd[0] * pb0 + Bd[1] * pb1;
+      const bpa0 = Bd[0] * P[0][0] + Bd[1] * P[1][0];
+      const bpa1 = Bd[0] * P[0][1] + Bd[1] * P[1][1];
+      const pa0 = [bpa0 * Ad[0][0] + bpa1 * Ad[1][0], bpa0 * Ad[0][1] + bpa1 * Ad[1][1]];
+      K = [pa0[0] / den, pa0[1] / den];
+      // P = AdᵀPAd - (AdᵀPB)K + Q
+      const ap00 = Ad[0][0] * P[0][0] + Ad[1][0] * P[1][0];
+      const ap01 = Ad[0][0] * P[0][1] + Ad[1][0] * P[1][1];
+      const ap10 = Ad[0][1] * P[0][0] + Ad[1][1] * P[1][0];
+      const ap11 = Ad[0][1] * P[0][1] + Ad[1][1] * P[1][1];
+      const q00 = ap00 * Ad[0][0] + ap01 * Ad[1][0] + Q;
+      const q01 = ap00 * Ad[0][1] + ap01 * Ad[1][1];
+      const q10 = ap10 * Ad[0][0] + ap11 * Ad[1][0];
+      const q11 = ap10 * Ad[0][1] + ap11 * Ad[1][1] + 1;
+      const r00 = (Bd[0] * P[0][0] + Bd[1] * P[1][0]) * K[0];
+      const r01 = (Bd[0] * P[0][0] + Bd[1] * P[1][0]) * K[1];
+      const r10 = (Bd[0] * P[0][1] + Bd[1] * P[1][1]) * K[0];
+      const r11 = (Bd[0] * P[0][1] + Bd[1] * P[1][1]) * K[1];
+      P = [[q00 - r00, q01 - r01], [q10 - r10, q11 - r11]];
+    }
+    function run(kind) {
+      const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
+      let x = 0, v = 0, I = 0, pe = 0;
+      for (let i = 0; i < n; i++) {
+        t[i] = i * dt;
+        const ref = t[i] >= 0.5 ? 1 : 0;
+        const e = ref - x;
+        let uu;
+        if (kind === "pid") {
+          I = Math.max(-10, Math.min(10, I + e * dt));
+          const de = (e - pe) / dt;
+          pe = e;
+          uu = Math.max(-20, Math.min(20, 8 * e + 2 * I + 0.5 * de));
+        } else {
+          uu = Math.max(-20, Math.min(20, K[0] * (ref - x) - K[1] * v + k * ref));
+        }
+        const acc = uu - c * v - k * x;
+        v += acc * dt;
+        x += v * dt;
+        y[i] = x; u[i] = uu;
+      }
+      return { t, y, u };
+    }
+    return { pid: run("pid"), lqr: run("lqr"), K };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, mracDemo, msdCompareDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

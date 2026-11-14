@@ -740,6 +740,76 @@
       },
     },
 
+    mrac: {
+      title: "t23 · MRAC 自适应",
+      lesson: "t23",
+      note: "参考模型给出理想响应；对象增益在 2s 从 1 变 2，MIT 规则按误差调 θ，约几秒恢复跟踪。γ 太大会振荡。",
+      diagram: {
+        aria: "MRAC：参考模型与对象误差驱动自适应律",
+        blocks: [{ label: "参考模型" }, { label: "自适应律", sub: "γ" }, { label: "Controller", sub: "θ" }, { label: "Plant" }],
+      },
+      params: [{ id: "gamma", label: "自适应增益 γ", min: 0.05, max: 2, step: 0.05, value: 0.5 }],
+      render(p) {
+        const r = S.mracDemo(p.gamma);
+        plot($("chart-a"), {
+          height: 260, xLabel: "时间 (s)", yLabel: "输出",
+          aria: "参考模型与对象输出",
+          series: [
+            { name: "参考模型", color: "#b9b3a5", width: 2.2, points: toPts(r.t, r.ym) },
+            { name: "对象 y", color: "#1f4e79", width: 1.6, points: toPts(r.t, r.y) },
+          ],
+        });
+        $("chart-b").innerHTML = "";
+        const err = Math.abs(r.y[r.y.length - 1] - r.ym[r.ym.length - 1]);
+        metrics([
+          ["末值误差", err.toFixed(4)],
+          ["θ 末值", r.theta[r.theta.length - 1].toFixed(3)],
+          ["γ", p.gamma.toFixed(2)],
+        ]);
+      },
+    },
+
+    msdcompare: {
+      title: "t29 · MSD：PID vs LQR",
+      lesson: "t29",
+      note: "同一质量-弹簧-阻尼对象：PID（固定参数）与离散 LQR（Q/R 可调）对比位置与控制量；LQR 带参考前馈。",
+      diagram: {
+        aria: "MSD 控制对比：PID 与 LQR 分别闭环",
+        blocks: [{ label: "参考" }, { label: "PID / LQR" }, { label: "MSD" }, { label: "Scope" }],
+      },
+      params: [
+        { id: "Q", label: "LQR Q（位置权重）", min: 1, max: 200, step: 1, value: 100 },
+        { id: "R", label: "LQR R（控制权重）", min: 0.1, max: 10, step: 0.1, value: 1 },
+      ],
+      render(p) {
+        const r = S.msdCompareDemo(p.Q, p.R);
+        const mp = S.metrics(r.pid.t, r.pid.y, 1);
+        const ml = S.metrics(r.lqr.t, r.lqr.y, 1);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "位置 x", yMin: 0, yMax: 1.6,
+          aria: "PID 与 LQR 位置对比",
+          series: [
+            { name: "PID", color: "#b9b3a5", width: 2.2, points: toPts(r.pid.t, r.pid.y) },
+            { name: "LQR", color: "#1f4e79", width: 1.6, points: toPts(r.lqr.t, r.lqr.y) },
+          ],
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          aria: "PID 与 LQR 控制量",
+          series: [
+            { name: "PID u", color: "#b9b3a5", width: 1.4, points: toPts(r.pid.t, r.pid.u) },
+            { name: "LQR u", color: "#2f6b4f", width: 1.4, points: toPts(r.lqr.t, r.lqr.u) },
+          ],
+        });
+        metrics([
+          ["PID 超调", f2(mp.overshoot) + "%"],
+          ["LQR 超调", f2(ml.overshoot) + "%"],
+          ["LQR K", `[${r.K[0].toFixed(1)}, ${r.K[1].toFixed(1)}]`],
+          ["末值误差", `${mp.ess.toFixed(3)} / ${ml.ess.toFixed(3)}`],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",

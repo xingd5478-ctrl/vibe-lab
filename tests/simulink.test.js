@@ -230,3 +230,16 @@ test("system identification recovers K and tau without noise", () => {
   assert.ok(Math.abs(r.tauFit - 0.4) < 0.03);
   assert.ok(r.rmse < 0.01);
 });
+
+test("MRAC adapts after plant gain change", () => {
+  const r = S.mracDemo(0.5);
+  const err = Math.abs(r.y[r.y.length - 1] - r.ym[r.ym.length - 1]);
+  assert.ok(err < 0.05, `err=${err}`);
+  assert.ok(r.theta.every((v) => v >= 0.1 && v <= 5));
+});
+
+test("MSD LQR tracks reference with finite gains", () => {
+  const r = S.msdCompareDemo(100, 1);
+  assert.ok(r.K.every((v) => isFinite(v) && v > 0), `K=${r.K}`);
+  assert.ok(Math.abs(r.lqr.y[r.lqr.y.length - 1] - 1) < 0.02);
+});

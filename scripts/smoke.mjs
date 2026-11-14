@@ -137,7 +137,7 @@ async function main() {
     await check("simulink", fileUrl("simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#phases .phase-link').length")) === 8, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));
-      if ((await e("document.querySelectorAll('#tabs button').length")) !== 23) throw new Error("simulink: demo tabs");
+      if ((await e("document.querySelectorAll('#tabs button').length")) !== 25) throw new Error("simulink: demo tabs");
       await e("document.querySelector('#tabs button[data-demo=\"smc\"]').click()");
       await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("抖振"));
     });
@@ -172,3 +172,4 @@ async function main() {
 }
 
 main().catch((e) => { console.error("SMOKE FAIL:", e.message); process.exit(1); });
+

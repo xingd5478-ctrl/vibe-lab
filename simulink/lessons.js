@@ -43,7 +43,7 @@ window.SIMULINK_LESSONS = {
         { id: "t19", n: 19, title: "H∞ 鲁棒控制", desc: "混合灵敏度、hinfsyn、μ 分析", file: "t19_robust_control.m", model: "tutorial19_robust.slx" },
         { id: "t20", n: 20, title: "模型预测控制 MPC", desc: "滚动优化、QP 约束", file: "t20_mpc.m", model: "tutorial20_mpc.slx", demo: "mpc" },
         { id: "t21", n: 21, title: "滑模控制 SMC", desc: "滑模面、抖振、Super-Twisting", file: "t21_sliding_mode.m", model: "tutorial21_smc.slx", demo: "smc" },
-        { id: "t23", n: 23, title: "MRAC 自适应", desc: "MIT 规则、参考模型", file: "t23_mrac.m", model: "tutorial23_mrac.slx" },
+        { id: "t23", n: 23, title: "MRAC 自适应", desc: "MIT 规则、参考模型", file: "t23_mrac.m", model: "tutorial23_mrac.slx", demo: "mrac" },
         { id: "t24", n: 24, title: "模糊逻辑控制", desc: "Sugeno FIS、隶属度、控制曲面", file: "t24_fuzzy_control.m", model: "tutorial24_fuzzy.slx", demo: "fuzzy" },
       ],
     },
@@ -62,7 +62,7 @@ window.SIMULINK_LESSONS = {
         { id: "t26", n: 26, title: "机器人运动学", desc: "DH 参数、正逆运动学", file: "t26_robot_kinematics.m", model: "tutorial26_kinematics.slx", demo: "arm" },
         { id: "t27", n: 27, title: "MSD 系统建模", desc: "TF/SS/离散/数值积分对比", file: "t27_msd_modeling.m", model: "tutorial27_msd_models.slx", demo: "msd" },
         { id: "t28", n: 28, title: "DSP 基础", desc: "采样定理、FFT、窗函数", file: "t28_dsp_basics.m", model: "tutorial28_dsp.slx", demo: "dsp" },
-        { id: "t29", n: 29, title: "MSD 控制对比", desc: "PID vs LQR + 噪声", file: "t29_msd_control.m", model: "tutorial29_control_compare.slx" },
+        { id: "t29", n: 29, title: "MSD 控制对比", desc: "PID vs LQR + 噪声", file: "t29_msd_control.m", model: "tutorial29_control_compare.slx", demo: "msdcompare" },
         { id: "t30", n: 30, title: "主动悬挂", desc: "1/4 车模型 + PID", file: "t30_active_suspension.m", model: "tutorial30_suspension.slx" },
       ],
     },
@@ -91,4 +91,5 @@ window.SIMULINK_LESSONS = {
     },
   ],
 };
+
 
