@@ -37,7 +37,7 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test            # 算法/数据/Worker/Simulink/控制实验单测（44 个）
+npm test            # 算法/数据/Worker/Simulink/控制实验单测（45 个）
 npm run smoke       # Edge CDP DOM 冒烟（5 页）
 npm run e2e         # Edge CDP 端到端 + axe 无障碍
 npm run bigtest     # 200k 行 Worker 全链路

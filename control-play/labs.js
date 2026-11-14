@@ -146,6 +146,10 @@
         name: `分支${i + 1}`, color: ["#1f4e79", "#2f6b4f", "#8a4a12"][i], width: 1.4, legend: false, points: br,
       }));
       series.push({
+        name: "虚轴", color: "#b9b3a5", width: 1, dash: "4 4", legend: false,
+        points: [[0, -mi * 1.25], [0, mi * 1.25]],
+      });
+      series.push({
         name: "开环极点 X", color: "#5b564c", marker: "x", line: false, legend: true,
         points: r.openPoles.map((p) => [p, 0]),
       });
@@ -157,7 +161,7 @@
         series.push({ name: "零点 O", color: "#2f6b4f", marker: "o", line: false, legend: true, points: r.zeros.map((p) => [p, 0]) });
       }
       plot(a, {
-        height: 220, xLabel: "Re", yLabel: "Im",
+        height: 220, xLabel: "Re", yLabel: "Im", equalAspect: true,
         yMin: -mi * 1.25, yMax: mi * 1.25,
         series,
       });

@@ -298,6 +298,20 @@
       const padv = (ymax - ymin) * 0.06;
       ymin -= padv; ymax += padv;
     }
+    if (cfg.equalAspect && !logX && !logY) {
+      const xr = xmax - xmin, yr = ymax - ymin;
+      const targetY = xr * (ih / iw);
+      if (yr < targetY) {
+        const c = (ymin + ymax) / 2;
+        ymin = c - targetY / 2;
+        ymax = c + targetY / 2;
+      } else {
+        const targetX = yr * (iw / ih);
+        const c = (xmin + xmax) / 2;
+        xmin = c - targetX / 2;
+        xmax = c + targetX / 2;
+      }
+    }
 
     const lx0 = logX ? Math.log10(xmin) : xmin, lx1 = logX ? Math.log10(xmax) : xmax;
     const ly0 = logY ? Math.log10(ymin) : ymin, ly1 = logY ? Math.log10(ymax) : ymax;

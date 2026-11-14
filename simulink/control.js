@@ -285,23 +285,25 @@
 
   function rootLocusDemo(K) {
     const Ks = [];
-    for (let e = -2; e <= 2.0001; e += 0.05) Ks.push(Math.pow(10, e));
+    for (let e = -2; e <= Math.log10(20); e += 0.05) Ks.push(Math.pow(10, e));
     const branches = [[], [], []];
     let prev = null;
+    const dist2 = (p, q) => (p.re - q.re) ** 2 + (p.im - q.im) ** 2;
     for (const kk of Ks) {
       let roots = rootsOf(kk);
       if (prev) {
         const used = new Set();
         const ordered = [];
         for (const p of prev) {
-          let best = -1, bd = Infinity;
-          roots.forEach((r, i) => {
-            if (used.has(i)) return;
-            const d = (r.re - p.re) ** 2 + (r.im - p.im) ** 2;
-            if (d < bd) { bd = d; best = i; }
-          });
-          used.add(best);
-          ordered.push(roots[best]);
+          let pool = roots.map((r, i) => ({ r, i })).filter((x) => !used.has(x.i));
+          if (Math.abs(p.im) > 1e-6) {
+            const sameSign = pool.filter((x) => Math.sign(x.r.im) === Math.sign(p.im));
+            if (sameSign.length) pool = sameSign;
+          }
+          let best = pool[0];
+          for (const c of pool) if (dist2(c.r, p) < dist2(best.r, p)) best = c;
+          used.add(best.i);
+          ordered.push(best.r);
         }
         roots = ordered;
       } else {

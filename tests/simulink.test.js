@@ -182,3 +182,13 @@ test("root locus exposes poles/zero and current poles move with K", () => {
   assert.ok(Math.abs(sumA + 3) < 1e-6, `sum roots=${sumA}`);
   assert.notDeepEqual(a.current, b.current);
 });
+
+test("root locus branches are continuous (no zigzag)", () => {
+  const r = S.rootLocusDemo(1);
+  for (const br of r.branches) {
+    for (let i = 1; i < br.length; i++) {
+      const d = Math.hypot(br[i][0] - br[i - 1][0], br[i][1] - br[i - 1][1]);
+      assert.ok(d < 0.6, `jump ${d} at branch step ${i}`);
+    }
+  }
+});

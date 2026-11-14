@@ -373,13 +373,14 @@
           name: `分支 ${i + 1}`, color: i === 0 ? "#1f4e79" : i === 1 ? "#2f6b4f" : "#8a4a12",
           width: 1.4, legend: false, points: br,
         }));
+        series.push({ name: "虚轴", color: "#b9b3a5", width: 1, dash: "4 4", legend: false, points: [[0, -maxIm * 1.25], [0, maxIm * 1.25]] });
         series.push({ name: "开环极点 X", color: "#5b564c", marker: "x", line: false, points: b.openPoles.map((p) => [p, 0]) });
         series.push({ name: "当前闭环极点", color: "#1f4e79", marker: "dot", line: false, points: b.current.map((p) => [p.re, p.im]) });
         if (b.zeros.length) {
           series.push({ name: "零点 O", color: "#2f6b4f", marker: "o", line: false, points: b.zeros.map((p) => [p, 0]) });
         }
         plot($("chart-a"), {
-          height: 270, xLabel: "Re", yLabel: "Im",
+          height: 270, xLabel: "Re", yLabel: "Im", equalAspect: true,
           yMin: -maxIm * 1.25, yMax: maxIm * 1.25,
           aria: `根轨迹，K=${p.K}`,
           series,
