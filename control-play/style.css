@@ -271,3 +271,10 @@ footer a { color: var(--accent); text-decoration: underline; text-underline-offs
   .tip { background: #2b2f37; border-color: #3a3e46; }
   .crosshair { stroke: #8f8a7c; }
 }
+
+@media (max-width: 600px) {
+  .topnav a { min-height: 40px; display: inline-flex; align-items: center; }
+  button, .mini, .tabs-bar button, .manual-search { min-height: 40px; }
+  input[type="range"] { min-height: 40px; }
+  select, input[type="number"], input[type="search"] { min-height: 40px; }
+}

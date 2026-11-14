@@ -46,10 +46,11 @@ npm run check:matlab# 校验 43 个模型哈希与 matlab.html 是否同步
 npm run bigtest     # 200k 行 Worker 全链路
 npm run visual      # 浅色截图对比基线
 npm run visual:dark # 深色截图对比基线
-npm run visual:update / visual:dark:update  # 有意改版后更新基线
+npm run visual:mobile # 390×844 移动端截图 + 横向溢出/触控目标检查
+npm run visual:update / visual:dark:update / visual:mobile:update  # 有意改版后更新基线
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS/IRLS 拟合、Worker、列式数据层、Simulink 复现；E2E 验证交互/下载、英文 UI，并跑 **axe-core**（WCAG 2 A/AA，浅色 + 深色），要求 0 serious/critical；运行时预算含 ready/LCP/CLS/长任务，CI 用 `PERF_SCALE=2` 放宽；浅色与深色截图分别对比 `tests/baselines*`。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS/IRLS 拟合、Worker、列式数据层、Simulink 复现；E2E 验证交互/下载、英文 UI，并跑 **axe-core**（WCAG 2 A/AA，浅色 + 深色），要求 0 serious/critical；运行时预算含 ready/LCP/CLS/长任务，CI 用 `PERF_SCALE=2` 放宽；浅色、深色、390px 移动端截图分别对比基线，移动端脚本同时检查横向溢出与触控目标。
 
 ## 键盘操作
 

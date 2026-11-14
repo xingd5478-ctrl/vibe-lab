@@ -18,7 +18,9 @@
     "visual:dark": "node scripts/dark_shots.mjs",
     "visual:dark:update": "node scripts/dark_shots.mjs --update",
     "e2e": "node scripts/e2e.mjs",
-    "bigtest": "node scripts/bigtest.mjs"
+    "bigtest": "node scripts/bigtest.mjs",
+    "visual:mobile": "node scripts/mobile_shots.mjs",
+    "visual:mobile:update": "node scripts/mobile_shots.mjs --update"
   },
   "devDependencies": {
     "axe-core": "^4.14.0"

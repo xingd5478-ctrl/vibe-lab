@@ -59,6 +59,8 @@ jobs:
           }
       - name: Dark visual regression
         run: node scripts/dark_shots.mjs
+      - name: Mobile 390px layout regression
+        run: node scripts/mobile_shots.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
