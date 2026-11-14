@@ -23,6 +23,8 @@
     q: 2.51188643150958e-9,
     fit: null,
     compare: null,
+    pendingText: null,
+    pendingName: "",
   };
 
   let dataVersion = 0;
@@ -77,11 +79,9 @@
     return rows;
   }
 
-  function parseCSV(text) {
-    const lines = text.split(/\r?\n/).filter((l) => l.trim().length);
-    if (!lines.length) return [];
+  function parseHeader(line) {
     const norm = (s) => s.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
-    const head = lines[0].split(",").map(norm);
+    const head = line.split(",").map(norm);
     const pick = (names) => {
       for (const n of names) {
         const i = head.indexOf(n);
@@ -96,11 +96,23 @@
       gz: pick(["gz_dps", "gz", "gyro_z", "gyroz", "gz_deg_s"]),
       crc: pick(["crc_ok", "crc", "crcok"]),
     };
+    const rawHead = line.split(",").map((s) => s.trim());
+    const looksHeader = rawHead.some((v) => v !== "" && !isFinite(Number(v)));
+    if (looksHeader && (idx.gx < 0 || idx.gy < 0 || idx.gz < 0)) return null;
     let start = 1;
     if (idx.gx < 0 || idx.gy < 0 || idx.gz < 0) {
       idx = { t: 0, gx: 1, gy: 2, gz: 3, crc: 4 };
       start = 0;
     }
+    return { idx, start };
+  }
+
+  function parseCSV(text) {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim().length);
+    if (!lines.length) return [];
+    const h = parseHeader(lines[0]);
+    if (!h) return [];
+    const { idx, start } = h;
     const rows = [];
     for (let i = start; i < lines.length; i++) {
       const c = lines[i].split(",");
@@ -111,6 +123,84 @@
       rows.push({ t, gx, gy, gz, crc: isFinite(crc) ? crc : 1 });
     }
     return rows;
+  }
+
+  async function parseCSVChunked(text, onProgress) {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim().length);
+    if (!lines.length) return [];
+    const h = parseHeader(lines[0]);
+    if (!h) return [];
+    const { idx, start } = h;
+    const rows = [];
+    for (let i = start; i < lines.length; i++) {
+      const c = lines[i].split(",");
+      const gx = Number(c[idx.gx]), gy = Number(c[idx.gy]), gz = Number(c[idx.gz]);
+      if (isFinite(gx) && isFinite(gy) && isFinite(gz)) {
+        const t = idx.t >= 0 ? Number(c[idx.t]) : NaN;
+        const crc = idx.crc >= 0 ? Number(c[idx.crc]) : 1;
+        rows.push({ t, gx, gy, gz, crc: isFinite(crc) ? crc : 1 });
+      }
+      if (i % 20000 === 0) {
+        if (onProgress) onProgress(Math.round((i / lines.length) * 100));
+        await new Promise((r) => setTimeout(r, 0));
+      }
+    }
+    if (onProgress) onProgress(100);
+    return rows;
+  }
+
+  function applyRows(rows, source) {
+    state.rows = rows;
+    state.source = source;
+    state.pendingText = null;
+    $("map-ui").style.display = "none";
+    prepare();
+    draw();
+  }
+
+  function showMapping(text, name) {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim().length);
+    const head = (lines[0] || "").split(",").map((s) => s.trim());
+    if (head.length < 2 || head.every((v) => isFinite(Number(v)))) {
+      flash("无法识别列，请提供带表头的 CSV");
+      return;
+    }
+    const opts = head.map((h, i) => `<option value="${i}">${h || "列" + (i + 1)}</option>`).join("");
+    ["gx", "gy", "gz"].forEach((k) => { $("map-" + k).innerHTML = opts; });
+    const pick = (re) => head.findIndex((h) => re.test(h.toLowerCase()));
+    $("map-gx").value = String(Math.max(0, pick(/gx|x/)));
+    $("map-gy").value = String(Math.max(0, pick(/gy|y/)));
+    $("map-gz").value = String(Math.max(0, pick(/gz|z/)));
+    state.pendingText = text;
+    state.pendingName = name;
+    $("map-ui").style.display = "";
+    flash(`未识别列，请手动映射（共 ${head.length} 列）`);
+  }
+
+  function parseWithMapping(text, map) {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim().length);
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const c = lines[i].split(",");
+      const gx = Number(c[map.gx]), gy = Number(c[map.gy]), gz = Number(c[map.gz]);
+      if (!isFinite(gx) || !isFinite(gy) || !isFinite(gz)) continue;
+      rows.push({ t: NaN, gx, gy, gz, crc: 1 });
+    }
+    return rows;
+  }
+
+  function finishLoad(rows, f, text) {
+    if (!rows.length) {
+      showMapping(text, f.name);
+      $("source-name").textContent = state.source;
+      return;
+    }
+    if (rows.length > 1000000) {
+      flash("行数超过 100 万，请先降采样");
+      $("source-name").textContent = state.source;
+      return;
+    }
+    applyRows(rows, f.name);
   }
 
   function loadFile(f) {
@@ -126,29 +216,33 @@
       }
     };
     reader.onload = () => {
-      const rows = parseCSV(String(reader.result));
-      if (!rows.length) {
-        flash("没有解析到有效数据，请检查表头（gx_dps/gy_dps/gz_dps）与分隔符");
-        $("source-name").textContent = state.source;
-        return;
+      const text = String(reader.result);
+      $("source-name").textContent = "解析中…";
+      if (text.length > 4000000) {
+        parseCSVChunked(text, (p) => { $("source-name").textContent = `解析中 ${p}%`; })
+          .then((rows) => finishLoad(rows, f, text))
+          .catch(() => {
+            flash("解析失败，请检查文件格式");
+            $("source-name").textContent = state.source;
+          });
+      } else {
+        setTimeout(() => finishLoad(parseCSV(text), f, text), 20);
       }
-      if (rows.length > 200000) {
-        flash("行数超过 20 万，请先降采样再上传");
-        $("source-name").textContent = state.source;
-        return;
-      }
-      state.rows = rows;
-      state.source = f.name;
-      prepare();
-      draw();
     };
     reader.onerror = () => flash("文件读取失败");
     reader.readAsText(f);
   }
 
   function fixTime(rows, fs) {
+    let ok = true, prev = -Infinity;
     for (let i = 0; i < rows.length; i++) {
-      if (!isFinite(rows[i].t)) rows[i].t = i / fs;
+      const t = rows[i].t;
+      if (!isFinite(t) || t <= prev) { ok = false; break; }
+      prev = t;
+    }
+    if (!ok) {
+      for (let i = 0; i < rows.length; i++) rows[i].t = i / fs;
+      flash("时间戳缺失或非单调，已按采样率重建");
     }
   }
 
@@ -271,6 +365,35 @@
       tip.style.opacity = "1";
     };
     canvas.onmouseleave = () => { tip.style.opacity = "0"; };
+
+    canvas.tabIndex = 0;
+    let kidx = 0;
+    const live = document.getElementById("chart-live");
+    const step = Math.max(1, Math.floor(raw.length / 500));
+    const showIdx = (i) => {
+      kidx = Math.max(0, Math.min(raw.length - 1, i));
+      const r = raw[kidx];
+      let lo = 0, hi = clean.length - 1;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (clean[mid].t < r.t) lo = mid + 1; else hi = mid;
+      }
+      const c = clean[Math.min(lo, clean.length - 1)];
+      const text = `时间 ${r.t.toFixed(2)} s · 原始 ${r[ch].toFixed(3)} · 清洗 ${c[ch].toFixed(3)} °/s`;
+      tip.textContent = text;
+      tip.style.left = `${(X(r.t) / w) * 100}%`;
+      tip.style.top = "12%";
+      tip.style.opacity = "1";
+      if (live) live.textContent = text;
+    };
+    canvas.addEventListener("focus", () => showIdx(kidx));
+    canvas.addEventListener("blur", () => { tip.style.opacity = "0"; });
+    canvas.addEventListener("keydown", (ev) => {
+      if (ev.key === "ArrowRight" || ev.key === "ArrowUp") { showIdx(kidx + step); ev.preventDefault(); }
+      else if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") { showIdx(kidx - step); ev.preventDefault(); }
+      else if (ev.key === "Home") { showIdx(0); ev.preventDefault(); }
+      else if (ev.key === "End") { showIdx(raw.length - 1); ev.preventDefault(); }
+    });
   }
 
   /* ---------- 绘图 ---------- */
@@ -543,6 +666,42 @@
     }
   }
 
+  function updateSRSummary() {
+    const el = $("sr-summary");
+    const s = state.stats;
+    if (!el || !s) return;
+    const fit = state.fit;
+    el.textContent =
+      `统计：${s.frames} 帧，坏帧 ${s.bad}，时长 ${s.duration.toFixed(1)} 秒；` +
+      `主通道 ${state.channel} 均值 ${(s.means[state.channel] || 0).toFixed(3)} 度每秒；` +
+      `R=${state.r.toExponential(2)}，Q=${state.q.toExponential(2)}；` +
+      (fit ? `拟合 ARW ${fit.arw.toFixed(3)}，RRW ${fit.rrw.toFixed(3)}，R² ${fit.r2.toFixed(3)}` : "Allan 计算中");
+  }
+
+  function updateAllanTable(pts) {
+    const tbody = document.querySelector("#sr-allan tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    if (!pts.length) return;
+    const n = Math.min(8, pts.length);
+    for (let j = 0; j < n; j++) {
+      const i = Math.floor((j * (pts.length - 1)) / Math.max(1, n - 1));
+      const tr = document.createElement("tr");
+      const vals = [pts[i].tau.toFixed(3)].concat(
+        AXES.map((a) => {
+          const arr = allanFor(a.key);
+          return arr[i] ? arr[i].adev.toFixed(5) : "—";
+        })
+      );
+      vals.forEach((v) => {
+        const td = document.createElement("td");
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }
+  }
+
   function draw() {
     const raw = state.rows;
     if (!raw.length) return;
@@ -620,6 +779,8 @@
 
     $("meta-time").textContent = `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
     $("meta-allan").textContent = pending ? "计算中…" : (fit ? `R²=${fit.r2.toFixed(3)}` : "log-log");
+    updateAllanTable(pending ? [] : pts);
+    updateSRSummary();
     drawKF();
   }
 
@@ -654,6 +815,7 @@
       series,
     });
     $("meta-kf").textContent = `R=${state.r.toExponential(2)} · Q=${state.q.toExponential(2)}`;
+    updateSRSummary();
     syncURL();
   }
 
@@ -741,6 +903,21 @@
     };
     img.onerror = () => { URL.revokeObjectURL(url); flash("PNG 导出失败"); };
     img.src = url;
+  }
+
+  function exportAllanCSV() {
+    const keys = AXES.map((a) => a.key);
+    const series = keys.map((k) => allanFor(k));
+    const n = Math.min(...series.map((s) => s.length));
+    if (!n) { flash("Allan 尚未就绪"); return; }
+    const lines = ["tau_s," + keys.map((k) => "adev_" + k).join(",")];
+    for (let i = 0; i < n; i++) {
+      lines.push([series[0][i].tau.toFixed(6)].concat(series.map((s) => s[i].adev.toFixed(9))).join(","));
+    }
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    downloadBlob(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }),
+      `imu_allan_${stamp}.csv`);
+    flash("Allan CSV 已导出");
   }
 
   function exportReport() {
@@ -862,12 +1039,20 @@ ${blocks}
     bindSlider("logQ", "q-val", (e) => { state.q = Math.pow(10, e); });
 
     $("reset").addEventListener("click", () => {
-      state.rows = synth();
-      state.source = "示例数据（合成）";
       state.fs = 100;
       $("fs").value = "100";
-      prepare();
-      draw();
+      applyRows(synth(), "示例数据（合成）");
+    });
+
+    $("map-apply").addEventListener("click", () => {
+      if (!state.pendingText) return;
+      const rows = parseWithMapping(state.pendingText, {
+        gx: Number($("map-gx").value),
+        gy: Number($("map-gy").value),
+        gz: Number($("map-gz").value),
+      });
+      if (!rows.length) { flash("映射后没有有效数据"); return; }
+      applyRows(rows, state.pendingName || "手动映射");
     });
 
     $("load-real").addEventListener("click", async () => {
@@ -888,10 +1073,7 @@ ${blocks}
         }
         const rows = parseCSV(text);
         if (!rows.length) throw new Error("empty");
-        state.rows = rows;
-        state.source = "真实片段（10 min，仅演示）";
-        prepare();
-        draw();
+        applyRows(rows, "真实片段（10 min，仅演示）");
       } catch (e) {
         flash("file:// 下无法自动加载，请用“下载片段 CSV”后手动上传");
       }
@@ -913,6 +1095,7 @@ ${blocks}
 
     $("export-csv").addEventListener("click", exportCSV);
     $("export-report").addEventListener("click", exportReport);
+    $("export-allan").addEventListener("click", exportAllanCSV);
 
     $("compare").addEventListener("click", () => {
       const btn = $("compare");

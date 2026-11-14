@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <a class="skip" href="#main">跳到内容</a>
   <div class="wrap">
     <header>
       <div class="kicker">vibe-lab / instrument 01</div>
@@ -22,6 +23,7 @@
       <p class="sub">上传 MPU6050 CSV → CRC 清洗 → Allan 方差 → 拖动 R/Q 看滤波。全部在浏览器内计算，无后端。<span class="badge" id="demo-badge">演示数据</span></p>
     </header>
 
+    <main id="main">
     <div class="layout">
       <aside class="panel controls">
         <div class="field">
@@ -29,6 +31,13 @@
           <input id="file" type="file" accept=".csv,text/csv" />
           <div class="hint">当前：<span id="source-name">示例数据（合成）</span></div>
           <div class="hint">也可以把 CSV 直接拖到这个面板。</div>
+          <div id="map-ui" class="field" style="display:none;margin-top:10px">
+            <div class="hint">列名未识别，请手动映射：</div>
+            <label>GX <select id="map-gx"></select></label>
+            <label>GY <select id="map-gy"></select></label>
+            <label>GZ <select id="map-gz"></select></label>
+            <button id="map-apply" type="button" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">应用映射</button>
+          </div>
           <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
           <div class="hint">
             论文在审，仅作演示；完整数据待录用后按期刊政策公开，版权归作者/实验室。
@@ -76,6 +85,9 @@
         <div class="field" style="display:flex;gap:8px;">
           <button id="compare" type="button" aria-pressed="false" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">保存对比</button>
           <button id="share" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">复制链接</button>
+        </div>
+        <div class="field">
+          <button id="export-allan" type="button" style="width:100%;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">导出 Allan CSV</button>
         </div>
         <div class="hint" id="share-info" aria-live="polite">—</div>
 
@@ -128,6 +140,7 @@
         </div>
       </section>
     </div>
+    </main>
 
     <footer>
       vibe-lab · 数据与算法在浏览器内运行 · 工程近似：R=(ARW/60)²·Δt，Q=(RRW/60)²·Δt ·
@@ -136,6 +149,12 @@
   </div>
 
   <div id="chart-live" class="sr-only" aria-live="polite"></div>
+  <div id="sr-summary" class="sr-only"></div>
+  <table id="sr-allan" class="sr-only">
+    <caption>Allan 方差数据（抽样）</caption>
+    <thead><tr><th>τ (s)</th><th>GX</th><th>GY</th><th>GZ</th></tr></thead>
+    <tbody></tbody>
+  </table>
 
   <script src="allan.js"></script>
   <script src="kf.js"></script>

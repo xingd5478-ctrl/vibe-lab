@@ -36,13 +36,14 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test            # 算法单测（8 个）
-npm run smoke       # Edge headless DOM 冒烟（四页渲染 + 拟合 + PID URL + 键盘可聚焦）
-npm run visual      # 截图对比基线（桌面 + 窄屏，差异 >0.3% 失败）
+npm test            # 算法单测（10 个）
+npm run smoke       # Edge headless DOM 冒烟
+npm run e2e         # Edge CDP 端到端（拟合、报告下载、URL 恢复、PID）
+npm run visual      # 截图对比基线
 npm run visual:update  # 有意改版后更新基线
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、拟合恢复 ARW/RRW 与 R²；冒烟测试检查页面 SVG、拟合信息、PID 参数、Bode 轴与键盘焦点；视觉回归对比 `tests/baselines/`，截图输出到 `artifacts/visual/`。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS 拟合、Worker；E2E 验证交互与下载；视觉回归对比 `tests/baselines/`（CI 用 `tests/baselines-ci/`）。
 
 ## 键盘操作
 

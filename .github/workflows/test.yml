@@ -15,6 +15,16 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+  e2e:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: End-to-end (Edge CDP)
+        run: node scripts/e2e.mjs
+
   visual:
     runs-on: windows-latest
     steps:

@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <a class="skip" href="#main">跳到内容</a>
   <div class="wrap">
     <header>
       <div class="kicker">vibe-lab / method</div>
@@ -22,10 +23,12 @@
       <p class="sub">这两个工具里每个数字是怎么来的，以及哪些地方不能当真。</p>
     </header>
 
+    <main id="main">
+
     <h2>1. IMU 数据实验室</h2>
     <p><strong>CRC 清洗。</strong>静态零速下陀螺出现 ±200 °/s 的样本，物理上不可能，来源是串口误码。页面先剔除 <code>crc_ok=0</code> 的帧，再剔除任一角速度超过 5 °/s 的帧；否则一组坏帧会把 Allan 曲线的短 τ 段抬高一个量级。</p>
     <p><strong>Allan 方差。</strong>对每个簇时间 τ，用重叠式 Allan 标准差 σ(τ) 估计随机噪声结构。白噪声段满足 σ(τ)=N/√τ，随机游走段满足 σ(τ)=K√(τ/3)。</p>
-    <p><strong>ARW / RRW 拟合。</strong>短 τ 段取 <code>N = median(σ√τ)</code>，长 τ 段取 <code>K = median(σ/√(τ/3))</code>；再用双项模型 σ=√(N²/τ + K²τ/3) 在 log 空间计算 R²，并用分位数给出 95% 区间。这是工程近似，不是最大似然拟合。</p>
+    <p><strong>ARW / RRW 拟合。</strong>把 σ²(τ)=N²/τ+K²τ/3 视为线性模型，对 (1/τ, τ/3) 做最小二乘得到 N、K；R² 在 log 空间计算，95% 区间来自回归参数协方差。若拟合失败（数据太短/负系数），回退到短/长段中位数法。</p>
     <p><strong>R/Q 映射。</strong>采用 <code>R=(ARW/60)²·Δt</code>、<code>Q=(RRW/60)²·Δt</code>；R/Q 与采样率无关。卡尔曼滤波是一维随机游走模型，只用于演示“Q 大更抖、Q 小更平滑”的定性关系。</p>
     <p><strong>数据来源。</strong>默认加载 60 s 合成数据用于跑通流程；“加载 10 min 真实片段”会读取 2 h 静态实验中的 10 min 截段（含 5 个坏帧），仅作演示，不构成标定数据集。</p>
     <p><strong>键盘操作。</strong>图表可用 Tab 聚焦，`←/→` 或 `↑/↓` 逐点移动，`Home/End` 跳到首尾；当前读数通过屏幕阅读器播报。</p>
@@ -48,6 +51,8 @@
       <li>算法模块 <code>allan.js</code>、<code>kf.js</code>、<code>fit.js</code> 有 Node 单测；</li>
       <li>源码：<a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">github.com/xingd5478-ctrl/vibe-lab</a>。</li>
     </ul>
+
+    </main>
 
     <footer>
       <a href="../">← vibe-lab</a> · <a href="../imu/" data-nav="imu">IMU Lab</a> · <a href="../control/" data-nav="control">Control Play</a>

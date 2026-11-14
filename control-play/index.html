@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <a class="skip" href="#main">跳到内容</a>
   <div class="wrap">
     <header>
       <div class="kicker">vibe-lab / instrument 02</div>
@@ -22,6 +23,7 @@
       <p class="sub">G(s) = ωn² / (s² + 2ζωn·s + ωn²) · 拖动滑杆，实时看 Bode 与阶跃响应。</p>
     </header>
 
+    <main id="main">
     <div class="layout">
       <aside class="panel controls">
         <div class="field">
@@ -77,6 +79,7 @@
         </div>
       </section>
     </div>
+    </main>
 
     <footer>
       vibe-lab · 零依赖 SVG · 参数同步到 URL（<span id="url-params">—</span>） · 仅用于教学/复习演示 ·
