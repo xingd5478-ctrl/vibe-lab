@@ -106,7 +106,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 }
 
 .chart { width: 100%; position: relative; }
-.chart svg { display: block; width: 100%; height: auto; }
+.chart svg { display: block; width: 100%; height: auto; touch-action: none; }
 
 .crosshair { stroke: #8a8478; stroke-width: 1; stroke-dasharray: 3 3; }
 .hover-dot { fill: var(--accent); }

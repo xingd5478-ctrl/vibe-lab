@@ -122,7 +122,7 @@
       return best;
     };
 
-    svg.addEventListener("mousemove", (ev) => {
+    const onMove = (ev) => {
       const rect = svg.getBoundingClientRect();
       const frac = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
       const xv = meta.xInv(frac);
@@ -139,8 +139,11 @@
       tip.style.left = `${(px / meta.w) * 100}%`;
       tip.style.top = `${Math.max(8, (Number(dot.getAttribute("cy")) / meta.h) * 100 - 4)}%`;
       tip.style.opacity = "1";
-    });
-    svg.addEventListener("mouseleave", () => {
+    };
+
+    svg.addEventListener("pointermove", onMove);
+    svg.addEventListener("pointerdown", onMove);
+    svg.addEventListener("pointerleave", () => {
       tip.style.opacity = "0";
       line.setAttribute("opacity", "0");
       dot.setAttribute("opacity", "0");
@@ -167,8 +170,9 @@
       svg += `<line class="grid" x1="${PAD.l}" y1="${y}" x2="${w - PAD.r}" y2="${y}"/>`;
       svg += `<text class="tick-label" x="${PAD.l - 7}" y="${y + 3}" text-anchor="end">${fmt(v)}</text>`;
     });
-    linTicks(phMin, phMax, 4).forEach((v) => {
+    linTicks(phMin, phMax, 6).forEach((v) => {
       const y = Yp(v);
+      svg += `<line x1="${w - PAD.r}" y1="${y}" x2="${w - PAD.r + 4}" y2="${y}" stroke="#1b1d22" stroke-width="1"/>`;
       svg += `<text class="tick-label" x="${w - PAD.r + 7}" y="${y + 3}" text-anchor="start">${fmt(v)}</text>`;
     });
     logTicks(b.w[0], b.w[b.w.length - 1]).forEach((v) => {
@@ -275,6 +279,8 @@
     $("ess").textContent = m.ess.toFixed(3);
     $("meta-bode").textContent = `ωn=${wn.toFixed(1)} · ζ=${zeta.toFixed(2)}`;
     $("meta-step").textContent = `Kp=${kp.toFixed(2)} · Ki=${ki.toFixed(2)} · Kd=${kd.toFixed(3)}`;
+    const params = `?wn=${state.wn.toFixed(2)}&zeta=${state.zeta.toFixed(2)}&kp=${state.kp.toFixed(2)}&ki=${state.ki.toFixed(2)}&kd=${state.kd.toFixed(3)}`;
+    if ($("url-params")) $("url-params").textContent = params;
     syncURL();
   }
 

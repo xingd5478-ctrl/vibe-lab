@@ -9,12 +9,14 @@
 ```
 vibe-lab/
 ├── landing/             # 首页：两个工具的入口
+├── about/               # 方法说明与局限
 ├── imu-lab/
 │   ├── static/          # ① IMU 数据实验室（部署到 /imu/）
 │   └── app.py           #    Streamlit 备份
 ├── control-play/        # ② 二阶系统 + PID（部署到 /control/）
 ├── shared/              # Python 共享算法
 ├── tests/               # Node 单测（Allan / KF / 拟合）
+├── scripts/smoke.ps1    # Edge headless DOM 冒烟测试
 ├── data/sample/         # 合成样例数据
 └── .github/workflows/   # Pages 部署
 ```
@@ -34,10 +36,11 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test
+npm test        # 算法单测（8 个）
+npm run smoke   # Edge headless DOM 冒烟（页面渲染 + 拟合 + PID URL）
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、拟合恢复 ARW/RRW 与 R²。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、拟合恢复 ARW/RRW 与 R²；冒烟测试检查页面 SVG、拟合信息、PID 参数与 Bode 轴。
 
 ## 线上结构
 
@@ -46,6 +49,7 @@ npm test
 | `/` | 首页（landing） |
 | `/imu/` | IMU 数据实验室 |
 | `/control/` | Control Play |
+| `/about/` | 方法说明与局限 |
 
 ## 约定
 

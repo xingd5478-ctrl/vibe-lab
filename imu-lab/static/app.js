@@ -202,7 +202,7 @@
       return best;
     };
 
-    svg.addEventListener("mousemove", (ev) => {
+    const onMove = (ev) => {
       const rect = svg.getBoundingClientRect();
       const frac = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
       const xv = meta.xInv(frac);
@@ -211,7 +211,7 @@
       line.setAttribute("x1", px);
       line.setAttribute("x2", px);
       line.setAttribute("opacity", "1");
-      dot.setAttribute("cx", meta.X(first[0]));
+      dot.setAttribute("cx", px);
       dot.setAttribute("cy", meta.Y(first[1]));
       dot.setAttribute("opacity", "1");
       let text = `${meta.xLabel} ${fmt(first[0])} · ${meta.series[0].name} ${fmt(first[1])}`;
@@ -221,10 +221,13 @@
       }
       tip.textContent = text;
       tip.style.left = `${(px / meta.w) * 100}%`;
-      tip.style.top = `${Math.max(8, (dot.getAttribute("cy") / meta.h) * 100 - 4)}%`;
+      tip.style.top = `${Math.max(8, (Number(dot.getAttribute("cy")) / meta.h) * 100 - 4)}%`;
       tip.style.opacity = "1";
-    });
-    svg.addEventListener("mouseleave", () => {
+    };
+
+    svg.addEventListener("pointermove", onMove);
+    svg.addEventListener("pointerdown", onMove);
+    svg.addEventListener("pointerleave", () => {
       tip.style.opacity = "0";
       line.setAttribute("opacity", "0");
       dot.setAttribute("opacity", "0");
@@ -529,10 +532,22 @@
     $("file").addEventListener("change", (ev) => {
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
+      if (f.size > 20 * 1024 * 1024) {
+        flash("文件超过 20 MB，请先降采样");
+        ev.target.value = "";
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
-        const rows = parseCSV(String(reader.result));
-        if (!rows.length) { alert("没有解析到有效数据，请检查列名。"); return; }
+        const text = String(reader.result);
+        const head = text.split(/\r?\n/)[0] || "";
+        if (!/gx_dps/i.test(head) || !/gy_dps/i.test(head) || !/gz_dps/i.test(head)) {
+          flash("CSV 缺少列：gx_dps / gy_dps / gz_dps");
+          return;
+        }
+        const rows = parseCSV(text);
+        if (!rows.length) { flash("没有解析到有效数据，请检查列名与分隔符"); return; }
+        if (rows.length > 200000) { flash("行数超过 20 万，请先降采样再上传"); return; }
         state.rows = rows;
         state.source = f.name;
         invalidate();

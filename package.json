@@ -4,6 +4,7 @@
   "private": true,
   "description": "Sensor & control visual lab: IMU data lab, control playground, landing page",
   "scripts": {
-    "test": "node --test tests/allan.test.js tests/kf.test.js tests/fit.test.js"
+    "test": "node --test tests/allan.test.js tests/kf.test.js tests/fit.test.js",
+    "smoke": "pwsh -NoProfile -File scripts/smoke.ps1"
   }
 }
