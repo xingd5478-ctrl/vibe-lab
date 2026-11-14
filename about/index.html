@@ -64,7 +64,7 @@
 
     <section class="panel" style="margin-top:24px">
 <h2>MATLAB 对照（真机仿真）</h2>
-<p>用 MATLAB R2025a 对 .slx 实际仿真，与网页 demo 对比。目前完成 7/7 个核心模型。</p>
+<p>用 MATLAB R2025a 对 .slx 实际仿真，与网页 demo 对比。目前完成 9/9 个核心模型。</p>
 <table style="width:100%;border-collapse:collapse;font-size:13px">
 <thead><tr><th align="left">课程</th><th align="left">网页 demo</th><th align="left">.slx 实测</th><th align="left">说明</th></tr></thead>
 <tbody>
@@ -75,6 +75,8 @@
 <tr><td>t16 频域</td><td>PM 可算</td><td>Plant 4/(s²+0.5s+4)：Gm=∞，PM=20.4°</td><td>已完成</td></tr>
 <tr><td>t11 观测器</td><td>估计误差收敛</td><td>最大误差 0.300，末值 0.000</td><td>一致</td></tr>
 <tr><td>t12 Kalman</td><td>Kalman vs 测量</td><td>Kalman RMSE 0.455，测量 1.149</td><td>Kalman 明显更优</td></tr>
+<tr><td>t13 电机</td><td>速度 PI</td><td>峰值 192.44，终值 137.09</td><td>有超调，稳态有差</td></tr>
+<tr><td>t22 根轨迹</td><td>闭环阶跃</td><td>峰值 1.289，终值 0.825</td><td>对应当前 K 的稳态偏差</td></tr>
 </tbody></table>
 <p class="hint">只列已真机跑过的模型；其余后续补。t10 的差异是真实存在的：原 .slx 用 u=−Kx，网页 demo 加了参考前馈。</p>
 </section>
@@ -116,6 +118,7 @@
 </script>
 </body>
 </html>
+
 
 
 
