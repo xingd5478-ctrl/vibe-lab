@@ -37,7 +37,7 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test            # 算法/数据/Worker/Simulink 单测（40 个）
+npm test            # 算法/数据/Worker/Simulink 单测（42 个）
 npm run smoke       # Edge CDP DOM 冒烟（5 页）
 npm run e2e         # Edge CDP 端到端 + axe 无障碍
 npm run bigtest     # 200k 行 Worker 全链路
@@ -80,7 +80,7 @@ imu-lab/static/
 
 **完整讲义阅读器**：`/simulink/course.html` 提供 43 课讲义、注释、代码与结果图。为控制站点体积，课程内容按需从教程仓库的 jsDelivr CDN 读取（失败回退 raw GitHub；再失败保留源链接），本站负责排版、搜索与上下课导航。
 
-**新手讲义（全部 43 课）**：t01–t43 已重写为「傻瓜式」结构：生活类比 → 本课目标 → 关键概念 → 公式读法 → Simulink 步骤 → 运行后看什么 → 新手坑 → 自测。课程页会自动展示 `simulink/guide.js` 中的讲义。交互复现 17 个，覆盖 19 课：信号（t01/t02/t06）、t03、t04、t05 PID、t10、t11、t12 Kalman、t16 Bode、t20 MPC、t21 SMC、t22 根轨迹、t24 模糊、t26 运动学、t27 MSD、t28 采样、t35 IMU 融合、t38 Bus。
+**新手讲义（全部 43 课）**：t01–t43 已重写为「傻瓜式」结构：生活类比 → 本课目标 → 关键概念 → 公式读法 → Simulink 步骤 → 运行后看什么 → 新手坑 → 自测。课程页会自动展示 `simulink/guide.js` 中的讲义。交互复现 19 个，覆盖 21 课：信号（t01/t02/t06）、t03、t04、t05 PID、t10、t11、t12 Kalman、t16 Bode、t20 MPC、t21 SMC、t22 根轨迹、t24 模糊、t26 运动学、t27 MSD、t28 采样、t35 IMU 融合、t36 Stateflow、t38 Bus、t40 变体。
 
 **模型下载**：43 个 `.slx` 已托管在 `simulink/models/`（约 3.8 MB，MIT，见 `NOTICE.md`），每课讲义页提供同源 `download` 链接，`npm run smoke/e2e` 会校验下载文件是 zip。更新模型用 `node scripts/vendor_models.mjs`。
 

@@ -142,7 +142,7 @@
     return { t, u, y };
   }
 
-  function pidDemo(kp, ki, kd) {
+  function pidDemo(kp, ki, kd, openLoop) {
     const wn = 4, zeta = 0.4, dt = 0.002, T = 8, n = Math.round(T / dt);
     const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
     let x = 0, v = 0, I = 0, pe = 0;
@@ -153,7 +153,7 @@
       I = Math.max(-10, Math.min(10, I + e * dt));
       const de = (e - pe) / dt;
       pe = e;
-      u[i] = Math.max(-20, Math.min(20, kp * e + ki * I + kd * de));
+      u[i] = openLoop ? ref : Math.max(-20, Math.min(20, kp * e + ki * I + kd * de));
       const acc = wn * wn * (u[i] - x) - 2 * zeta * wn * v;
       v += acc * dt;
       x += v * dt;
@@ -440,7 +440,23 @@
     return { t, sigs, sel: Math.max(0, Math.min(3, Math.round(sel))) };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, metrics, poles };
+  /* ---------- Stateflow：Idle / Running / Fault 状态机 ---------- */
+  function nextState(state, cmd) {
+    // cmd: 0 stop, 1 start, 2 fault, 3 reset
+    if (cmd === 2) return 2;
+    if (state === 2) return cmd === 3 ? 0 : 2;
+    if (cmd === 1) return 1;
+    if (cmd === 0 || cmd === 3) return 0;
+    return state;
+  }
+
+  function variantDemo(mode) {
+    if (mode === 0) return { ...pidDemo(0, 0, 0, true), label: "开环" };
+    if (mode === 2) return { ...pidDemo(4, 0, 0.3), label: "状态反馈 (PD)" };
+    return { ...pidDemo(1.5, 1.2, 0.05), label: "PID" };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -92,7 +92,81 @@
       </svg>`;
   }
 
+  const sfState = { state: 0, log: [[0, 0]], lastCmd: 0 };
+
   const DEMOS = {
+    stateflow: {
+      title: "t36 · Stateflow 状态机",
+      lesson: "t36",
+      note: "状态机只认「状态 + 事件」：启动→Running，故障→Fault 锁存，必须复位才回 Idle。点按钮看状态迁移。",
+      diagram: {
+        aria: "状态机：事件进入 Stateflow，输出状态",
+        blocks: [{ label: "事件" }, { label: "Stateflow", sub: "Idle/Run/Fault" }, { label: "状态输出" }],
+      },
+      params: [{
+        id: "cmd", label: "事件", type: "buttons", value: 0,
+        options: [{ label: "启动", value: 1 }, { label: "停止", value: 0 }, { label: "故障", value: 2 }, { label: "复位", value: 3 }],
+      }],
+      render(p) {
+        if (p.cmd !== sfState.lastCmd) {
+          const ns = S.nextState(sfState.state, p.cmd);
+          sfState.state = ns;
+          sfState.log.push([sfState.log.length, ns]);
+          sfState.lastCmd = p.cmd;
+        }
+        const pts = [];
+        sfState.log.forEach(([i, s]) => { pts.push([i, s]); pts.push([i + 0.9, s]); });
+        plot($("chart-a"), {
+          height: 250, xLabel: "事件序号", yLabel: "状态 (0=Idle, 1=Run, 2=Fault)",
+          yMin: -0.3, yMax: 2.4,
+          aria: "状态机状态随事件变化",
+          series: [{ name: "state", color: "#1f4e79", width: 2.0, points: pts }],
+        });
+        $("chart-b").innerHTML = "";
+        const names = ["Idle", "Running", "Fault"];
+        metrics([
+          ["当前状态", names[sfState.state]],
+          ["事件数", String(sfState.log.length - 1)],
+          ["故障锁存", sfState.state === 2 ? "是（需复位）" : "否"],
+        ]);
+      },
+    },
+
+    variant: {
+      title: "t40 · 变体切换",
+      lesson: "t40",
+      note: "同一个被控对象，切换「开环 / PID / 状态反馈」三个变体。变体只是配置选择，不是重新建模。",
+      diagram: {
+        aria: "变体子系统：三个控制器实现切换",
+        blocks: [{ label: "参考" }, { label: "Variant", sub: "开环/PID/PD" }, { label: "Plant" }, { label: "Scope" }],
+      },
+      params: [{
+        id: "mode", label: "变体", type: "buttons", value: 1,
+        options: [{ label: "开环", value: 0 }, { label: "PID", value: 1 }, { label: "状态反馈", value: 2 }],
+      }],
+      render(p) {
+        const r = S.variantDemo(p.mode);
+        const m = S.metrics(r.t, r.y, 1);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "输出 y",
+          yMin: 0, yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
+          aria: `变体 ${r.label} 的阶跃响应`,
+          series: [{ name: r.label, color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          aria: "变体控制量",
+          series: [{ name: "u", color: "#2f6b4f", width: 1.2, points: toPts(r.t, r.u) }],
+        });
+        metrics([
+          ["当前变体", r.label],
+          ["超调量", f2(m.overshoot) + " %"],
+          ["2% 调节时间", f2(m.settle) + " s"],
+          ["稳态误差", m.ess.toFixed(3)],
+        ]);
+      },
+    },
+
     signal: {
       title: "t01 · 信号与增益",
       lesson: "t01",
@@ -724,6 +798,34 @@
         lab.querySelector("input").addEventListener("change", onChange);
         return;
       }
+      if (d.type === "buttons") {
+        const div = document.createElement("div");
+        div.className = "ctl buttons";
+        const head = document.createElement("div");
+        head.className = "ctl-head";
+        const label = document.createElement("span");
+        label.textContent = d.label || "";
+        head.appendChild(label);
+        div.appendChild(head);
+        const row = document.createElement("div");
+        row.className = "btn-row";
+        d.options.forEach((o) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = o.label;
+          if (d.value === o.value) b.setAttribute("aria-pressed", "true");
+          b.addEventListener("click", () => {
+            d.value = o.value;
+            row.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false"));
+            b.setAttribute("aria-pressed", "true");
+            onChange();
+          });
+          row.appendChild(b);
+        });
+        div.appendChild(row);
+        box.appendChild(div);
+        return;
+      }
       const div = document.createElement("div");
       div.className = "ctl";
       div.innerHTML =
@@ -737,6 +839,7 @@
   function readParams(params) {
     const p = {};
     params.forEach((d) => {
+      if (d.type === "buttons") { p[d.id] = d.value; return; }
       const el = $("p-" + d.id);
       p[d.id] = d.type === "toggle" ? el.checked : parseFloat(el.value);
     });

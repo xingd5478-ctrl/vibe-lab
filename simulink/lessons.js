@@ -75,11 +75,11 @@ window.SIMULINK_LESSONS = {
     {
       id: 8, title: "Phase 8 · Simulink 进阶", range: "t36–t43",
       items: [
-        { id: "t36", n: 36, title: "Stateflow 状态机", desc: "状态/转移/条件动作", file: "t36_stateflow_basics.m", model: "tutorial36_stateflow.slx" },
+        { id: "t36", n: 36, title: "Stateflow 状态机", desc: "状态/转移/条件动作", file: "t36_stateflow_basics.m", model: "tutorial36_stateflow.slx", demo: "stateflow" },
         { id: "t37", n: 37, title: "触发/使能子系统", desc: "条件执行、采样保持", file: "t37_triggered_subsystem.m", model: "tutorial37_triggered.slx" },
         { id: "t38", n: 38, title: "Bus 信号", desc: "打包拆解、按名提取", file: "t38_bus_signals.m", model: "tutorial38_bus.slx", demo: "bus" },
         { id: "t39", n: 39, title: "模型引用", desc: "Model block 子模型复用", file: "t39_model_referencing.m", model: "tutorial39_top.slx" },
-        { id: "t40", n: 40, title: "变体子系统", desc: "一套模型多套方案", file: "t40_variant_subsystem.m", model: "tutorial40_variant.slx" },
+        { id: "t40", n: 40, title: "变体子系统", desc: "一套模型多套方案", file: "t40_variant_subsystem.m", model: "tutorial40_variant.slx", demo: "variant" },
         { id: "t41", n: 41, title: "模型回调", desc: "PreLoad/Init/StopFcn", file: "t41_callbacks.m", model: "tutorial41_callbacks.slx" },
         { id: "t42", n: 42, title: "S-Function", desc: "Level-2 MATLAB S-Function", file: "t42_sfunction_basics.m", model: "tutorial42_sfunction.slx" },
         { id: "t43", n: 43, title: "Model Advisor", desc: "静态分析、代数环检查", file: "t43_model_advisor.m", model: "tutorial43_advisor.slx" },

@@ -141,3 +141,20 @@ test("Bus selector returns the requested signal", () => {
   assert.equal(r.sigs[r.sel].length, r.t.length);
   assert.ok(Math.abs(r.sigs[2][r.t.length - 1] - 1) < 0.01);
 });
+
+test("state machine latches fault and resets", () => {
+  assert.equal(S.nextState(0, 1), 1); // start
+  assert.equal(S.nextState(1, 0), 0); // stop
+  assert.equal(S.nextState(1, 2), 2); // fault
+  assert.equal(S.nextState(2, 1), 2); // start ignored while fault
+  assert.equal(S.nextState(2, 3), 0); // reset
+});
+
+test("variant mode selects different controllers", () => {
+  const open = S.variantDemo(0), pid = S.variantDemo(1), pd = S.variantDemo(2);
+  assert.equal(open.label, "开环");
+  assert.equal(pid.label, "PID");
+  assert.equal(pd.label, "状态反馈 (PD)");
+  assert.ok(open.y[open.y.length - 1] > 0);
+  assert.ok(Math.abs(pid.y[pid.y.length - 1] - 1) < 0.02);
+});
