@@ -100,6 +100,11 @@
     links.appendChild(a1);
     links.appendChild(dl);
     links.appendChild(a2);
+    if (lesson.demo) {
+      const demo = el("a", "dl", "打开交互实验 →");
+      demo.href = `index.html#${lesson.id}`;
+      links.appendChild(demo);
+    }
     intro.appendChild(links);
     intro.appendChild(el("p", "hint", "模型已托管在本站（MIT），下载后用 MATLAB/Simulink 打开；浏览器不能直接运行 .slx。"));
     return intro;

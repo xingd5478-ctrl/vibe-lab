@@ -872,55 +872,37 @@
 
   function buildTabs() {
     const box = $("tabs");
-    Object.keys(DEMOS).forEach((id) => {
+    const order = Object.keys(DEMOS).sort((a, b) =>
+      parseInt(DEMOS[a].lesson.slice(1), 10) - parseInt(DEMOS[b].lesson.slice(1), 10));
+    order.forEach((id) => {
       const b = document.createElement("button");
       b.type = "button";
       b.dataset.demo = id;
       b.setAttribute("role", "tab");
       b.setAttribute("aria-selected", String(id === current));
-      b.textContent = DEMOS[id].title.split(" · ")[1];
+      b.textContent = `${DEMOS[id].lesson.toUpperCase()} · ${DEMOS[id].title.split(" · ")[1]}`;
       b.addEventListener("click", () => selectDemo(id));
       box.appendChild(b);
     });
   }
 
-  function buildCatalog() {
-    const box = $("catalog");
+  function buildPhases() {
+    const box = $("phases");
+    if (!box) return;
     DATA.phases.forEach((ph) => {
-      const h = document.createElement("div");
-      h.className = "phase-title";
-      h.textContent = ph.title;
-      box.appendChild(h);
-      ph.items.forEach((l) => {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "lesson";
-        b.dataset.text = (l.id + " " + l.title + " " + l.desc).toLowerCase();
-        b.title = l.desc;
-        b.innerHTML = `<span class="n">${l.id}</span>${l.title}` + (l.demo ? '<span class="tag">交互</span>' : "");
-        b.addEventListener("click", () => {
-          if (l.demo) {
-            selectDemo(l.demo);
-            $("demo-title").scrollIntoView({ behavior: "smooth", block: "start" });
-          } else {
-            location.href = `course.html?id=${l.id}`;
-          }
-        });
-        box.appendChild(b);
-      });
+      const b = document.createElement("a");
+      b.className = "phase-link";
+      b.href = `course.html?id=${ph.items[0].id}`;
+      b.innerHTML = `<b>${ph.title}</b><span>${ph.items.length} 课 · ${ph.range}</span>`;
+      box.appendChild(b);
     });
   }
 
-  $("search").addEventListener("input", (e) => {
-    const q = e.target.value.trim().toLowerCase();
-    document.querySelectorAll(".lesson").forEach((b) => {
-      b.classList.toggle("dim", q && !b.dataset.text.includes(q));
-    });
-  });
-
-  buildCatalog();
+  buildPhases();
   buildTabs();
-  selectDemo("first-order");
+  const hash = location.hash.replace(/^#/, "");
+  const byLesson = Object.keys(DEMOS).find((id) => DEMOS[id].lesson === hash);
+  selectDemo(byLesson || (DEMOS[hash] ? hash : "signal"));
   window.addEventListener("resize", () => {
     clearTimeout(window.__simT);
     window.__simT = setTimeout(() => { diagram(DEMOS[current].diagram); refresh(); }, 120);

@@ -150,7 +150,7 @@ async function main() {
     await audit("about");
 
     await client.send("Page.navigate", { url: `${base}/simulink/index.html` });
-    await waitFor(async () => (await evalJs("document.querySelectorAll('#catalog .lesson').length")) === 43, 12000);
+    await waitFor(async () => (await evalJs("document.querySelectorAll('#phases .phase-link').length")) === 8, 12000);
     await waitFor(() => evalJs("!!document.querySelector('#chart-a svg')"));
     await evalJs("document.querySelector('#tabs button[data-demo=\"smc\"]').click()");
     await sleep(350);
