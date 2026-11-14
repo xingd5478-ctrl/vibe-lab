@@ -87,7 +87,19 @@
       if (home) home.href = "../landing/index.html";
     })();
   </script>
+<script>/* file:// 顶栏修复 */
+
+(function () {
+  if (location.protocol !== "file:") return;
+  var p = location.pathname;
+  var pre = p.indexOf("/imu-lab/static/") >= 0 ? "../../" : "../";
+  var home = p.indexOf("/landing/") >= 0 ? "index.html" : pre + "landing/index.html";
+  var hrefs = [home, pre + "imu-lab/static/index.html", pre + "control-play/index.html", pre + "simulink/index.html", pre + "about/index.html"];
+  document.querySelectorAll(".topnav a").forEach(function (a, i) { if (hrefs[i]) a.href = hrefs[i]; });
+})();
+</script>
 </body>
 </html>
+
 
 
