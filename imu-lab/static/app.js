@@ -25,6 +25,8 @@
     compare: null,
     pendingText: null,
     pendingName: "",
+    cols: null,
+    mask: null,
   };
 
   let dataVersion = 0;
@@ -264,8 +266,12 @@
     if (state.rows.length > 150000 && allanWorker) return [];
     const key = `${dataVersion}|${state.fs}|${state.clean ? 1 : 0}|${axis}`;
     if (!allanCache.has(key)) {
-      const rows = currentRows();
-      allanCache.set(key, allanDeviation(rows.map((r) => r[axis]), 1 / state.fs));
+      if (state.cols && window.IMUData) {
+        allanCache.set(key, IMUData.allan(state.cols, axis, state.fs, state.mask));
+      } else {
+        const rows = currentRows();
+        allanCache.set(key, allanDeviation(rows.map((r) => r[axis]), 1 / state.fs));
+      }
     }
     return allanCache.get(key);
   }
@@ -637,16 +643,25 @@
     fixTime(state.rows, state.fs);
     const raw = state.rows;
     const clean = currentRows();
-    const means = {};
-    AXES.forEach((a) => {
-      means[a.key] = clean.length ? clean.reduce((sum, r) => sum + r[a.key], 0) / clean.length : 0;
-    });
-    state.stats = {
-      frames: raw.length,
-      bad: raw.length - clean.length,
-      duration: raw.length ? raw[raw.length - 1].t - raw[0].t : 0,
-      means,
-    };
+
+    if (raw.length <= 150000 && window.IMUData) {
+      state.cols = IMUData.fromRows(raw);
+      state.mask = state.clean ? IMUData.cleanMask(state.cols) : new Uint8Array(state.cols.n).fill(1);
+      state.stats = IMUData.stats(state.cols, state.mask);
+    } else {
+      state.cols = null;
+      state.mask = null;
+      const means = {};
+      AXES.forEach((a) => {
+        means[a.key] = clean.length ? clean.reduce((sum, r) => sum + r[a.key], 0) / clean.length : 0;
+      });
+      state.stats = {
+        frames: raw.length,
+        bad: raw.length - clean.length,
+        duration: raw.length ? raw[raw.length - 1].t - raw[0].t : 0,
+        means,
+      };
+    }
 
     workerAllan = null;
     if (allanWorker && raw.length > 150000) {
@@ -847,6 +862,13 @@
     const clean = currentRows();
     if (!clean.length) return;
     const ch = state.channel;
+    if (state.cols && window.IMUData) {
+      const text = IMUData.csv(state.cols, state.mask, ch, state.fs, state.r, state.q);
+      downloadBlob(new Blob([text], { type: "text/csv;charset=utf-8" }),
+        `imu_lab_${ch}_R${state.r.toExponential(1)}_Q${state.q.toExponential(1)}.csv`.replace(/[^A-Za-z0-9_.+-]/g, ""));
+      flash("CSV 已导出");
+      return;
+    }
     const angle = integrate(clean.map((r) => r[ch]), state.fs);
     const filtered = kf1d(angle, state.r, state.q, angle[0], 1);
     const lines = ["t,gx_dps,gy_dps,gz_dps,angle_deg,kf_deg"];
