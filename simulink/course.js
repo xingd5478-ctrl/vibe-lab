@@ -109,6 +109,13 @@
       demo.href = `index.html#${lesson.id}`;
       links.appendChild(demo);
     }
+    const fb = el("a", "", "这节没看懂？反馈");
+    const title = encodeURIComponent(`[课程反馈] ${lesson.id} ${lesson.title}`);
+    const body = encodeURIComponent(`课程：${lesson.id} ${lesson.title}\n页面：${location.href}\n\n我卡在：\n\n`);
+    fb.href = `https://github.com/xingd5478-ctrl/vibe-lab/issues/new?title=${title}&body=${body}`;
+    fb.target = "_blank";
+    fb.rel = "noreferrer";
+    links.appendChild(fb);
     intro.appendChild(links);
     intro.appendChild(el("p", "hint", "模型已托管在本站（MIT），下载后用 MATLAB/Simulink 打开；浏览器不能直接运行 .slx。"));
     return intro;
