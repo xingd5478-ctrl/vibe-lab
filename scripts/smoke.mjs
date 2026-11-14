@@ -79,6 +79,10 @@ async function main() {
       if (!(await e("!!document.querySelector('#load-real')"))) throw new Error("imu: sample button missing");
       if (!(await e("!!document.querySelector('#export-report')"))) throw new Error("imu: report missing");
       if ((await e("document.querySelectorAll('#manual .manual-card').length")) !== 10) throw new Error("imu: manual chapters");
+      await e("document.querySelector('[data-tab=\"manual\"]').click()");
+      await waitFor(async () => (await e("document.getElementById('manual').hidden")) === false);
+      await e("document.querySelector('[data-tab=\"lab\"]').click()");
+      await waitFor(async () => (await e("document.getElementById('manual').hidden")) === true);
       if ((await e("document.querySelectorAll('[tabindex=\"0\"]').length")) < 1) throw new Error("imu: no keyboard focus");
     });
 
@@ -88,6 +92,12 @@ async function main() {
       if (!(await e("!!document.querySelector('#step svg')"))) throw new Error("control: step chart");
       if ((await e("document.querySelectorAll('#manual .manual-card').length")) !== 14) throw new Error("control: manual chapters");
       if ((await e("document.querySelectorAll('#labs .lab-module').length")) !== 4) throw new Error("control: extra labs");
+      await e("document.querySelector('[data-tab=\"labs\"]').click()");
+      await waitFor(async () => (await e("document.getElementById('labs').hidden")) === false);
+      await e("document.querySelector('[data-tab=\"manual\"]').click()");
+      await waitFor(async () => (await e("document.getElementById('manual').hidden")) === false);
+      await e("document.querySelector('[data-tab=\"lab\"]').click()");
+      await waitFor(async () => (await e("document.getElementById('manual').hidden")) === true);
       if (!(await e("!!document.querySelector('#lab-sf-a svg')"))) throw new Error("control: state feedback lab chart");
       if ((await e("document.querySelectorAll('#lab-rl-a svg circle').length")) < 3) throw new Error("control: root locus pole markers");
       const cy0 = await e("[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')");
@@ -97,6 +107,7 @@ async function main() {
 
     await check("landing", fileUrl("landing/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 3);
+      if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 3) throw new Error("landing: path chooser");
       if (!(await e("document.title")).includes("vibe-lab")) throw new Error("landing: title");
     });
 

@@ -5,6 +5,7 @@
   const S = window.SimControl;
   const grid = document.getElementById("lab-grid");
   if (!grid || !S) return;
+  const refreshes = [];
 
   const toPts = (t, y) => {
     const out = new Array(t.length);
@@ -81,6 +82,7 @@
 
     const state = Object.assign({}, spec.defaults);
     const refresh = () => spec.render(state, a, b, m);
+    refreshes.push(refresh);
     spec.controls(controls, state, refresh);
     refresh();
   }
@@ -208,5 +210,11 @@
         series: [{ name: "Δy", color: "#8a4a12", width: 1.2, points: toPts(r.t, Float64Array.from(r.t, (_, i) => r.yd[i] - r.yc[i])) }] });
       metrics(m, [["采样数", String(r.samples)], ["RMSE 差异", rmse.toFixed(4)], ["离散超调", f2(met.overshoot) + "%"]]);
     },
+  });
+
+  let rt = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => refreshes.forEach((fn) => fn()), 120);
   });
 })();

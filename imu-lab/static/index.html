@@ -172,6 +172,43 @@
   <script src="manual.js"></script>
   <script>
     (function () {
+      const main = document.querySelector("main");
+      const panels = [];
+      const lab = main && main.querySelector(".layout");
+      if (lab) panels.push({ id: "lab", name: "实验台", el: lab });
+      const manual = document.getElementById("manual");
+      if (manual) panels.push({ id: "manual", name: "10 章手册", el: manual });
+      if (panels.length < 2) return;
+      const bar = document.createElement("div");
+      bar.className = "tabs-bar";
+      bar.setAttribute("role", "tablist");
+      bar.setAttribute("aria-label", "页面分区");
+      const btns = panels.map((p) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("role", "tab");
+        b.dataset.tab = p.id;
+        b.textContent = p.name;
+        b.addEventListener("click", () => show(p.id));
+        bar.appendChild(b);
+        return b;
+      });
+      main.insertBefore(bar, panels[0].el);
+      function show(id, push) {
+        panels.forEach((p) => { p.el.hidden = p.id !== id; });
+        btns.forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
+        if (push !== false) {
+          try { history.replaceState(null, "", id === "lab" ? location.pathname : "#" + id); }
+          catch (e) { location.hash = id; }
+        }
+        window.dispatchEvent(new Event("resize"));
+      }
+      const h = location.hash.replace(/^#/, "");
+      show(panels.some((p) => p.id === h) ? h : "lab", false);
+    })();
+  </script>
+  <script>
+    (function () {
       if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
       var root = location.pathname.replace(/(imu|control|about)\/(index\.html)?$/, "");
       navigator.serviceWorker.register(root + "sw.js").catch(function () {});

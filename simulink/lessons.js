@@ -1,6 +1,10 @@
 /* 43 课目录（来自 simulink-control-tutorial），demo 字段指向本页可交互复现的课程 */
 window.SIMULINK_LESSONS = {
   repo: "https://github.com/xingd5478-ctrl/simulink-control-tutorial",
+  levels: {
+    core: ["t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09", "t10", "t11", "t12", "t16", "t20", "t21", "t22", "t26", "t27", "t28", "t35"],
+    concept: ["t19", "t33", "t34", "t36", "t39", "t40", "t41", "t42", "t43"],
+  },
   phases: [
     {
       id: 1, title: "Phase 1 · Simulink 基础与动力学", range: "t01–t08",

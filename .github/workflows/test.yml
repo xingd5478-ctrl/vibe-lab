@@ -14,6 +14,8 @@ jobs:
           node-version: "22"
       - name: Run unit tests
         run: npm test
+      - name: chart.js copies in sync
+        run: node scripts/sync_chart.mjs --check
 
   e2e:
     runs-on: windows-latest

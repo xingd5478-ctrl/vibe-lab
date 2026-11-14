@@ -26,6 +26,15 @@
       </p>
     </header>
 
+    <section class="paths" aria-label="选择学习路径">
+      <h2>从哪开始？</h2>
+      <div class="paths-grid">
+        <a data-path="imu" href="imu/"><b>① 我有一组传感器数据</b><span>IMU 数据实验室 · 10 章手册</span></a>
+        <a data-path="control" href="control/"><b>② 我想调控制器</b><span>Control Play · 14 章手册 + 4 实验</span></a>
+        <a data-path="simulink" href="simulink/"><b>③ 我想系统学控制</b><span>Simulink 43 课 · 19 交互</span></a>
+      </div>
+    </section>
+
     <main id="main">
     <section class="cards">
       <a class="card" data-target="imu" href="#">
@@ -87,8 +96,8 @@
     (function () {
       var isFile = location.protocol === "file:";
       var base = location.pathname.replace(/[^/]*$/, "");
-      document.querySelectorAll("[data-target]").forEach(function (a) {
-        var t = a.getAttribute("data-target");
+      document.querySelectorAll("[data-target], [data-path]").forEach(function (a) {
+        var t = a.getAttribute("data-target") || a.getAttribute("data-path");
         if (isFile) {
           a.href = t === "imu" ? "../imu-lab/static/index.html"
             : t === "control" ? "../control-play/index.html"

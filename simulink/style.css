@@ -72,6 +72,8 @@ input[type="search"] {
   font-size: 10px; color: var(--accent-2); border: 1px solid #bcd0c3;
   padding: 0 4px; border-radius: 2px; margin-left: 6px; vertical-align: 1px;
 }
+.lesson .tag.core { color: var(--accent); border-color: #9db8d0; }
+.lesson .tag.concept { color: var(--orange); border-color: #dfc7b2; }
 .lesson.dim { display: none; }
 
 .demo-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }

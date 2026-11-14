@@ -14,6 +14,9 @@
   DATA.phases.forEach((ph) => ph.items.forEach((l) => lessons.push({ ...l, phase: ph.title })));
   const byId = {};
   lessons.forEach((l) => { byId[l.id] = l; });
+  const LEVELS = DATA.levels || { core: [], concept: [] };
+  const levelOf = (id) => (LEVELS.core.includes(id) ? "core" : LEVELS.concept.includes(id) ? "concept" : "ok");
+  const LEVEL_LABEL = { core: "精读", concept: "概念", ok: "合格" };
 
   const cache = new Map();
   let current = null;
@@ -167,11 +170,11 @@
   }
 
   function render(lesson, text) {
+    const body = $("lesson-body");
     $("lesson-title").textContent = `${lesson.id} · ${lesson.title}`;
-    $("lesson-phase").textContent = lesson.phase;
+    $("lesson-phase").textContent = `${lesson.phase} · ${LEVEL_LABEL[levelOf(lesson.id)]}`;
     $("lesson-num").textContent = lesson.desc;
     $("lesson-status").textContent = "";
-    const body = $("lesson-body");
     body.innerHTML = "";
     body.appendChild(introFor(lesson));
     const guide = guideFor(lesson);
@@ -234,8 +237,8 @@
     document.querySelectorAll(".lesson").forEach((b) => {
       b.setAttribute("aria-current", String(b.dataset.id === id));
     });
+    $("lesson-phase").textContent = `${lesson.phase} · ${LEVEL_LABEL[levelOf(id)]}`;
     $("lesson-title").textContent = `${lesson.id} · ${lesson.title}`;
-    $("lesson-phase").textContent = lesson.phase;
     $("lesson-num").textContent = lesson.desc;
     $("lesson-body").innerHTML = "";
     renderNav(id);
@@ -288,7 +291,9 @@
         b.type = "button";
         b.dataset.id = l.id;
         b.dataset.text = (l.id + " " + l.title + " " + l.desc + " " + ph.title).toLowerCase();
-        b.innerHTML = `<span class="n">${l.id}</span>${l.title}`;
+        b.innerHTML = `<span class="n">${l.id}</span>${l.title}` +
+          `<span class="tag ${levelOf(l.id)}">${LEVEL_LABEL[levelOf(l.id)]}</span>` +
+          (l.demo ? '<span class="tag">交互</span>' : "");
         b.addEventListener("click", () => load(l.id));
         box.appendChild(b);
       });
