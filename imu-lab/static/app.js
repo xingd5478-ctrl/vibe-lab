@@ -20,6 +20,7 @@
     source: "示例数据（合成）",
     r: 2.51188643150958e-7,
     q: 2.51188643150958e-9,
+    fit: null,
   };
 
   /* ---------- 数据 ---------- */
@@ -141,6 +142,37 @@
     return out;
   }
 
+  function median(arr) {
+    const a = [...arr].sort((x, y) => x - y);
+    if (!a.length) return NaN;
+    const m = Math.floor(a.length / 2);
+    return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+  }
+
+  /* 从 Allan 曲线拟合 ARW/RRW：
+     σ(τ)=N/√τ（短 τ），σ(τ)=K√(τ/3)（长 τ）；N、K 单位为 °/√s 与 (°/s)/√s */
+  function fitAllan(pts, dt) {
+    if (!pts.length) return null;
+    const tmin = pts[0].tau, tmax = pts[pts.length - 1].tau;
+    const shortMax = Math.min(1.0, tmax / 3);
+    const longMin = Math.max(2 * tmin, tmax / 4);
+    const short = pts.filter((p) => p.tau <= shortMax);
+    const long = pts.filter((p) => p.tau >= longMin);
+    const N = median(short.map((p) => p.adev * Math.sqrt(p.tau)));
+    const K = median(long.map((p) => p.adev / Math.sqrt(p.tau / 3)));
+    if (!isFinite(N) || !isFinite(K) || N <= 0 || K <= 0) return null;
+    return {
+      N,
+      K,
+      arw: N * 60,
+      rrw: K * 60,
+      r: N * N * dt,
+      q: K * K * dt,
+      shortMax,
+      longMin,
+    };
+  }
+
   function plot(el, cfg) {
     const pad = { l: 58, r: 16, t: 28, b: 34 };
     const w = Math.max(el.clientWidth || 640, 320);
@@ -200,14 +232,15 @@
     series.forEach((s) => {
       let d = "";
       s.points.forEach(([x, y], i) => { d += `${i ? "L" : "M"}${X(x).toFixed(2)},${Y(y).toFixed(2)}`; });
-      svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.width || 1.2}" stroke-linejoin="round" stroke-linecap="round"/>`;
+      svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.width || 1.2}" stroke-linejoin="round" stroke-linecap="round"${s.dash ? ` stroke-dasharray="${s.dash}"` : ""}/>`;
     });
     svg += `</g>`;
 
     let total = 0;
-    series.forEach((s) => { total += 28 + s.name.length * 11; });
+    series.forEach((s) => { if (s.legend !== false) total += 28 + s.name.length * 11; });
     let lx = Math.max(pad.l + 84, w - pad.r - total);
     series.forEach((s) => {
+      if (s.legend === false) return;
       svg += `<line x1="${lx}" y1="${pad.t - 18}" x2="${lx + 14}" y2="${pad.t - 18}" stroke="${s.color}" stroke-width="2"/>`;
       svg += `<text class="legend-label" x="${lx + 19}" y="${pad.t - 14}">${s.name}</text>`;
       lx += 28 + s.name.length * 11;
@@ -258,6 +291,21 @@
     });
 
     const dt = 1 / state.fs;
+    const allan = {};
+    AXES.forEach((a) => { allan[a.key] = allanDeviation(clean.map((r) => r[a.key]), dt); });
+    const fit = fitAllan(allan[ch] || [], dt);
+    state.fit = fit;
+    const fitSeries = [];
+    if (fit) {
+      const shortPts = (allan[ch] || [])
+        .filter((p) => p.tau <= fit.shortMax)
+        .map((p) => [p.tau, fit.N / Math.sqrt(p.tau)]);
+      const longPts = (allan[ch] || [])
+        .filter((p) => p.tau >= fit.longMin)
+        .map((p) => [p.tau, fit.K * Math.sqrt(p.tau / 3)]);
+      fitSeries.push({ name: "ARW 拟合", color: "#7a9cc6", width: 1.1, dash: "5 4", legend: false, points: shortPts });
+      fitSeries.push({ name: "RRW 拟合", color: "#c9a27a", width: 1.1, dash: "5 4", legend: false, points: longPts });
+    }
     plot($("chart-allan"), {
       height: 250,
       logX: true,
@@ -268,9 +316,15 @@
         name: a.label.split(" · ")[0],
         color: a.color,
         width: 1.2,
-        points: allanDeviation(clean.map((r) => r[a.key]), dt).map((p) => [p.tau, p.adev]),
-      })),
+        points: allan[a.key].map((p) => [p.tau, p.adev]),
+      })).concat(fitSeries),
     });
+    const fi = $("fit-info");
+    if (fi) {
+      fi.textContent = fit
+        ? `ARW=${fit.arw.toFixed(3)} °/√h · RRW=${fit.rrw.toFixed(3)} (°/s)/√h · R/Q=${(fit.r / fit.q).toFixed(1)}`
+        : "拟合失败：数据太短或曲线异常";
+    }
 
     const angle = integrate(clean.map((r) => r[ch]), state.fs);
     const filtered = kf1d(angle, state.r, state.q, angle[0], 1);
@@ -345,6 +399,20 @@
       state.source = "示例数据（合成）";
       state.fs = 100;
       $("fs").value = "100";
+      draw();
+    });
+
+    $("fit").addEventListener("click", () => {
+      if (!state.fit) return;
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+      const lr = clamp(Math.log10(state.fit.r), -10, -2);
+      const lq = clamp(Math.log10(state.fit.q), -12, -4);
+      state.r = Math.pow(10, lr);
+      state.q = Math.pow(10, lq);
+      $("logR").value = lr.toFixed(1);
+      $("logQ").value = lq.toFixed(1);
+      $("r-val").textContent = state.r.toExponential(2);
+      $("q-val").textContent = state.q.toExponential(2);
       draw();
     });
 
