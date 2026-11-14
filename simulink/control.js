@@ -285,7 +285,7 @@
 
   function rootLocusDemo(K) {
     const Ks = [];
-    for (let e = -2; e <= Math.log10(20); e += 0.05) Ks.push(Math.pow(10, e));
+    for (let e = -2; e <= Math.log10(300); e += 0.05) Ks.push(Math.pow(10, e));
     const branches = [[], [], []];
     let prev = null;
     const dist2 = (p, q) => (p.re - q.re) ** 2 + (p.im - q.im) ** 2;

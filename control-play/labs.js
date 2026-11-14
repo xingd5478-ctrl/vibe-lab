@@ -133,7 +133,7 @@
   module({
     id: "lab-rl",
     title: "根轨迹",
-    note: "G(s)=1/(s(s+1)(s+2))。X=开环极点（0,−1,−2），实心点=当前闭环极点；本系统无零点，所以没有 O。K 过 6 后进入右半平面。",
+    note: "G(s)=1/(s(s+1)(s+2))。X=开环极点（0,−1,−2），实心点=当前闭环极点；蓝色虚线为 60° 渐近线，本系统无零点（无 O）。K 过 6 后进入右半平面。",
     defaults: { K: 1 },
     controls(box, s, refresh) {
       box.appendChild(slider("开环增益 K", 0.1, 50, 0.1, s.K, (v) => { s.K = v; refresh(); }));
@@ -147,7 +147,14 @@
       }));
       series.push({
         name: "虚轴", color: "#b9b3a5", width: 1, dash: "4 4", legend: false,
-        points: [[0, -mi * 1.25], [0, mi * 1.25]],
+        points: [[0, -4.5], [0, 4.5]],
+      });
+      [60, 180, 300].forEach((deg) => {
+        const rad = (deg * Math.PI) / 180;
+        series.push({
+          name: "渐近线", color: "#7a9cc6", width: 1, dash: "6 5", legend: false,
+          points: [[-1, 0], [-1 + 8 * Math.cos(rad), 8 * Math.sin(rad)]],
+        });
       });
       series.push({
         name: "开环极点 X", color: "#5b564c", marker: "x", line: false, legend: true,
@@ -161,8 +168,8 @@
         series.push({ name: "零点 O", color: "#2f6b4f", marker: "o", line: false, legend: true, points: r.zeros.map((p) => [p, 0]) });
       }
       plot(a, {
-        height: 220, xLabel: "Re", yLabel: "Im", equalAspect: true,
-        yMin: -mi * 1.25, yMax: mi * 1.25,
+        height: 240, xLabel: "Re", yLabel: "Im",
+        xMin: -5.5, xMax: 1.5, yMin: -4.5, yMax: 4.5,
         series,
       });
       b.innerHTML = "";

@@ -359,7 +359,7 @@
     rootlocus: {
       title: "t22 · 根轨迹",
       lesson: "t22",
-      note: "G(s)=1/(s(s+1)(s+2))。X=开环极点（0,−1,−2），实心点=当前闭环极点；本系统无零点，所以没有 O。K 过 6 后极点进入右半平面。",
+      note: "G(s)=1/(s(s+1)(s+2))。X=开环极点（0,−1,−2），实心点=当前闭环极点，蓝色虚线为 60° 渐近线；本系统无零点（无 O）。K 过 6 后极点进入右半平面。",
       diagram: {
         aria: "根轨迹：增益 K 与开环 G(s) 的闭环极点",
         blocks: [{ label: "K" }, { label: "G(s)", sub: "1/(s(s+1)(s+2))" }, { label: "rlocus" }],
@@ -373,15 +373,20 @@
           name: `分支 ${i + 1}`, color: i === 0 ? "#1f4e79" : i === 1 ? "#2f6b4f" : "#8a4a12",
           width: 1.4, legend: false, points: br,
         }));
-        series.push({ name: "虚轴", color: "#b9b3a5", width: 1, dash: "4 4", legend: false, points: [[0, -maxIm * 1.25], [0, maxIm * 1.25]] });
+        series.push({ name: "虚轴", color: "#b9b3a5", width: 1, dash: "4 4", legend: false, points: [[0, -4.5], [0, 4.5]] });
+        [60, 180, 300].forEach((deg) => {
+          const rad = (deg * Math.PI) / 180;
+          series.push({ name: "渐近线", color: "#7a9cc6", width: 1, dash: "6 5", legend: false,
+            points: [[-1, 0], [-1 + 8 * Math.cos(rad), 8 * Math.sin(rad)]] });
+        });
         series.push({ name: "开环极点 X", color: "#5b564c", marker: "x", line: false, points: b.openPoles.map((p) => [p, 0]) });
         series.push({ name: "当前闭环极点", color: "#1f4e79", marker: "dot", line: false, points: b.current.map((p) => [p.re, p.im]) });
         if (b.zeros.length) {
           series.push({ name: "零点 O", color: "#2f6b4f", marker: "o", line: false, points: b.zeros.map((p) => [p, 0]) });
         }
         plot($("chart-a"), {
-          height: 270, xLabel: "Re", yLabel: "Im", equalAspect: true,
-          yMin: -maxIm * 1.25, yMax: maxIm * 1.25,
+          height: 270, xLabel: "Re", yLabel: "Im",
+          xMin: -5.5, xMax: 1.5, yMin: -4.5, yMax: 4.5,
           aria: `根轨迹，K=${p.K}`,
           series,
         });

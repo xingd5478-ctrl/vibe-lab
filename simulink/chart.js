@@ -287,8 +287,8 @@
 
     const logX = !!cfg.logX, logY = !!cfg.logY;
     const pos = (a) => a.filter((v) => v > 0);
-    let xmin = logX ? Math.min(...pos(xs)) : Math.min(...xs);
-    let xmax = logX ? Math.max(...pos(xs)) : Math.max(...xs);
+    let xmin = cfg.xMin !== undefined ? cfg.xMin : (logX ? Math.min(...pos(xs)) : Math.min(...xs));
+    let xmax = cfg.xMax !== undefined ? cfg.xMax : (logX ? Math.max(...pos(xs)) : Math.max(...xs));
     let ymin = cfg.yMin !== undefined ? cfg.yMin : (logY ? Math.min(...pos(ys)) : Math.min(...ys));
     let ymax = cfg.yMax !== undefined ? cfg.yMax : (logY ? Math.max(...pos(ys)) : Math.max(...ys));
 
