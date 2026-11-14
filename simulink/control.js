@@ -130,7 +130,39 @@
     return { re: -zeta * wn, im };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, metrics, poles };
+  function signalDemo(K, freq, noise) {
+    const dt = 0.001, T = 4, n = Math.round(T / dt);
+    const t = new Float64Array(n), u = new Float64Array(n), y = new Float64Array(n);
+    const r = rng(11);
+    for (let i = 0; i < n; i++) {
+      t[i] = i * dt;
+      u[i] = Math.sin(2 * Math.PI * freq * t[i]) + (noise ? gauss(r) * 0.15 : 0);
+      y[i] = K * u[i];
+    }
+    return { t, u, y };
+  }
+
+  function pidDemo(kp, ki, kd) {
+    const wn = 4, zeta = 0.4, dt = 0.002, T = 8, n = Math.round(T / dt);
+    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
+    let x = 0, v = 0, I = 0, pe = 0;
+    for (let i = 0; i < n; i++) {
+      t[i] = i * dt;
+      const ref = t[i] >= 0.5 ? 1 : 0;
+      const e = ref - x;
+      I = Math.max(-10, Math.min(10, I + e * dt));
+      const de = (e - pe) / dt;
+      pe = e;
+      u[i] = Math.max(-20, Math.min(20, kp * e + ki * I + kd * de));
+      const acc = wn * wn * (u[i] - x) - 2 * zeta * wn * v;
+      v += acc * dt;
+      x += v * dt;
+      y[i] = x;
+    }
+    return { t, y, u };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

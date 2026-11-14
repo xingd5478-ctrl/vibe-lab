@@ -99,7 +99,7 @@ async function main() {
     await check("simulink", fileUrl("simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#catalog .lesson').length")) === 43, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));
-      if ((await e("document.querySelectorAll('#tabs button').length")) !== 5) throw new Error("simulink: demo tabs");
+      if ((await e("document.querySelectorAll('#tabs button').length")) !== 7) throw new Error("simulink: demo tabs");
       await e("document.querySelector('#tabs button[data-demo=\"smc\"]').click()");
       await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("抖振"));
     });
@@ -110,6 +110,8 @@ async function main() {
       if ((await e("document.querySelectorAll('#lesson-nav button').length")) < 1) throw new Error("course: prev/next missing");
       const dl = await e("(() => { const a = document.querySelector('#lesson-body a[download]'); return a ? a.getAttribute('href') : ''; })()");
       if (!/\.slx$/.test(dl)) throw new Error("course: .slx download link missing");
+      if (!(await e("!!document.querySelector('#lesson-body .guide')"))) throw new Error("course: beginner guide missing");
+      if ((await e("document.querySelectorAll('#lesson-body .guide-card').length")) < 3) throw new Error("course: guide concepts missing");
       try {
         await waitFor(async () => (await e("document.querySelectorAll('#lesson-body .reader-sec').length")) > 0, 10000);
         console.log("   course content loaded (jsDelivr)");

@@ -188,6 +188,26 @@ code { font-family: var(--mono); font-size: 0.92em; background: #ece8dd; padding
 .reader-fig figcaption { font: 10px var(--mono); color: var(--muted); margin-top: 4px; }
 .lesson[aria-current="true"] { background: #e7edf3; color: var(--accent); font-weight: 600; }
 
+.guide { margin-top: 18px; padding: 14px 16px; border: 1px solid var(--line); background: #f9f7f0; border-radius: 3px; }
+.guide h3 { margin: 0 0 8px; font-size: 15px; }
+.guide h4 { margin: 14px 0 4px; font-size: 12.5px; color: var(--muted); letter-spacing: 0.04em; }
+.guide-hook { margin: 8px 0; padding: 8px 12px; border-left: 3px solid var(--accent); background: #eef2f6; font-size: 14px; color: #2a2a2a; }
+.guide-goal { margin: 8px 0; font-size: 13px; color: #3c3a34; }
+.guide-goal b { color: var(--ink); }
+.flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; }
+.flow-chip { border: 1px solid #b9b3a5; background: #fff; padding: 4px 9px; font: 11px var(--mono); border-radius: 2px; }
+.flow-arrow { color: var(--muted); font-family: var(--mono); }
+.guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 8px 0; }
+.guide-card { border: 1px solid var(--line); background: #fff; padding: 8px 10px; }
+.guide-card b { display: block; font-size: 12.5px; margin-bottom: 2px; }
+.guide-card p { margin: 0; font-size: 12.5px; color: #3c3a34; }
+.guide-math { font: 13px/1.6 var(--mono); background: #ece8dd; padding: 8px 10px; border-radius: 2px; margin: 8px 0; }
+.guide-list { margin: 6px 0 0 18px; padding: 0; font-size: 13px; }
+.guide-list li { margin: 3px 0; }
+.guide-warn { border-left: 3px solid var(--orange); background: #fbf3ea; padding: 8px 10px; margin: 8px 0; font-size: 13px; }
+.guide-quiz details { margin: 6px 0; font-size: 13px; }
+.guide-quiz summary { cursor: pointer; color: var(--accent); }
+
 @media (max-width: 900px) {
   .course-layout { grid-template-columns: 1fr; }
 }

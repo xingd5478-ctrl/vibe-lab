@@ -5,12 +5,12 @@ window.SIMULINK_LESSONS = {
     {
       id: 1, title: "Phase 1 · Simulink 基础与动力学", range: "t01–t08",
       items: [
-        { id: "t01", n: 1, title: "信号基础", desc: "信号、增益、示波器", file: "t01_signal_basics.m", model: "tutorial01_signals.slx" },
-        { id: "t02", n: 2, title: "数学运算", desc: "Sum/Product/Mux/Demux", file: "t02_math_blocks.m", model: "tutorial02_math.slx" },
+        { id: "t01", n: 1, title: "信号基础", desc: "信号、增益、示波器", file: "t01_signal_basics.m", model: "tutorial01_signals.slx", demo: "signal" },
+        { id: "t02", n: 2, title: "数学运算", desc: "Sum/Product/Mux/Demux", file: "t02_math_blocks.m", model: "tutorial02_math.slx", demo: "signal" },
         { id: "t03", n: 3, title: "一阶系统", desc: "传递函数、时间常数", file: "t03_first_order_sys.m", model: "tutorial03_first_order.slx", demo: "first-order" },
         { id: "t04", n: 4, title: "二阶系统", desc: "阻尼比、超调量、固有频率", file: "t04_second_order_sys.m", model: "tutorial04_second_order.slx", demo: "second-order" },
-        { id: "t05", n: 5, title: "PID 控制", desc: "P/I/D 各环节作用、反馈闭环", file: "t05_pid_control.m", model: "tutorial05_pid.slx" },
-        { id: "t06", n: 6, title: "信号源与输出", desc: "Workspace 导入导出", file: "t06_sources_and_sinks.m", model: "tutorial06_sources_sinks.slx" },
+        { id: "t05", n: 5, title: "PID 控制", desc: "P/I/D 各环节作用、反馈闭环", file: "t05_pid_control.m", model: "tutorial05_pid.slx", demo: "pid" },
+        { id: "t06", n: 6, title: "信号源与输出", desc: "Workspace 导入导出", file: "t06_sources_and_sinks.m", model: "tutorial06_sources_sinks.slx", demo: "signal" },
         { id: "t07", n: 7, title: "子系统", desc: "模型层次化封装", file: "t07_subsystem.m", model: "tutorial07_subsystem.slx" },
         { id: "t08", n: 8, title: "Mask 封装", desc: "参数化模块设计", file: "t08_masking.m", model: "tutorial08_masking.slx" },
       ],

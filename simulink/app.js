@@ -69,6 +69,77 @@
   }
 
   const DEMOS = {
+    signal: {
+      title: "t01 · 信号与增益",
+      lesson: "t01",
+      note: "y(t)=K·u(t)。先看输入，再看放大后的输出；打开噪声模拟真实传感器。",
+      diagram: {
+        aria: "信号流：正弦输入经增益到示波器",
+        blocks: [{ label: "Sine" }, { label: "Gain K" }, { label: "Scope" }],
+      },
+      params: [
+        { id: "K", label: "增益 K", min: 0.5, max: 3, step: 0.1, value: 2 },
+        { id: "freq", label: "频率 (Hz)", min: 0.2, max: 2, step: 0.05, value: 0.5 },
+        { id: "noise", label: "叠加噪声", type: "toggle", value: false },
+      ],
+      render(p) {
+        const r = S.signalDemo(p.K, p.freq, p.noise);
+        plot($("chart-a"), {
+          height: 260, xLabel: "时间 (s)", yLabel: "u(t) / y(t)",
+          yMin: -3.6, yMax: 3.6,
+          aria: `正弦输入经增益 K=${p.K} 的输出`,
+          series: [
+            { name: "输入 u", color: "#b9b3a5", width: 1.6, points: toPts(r.t, r.u) },
+            { name: "输出 y=K·u", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) },
+          ],
+        });
+        $("chart-b").innerHTML = "";
+        metrics([
+          ["输入幅值", "1.00"],
+          ["输出幅值", p.K.toFixed(2)],
+          ["频率", p.freq.toFixed(2) + " Hz"],
+          ["噪声", p.noise ? "有" : "无"],
+        ]);
+      },
+    },
+
+    pid: {
+      title: "t05 · PID 控制",
+      lesson: "t05",
+      note: "u = Kp·e + Ki·∫e + Kd·de。先把 Ki、Kd 调 0 只看 P，再加 I 消稳态误差，最后加 D 压超调。",
+      diagram: {
+        aria: "PID 闭环框图：参考与输出相减进入 PID，控制二阶对象",
+        blocks: [{ label: "Step" }, { label: "Σ", sub: "+ −" }, { label: "PID" }, { label: "Plant", sub: "二阶对象" }, { label: "Scope" }],
+        sumIndex: 1, feedback: "输出 y",
+      },
+      params: [
+        { id: "kp", label: "Kp", min: 0, max: 6, step: 0.1, value: 1.5 },
+        { id: "ki", label: "Ki", min: 0, max: 4, step: 0.1, value: 1.2 },
+        { id: "kd", label: "Kd", min: 0, max: 1, step: 0.01, value: 0.05 },
+      ],
+      render(p) {
+        const r = S.pidDemo(p.kp, p.ki, p.kd);
+        const m = S.metrics(r.t, r.y, 1);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "输出 y",
+          yMin: 0, yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
+          aria: `PID 阶跃响应，Kp=${p.kp}，Ki=${p.ki}，Kd=${p.kd}`,
+          series: [{ name: "y", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          aria: "PID 控制量",
+          series: [{ name: "u", color: "#2f6b4f", width: 1.2, points: toPts(r.t, r.u) }],
+        });
+        metrics([
+          ["超调量", f2(m.overshoot) + " %"],
+          ["2% 调节时间", f2(m.settle) + " s"],
+          ["稳态误差", m.ess.toFixed(4)],
+          ["控制峰值", maxOf(r.u).toFixed(2)],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",

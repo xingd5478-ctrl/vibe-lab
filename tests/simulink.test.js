@@ -52,3 +52,21 @@ test("SMC tracks with boundary layer and reports chattering", () => {
   const sharp = S.smc(4, 8, 0.01);
   assert.ok(sharp.chattering > r.chattering, "smaller boundary layer should chatter more");
 });
+
+test("signal demo applies gain elementwise", () => {
+  const a = S.signalDemo(2, 0.5, false);
+  const b = S.signalDemo(0.5, 0.5, false);
+  for (let i = 0; i < a.t.length; i += 50) {
+    assert.ok(Math.abs(a.y[i] - 2 * a.u[i]) < 1e-9);
+    assert.ok(Math.abs(b.y[i] - 0.5 * b.u[i]) < 1e-9);
+  }
+});
+
+test("PID with integral removes steady-state error", () => {
+  const noI = S.pidDemo(1.5, 0, 0.05);
+  const withI = S.pidDemo(1.5, 1.5, 0.05);
+  const essP = Math.abs(1 - noI.y[noI.y.length - 1]);
+  const essPI = Math.abs(1 - withI.y[withI.y.length - 1]);
+  assert.ok(essPI < 0.02, `ess=${essPI}`);
+  assert.ok(essPI < essP, `PI ${essPI} should beat P ${essP}`);
+});

@@ -105,6 +105,62 @@
     return intro;
   }
 
+  function guideFor(lesson) {
+    const g = window.SIMULINK_GUIDE && window.SIMULINK_GUIDE[lesson.id];
+    if (!g) return null;
+    const wrap = el("section", "guide");
+    wrap.appendChild(el("h3", "", "新手讲义 · 一步一步看懂"));
+    wrap.appendChild(el("p", "guide-hook", g.hook));
+    const goal = el("p", "guide-goal");
+    goal.appendChild(el("b", "", "本课目标："));
+    goal.appendChild(document.createTextNode(g.goal));
+    wrap.appendChild(goal);
+
+    if (g.blocks) {
+      const flow = el("div", "flow");
+      g.blocks.forEach((b, i) => {
+        if (i) flow.appendChild(el("span", "flow-arrow", "→"));
+        flow.appendChild(el("span", "flow-chip", b));
+      });
+      wrap.appendChild(flow);
+    }
+
+    wrap.appendChild(el("h4", "", "关键概念"));
+    const grid = el("div", "guide-grid");
+    g.concepts.forEach(([t, d]) => {
+      const c = el("div", "guide-card");
+      c.appendChild(el("b", "", t));
+      c.appendChild(el("p", "", d));
+      grid.appendChild(c);
+    });
+    wrap.appendChild(grid);
+
+    wrap.appendChild(el("h4", "", "公式 / 怎么读"));
+    wrap.appendChild(el("div", "guide-math", g.math));
+
+    wrap.appendChild(el("h4", "", "在 Simulink 里怎么做"));
+    const ol = el("ol", "guide-list");
+    g.steps.forEach((s) => ol.appendChild(el("li", "", s)));
+    wrap.appendChild(ol);
+
+    wrap.appendChild(el("h4", "", "运行后看什么"));
+    wrap.appendChild(el("p", "guide-goal", g.watch));
+
+    wrap.appendChild(el("h4", "", "新手容易踩的坑"));
+    wrap.appendChild(el("p", "guide-warn", g.pitfall));
+
+    wrap.appendChild(el("h4", "", "自测"));
+    const quiz = el("div", "guide-quiz");
+    g.quiz.forEach(([q, a]) => {
+      const d = document.createElement("details");
+      d.appendChild(el("summary", "", q));
+      d.appendChild(el("p", "", a));
+      quiz.appendChild(d);
+    });
+    wrap.appendChild(quiz);
+    return wrap;
+  }
+
   function render(lesson, text) {
     $("lesson-title").textContent = `${lesson.id} · ${lesson.title}`;
     $("lesson-phase").textContent = lesson.phase;
@@ -113,6 +169,8 @@
     const body = $("lesson-body");
     body.innerHTML = "";
     body.appendChild(introFor(lesson));
+    const guide = guideFor(lesson);
+    if (guide) body.appendChild(guide);
 
     const imgs = el("div", "reader-figs");
     imageList(lesson).forEach((name, i) => {
@@ -179,6 +237,8 @@
     const cached = cache.get(id);
     if (cached) { render(lesson, cached); return; }
     $("lesson-body").appendChild(introFor(lesson));
+    const guide = guideFor(lesson);
+    if (guide) $("lesson-body").appendChild(guide);
     setStatus("正在读取讲义…");
     try {
       let text = null;

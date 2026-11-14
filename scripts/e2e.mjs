@@ -162,6 +162,7 @@ async function main() {
     await sleep(900);
     if (!(await evalJs("document.querySelector('#lesson-title').textContent")).includes("t03")) throw new Error("course: title");
     if ((await evalJs("document.querySelectorAll('#lesson-list .lesson').length")) !== 43) throw new Error("course: lessons");
+    if ((await evalJs("document.querySelectorAll('#lesson-body .guide-card').length")) < 3) throw new Error("course: guide");
     await evalJs("document.querySelector('#lesson-body a[download]').click()");
     await waitFor(() => fs.readdirSync(download).some((f) => f.endsWith(".slx")), 10000);
     const slx = path.join(download, fs.readdirSync(download).find((f) => f.endsWith(".slx")));
