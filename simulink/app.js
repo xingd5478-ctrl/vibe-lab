@@ -31,7 +31,7 @@
     if (!l) { $("links").innerHTML = ""; return; }
     $("links").innerHTML =
       `<a href="${REPO}/blob/main/${l.file}" target="_blank" rel="noreferrer">第 ${l.n} 课 · ${l.file}</a>` +
-      `<a href="${REPO}/blob/main/models/${l.model}" target="_blank" rel="noreferrer">${l.model}</a>` +
+      `<a href="models/${l.model}" download>下载 ${l.model}（本站）</a>` +
       `<a href="${REPO}" target="_blank" rel="noreferrer">教程仓库</a>`;
   }
 

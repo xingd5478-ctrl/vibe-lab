@@ -45,6 +45,9 @@ async function waitFor(fn, timeout = 12000) {
 }
 
 async function main() {
+  const modelDir = path.join(ROOT, "simulink", "models");
+  const nModels = fs.existsSync(modelDir) ? fs.readdirSync(modelDir).filter((f) => f.endsWith(".slx")).length : 0;
+  if (nModels !== 43) throw new Error(`simulink: expected 43 vendored models, got ${nModels}`);
   const port = 9336;
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-smoke-"));
   const edge = spawn(EDGE, ["--headless=new", "--disable-gpu", "--no-first-run",
@@ -105,6 +108,8 @@ async function main() {
       await waitFor(async () => (await e("document.querySelectorAll('#lesson-list .lesson').length")) === 43);
       if (!(await e("document.querySelector('#lesson-title').textContent")).includes("t03")) throw new Error("course: lesson title");
       if ((await e("document.querySelectorAll('#lesson-nav button').length")) < 1) throw new Error("course: prev/next missing");
+      const dl = await e("(() => { const a = document.querySelector('#lesson-body a[download]'); return a ? a.getAttribute('href') : ''; })()");
+      if (!/\.slx$/.test(dl)) throw new Error("course: .slx download link missing");
       try {
         await waitFor(async () => (await e("document.querySelectorAll('#lesson-body .reader-sec').length")) > 0, 10000);
         console.log("   course content loaded (jsDelivr)");

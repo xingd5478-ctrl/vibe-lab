@@ -78,7 +78,9 @@ imu-lab/static/
 
 仿真内核在 `simulink/control.js`（UMD，可单测），图表复用 `chart.js`。`.slx` 是 MATLAB 二进制模型，浏览器不能直接运行；页面复现的是同一套数学，并链接每课的 `.m` / `.slx`。
 
-**完整讲义阅读器**：`/simulink/course.html` 提供 43 课讲义、注释、代码与结果图。为控制站点体积，课程内容按需从教程仓库的 raw 地址读取（需联网；失败时保留 GitHub 源链接），本站负责排版、搜索与上下课导航。
+**完整讲义阅读器**：`/simulink/course.html` 提供 43 课讲义、注释、代码与结果图。为控制站点体积，课程内容按需从教程仓库的 jsDelivr CDN 读取（失败回退 raw GitHub；再失败保留源链接），本站负责排版、搜索与上下课导航。
+
+**模型下载**：43 个 `.slx` 已托管在 `simulink/models/`（约 3.8 MB，MIT，见 `NOTICE.md`），每课讲义页提供同源 `download` 链接，`npm run smoke/e2e` 会校验下载文件是 zip。更新模型用 `node scripts/vendor_models.mjs`。
 
 ## 数据层
 

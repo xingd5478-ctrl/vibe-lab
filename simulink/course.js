@@ -97,13 +97,18 @@
     a1.href = `${REPO}/blob/main/${lesson.file}`;
     a1.target = "_blank";
     a1.rel = "noreferrer";
-    const a2 = el("a", "", `${lesson.model}（下载 .slx）`);
-    a2.href = `${REPO}/blob/main/models/${lesson.model}`;
+    const dl = el("a", "dl", `下载 ${lesson.model}`);
+    dl.href = `models/${lesson.model}`;
+    dl.setAttribute("download", lesson.model);
+    const a2 = el("a", "", "模型原始仓库");
+    a2.href = `${REPO}/tree/main/models`;
     a2.target = "_blank";
     a2.rel = "noreferrer";
     links.appendChild(a1);
+    links.appendChild(dl);
     links.appendChild(a2);
     intro.appendChild(links);
+    intro.appendChild(el("p", "hint", "模型已托管在本站（MIT），下载后用 MATLAB/Simulink 打开；浏览器不能直接运行 .slx。"));
     body.appendChild(intro);
 
     const imgs = el("div", "reader-figs");
