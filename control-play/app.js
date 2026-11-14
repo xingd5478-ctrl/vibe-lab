@@ -164,7 +164,7 @@
     const Yp = (v) => PAD.t + (1 - (v - phMin) / (phMax - phMin)) * ih;
     const xInv = (frac) => Math.pow(10, x0 + frac * (x1 - x0));
 
-    let svg = `<svg viewBox="0 0 ${w} ${h}" role="img">`;
+    let svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Bode 图：幅频与相频">`;
     linTicks(magMin, magMax, 5).forEach((v) => {
       const y = Ym(v);
       svg += `<line class="grid" x1="${PAD.l}" y1="${y}" x2="${w - PAD.r}" y2="${y}"/>`;
@@ -216,7 +216,7 @@
     const Y = (v) => PAD.t + (1 - v / ymax) * ih;
     const xInv = (frac) => frac * tmax;
 
-    let svg = `<svg viewBox="0 0 ${w} ${h}" role="img">`;
+    let svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="阶跃响应：开环与闭环 PID 对比">`;
     linTicks(0, ymax, 4).forEach((v) => {
       const y = Y(v);
       svg += `<line class="grid" x1="${PAD.l}" y1="${y}" x2="${w - PAD.r}" y2="${y}"/>`;
@@ -266,6 +266,10 @@
     $("kp-val").textContent = kp.toFixed(2);
     $("ki-val").textContent = ki.toFixed(2);
     $("kd-val").textContent = kd.toFixed(3);
+    [["wn", wn.toFixed(1)], ["zeta", zeta.toFixed(2)], ["kp", kp.toFixed(2)],
+     ["ki", ki.toFixed(2)], ["kd", kd.toFixed(3)]].forEach(([id, v]) => {
+      $(id).setAttribute("aria-valuetext", v);
+    });
 
     plotBode($("bode"), bode(wn, zeta));
     const open = sim(wn, zeta, false);

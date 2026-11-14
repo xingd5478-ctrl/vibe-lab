@@ -29,4 +29,10 @@ if ($dom2 -notmatch "Kp=3\.00") { throw "control: PID params not applied from UR
 if ($dom2 -notmatch "相位") { throw "control: Bode phase axis missing" }
 if ($dom2 -notmatch "闭环") { throw "control: closed-loop series missing" }
 
-Write-Output "SMOKE OK (imu + control)"
+$landing = ([uri](Join-Path $root "landing\index.html")).AbsoluteUri
+if ((Get-Dom $landing) -notmatch "传感器与控制可视化实验室") { throw "landing: title missing" }
+
+$about = ([uri](Join-Path $root "about\index.html")).AbsoluteUri
+if ((Get-Dom $about) -notmatch "方法说明") { throw "about: content missing" }
+
+Write-Output "SMOKE OK (landing + imu + control + about)"

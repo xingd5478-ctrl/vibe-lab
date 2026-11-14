@@ -23,6 +23,7 @@ python -m http.server 8000
 - **拟合 ARW/RRW + R² + 95% 分位区间**，图上叠加虚线拟合段
 - **一键把拟合值回填 R/Q**（log10 滑杆）
 - 实时 KF：积分角度 vs 滤波输出
+- **加载真实样例**：2 h 静态实验中的 60 s 片段（含 3 个坏帧），观察 CRC 清洗前后差异
 - **悬浮/触摸十字线读数**（时间/Allan/滤波图）
 - **导出 CSV / 单图 PNG**（2×）
 - **分享链接**：R/Q、通道、采样率写入 URL，可复现
@@ -40,7 +41,9 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test   # 在仓库根目录
+npm test        # 算法单测
+npm run smoke   # DOM 冒烟
+npm run visual  # 截图检查
 ```
 
 ## 部署

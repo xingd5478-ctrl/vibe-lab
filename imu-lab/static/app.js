@@ -274,7 +274,7 @@
     const xt = logX ? logTicks(xmin, xmax) : linTicks(xmin, xmax, 5);
     const yt = logY ? logTicks(ymin, ymax) : linTicks(ymin, ymax, 4);
 
-    let svg = `<svg viewBox="0 0 ${w} ${h}" role="img">`;
+    let svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${cfg.aria || "数据图"}">`;
     const clipId = "clip" + ((el._cid = (el._cid || 0) + 1));
     svg += `<defs><clipPath id="${clipId}"><rect x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}"/></clipPath></defs>`;
 
@@ -345,6 +345,7 @@
       yLabel: "角速度 (°/s)",
       yMin: -6,
       yMax: 6,
+      aria: `时域图：${clean.length} 帧角速度，原始与清洗后对比`,
       series: [
         { name: "原始", color: "#b9b3a5", width: 0.8, points: raw.map((r) => [r.t, r[ch]]) },
         { name: "清洗后", color: "#1f4e79", width: 1.0, points: clean.map((r) => [r.t, r[ch]]) },
@@ -372,6 +373,7 @@
       logY: true,
       xLabel: "τ (s)",
       yLabel: "Allan 标准差 (°/s)",
+      aria: `Allan 方差：三轴曲线，${fit ? `R²=${fit.r2.toFixed(3)}` : "未拟合"}`,
       series: AXES.map((a) => ({
         name: a.label.split(" · ")[0],
         color: a.color,
@@ -400,6 +402,7 @@
       height: 230,
       xLabel: "时间 (s)",
       yLabel: "角度 (°)",
+      aria: `滤波对比：原始积分与卡尔曼输出，R=${state.r.toExponential(1)}，Q=${state.q.toExponential(1)}`,
       series: [
         { name: "原始积分", color: "#d3ccba", width: 2.6, points: clean.map((r, i) => [r.t, angle[i] - angle[0]]) },
         { name: "卡尔曼", color: "#2f6b4f", width: 1.3, points: clean.map((r, i) => [r.t, filtered[i] - filtered[0]]) },
@@ -451,7 +454,8 @@
         (filtered[i] - filtered[0]).toFixed(6),
       ].join(","));
     });
-    downloadBlob(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }), "imu_lab_export.csv");
+    downloadBlob(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }),
+      `imu_lab_${ch}_R${state.r.toExponential(1)}_Q${state.q.toExponential(1)}.csv`.replace(/[^A-Za-z0-9_.+-]/g, ""));
     flash("CSV 已导出");
   }
 
@@ -579,7 +583,9 @@
       $(id).addEventListener("input", (ev) => {
         const e = Number(ev.target.value);
         setter(e);
-        $(valId).textContent = Math.pow(10, e).toExponential(2);
+        const v = Math.pow(10, e).toExponential(2);
+        $(valId).textContent = v;
+        ev.target.setAttribute("aria-valuetext", v);
         scheduleDraw();
       });
     };
@@ -593,6 +599,22 @@
       $("fs").value = "100";
       invalidate();
       draw();
+    });
+
+    $("load-real").addEventListener("click", async () => {
+      try {
+        const res = await fetch("sample_real_60s.csv", { cache: "no-store" });
+        if (!res.ok) throw new Error(String(res.status));
+        const rows = parseCSV(await res.text());
+        if (!rows.length) throw new Error("empty");
+        state.rows = rows;
+        state.source = "真实样例（2 h 数据 60 s）";
+        invalidate();
+        fixTime(rows, state.fs);
+        draw();
+      } catch (e) {
+        flash("file:// 下无法自动加载，请用“下载样例 CSV”后手动上传");
+      }
     });
 
     $("fit").addEventListener("click", () => {

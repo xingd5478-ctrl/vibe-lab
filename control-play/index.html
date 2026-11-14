@@ -17,28 +17,28 @@
     <div class="layout">
       <aside class="panel controls">
         <div class="field">
-          <label>自然频率 ωn <output id="wn-val">4.0</output></label>
-          <input id="wn" type="range" min="0.5" max="20" step="0.1" value="4" />
+          <label for="wn">自然频率 ωn <output id="wn-val">4.0</output></label>
+          <input id="wn" type="range" min="0.5" max="20" step="0.1" value="4" aria-label="自然频率" />
         </div>
 
         <div class="field">
-          <label>阻尼比 ζ <output id="zeta-val">0.40</output></label>
-          <input id="zeta" type="range" min="0.05" max="2" step="0.01" value="0.4" />
+          <label for="zeta">阻尼比 ζ <output id="zeta-val">0.40</output></label>
+          <input id="zeta" type="range" min="0.05" max="2" step="0.01" value="0.4" aria-label="阻尼比" />
         </div>
 
         <div class="field">
-          <label>Kp <output id="kp-val">1.50</output></label>
-          <input id="kp" type="range" min="0" max="10" step="0.05" value="1.5" />
+          <label for="kp">Kp <output id="kp-val">1.50</output></label>
+          <input id="kp" type="range" min="0" max="10" step="0.05" value="1.5" aria-label="比例增益 Kp" />
         </div>
 
         <div class="field">
-          <label>Ki <output id="ki-val">0.50</output></label>
-          <input id="ki" type="range" min="0" max="10" step="0.05" value="0.5" />
+          <label for="ki">Ki <output id="ki-val">0.50</output></label>
+          <input id="ki" type="range" min="0" max="10" step="0.05" value="0.5" aria-label="积分增益 Ki" />
         </div>
 
         <div class="field">
-          <label>Kd <output id="kd-val">0.050</output></label>
-          <input id="kd" type="range" min="0" max="2" step="0.005" value="0.05" />
+          <label for="kd">Kd <output id="kd-val">0.050</output></label>
+          <input id="kd" type="range" min="0" max="2" step="0.005" value="0.05" aria-label="微分增益 Kd" />
         </div>
 
         <div class="metrics">

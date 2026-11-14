@@ -5,6 +5,7 @@ venv/
 node_modules/
 dist/
 .streamlit/secrets.toml
+artifacts/
 *.log
 .DS_Store
 data/raw/

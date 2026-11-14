@@ -37,10 +37,11 @@ python -m http.server 8000
 
 ```bash
 npm test        # 算法单测（8 个）
-npm run smoke   # Edge headless DOM 冒烟（页面渲染 + 拟合 + PID URL）
+npm run smoke   # Edge headless DOM 冒烟（四页渲染 + 拟合 + PID URL）
+npm run visual  # 截图检查（桌面 + 窄屏，非空白/尺寸校验）
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、拟合恢复 ARW/RRW 与 R²；冒烟测试检查页面 SVG、拟合信息、PID 参数与 Bode 轴。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、拟合恢复 ARW/RRW 与 R²；冒烟测试检查页面 SVG、拟合信息、PID 参数与 Bode 轴；视觉检查输出到 `artifacts/visual/`。
 
 ## 线上结构
 
