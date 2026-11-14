@@ -317,6 +317,8 @@
     return {
       branches,
       current: cur,
+      openPoles: [0, -1, -2],
+      zeros: [],
       stable: maxRe < 0,
       maxRe,
       damping: -dom.re / mag,

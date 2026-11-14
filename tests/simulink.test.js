@@ -170,3 +170,15 @@ test("discrete PID deviates more as Ts grows", () => {
   assert.ok(err(fine) < err(coarse), `${err(fine)} < ${err(coarse)}`);
   assert.ok(fine.samples > coarse.samples);
 });
+
+test("root locus exposes poles/zero and current poles move with K", () => {
+  const a = S.rootLocusDemo(1);
+  const b = S.rootLocusDemo(10);
+  assert.deepEqual(a.openPoles, [0, -1, -2]);
+  assert.equal(a.zeros.length, 0);
+  assert.ok(a.maxRe < 0);
+  assert.ok(b.maxRe > 0);
+  const sumA = a.current.reduce((s, p) => s + p.re, 0);
+  assert.ok(Math.abs(sumA + 3) < 1e-6, `sum roots=${sumA}`);
+  assert.notDeepEqual(a.current, b.current);
+});

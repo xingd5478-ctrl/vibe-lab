@@ -57,6 +57,7 @@
   function module(spec) {
     const card = document.createElement("article");
     card.className = "lab-module";
+    card.id = spec.id;
     const h = document.createElement("h3");
     h.textContent = spec.title;
     const p = document.createElement("p");
@@ -132,7 +133,7 @@
   module({
     id: "lab-rl",
     title: "根轨迹",
-    note: "G(s)=1/(s(s+1)(s+2))，K 从 0→∞ 的闭环极点轨迹；穿过虚轴即临界稳定。",
+    note: "G(s)=1/(s(s+1)(s+2))。X=开环极点（0,−1,−2），实心点=当前闭环极点；本系统无零点，所以没有 O。K 过 6 后进入右半平面。",
     defaults: { K: 1 },
     controls(box, s, refresh) {
       box.appendChild(slider("开环增益 K", 0.1, 50, 0.1, s.K, (v) => { s.K = v; refresh(); }));
@@ -141,10 +142,28 @@
       const r = S.rootLocusDemo(s.K);
       let mi = 0.1;
       r.branches.forEach((br) => br.forEach(([, im]) => { if (Math.abs(im) > mi) mi = Math.abs(im); }));
-      plot(a, { height: 220, xLabel: "Re", yLabel: "Im", yMin: -mi * 1.25, yMax: mi * 1.25,
-        series: r.branches.map((br, i) => ({ name: `分支${i + 1}`, color: ["#1f4e79", "#2f6b4f", "#8a4a12"][i], width: 1.4, legend: false, points: br })) });
+      const series = r.branches.map((br, i) => ({
+        name: `分支${i + 1}`, color: ["#1f4e79", "#2f6b4f", "#8a4a12"][i], width: 1.4, legend: false, points: br,
+      }));
+      series.push({
+        name: "开环极点 X", color: "#5b564c", marker: "x", line: false, legend: true,
+        points: r.openPoles.map((p) => [p, 0]),
+      });
+      series.push({
+        name: "当前闭环极点", color: "#1f4e79", marker: "dot", line: false, legend: true,
+        points: r.current.map((p) => [p.re, p.im]),
+      });
+      if (r.zeros.length) {
+        series.push({ name: "零点 O", color: "#2f6b4f", marker: "o", line: false, legend: true, points: r.zeros.map((p) => [p, 0]) });
+      }
+      plot(a, {
+        height: 220, xLabel: "Re", yLabel: "Im",
+        yMin: -mi * 1.25, yMax: mi * 1.25,
+        series,
+      });
       b.innerHTML = "";
-      metrics(m, [["稳定性", r.stable ? "稳定" : "不稳定"], ["最大实部", r.maxRe.toFixed(3)], ["阻尼", r.damping.toFixed(2)]]);
+      const poles = r.current.map((q) => `${q.re.toFixed(2)}${q.im >= 0 ? "+" : ""}${q.im.toFixed(2)}j`).join("  ");
+      metrics(m, [["稳定性", r.stable ? "稳定" : "不稳定"], ["当前极点", poles], ["最大实部", r.maxRe.toFixed(3)], ["零点", "无"]]);
     },
   });
 

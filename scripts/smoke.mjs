@@ -89,6 +89,10 @@ async function main() {
       if ((await e("document.querySelectorAll('#manual .manual-card').length")) !== 14) throw new Error("control: manual chapters");
       if ((await e("document.querySelectorAll('#labs .lab-module').length")) !== 4) throw new Error("control: extra labs");
       if (!(await e("!!document.querySelector('#lab-sf-a svg')"))) throw new Error("control: state feedback lab chart");
+      if ((await e("document.querySelectorAll('#lab-rl-a svg circle').length")) < 3) throw new Error("control: root locus pole markers");
+      const cy0 = await e("[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')");
+      await e("(() => { const i = document.querySelector('#lab-rl input[type=range]'); i.value = '10'; i.dispatchEvent(new Event('input', { bubbles: true })); })()");
+      await waitFor(async () => (await e("[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')")) !== cy0);
     });
 
     await check("landing", fileUrl("landing/index.html"), async (e) => {

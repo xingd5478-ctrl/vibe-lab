@@ -278,7 +278,7 @@
     const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
     const series = cfg.series
       .map((s) => ({ ...s, points: decimate(s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])), 1500) }))
-      .filter((s) => s.points.length > 1);
+      .filter((s) => s.points.length > 1 || s.marker);
 
     if (!series.length) { el.innerHTML = ""; return; }
 
@@ -332,10 +332,27 @@
     svg += `<text class="axis-label" x="${pad.l}" y="${pad.t - 10}">${cfg.yLabel || ""}</text>`;
 
     svg += `<g clip-path="url(#${clipId})">`;
+    const marker = (kind, cx, cy, color, r) => {
+      const rr = r || 3.5;
+      if (kind === "x") {
+        return `<path d="M${cx - rr},${cy - rr} L${cx + rr},${cy + rr} M${cx + rr},${cy - rr} L${cx - rr},${cy + rr}" stroke="${color}" stroke-width="1.7" fill="none"/>`;
+      }
+      if (kind === "o") {
+        return `<circle cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="${color}" stroke-width="1.4"/>`;
+      }
+      return `<circle cx="${cx}" cy="${cy}" r="${rr}" fill="${color}"/>`;
+    };
     series.forEach((s) => {
-      let d = "";
-      s.points.forEach(([x, y], i) => { d += `${i ? "L" : "M"}${X(x).toFixed(2)},${Y(y).toFixed(2)}`; });
-      svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.width || 1.2}" stroke-linejoin="round" stroke-linecap="round"${s.dash ? ` stroke-dasharray="${s.dash}"` : ""}/>`;
+      if (s.line !== false && s.points.length > 1) {
+        let d = "";
+        s.points.forEach(([x, y], i) => { d += `${i ? "L" : "M"}${X(x).toFixed(2)},${Y(y).toFixed(2)}`; });
+        svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.width || 1.2}" stroke-linejoin="round" stroke-linecap="round"${s.dash ? ` stroke-dasharray="${s.dash}"` : ""}/>`;
+      }
+      if (s.marker) {
+        s.points.slice(0, 80).forEach(([x, y]) => {
+          svg += marker(s.marker, X(x), Y(y), s.color, s.markerSize);
+        });
+      }
     });
     svg += `</g>`;
 
@@ -344,7 +361,11 @@
     let lx = Math.max(pad.l + 84, w - pad.r - total);
     series.forEach((s) => {
       if (s.legend === false) return;
-      svg += `<line x1="${lx}" y1="${pad.t - 18}" x2="${lx + 14}" y2="${pad.t - 18}" stroke="${s.color}" stroke-width="2"/>`;
+      if (s.marker) {
+        svg += marker(s.marker, lx + 7, pad.t - 14, s.color, 3.2);
+      } else {
+        svg += `<line x1="${lx}" y1="${pad.t - 18}" x2="${lx + 14}" y2="${pad.t - 18}" stroke="${s.color}" stroke-width="2"/>`;
+      }
       svg += `<text class="legend-label" x="${lx + 19}" y="${pad.t - 14}">${s.name}</text>`;
       lx += 28 + s.name.length * 11;
     });

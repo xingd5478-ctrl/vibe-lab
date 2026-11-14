@@ -359,7 +359,7 @@
     rootlocus: {
       title: "t22 · 根轨迹",
       lesson: "t22",
-      note: "G(s)=1/(s(s+1)(s+2))；K 从 0 增大时 3 个闭环极点沿分支移动，穿过虚轴就是临界稳定。",
+      note: "G(s)=1/(s(s+1)(s+2))。X=开环极点（0,−1,−2），实心点=当前闭环极点；本系统无零点，所以没有 O。K 过 6 后极点进入右半平面。",
       diagram: {
         aria: "根轨迹：增益 K 与开环 G(s) 的闭环极点",
         blocks: [{ label: "K" }, { label: "G(s)", sub: "1/(s(s+1)(s+2))" }, { label: "rlocus" }],
@@ -373,6 +373,11 @@
           name: `分支 ${i + 1}`, color: i === 0 ? "#1f4e79" : i === 1 ? "#2f6b4f" : "#8a4a12",
           width: 1.4, legend: false, points: br,
         }));
+        series.push({ name: "开环极点 X", color: "#5b564c", marker: "x", line: false, points: b.openPoles.map((p) => [p, 0]) });
+        series.push({ name: "当前闭环极点", color: "#1f4e79", marker: "dot", line: false, points: b.current.map((p) => [p.re, p.im]) });
+        if (b.zeros.length) {
+          series.push({ name: "零点 O", color: "#2f6b4f", marker: "o", line: false, points: b.zeros.map((p) => [p, 0]) });
+        }
         plot($("chart-a"), {
           height: 270, xLabel: "Re", yLabel: "Im",
           yMin: -maxIm * 1.25, yMax: maxIm * 1.25,
@@ -385,7 +390,7 @@
           ["闭环极点", poles],
           ["稳定性", b.stable ? "稳定" : "不稳定"],
           ["最大实部", b.maxRe.toFixed(3)],
-          ["主极点阻尼", b.damping.toFixed(2)],
+          ["零点", "无（O 不显示）"],
         ]);
       },
     },
