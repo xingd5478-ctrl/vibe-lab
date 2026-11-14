@@ -203,7 +203,149 @@
     return { w, mag, phase, peak, bw, phaseAtWn: phase[iw < 0 ? phase.length - 1 : iw] };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, metrics, poles };
+  /* ---------- MPC：一阶对象，滚动优化 + 输入约束 ---------- */
+  function mpcDemo(N, Q, R, uMax) {
+    const Ts = 0.1, T = 8, n = Math.round(T / Ts);
+    const a = 0.9, b = 0.5;
+    const t = new Float64Array(n), xa = new Float64Array(n), ua = new Float64Array(n);
+    let x = 0;
+    let us = new Array(N).fill(0);
+    const refAt = (step) => (step * Ts >= 1 ? 1 : 0);
+
+    function predictCost(x0, u, ref, start) {
+      let xx = x0, cost = 0;
+      for (let j = 0; j < N; j++) {
+        xx = a * xx + b * u[j];
+        const r = refAt(start + j + 1);
+        cost += Q * (xx - r) * (xx - r) + R * u[j] * u[j];
+      }
+      return cost;
+    }
+
+    for (let k = 0; k < n; k++) {
+      const ref = refAt(k);
+      let base = predictCost(x, us, ref, k);
+      for (let it = 0; it < 18; it++) {
+        const grad = new Array(N).fill(0);
+        const eps = 1e-4;
+        for (let j = 0; j < N; j++) {
+          const old = us[j];
+          us[j] = old + eps;
+          grad[j] = (predictCost(x, us, ref, k) - base) / eps;
+          us[j] = old;
+        }
+        const step = 0.08 / (1 + Q);
+        for (let j = 0; j < N; j++) {
+          us[j] = Math.max(-uMax, Math.min(uMax, us[j] - step * grad[j]));
+        }
+        base = predictCost(x, us, ref, k);
+      }
+      const u = us[0];
+      t[k] = k * Ts;
+      ua[k] = u;
+      x = a * x + b * u;
+      xa[k] = x;
+      us = us.slice(1).concat(0);
+    }
+    return { t, x: xa, u: ua };
+  }
+
+  /* ---------- 根轨迹：1 + K·G(s)，G=1/(s(s+1)(s+2)) ---------- */
+  function rootsOf(K) {
+    // s^3 + 3s^2 + 2s + K
+    let z = [
+      { re: 0.3, im: 0.9 },
+      { re: 0.3, im: -0.9 },
+      { re: -2.0, im: 0 },
+    ];
+    const cadd = (p, q) => ({ re: p.re + q.re, im: p.im + q.im });
+    const csub = (p, q) => ({ re: p.re - q.re, im: p.im - q.im });
+    const cmul = (p, q) => ({ re: p.re * q.re - p.im * q.im, im: p.re * q.im + p.im * q.re });
+    const cdiv = (p, q) => {
+      const d = q.re * q.re + q.im * q.im;
+      return { re: (p.re * q.re + p.im * q.im) / d, im: (p.im * q.re - p.re * q.im) / d };
+    };
+    const poly = (s) => {
+      const s2 = cmul(s, s), s3 = cmul(s2, s);
+      return {
+        re: s3.re + 3 * s2.re + 2 * s.re + K,
+        im: s3.im + 3 * s2.im + 2 * s.im,
+      };
+    };
+    for (let it = 0; it < 80; it++) {
+      for (let i = 0; i < 3; i++) {
+        let den = { re: 1, im: 0 };
+        for (let j = 0; j < 3; j++) if (j !== i) den = cmul(den, csub(z[i], z[j]));
+        const dz = cdiv(poly(z[i]), den);
+        z[i] = csub(z[i], dz);
+      }
+    }
+    return z;
+  }
+
+  function rootLocusDemo(K) {
+    const Ks = [];
+    for (let e = -2; e <= 2.0001; e += 0.05) Ks.push(Math.pow(10, e));
+    const branches = [[], [], []];
+    let prev = null;
+    for (const kk of Ks) {
+      let roots = rootsOf(kk);
+      if (prev) {
+        const used = new Set();
+        const ordered = [];
+        for (const p of prev) {
+          let best = -1, bd = Infinity;
+          roots.forEach((r, i) => {
+            if (used.has(i)) return;
+            const d = (r.re - p.re) ** 2 + (r.im - p.im) ** 2;
+            if (d < bd) { bd = d; best = i; }
+          });
+          used.add(best);
+          ordered.push(roots[best]);
+        }
+        roots = ordered;
+      } else {
+        roots = [...roots].sort((p, q) => p.re - q.re || p.im - q.im);
+      }
+      roots.forEach((r, i) => branches[i].push([r.re, r.im]));
+      prev = roots;
+    }
+    const cur = rootsOf(K);
+    const maxRe = Math.max(...cur.map((p) => p.re));
+    const dom = cur.reduce((m, p) => (p.re > m.re ? p : m), cur[0]);
+    const mag = Math.hypot(dom.re, dom.im) || 1;
+    return {
+      branches,
+      current: cur,
+      stable: maxRe < 0,
+      maxRe,
+      damping: -dom.re / mag,
+    };
+  }
+
+  /* ---------- 一维模糊控制：N/Z/P 隶属度 + 加权平均 ---------- */
+  function fuzzyDemo(scale) {
+    const wn = 4, zeta = 0.5, dt = 0.002, T = 8, n = Math.round(T / dt);
+    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
+    const tri = (x, a, b, c) => Math.max(0, Math.min((x - a) / (b - a), (c - x) / (c - b)));
+    let x = 0, v = 0;
+    for (let i = 0; i < n; i++) {
+      t[i] = i * dt;
+      const ref = t[i] >= 0.5 ? 1 : 0;
+      const e = Math.max(-1.5, Math.min(1.5, ref - x));
+      const wN = tri(e, -1.5, -1, 0), wZ = tri(e, -1, 0, 1), wP = tri(e, 0, 1, 1.5);
+      const sum = wN + wZ + wP || 1;
+      const out = (wP - wN) / sum;
+      u[i] = Math.max(-10, Math.min(10, scale * out));
+      const acc = wn * wn * (u[i] - x) - 2 * zeta * wn * v;
+      v += acc * dt;
+      x += v * dt;
+      y[i] = x;
+    }
+    return { t, y, u };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

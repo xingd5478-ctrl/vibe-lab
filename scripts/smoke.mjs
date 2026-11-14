@@ -99,7 +99,7 @@ async function main() {
     await check("simulink", fileUrl("simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#catalog .lesson').length")) === 43, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));
-      if ((await e("document.querySelectorAll('#tabs button').length")) !== 9) throw new Error("simulink: demo tabs");
+      if ((await e("document.querySelectorAll('#tabs button').length")) !== 12) throw new Error("simulink: demo tabs");
       await e("document.querySelector('#tabs button[data-demo=\"smc\"]').click()");
       await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("抖振"));
     });

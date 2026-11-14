@@ -83,3 +83,26 @@ test("Bode phase at wn is -90 and resonance grows as zeta drops", () => {
   const high = S.bodeDemo(5, 0.7);
   assert.ok(high.peak < low.peak, "higher damping should reduce resonance");
 });
+
+test("MPC respects input bound and tracks reference", () => {
+  const r = S.mpcDemo(8, 1, 0.1, 0.3);
+  assert.ok(Math.abs(r.x[r.x.length - 1] - 1) < 0.05, `final=${r.x[r.x.length - 1]}`);
+  for (const u of r.u) assert.ok(Math.abs(u) <= 0.3 + 1e-9, `u=${u}`);
+});
+
+test("root locus: low gain stable, high gain unstable", () => {
+  const ok = S.rootLocusDemo(1);
+  const bad = S.rootLocusDemo(50);
+  assert.equal(ok.stable, true);
+  assert.equal(bad.stable, false);
+  assert.ok(bad.maxRe > 0);
+  assert.ok(ok.branches.length === 3);
+});
+
+test("fuzzy P has steady error that shrinks with scale", () => {
+  const a = S.fuzzyDemo(4), b = S.fuzzyDemo(10);
+  const ea = Math.abs(1 - a.y[a.y.length - 1]);
+  const eb = Math.abs(1 - b.y[b.y.length - 1]);
+  assert.ok(ea < 0.25, `ea=${ea}`);
+  assert.ok(eb < ea, `larger scale should reduce error (${eb} < ${ea})`);
+});

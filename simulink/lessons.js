@@ -20,7 +20,7 @@ window.SIMULINK_LESSONS = {
       items: [
         { id: "t16", n: 16, title: "频域分析", desc: "Bode/Nyquist、增益/相位裕度", file: "t16_freq_domain.m", model: "tutorial16_freq.slx", demo: "bode" },
         { id: "t17", n: 17, title: "超前-滞后校正", desc: "Lead/Lag 补偿器、频率整形", file: "t17_lead_lag.m", model: "tutorial17_leadlag.slx" },
-        { id: "t22", n: 22, title: "根轨迹法", desc: "rlocus、极点走向、补偿器", file: "t22_root_locus.m", model: "tutorial22_root_locus.slx" },
+        { id: "t22", n: 22, title: "根轨迹法", desc: "rlocus、极点走向、补偿器", file: "t22_root_locus.m", model: "tutorial22_root_locus.slx", demo: "rootlocus" },
       ],
     },
     {
@@ -37,10 +37,10 @@ window.SIMULINK_LESSONS = {
       items: [
         { id: "t18", n: 18, title: "系统辨识", desc: "阶跃响应、最小二乘、验证", file: "t18_system_id.m", model: "tutorial18_sysid.slx" },
         { id: "t19", n: 19, title: "H∞ 鲁棒控制", desc: "混合灵敏度、hinfsyn、μ 分析", file: "t19_robust_control.m", model: "tutorial19_robust.slx" },
-        { id: "t20", n: 20, title: "模型预测控制 MPC", desc: "滚动优化、QP 约束", file: "t20_mpc.m", model: "tutorial20_mpc.slx" },
+        { id: "t20", n: 20, title: "模型预测控制 MPC", desc: "滚动优化、QP 约束", file: "t20_mpc.m", model: "tutorial20_mpc.slx", demo: "mpc" },
         { id: "t21", n: 21, title: "滑模控制 SMC", desc: "滑模面、抖振、Super-Twisting", file: "t21_sliding_mode.m", model: "tutorial21_smc.slx", demo: "smc" },
         { id: "t23", n: 23, title: "MRAC 自适应", desc: "MIT 规则、参考模型", file: "t23_mrac.m", model: "tutorial23_mrac.slx" },
-        { id: "t24", n: 24, title: "模糊逻辑控制", desc: "Sugeno FIS、隶属度、控制曲面", file: "t24_fuzzy_control.m", model: "tutorial24_fuzzy.slx" },
+        { id: "t24", n: 24, title: "模糊逻辑控制", desc: "Sugeno FIS、隶属度、控制曲面", file: "t24_fuzzy_control.m", model: "tutorial24_fuzzy.slx", demo: "fuzzy" },
       ],
     },
     {

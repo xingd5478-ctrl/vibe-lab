@@ -215,6 +215,116 @@
       },
     },
 
+    mpc: {
+      title: "t20 · MPC 模型预测控制",
+      lesson: "t20",
+      note: "每步往后预测 N 步，只执行第一个控制量，再滚动重算。uMax 是输入约束；N 太小短视，Q/R 权衡跟踪与省力。",
+      diagram: {
+        aria: "MPC 框图：参考进入预测优化器，控制对象并反馈",
+        blocks: [{ label: "参考" }, { label: "MPC", sub: "min Σ Q e²+R u²" }, { label: "Plant" }, { label: "Scope" }],
+        sumIndex: 0, feedback: "状态反馈",
+      },
+      params: [
+        { id: "N", label: "预测步数 N", min: 3, max: 15, step: 1, value: 8 },
+        { id: "Q", label: "跟踪权重 Q", min: 0.1, max: 10, step: 0.1, value: 1 },
+        { id: "R", label: "控制权重 R", min: 0.01, max: 1, step: 0.01, value: 0.1 },
+        { id: "uMax", label: "输入约束 uMax", min: 0.05, max: 1, step: 0.05, value: 0.3 },
+      ],
+      render(p) {
+        const r = S.mpcDemo(p.N, p.Q, p.R, p.uMax);
+        const m = S.metrics(r.t, r.x, 1);
+        let sat = 0;
+        for (const u of r.u) if (Math.abs(u) >= p.uMax * 0.999) sat++;
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "输出 x",
+          yMin: 0, yMax: Math.max(1.2, maxOf(r.x)) * 1.1,
+          aria: `MPC 跟踪，N=${p.N}，uMax=${p.uMax}`,
+          series: [
+            { name: "x", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.x) },
+            { name: "参考", color: "#b9b3a5", width: 1.2, dash: "5 4", points: [[0, 0], [1, 0], [1, 1], [8, 1]] },
+          ],
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          aria: "MPC 控制量",
+          series: [{ name: "u", color: "#2f6b4f", width: 1.4, points: toPts(r.t, r.u) }],
+        });
+        metrics([
+          ["超调量", f2(m.overshoot) + " %"],
+          ["末值误差", Math.abs(r.x[r.x.length - 1] - 1).toFixed(4)],
+          ["贴限幅比例", ((sat / r.u.length) * 100).toFixed(0) + " %"],
+          ["N", String(p.N)],
+        ]);
+      },
+    },
+
+    rootlocus: {
+      title: "t22 · 根轨迹",
+      lesson: "t22",
+      note: "G(s)=1/(s(s+1)(s+2))；K 从 0 增大时 3 个闭环极点沿分支移动，穿过虚轴就是临界稳定。",
+      diagram: {
+        aria: "根轨迹：增益 K 与开环 G(s) 的闭环极点",
+        blocks: [{ label: "K" }, { label: "G(s)", sub: "1/(s(s+1)(s+2))" }, { label: "rlocus" }],
+      },
+      params: [{ id: "K", label: "开环增益 K", min: 0.1, max: 50, step: 0.1, value: 1 }],
+      render(p) {
+        const b = S.rootLocusDemo(p.K);
+        let maxIm = 0.1;
+        b.branches.forEach((br) => br.forEach(([, im]) => { if (Math.abs(im) > maxIm) maxIm = Math.abs(im); }));
+        const series = b.branches.map((br, i) => ({
+          name: `分支 ${i + 1}`, color: i === 0 ? "#1f4e79" : i === 1 ? "#2f6b4f" : "#8a4a12",
+          width: 1.4, legend: false, points: br,
+        }));
+        plot($("chart-a"), {
+          height: 270, xLabel: "Re", yLabel: "Im",
+          yMin: -maxIm * 1.25, yMax: maxIm * 1.25,
+          aria: `根轨迹，K=${p.K}`,
+          series,
+        });
+        $("chart-b").innerHTML = "";
+        const poles = b.current.map((q) => `${q.re.toFixed(2)}${q.im >= 0 ? "+" : ""}${q.im.toFixed(2)}j`).join("  ");
+        metrics([
+          ["闭环极点", poles],
+          ["稳定性", b.stable ? "稳定" : "不稳定"],
+          ["最大实部", b.maxRe.toFixed(3)],
+          ["主极点阻尼", b.damping.toFixed(2)],
+        ]);
+      },
+    },
+
+    fuzzy: {
+      title: "t24 · 模糊控制",
+      lesson: "t24",
+      note: "误差分为 N/Z/P 三个隶属度，规则输出加权平均；scale 是总增益。它不依赖精确模型，靠规则表；纯模糊 P 会留下稳态误差，实际常加积分或提高尺度。",
+      diagram: {
+        aria: "模糊控制：误差进入模糊推理，输出控制对象",
+        blocks: [{ label: "e" }, { label: "Fuzzy", sub: "N/Z/P" }, { label: "Plant" }, { label: "Scope" }],
+      },
+      params: [{ id: "scale", label: "输出尺度", min: 0.5, max: 10, step: 0.5, value: 4 }],
+      render(p) {
+        const r = S.fuzzyDemo(p.scale);
+        const m = S.metrics(r.t, r.y, 1);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "输出 y",
+          yMin: 0, yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
+          aria: `模糊控制响应，尺度=${p.scale}`,
+          series: [{ name: "y", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          aria: "模糊控制量",
+          series: [{ name: "u", color: "#2f6b4f", width: 1.2, points: toPts(r.t, r.u) }],
+        });
+        metrics([
+          ["超调量", f2(m.overshoot) + " %"],
+          ["2% 调节时间", f2(m.settle) + " s"],
+          ["稳态误差", m.ess.toFixed(3)],
+          ["控制峰值", maxOf(r.u).toFixed(2)],
+          ["输出尺度", p.scale.toFixed(1)],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",
