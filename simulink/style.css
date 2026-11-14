@@ -150,6 +150,48 @@ footer {
 
 code { font-family: var(--mono); font-size: 0.92em; background: #ece8dd; padding: 1px 4px; border-radius: 2px; }
 
+.course-cta {
+  display: inline-block; margin-top: 10px; padding: 6px 12px;
+  border: 1px solid var(--accent); color: var(--accent);
+  text-decoration: none; border-radius: 2px; font-size: 12.5px;
+}
+.course-cta:hover { background: var(--accent); color: #fff; }
+
+.course-layout {
+  display: grid; grid-template-columns: 300px minmax(0, 1fr);
+  gap: 18px; margin-top: 22px; align-items: start;
+}
+.reader { min-height: 620px; }
+.reader-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.reader-nav { margin-left: auto; display: flex; gap: 6px; }
+.reader-nav button {
+  padding: 4px 9px; border: 1px solid var(--line); background: #fff;
+  border-radius: 2px; cursor: pointer; font: 12px var(--mono); color: var(--muted);
+}
+.reader h2 { font-size: 22px; margin: 12px 0 6px; }
+.reader-p { margin: 8px 0; color: #3c3a34; font-size: 13.5px; white-space: pre-wrap; }
+.reader-sec { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
+.reader-sec h3 { font-size: 14.5px; margin: 0 0 6px; }
+.reader-codebox { margin-top: 8px; }
+.reader-codebox summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.reader-code {
+  max-height: 380px; overflow: auto; margin: 8px 0 0;
+  background: #ece8dd; border: 1px solid var(--line); padding: 10px 12px;
+  font: 12px/1.6 var(--mono); white-space: pre;
+}
+.reader-figs {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px; margin: 14px 0;
+}
+.reader-fig { margin: 0; border: 1px solid var(--line); background: #fff; padding: 6px; }
+.reader-fig img { width: 100%; display: block; }
+.reader-fig figcaption { font: 10px var(--mono); color: var(--muted); margin-top: 4px; }
+.lesson[aria-current="true"] { background: #e7edf3; color: var(--accent); font-weight: 600; }
+
+@media (max-width: 900px) {
+  .course-layout { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 900px) {
   .wrap { padding: 24px 16px 30px; }
   .layout { grid-template-columns: 1fr; }

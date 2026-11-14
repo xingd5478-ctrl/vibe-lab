@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>43 课讲义 · Simulink 控制教程 · vibe-lab</title>
+  <meta name="description" content="Simulink 控制教程 43 课完整讲义：注释、代码、结果图与 .m/.slx 源文件链接。" />
+  <meta name="theme-color" content="#f4f2ec" />
+  <meta property="og:title" content="43 课讲义 · Simulink 控制教程" />
+  <meta property="og:description" content="在浏览器里阅读 43 课 Simulink 控制教程：讲义、代码与结果图。" />
+  <meta property="og:type" content="article" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="../icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">跳到内容</a>
+  <div class="wrap">
+    <header>
+      <div class="kicker">VIBE-LAB / SIMULINK COURSE READER</div>
+      <h1>43 课 · 完整讲义</h1>
+      <p class="sub">
+        讲义、代码与结果图直接读；源文件仍在
+        <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">GitHub 仓库</a>
+        （MIT，作者：邢栋）。浏览器不能运行 Simulink，需要仿真的课程请用 MATLAB 打开 `.slx`。
+        <a href="index.html">← 交互复现</a>
+      </p>
+    </header>
+
+    <main id="main">
+      <div class="course-layout">
+        <aside class="panel">
+          <div class="field">
+            <label for="course-search">课程</label>
+            <input id="course-search" type="search" placeholder="搜索课程…" />
+          </div>
+          <div id="lesson-list" class="catalog"></div>
+        </aside>
+
+        <article class="panel reader" id="reader">
+          <div class="reader-top">
+            <span id="lesson-phase" class="badge">—</span>
+            <span id="lesson-num" class="hint"></span>
+            <div id="lesson-nav" class="reader-nav"></div>
+          </div>
+          <h2 id="lesson-title">选择左侧课程开始阅读</h2>
+          <div id="lesson-status" class="hint"></div>
+          <div id="lesson-body"></div>
+        </article>
+      </div>
+    </main>
+
+    <footer>
+      <span>课程内容 © 邢栋 · MIT</span> ·
+      <a href="index.html">交互复现</a> ·
+      <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">教程源码</a> ·
+      <a href="../">首页</a>
+    </footer>
+  </div>
+
+  <script src="lessons.js"></script>
+  <script src="course.js"></script>
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/(imu|control|about|simulink)\/(index\.html|course\.html)?$/, "");
+      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
+    })();
+  </script>
+</body>
+</html>

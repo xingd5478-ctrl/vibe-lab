@@ -158,6 +158,12 @@ async function main() {
     if (!/抖振/.test(simMeta)) throw new Error("simulink: SMC metrics missing");
     await audit("simulink");
 
+    await client.send("Page.navigate", { url: `${base}/simulink/course.html?id=t03` });
+    await sleep(900);
+    if (!(await evalJs("document.querySelector('#lesson-title').textContent")).includes("t03")) throw new Error("course: title");
+    if ((await evalJs("document.querySelectorAll('#lesson-list .lesson').length")) !== 43) throw new Error("course: lessons");
+    await audit("course");
+
     client.close();
     console.log("E2E OK");
   } finally {

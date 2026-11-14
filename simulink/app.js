@@ -348,7 +348,7 @@
             selectDemo(l.demo);
             $("demo-title").scrollIntoView({ behavior: "smooth", block: "start" });
           } else {
-            window.open(`${REPO}/blob/main/${l.file}`, "_blank", "noreferrer");
+            location.href = `course.html?id=${l.id}`;
           }
         });
         box.appendChild(b);

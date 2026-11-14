@@ -1,0 +1,235 @@
+/* 43 课阅读器：按需从 GitHub raw 读取 .m，解析注释/代码并展示结果图 */
+(function () {
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const DATA = window.SIMULINK_LESSONS;
+  const REPO = DATA.repo;
+  const CDN = "https://cdn.jsdelivr.net/gh/xingd5478-ctrl/simulink-control-tutorial@main/";
+  const RAW = "https://raw.githubusercontent.com/xingd5478-ctrl/simulink-control-tutorial/main/";
+  const IMG = CDN + "docs/images/";
+  const MULTI = { t16: 4, t17: 2, t19: 3, t21: 2, t22: 3, t24: 2 };
+
+  const lessons = [];
+  DATA.phases.forEach((ph) => ph.items.forEach((l) => lessons.push({ ...l, phase: ph.title })));
+  const byId = {};
+  lessons.forEach((l) => { byId[l.id] = l; });
+
+  const cache = new Map();
+  let current = null;
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function parseM(text) {
+    const lines = text.split(/\r?\n/);
+    const sections = [];
+    let cur = { title: "", notes: [], code: [] };
+    const flush = () => {
+      if (cur.title || cur.notes.length || cur.code.some((l) => l.trim())) sections.push(cur);
+      cur = { title: "", notes: [], code: [] };
+    };
+    for (const line of lines) {
+      if (/^\s*%%/.test(line)) {
+        flush();
+        cur.title = line.replace(/^\s*%%\s*/, "").trim();
+      } else if (/^\s*%/.test(line)) {
+        cur.notes.push(line.replace(/^\s*%\s?/, ""));
+      } else {
+        cur.code.push(line);
+      }
+    }
+    flush();
+    return sections.filter((s) => s.notes.some((l) => l.trim()) || s.code.some((l) => l.trim()));
+  }
+
+  function notesBlock(lines) {
+    const frag = document.createDocumentFragment();
+    let buf = [];
+    const flush = () => {
+      const text = buf.join("\n").trim();
+      if (text) {
+        const p = el("p", "reader-p");
+        p.textContent = text;
+        frag.appendChild(p);
+      }
+      buf = [];
+    };
+    for (const l of lines) {
+      if (!l.trim()) flush();
+      else buf.push(l);
+    }
+    flush();
+    return frag;
+  }
+
+  function codeBlock(lines) {
+    const pre = el("pre", "reader-code");
+    const code = el("code", "", lines.join("\n"));
+    pre.appendChild(code);
+    return pre;
+  }
+
+  function imageList(lesson) {
+    const base = lesson.file.replace(/\.m$/, "");
+    const n = MULTI[lesson.id] || 1;
+    const out = [];
+    for (let i = 1; i <= n; i++) out.push(`${base}_fig${i}.png`);
+    return out;
+  }
+
+  function render(lesson, text) {
+    $("lesson-title").textContent = `${lesson.id} · ${lesson.title}`;
+    $("lesson-phase").textContent = lesson.phase;
+    $("lesson-num").textContent = lesson.desc;
+    $("lesson-status").textContent = "";
+    const body = $("lesson-body");
+    body.innerHTML = "";
+
+    const intro = el("div", "reader-intro");
+    intro.appendChild(el("p", "reader-p", `本课目标：${lesson.desc}`));
+    const links = el("div", "links");
+    const a1 = el("a", "", `${lesson.file}（GitHub）`);
+    a1.href = `${REPO}/blob/main/${lesson.file}`;
+    a1.target = "_blank";
+    a1.rel = "noreferrer";
+    const a2 = el("a", "", `${lesson.model}（下载 .slx）`);
+    a2.href = `${REPO}/blob/main/models/${lesson.model}`;
+    a2.target = "_blank";
+    a2.rel = "noreferrer";
+    links.appendChild(a1);
+    links.appendChild(a2);
+    intro.appendChild(links);
+    body.appendChild(intro);
+
+    const imgs = el("div", "reader-figs");
+    imageList(lesson).forEach((name, i) => {
+      const fig = el("figure", "reader-fig");
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.src = IMG + name;
+      img.alt = `${lesson.title} 结果图 ${i + 1}`;
+      img.addEventListener("error", () => {
+        if (img.dataset.fallback === "1") { fig.remove(); return; }
+        img.dataset.fallback = "1";
+        img.src = RAW + "docs/images/" + name;
+      });
+      const cap = el("figcaption", "", `docs/images/${name}`);
+      fig.appendChild(img);
+      fig.appendChild(cap);
+      imgs.appendChild(fig);
+    });
+    body.appendChild(imgs);
+
+    const sections = parseM(text);
+    if (!sections.length) {
+      body.appendChild(el("p", "hint", "该课脚本没有可提取的注释内容，请直接打开 GitHub 源文件。"));
+      return;
+    }
+    sections.forEach((sec, idx) => {
+      const wrap = el("section", "reader-sec");
+      if (sec.title) wrap.appendChild(el("h3", "", sec.title));
+      if (sec.notes.some((l) => l.trim())) wrap.appendChild(notesBlock(sec.notes));
+      if (sec.code.some((l) => l.trim())) {
+        const det = document.createElement("details");
+        det.className = "reader-codebox";
+        const sum = document.createElement("summary");
+        sum.textContent = `MATLAB 代码（${sec.code.filter((l) => l.trim()).length} 行）`;
+        det.appendChild(sum);
+        det.appendChild(codeBlock(sec.code));
+        if (idx < 2) det.open = true;
+        wrap.appendChild(det);
+      }
+      body.appendChild(wrap);
+    });
+  }
+
+  function setStatus(msg) {
+    const s = $("lesson-status");
+    s.innerHTML = "";
+    s.appendChild(document.createTextNode(msg));
+  }
+
+  async function load(id) {
+    const lesson = byId[id];
+    if (!lesson) { setStatus("未找到该课程"); return; }
+    current = id;
+    try { history.replaceState(null, "", `course.html?id=${id}`); }
+    catch (e) { location.hash = id; }
+    document.querySelectorAll(".lesson").forEach((b) => {
+      b.setAttribute("aria-current", String(b.dataset.id === id));
+    });
+    $("lesson-title").textContent = `${lesson.id} · ${lesson.title}`;
+    $("lesson-phase").textContent = lesson.phase;
+    $("lesson-num").textContent = lesson.desc;
+    $("lesson-body").innerHTML = "";
+    renderNav(id);
+    const cached = cache.get(id);
+    if (cached) { render(lesson, cached); return; }
+    setStatus("正在读取讲义…");
+    try {
+      let text = null;
+      for (const base of [CDN, RAW]) {
+        try {
+          const res = await fetch(base + lesson.file, { mode: "cors" });
+          if (res.ok) { text = await res.text(); break; }
+        } catch (e) { /* try fallback */ }
+      }
+      if (text === null) throw new Error("fetch failed");
+      cache.set(id, text);
+      render(lesson, text);
+    } catch (e) {
+      setStatus("读取失败（网络受限）。可点上方 GitHub 链接直接看源文件，或稍后重试。");
+    }
+  }
+
+  function renderNav(id) {
+    const idx = lessons.findIndex((l) => l.id === id);
+    const nav = $("lesson-nav");
+    nav.innerHTML = "";
+    if (idx > 0) {
+      const b = el("button", "", "← " + lessons[idx - 1].id);
+      b.type = "button";
+      b.addEventListener("click", () => load(lessons[idx - 1].id));
+      nav.appendChild(b);
+    }
+    if (idx >= 0 && idx < lessons.length - 1) {
+      const b = el("button", "", lessons[idx + 1].id + " →");
+      b.type = "button";
+      b.addEventListener("click", () => load(lessons[idx + 1].id));
+      nav.appendChild(b);
+    }
+  }
+
+  function buildList() {
+    const box = $("lesson-list");
+    DATA.phases.forEach((ph) => {
+      box.appendChild(el("div", "phase-title", ph.title));
+      ph.items.forEach((l) => {
+        const b = el("button", "lesson", "");
+        b.type = "button";
+        b.dataset.id = l.id;
+        b.dataset.text = (l.id + " " + l.title + " " + l.desc + " " + ph.title).toLowerCase();
+        b.innerHTML = `<span class="n">${l.id}</span>${l.title}`;
+        b.addEventListener("click", () => load(l.id));
+        box.appendChild(b);
+      });
+    });
+  }
+
+  $("course-search").addEventListener("input", (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll(".lesson").forEach((b) => {
+      b.classList.toggle("dim", q && !b.dataset.text.includes(q));
+    });
+  });
+
+  buildList();
+  const initial = new URLSearchParams(location.search).get("id") ||
+    location.hash.replace(/^#/, "") || "t01";
+  load(initial);
+})();

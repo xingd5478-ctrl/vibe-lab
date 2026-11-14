@@ -101,6 +101,18 @@ async function main() {
       await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("抖振"));
     });
 
+    await check("course", fileUrl("simulink/course.html") + "#t03", async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('#lesson-list .lesson').length")) === 43);
+      if (!(await e("document.querySelector('#lesson-title').textContent")).includes("t03")) throw new Error("course: lesson title");
+      if ((await e("document.querySelectorAll('#lesson-nav button').length")) < 1) throw new Error("course: prev/next missing");
+      try {
+        await waitFor(async () => (await e("document.querySelectorAll('#lesson-body .reader-sec').length")) > 0, 10000);
+        console.log("   course content loaded (jsDelivr)");
+      } catch {
+        console.log("   course content offline (GitHub link fallback)");
+      }
+    });
+
     console.log("SMOKE OK (landing + imu + control + about + simulink)");
   } finally {
     edge.kill();

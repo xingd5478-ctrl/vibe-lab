@@ -78,6 +78,8 @@ imu-lab/static/
 
 仿真内核在 `simulink/control.js`（UMD，可单测），图表复用 `chart.js`。`.slx` 是 MATLAB 二进制模型，浏览器不能直接运行；页面复现的是同一套数学，并链接每课的 `.m` / `.slx`。
 
+**完整讲义阅读器**：`/simulink/course.html` 提供 43 课讲义、注释、代码与结果图。为控制站点体积，课程内容按需从教程仓库的 raw 地址读取（需联网；失败时保留 GitHub 源链接），本站负责排版、搜索与上下课导航。
+
 ## 数据层
 
 `imu-lab/static/data.js` 是列式核心（Float32Array/typed arrays）：
