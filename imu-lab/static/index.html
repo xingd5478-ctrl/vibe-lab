@@ -20,7 +20,11 @@
           <label for="file">数据文件</label>
           <input id="file" type="file" accept=".csv,text/csv" />
           <div class="hint">当前：<span id="source-name">示例数据（合成）</span></div>
-          <div class="hint">真实实验数据因论文在审暂不公开；可在本地“选择文件”上传自己的 CSV 复现分析。</div>
+          <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
+          <div class="hint">
+            论文在审，仅作演示；完整数据待录用后按期刊政策公开，版权归作者/实验室。
+            <a href="sample_real_10min.csv" download>下载片段 CSV</a>
+          </div>
         </div>
 
         <div class="field">

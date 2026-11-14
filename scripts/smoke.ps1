@@ -23,6 +23,8 @@ if ($dom -notmatch "ARW=") { throw "imu: fit info missing" }
 if ($dom -notmatch "R²") { throw "imu: R² missing" }
 if ($dom -notmatch "演示数据") { throw "imu: demo badge missing" }
 if ($dom -notmatch 'tabindex="0"') { throw "imu: chart not keyboard focusable" }
+if ($dom -notmatch "load-real") { throw "imu: real sample button missing" }
+if ($dom -notmatch "仅演示") { throw "imu: data disclosure missing" }
 
 $control = ([uri](Join-Path $root "control-play\index.html")).AbsoluteUri + "?kp=3&ki=1&kd=0.1"
 $dom2 = Get-Dom $control
