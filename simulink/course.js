@@ -82,14 +82,7 @@
     return out;
   }
 
-  function render(lesson, text) {
-    $("lesson-title").textContent = `${lesson.id} · ${lesson.title}`;
-    $("lesson-phase").textContent = lesson.phase;
-    $("lesson-num").textContent = lesson.desc;
-    $("lesson-status").textContent = "";
-    const body = $("lesson-body");
-    body.innerHTML = "";
-
+  function introFor(lesson) {
     const intro = el("div", "reader-intro");
     intro.appendChild(el("p", "reader-p", `本课目标：${lesson.desc}`));
     const links = el("div", "links");
@@ -109,7 +102,17 @@
     links.appendChild(a2);
     intro.appendChild(links);
     intro.appendChild(el("p", "hint", "模型已托管在本站（MIT），下载后用 MATLAB/Simulink 打开；浏览器不能直接运行 .slx。"));
-    body.appendChild(intro);
+    return intro;
+  }
+
+  function render(lesson, text) {
+    $("lesson-title").textContent = `${lesson.id} · ${lesson.title}`;
+    $("lesson-phase").textContent = lesson.phase;
+    $("lesson-num").textContent = lesson.desc;
+    $("lesson-status").textContent = "";
+    const body = $("lesson-body");
+    body.innerHTML = "";
+    body.appendChild(introFor(lesson));
 
     const imgs = el("div", "reader-figs");
     imageList(lesson).forEach((name, i) => {
@@ -175,6 +178,7 @@
     renderNav(id);
     const cached = cache.get(id);
     if (cached) { render(lesson, cached); return; }
+    $("lesson-body").appendChild(introFor(lesson));
     setStatus("正在读取讲义…");
     try {
       let text = null;
