@@ -1,0 +1,9 @@
+{
+  "name": "vibe-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sensor & control visual lab: IMU data lab, control playground, landing page",
+  "scripts": {
+    "test": "node --test tests/allan.test.js tests/kf.test.js tests/fit.test.js"
+  }
+}

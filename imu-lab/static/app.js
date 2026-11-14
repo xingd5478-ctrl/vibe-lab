@@ -1,10 +1,11 @@
-/* IMU Lab · 静态版（无后端，数据在浏览器内计算） */
+/* IMU Lab · 静态版（无后端；Allan 拟合、导出、分享链接、悬浮读数） */
 (function () {
   "use strict";
 
   const $ = (id) => document.getElementById(id);
   const { allanDeviation, cleanFrames } = window.IMUAllan;
   const { integrate, kf1d } = window.IMUKF;
+  const { fitAllan, quantile } = window.IMUFit;
 
   const AXES = [
     { key: "gx", label: "GX · roll rate", color: "#1f4e79" },
@@ -22,6 +23,11 @@
     q: 2.51188643150958e-9,
     fit: null,
   };
+
+  let dataVersion = 0;
+  let cleanRowsCache = null;
+  const allanCache = new Map();
+  let drawTimer = null;
 
   /* ---------- 数据 ---------- */
   function mulberry32(a) {
@@ -53,8 +59,9 @@
         crc: 1,
       });
     }
-    for (let k = 0; k < 10; k++) {
-      const i = Math.floor(rnd() * n);
+    const bad = new Set();
+    while (bad.size < 10) bad.add(Math.floor(rnd() * n));
+    for (const i of bad) {
       const s = rnd() < 0.5 ? -1 : 1;
       rows[i].crc = 0;
       rows[i].gx = 200 * s;
@@ -98,6 +105,28 @@
     }
   }
 
+  function invalidate() {
+    dataVersion += 1;
+    cleanRowsCache = null;
+    allanCache.clear();
+  }
+
+  function currentRows() {
+    if (!cleanRowsCache) {
+      cleanRowsCache = state.clean ? cleanFrames(state.rows, 5) : state.rows;
+    }
+    return cleanRowsCache;
+  }
+
+  function allanFor(axis) {
+    const key = `${dataVersion}|${state.fs}|${state.clean ? 1 : 0}|${axis}`;
+    if (!allanCache.has(key)) {
+      const rows = currentRows();
+      allanCache.set(key, allanDeviation(rows.map((r) => r[axis]), 1 / state.fs));
+    }
+    return allanCache.get(key);
+  }
+
   /* ---------- 绘图 ---------- */
   function niceStep(raw) {
     const p = Math.pow(10, Math.floor(Math.log10(raw)));
@@ -114,8 +143,7 @@
 
   function logTicks(min, max) {
     const out = [];
-    const e0 = Math.floor(Math.log10(min)), e1 = Math.ceil(Math.log10(max));
-    for (let e = e0; e <= e1; e++) {
+    for (let e = Math.floor(Math.log10(min)); e <= Math.ceil(Math.log10(max)); e++) {
       for (const m of [1, 2, 5]) {
         const v = m * Math.pow(10, e);
         if (v >= min * 0.999 && v <= max * 1.001) out.push(v);
@@ -142,35 +170,65 @@
     return out;
   }
 
-  function median(arr) {
-    const a = [...arr].sort((x, y) => x - y);
-    if (!a.length) return NaN;
-    const m = Math.floor(a.length / 2);
-    return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
-  }
+  function attachHover(el, meta) {
+    const svg = el.querySelector("svg");
+    if (!svg) return;
+    let tip = el.querySelector(".tip");
+    if (!tip) {
+      tip = document.createElement("div");
+      tip.className = "tip";
+      el.appendChild(tip);
+    }
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("class", "crosshair");
+    line.setAttribute("y1", meta.pad.t);
+    line.setAttribute("y2", meta.h - meta.pad.b);
+    line.setAttribute("x1", meta.pad.l);
+    line.setAttribute("x2", meta.pad.l);
+    line.setAttribute("opacity", "0");
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("class", "hover-dot");
+    dot.setAttribute("r", "3");
+    dot.setAttribute("opacity", "0");
+    svg.appendChild(line);
+    svg.appendChild(dot);
 
-  /* 从 Allan 曲线拟合 ARW/RRW：
-     σ(τ)=N/√τ（短 τ），σ(τ)=K√(τ/3)（长 τ）；N、K 单位为 °/√s 与 (°/s)/√s */
-  function fitAllan(pts, dt) {
-    if (!pts.length) return null;
-    const tmin = pts[0].tau, tmax = pts[pts.length - 1].tau;
-    const shortMax = Math.min(1.0, tmax / 3);
-    const longMin = Math.max(2 * tmin, tmax / 4);
-    const short = pts.filter((p) => p.tau <= shortMax);
-    const long = pts.filter((p) => p.tau >= longMin);
-    const N = median(short.map((p) => p.adev * Math.sqrt(p.tau)));
-    const K = median(long.map((p) => p.adev / Math.sqrt(p.tau / 3)));
-    if (!isFinite(N) || !isFinite(K) || N <= 0 || K <= 0) return null;
-    return {
-      N,
-      K,
-      arw: N * 60,
-      rrw: K * 60,
-      r: N * N * dt,
-      q: K * K * dt,
-      shortMax,
-      longMin,
+    const nearest = (pts, xv) => {
+      let best = pts[0], bd = Infinity;
+      for (const p of pts) {
+        const d = Math.abs(p[0] - xv);
+        if (d < bd) { bd = d; best = p; }
+      }
+      return best;
     };
+
+    svg.addEventListener("mousemove", (ev) => {
+      const rect = svg.getBoundingClientRect();
+      const frac = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
+      const xv = meta.xInv(frac);
+      const first = nearest(meta.series[0].points, xv);
+      const px = meta.X(first[0]);
+      line.setAttribute("x1", px);
+      line.setAttribute("x2", px);
+      line.setAttribute("opacity", "1");
+      dot.setAttribute("cx", meta.X(first[0]));
+      dot.setAttribute("cy", meta.Y(first[1]));
+      dot.setAttribute("opacity", "1");
+      let text = `${meta.xLabel} ${fmt(first[0])} · ${meta.series[0].name} ${fmt(first[1])}`;
+      if (meta.series[1]) {
+        const second = nearest(meta.series[1].points, xv);
+        text += ` · ${meta.series[1].name} ${fmt(second[1])}`;
+      }
+      tip.textContent = text;
+      tip.style.left = `${(px / meta.w) * 100}%`;
+      tip.style.top = `${Math.max(8, (dot.getAttribute("cy") / meta.h) * 100 - 4)}%`;
+      tip.style.opacity = "1";
+    });
+    svg.addEventListener("mouseleave", () => {
+      tip.style.opacity = "0";
+      line.setAttribute("opacity", "0");
+      dot.setAttribute("opacity", "0");
+    });
   }
 
   function plot(el, cfg) {
@@ -203,8 +261,12 @@
 
     const lx0 = logX ? Math.log10(xmin) : xmin, lx1 = logX ? Math.log10(xmax) : xmax;
     const ly0 = logY ? Math.log10(ymin) : ymin, ly1 = logY ? Math.log10(ymax) : ymax;
-    const X = (v) => pad.l + ((logX ? Math.log10(v) : v) - lx0) / (lx1 - lx0) * iw;
+    const X = (v) => pad.l + (((logX ? Math.log10(v) : v) - lx0) / (lx1 - lx0)) * iw;
     const Y = (v) => pad.t + (1 - ((logY ? Math.log10(v) : v) - ly0) / (ly1 - ly0)) * ih;
+    const xInv = (frac) => {
+      const v = lx0 + frac * (lx1 - lx0);
+      return logX ? Math.pow(10, v) : v;
+    };
 
     const xt = logX ? logTicks(xmin, xmax) : linTicks(xmin, xmax, 5);
     const yt = logY ? logTicks(ymin, ymax) : linTicks(ymin, ymax, 4);
@@ -212,6 +274,7 @@
     let svg = `<svg viewBox="0 0 ${w} ${h}" role="img">`;
     const clipId = "clip" + ((el._cid = (el._cid || 0) + 1));
     svg += `<defs><clipPath id="${clipId}"><rect x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}"/></clipPath></defs>`;
+
     yt.forEach((v) => {
       const y = Y(v);
       svg += `<line class="grid" x1="${pad.l}" y1="${y}" x2="${w - pad.r}" y2="${y}"/>`;
@@ -248,26 +311,21 @@
 
     svg += "</svg>";
     el.innerHTML = svg;
+    attachHover(el, { w, h, pad, series, X, Y, xInv, xLabel: cfg.xLabel || "x" });
   }
 
   /* ---------- 主流程 ---------- */
-  function currentRows() {
-    return state.clean ? cleanFrames(state.rows, 5) : state.rows;
-  }
-
   function updateStats(raw, clean) {
     $("stat-frames").textContent = raw.length.toLocaleString();
-    const bad = raw.length - clean.length;
-    $("stat-bad").textContent = bad.toLocaleString();
-    const dur = raw.length ? (raw[raw.length - 1].t - raw[0].t) : 0;
+    $("stat-bad").textContent = (raw.length - clean.length).toLocaleString();
+    const dur = raw.length ? raw[raw.length - 1].t - raw[0].t : 0;
     $("stat-duration").textContent = dur.toFixed(1) + " s";
     const ch = state.channel;
     const mean = clean.length ? clean.reduce((a, r) => a + r[ch], 0) / clean.length : 0;
     $("stat-mean").textContent = mean.toFixed(3) + " °/s";
     $("source-name").textContent = state.source;
-    $("meta-time").textContent = `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
-    $("meta-allan").textContent = "log-log";
-    $("meta-kf").textContent = `R=${state.r.toExponential(1)} · Q=${state.q.toExponential(1)}`;
+    const badge = $("demo-badge");
+    if (badge) badge.style.display = state.source.startsWith("示例数据") ? "" : "none";
   }
 
   function draw() {
@@ -291,20 +349,19 @@
     });
 
     const dt = 1 / state.fs;
-    const allan = {};
-    AXES.forEach((a) => { allan[a.key] = allanDeviation(clean.map((r) => r[a.key]), dt); });
-    const fit = fitAllan(allan[ch] || [], dt);
+    const pts = allanFor(ch);
+    const fit = fitAllan(pts, dt);
     state.fit = fit;
     const fitSeries = [];
     if (fit) {
-      const shortPts = (allan[ch] || [])
-        .filter((p) => p.tau <= fit.shortMax)
-        .map((p) => [p.tau, fit.N / Math.sqrt(p.tau)]);
-      const longPts = (allan[ch] || [])
-        .filter((p) => p.tau >= fit.longMin)
-        .map((p) => [p.tau, fit.K * Math.sqrt(p.tau / 3)]);
-      fitSeries.push({ name: "ARW 拟合", color: "#7a9cc6", width: 1.1, dash: "5 4", legend: false, points: shortPts });
-      fitSeries.push({ name: "RRW 拟合", color: "#c9a27a", width: 1.1, dash: "5 4", legend: false, points: longPts });
+      fitSeries.push({
+        name: "ARW 拟合", color: "#7a9cc6", width: 1.1, dash: "5 4", legend: false,
+        points: pts.filter((p) => p.tau <= fit.shortMax).map((p) => [p.tau, fit.N / Math.sqrt(p.tau)]),
+      });
+      fitSeries.push({
+        name: "RRW 拟合", color: "#c9a27a", width: 1.1, dash: "5 4", legend: false,
+        points: pts.filter((p) => p.tau >= fit.longMin).map((p) => [p.tau, fit.K * Math.sqrt(p.tau / 3)]),
+      });
     }
     plot($("chart-allan"), {
       height: 250,
@@ -316,14 +373,22 @@
         name: a.label.split(" · ")[0],
         color: a.color,
         width: 1.2,
-        points: allan[a.key].map((p) => [p.tau, p.adev]),
+        points: allanFor(a.key).map((p) => [p.tau, p.adev]),
       })).concat(fitSeries),
     });
+
     const fi = $("fit-info");
     if (fi) {
-      fi.textContent = fit
-        ? `ARW=${fit.arw.toFixed(3)} °/√h · RRW=${fit.rrw.toFixed(3)} (°/s)/√h · R/Q=${(fit.r / fit.q).toFixed(1)}`
-        : "拟合失败：数据太短或曲线异常";
+      if (fit) {
+        const nLo = (fit.nCI[0] * 60).toFixed(2), nHi = (fit.nCI[1] * 60).toFixed(2);
+        const kLo = (fit.kCI[0] * 60).toFixed(2), kHi = (fit.kCI[1] * 60).toFixed(2);
+        fi.innerHTML =
+          `ARW=${fit.arw.toFixed(3)} °/√h（95% ${nLo}–${nHi}）<br>` +
+          `RRW=${fit.rrw.toFixed(3)} (°/s)/√h（95% ${kLo}–${kHi}）<br>` +
+          `R²=${fit.r2.toFixed(3)} · R/Q=${(fit.r / fit.q).toFixed(1)}`;
+      } else {
+        fi.textContent = "拟合失败：数据太短或曲线异常";
+      }
     }
 
     const angle = integrate(clean.map((r) => r[ch]), state.fs);
@@ -339,11 +404,17 @@
     });
 
     $("meta-time").textContent = `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
-    $("meta-allan").textContent = "log-log";
+    $("meta-allan").textContent = fit ? `R²=${fit.r2.toFixed(3)}` : "log-log";
     $("meta-kf").textContent = `R=${state.r.toExponential(2)} · Q=${state.q.toExponential(2)}`;
     try { syncURL(); } catch (e) { /* ignore */ }
   }
 
+  function scheduleDraw() {
+    clearTimeout(drawTimer);
+    drawTimer = setTimeout(draw, 80);
+  }
+
+  /* ---------- 导出 / 分享 ---------- */
   function downloadBlob(blob, name) {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -422,9 +493,7 @@
     p.set("q", Math.log10(state.q).toFixed(2));
     p.set("ch", state.channel);
     p.set("fs", String(state.fs));
-    try {
-      history.replaceState(null, "", location.pathname + "?" + p.toString());
-    } catch (e) { /* file:// 下忽略 */ }
+    try { history.replaceState(null, "", location.pathname + "?" + p.toString()); } catch (e) { /* file:// */ }
   }
 
   function loadURL() {
@@ -445,24 +514,14 @@
         $("q-val").textContent = state.q.toExponential(2);
       }
     }
-    if (p.has("ch")) {
-      const ch = p.get("ch");
-      if (["gx", "gy", "gz"].includes(ch)) {
-        state.channel = ch;
-        $("channel").value = ch;
-      }
+    if (p.has("ch") && ["gx", "gy", "gz"].includes(p.get("ch"))) {
+      state.channel = p.get("ch");
+      $("channel").value = state.channel;
     }
     if (p.has("fs")) {
       const fs = parseFloat(p.get("fs"));
-      if (isFinite(fs) && fs > 0) {
-        state.fs = fs;
-        $("fs").value = fs;
-      }
+      if (isFinite(fs) && fs > 0) { state.fs = fs; $("fs").value = fs; }
     }
-  }
-
-  function debounce(fn, ms) {
-    let t; return function () { clearTimeout(t); t = setTimeout(fn, ms); };
   }
 
   /* ---------- 事件 ---------- */
@@ -476,6 +535,7 @@
         if (!rows.length) { alert("没有解析到有效数据，请检查列名。"); return; }
         state.rows = rows;
         state.source = f.name;
+        invalidate();
         fixTime(rows, state.fs);
         draw();
       };
@@ -484,6 +544,7 @@
 
     $("fs").addEventListener("change", (ev) => {
       state.fs = Math.max(1, Number(ev.target.value) || 100);
+      invalidate();
       fixTime(state.rows, state.fs);
       draw();
     });
@@ -495,28 +556,27 @@
 
     $("clean").addEventListener("change", (ev) => {
       state.clean = ev.target.checked;
+      invalidate();
       draw();
     });
 
-    $("logR").addEventListener("input", (ev) => {
-      const e = Number(ev.target.value);
-      state.r = Math.pow(10, e);
-      $("r-val").textContent = state.r.toExponential(2);
-      draw();
-    });
-
-    $("logQ").addEventListener("input", (ev) => {
-      const e = Number(ev.target.value);
-      state.q = Math.pow(10, e);
-      $("q-val").textContent = state.q.toExponential(2);
-      draw();
-    });
+    const bindSlider = (id, valId, setter) => {
+      $(id).addEventListener("input", (ev) => {
+        const e = Number(ev.target.value);
+        setter(e);
+        $(valId).textContent = Math.pow(10, e).toExponential(2);
+        scheduleDraw();
+      });
+    };
+    bindSlider("logR", "r-val", (e) => { state.r = Math.pow(10, e); });
+    bindSlider("logQ", "q-val", (e) => { state.q = Math.pow(10, e); });
 
     $("reset").addEventListener("click", () => {
       state.rows = synth();
       state.source = "示例数据（合成）";
       state.fs = 100;
       $("fs").value = "100";
+      invalidate();
       draw();
     });
 
@@ -552,7 +612,7 @@
       });
     });
 
-    window.addEventListener("resize", debounce(draw, 150));
+    window.addEventListener("resize", scheduleDraw);
   }
 
   function init() {

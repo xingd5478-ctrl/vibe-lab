@@ -48,6 +48,18 @@ h1 {
 
 .sub { color: var(--muted); font-size: 13px; margin: 0; }
 
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  border-radius: 2px;
+  vertical-align: 1px;
+}
+
 .layout { display: grid; grid-template-columns: 270px 1fr; gap: 20px; align-items: start; }
 
 .panel {
@@ -152,9 +164,28 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 
 .mini:hover { color: var(--ink); border-color: var(--muted); }
 
-.chart { width: 100%; min-height: 220px; }
+.chart { width: 100%; min-height: 220px; position: relative; }
 
 .chart svg { display: block; width: 100%; height: auto; }
+
+.crosshair { stroke: #8a8478; stroke-width: 1; stroke-dasharray: 3 3; }
+.hover-dot { fill: var(--accent); }
+
+.tip {
+  position: absolute;
+  transform: translate(-50%, -125%);
+  background: #1b1d22;
+  color: #fff;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 11px;
+  padding: 4px 7px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 5;
+}
 
 .axis { stroke: var(--ink); stroke-width: 1; }
 .grid { stroke: var(--grid); stroke-width: 1; }

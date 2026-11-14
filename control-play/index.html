@@ -26,13 +26,29 @@
           <input id="zeta" type="range" min="0.05" max="2" step="0.01" value="0.4" />
         </div>
 
-        <div class="metrics">
-          <div>超调量 <b id="overshoot">—</b></div>
-          <div>峰值时间 <b id="peak">—</b></div>
-          <div>调节时间（±2%） <b id="settle">—</b></div>
+        <div class="field">
+          <label>Kp <output id="kp-val">1.50</output></label>
+          <input id="kp" type="range" min="0" max="10" step="0.05" value="1.5" />
         </div>
 
-        <p class="hint">提示：ζ &lt; 1 欠阻尼，ζ = 1 临界阻尼；拖动 ζ 看超调与振荡的变化。</p>
+        <div class="field">
+          <label>Ki <output id="ki-val">0.50</output></label>
+          <input id="ki" type="range" min="0" max="10" step="0.05" value="0.5" />
+        </div>
+
+        <div class="field">
+          <label>Kd <output id="kd-val">0.050</output></label>
+          <input id="kd" type="range" min="0" max="2" step="0.005" value="0.05" />
+        </div>
+
+        <div class="metrics">
+          <div>超调量（闭环） <b id="overshoot">—</b></div>
+          <div>峰值时间 <b id="peak">—</b></div>
+          <div>调节时间（±2%） <b id="settle">—</b></div>
+          <div>稳态误差 <b id="ess">—</b></div>
+        </div>
+
+        <p class="hint">Kp 加快响应但增大超调；Ki 消除稳态误差但易振荡；Kd 抑制超调、放大噪声。拖滑杆对比开环/闭环。</p>
       </aside>
 
       <section class="charts">
@@ -47,7 +63,7 @@
         <div class="panel">
           <div class="panel-head">
             <h2>阶跃响应</h2>
-            <span class="meta">单位阶跃 · 数值积分</span>
+            <span class="meta" id="meta-step">—</span>
           </div>
           <div class="chart" id="step"></div>
         </div>
@@ -55,7 +71,8 @@
     </div>
 
     <footer>
-      vibe-lab · 零依赖 SVG · 参数可写进 URL（?wn=4&amp;zeta=0.4） · 仅用于教学/复习演示。
+      vibe-lab · 零依赖 SVG · 参数同步到 URL（?wn=4&zeta=0.4&kp=1.5&ki=0.5&kd=0.05） · 仅用于教学/复习演示 ·
+      <a href="../">← vibe-lab</a> · <a href="../imu/">IMU Lab →</a>
     </footer>
   </div>
 

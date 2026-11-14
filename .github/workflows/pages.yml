@@ -6,6 +6,7 @@ on:
     paths:
       - "imu-lab/static/**"
       - "control-play/**"
+      - "landing/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -30,8 +31,9 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p _site
-          cp -r imu-lab/static/. _site/
-          mkdir -p _site/control
+          cp -r landing/. _site/
+          mkdir -p _site/imu _site/control
+          cp -r imu-lab/static/. _site/imu/
           cp -r control-play/. _site/control/
       - uses: actions/upload-pages-artifact@v3
         with:

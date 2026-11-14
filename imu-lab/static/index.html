@@ -11,7 +11,7 @@
     <header>
       <div class="kicker">vibe-lab / instrument 01</div>
       <h1>IMU 数据实验室</h1>
-      <p class="sub">上传 MPU6050 CSV → CRC 清洗 → Allan 方差 → 拖动 R/Q 看滤波。全部在浏览器内计算，无后端。</p>
+      <p class="sub">上传 MPU6050 CSV → CRC 清洗 → Allan 方差 → 拖动 R/Q 看滤波。全部在浏览器内计算，无后端。<span class="badge" id="demo-badge">演示数据</span></p>
     </header>
 
     <div class="layout">
@@ -113,12 +113,13 @@
 
     <footer>
       vibe-lab · 数据与算法在浏览器内运行 · 工程近似：R=(ARW/60)²·Δt，Q=(RRW/60)²·Δt ·
-      仅用于教学/演示，真实标定以论文流程为准。 · <a href="control/">Control Play →</a>
+      仅用于教学/演示，真实标定以论文流程为准。 · <a href="../">← vibe-lab</a> · <a href="../control/">Control Play →</a>
     </footer>
   </div>
 
   <script src="allan.js"></script>
   <script src="kf.js"></script>
+  <script src="fit.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

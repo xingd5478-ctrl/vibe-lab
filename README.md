@@ -1,45 +1,54 @@
 # vibe-lab
 
-传感器与控制的可视化实验室：把毕设里的数据、算法和“讲清楚一件事”的能力，做成三个可以玩、可以演示、可以继续长大的小项目。
+传感器与控制的可视化实验室：两个零依赖的浏览器工具 + 一个说明页。
 
-> 一句话：**imu-lab 看数据，control-play 调节理论，sensor-story 讲故事。**
+**线上：** https://xingd5478-ctrl.github.io/vibe-lab/
 
 ## 目录
 
 ```
 vibe-lab/
+├── landing/             # 首页：两个工具的入口
 ├── imu-lab/
-│   ├── static/          # ① 静态版（主）：双击即开，可部署 GitHub Pages
-│   └── app.py           #    Streamlit 版（备份）
-├── control-play/        # ② 控制理论 playground：Bode/阶跃/PID（单文件网页）
-├── sensor-story/        # ③ 传感器数据故事：滚动叙事网页
-├── shared/              # Python 共享算法：CSV、CRC、Allan、1D KF
+│   ├── static/          # ① IMU 数据实验室（部署到 /imu/）
+│   └── app.py           #    Streamlit 备份
+├── control-play/        # ② 二阶系统 + PID（部署到 /control/）
+├── shared/              # Python 共享算法
+├── tests/               # Node 单测（Allan / KF / 拟合）
 ├── data/sample/         # 合成样例数据
-└── ROADMAP.md           # 两周计划 + 考研 guardrails
+└── .github/workflows/   # Pages 部署
 ```
 
 ## 快速开始
 
-### ① imu-lab
+```bash
+# 本地预览（推荐，避免 file:// 的浏览器限制）
+python -m http.server 8000
+# 首页：http://localhost:8000/landing/
+# IMU：http://localhost:8000/imu-lab/static/
+# 控制：http://localhost:8000/control-play/
+```
 
-- 直接双击 `imu-lab/static/index.html`（无需服务器、无需 Python）；
-- 或本地预览：`python -m http.server 8000 --directory imu-lab/static`；
-- 部署：见 `imu-lab/README.md`（GitHub Pages / Vercel）。
+也可以直接双击 `landing/index.html`（链接会自动切到本地路径）。
 
-### ② control-play
+## 测试
 
-直接用浏览器打开 `control-play/index.html`，拖 ωn/ζ 滑杆。
+```bash
+npm test
+```
 
-### ③ sensor-story
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、拟合恢复 ARW/RRW 与 R²。
 
-先读 `sensor-story/README.md` 的分镜，再决定是否动代码。
+## 线上结构
+
+| 路径 | 内容 |
+|---|---|
+| `/` | 首页（landing） |
+| `/imu/` | IMU 数据实验室 |
+| `/control/` | Control Play |
 
 ## 约定
 
-- 三个子项目各自独立，互不依赖；共享代码只放在 `shared/`。
-- 数据不进 Git（`data/sample` 除外），真实数据用绝对路径或环境变量引用。
+- 三个子项目各自独立；共享 JS 只有 `allan.js / kf.js / fit.js`。
+- 数据不进 Git（`data/sample` 除外）。
 - 每个子项目一个 README：写“现在能做什么 / 下一步 / 怎么跑”。
-
-## 命名
-
-仓库名 `vibe-lab`（短、好记、适合放 GitHub）；中文可叫“传感器与控制可视化实验室”。

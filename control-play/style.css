@@ -105,8 +105,27 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   color: var(--muted);
 }
 
-.chart { width: 100%; }
+.chart { width: 100%; position: relative; }
 .chart svg { display: block; width: 100%; height: auto; }
+
+.crosshair { stroke: #8a8478; stroke-width: 1; stroke-dasharray: 3 3; }
+.hover-dot { fill: var(--accent); }
+
+.tip {
+  position: absolute;
+  transform: translate(-50%, -125%);
+  background: #1b1d22;
+  color: #fff;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 11px;
+  padding: 4px 7px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 5;
+}
 
 .axis { stroke: var(--ink); stroke-width: 1; }
 .grid { stroke: var(--grid); stroke-width: 1; }
