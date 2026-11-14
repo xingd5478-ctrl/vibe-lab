@@ -86,7 +86,9 @@ async function main() {
       await waitFor(() => e("!!document.querySelector('#bode svg')"));
       if (!/Kp=3\.00/.test(await e("document.querySelector('#meta-step').textContent"))) throw new Error("control: PID URL");
       if (!(await e("!!document.querySelector('#step svg')"))) throw new Error("control: step chart");
-      if ((await e("document.querySelectorAll('#manual .manual-card').length")) !== 10) throw new Error("control: manual chapters");
+      if ((await e("document.querySelectorAll('#manual .manual-card').length")) !== 14) throw new Error("control: manual chapters");
+      if ((await e("document.querySelectorAll('#labs .lab-module').length")) !== 4) throw new Error("control: extra labs");
+      if (!(await e("!!document.querySelector('#lab-sf-a svg')"))) throw new Error("control: state feedback lab chart");
     });
 
     await check("landing", fileUrl("landing/index.html"), async (e) => {

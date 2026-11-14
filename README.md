@@ -89,7 +89,7 @@ imu-lab/static/
 ## 三个工具
 
 - **IMU 数据实验室**（`/imu/`）：CSV → CRC 清洗 → Allan → ARW/RRW → R/Q → KF，附 **10 章实验手册**；
-- **Control Play**（`/control/`）：Bode、阶跃、PID、状态空间/观测器/离散化讲解，附 **10 章实验手册**；
+- **Control Play**（`/control/`）：二阶 Bode/阶跃/PID + **状态反馈、观测器、根轨迹、离散化 4 个扩展实验**，附 **14 章实验手册**；
 - **Simulink 教程**（`/simulink/`）：43 课讲义 + 19 个交互实验 + 43 个 `.slx` 下载。
 
 ## 数据层

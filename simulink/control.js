@@ -456,7 +456,41 @@
     return { ...pidDemo(1.5, 1.2, 0.05), label: "PID" };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, metrics, poles };
+  /* ---------- 离散化：数字 PID 采样保持 vs 连续 PID ---------- */
+  function discreteDemo(Ts) {
+    const wn = 4, zeta = 0.4, kp = 1.5, ki = 1.2, kd = 0.05;
+    const dt = 0.001, T = 8, n = Math.round(T / dt);
+    const t = new Float64Array(n), yc = new Float64Array(n), yd = new Float64Array(n);
+
+    function run(sampleTs) {
+      let x = 0, v = 0, I = 0, pe = 0, uHold = 0, last = -1;
+      const out = new Float64Array(n);
+      for (let i = 0; i < n; i++) {
+        t[i] = i * dt;
+        const ref = t[i] >= 0.5 ? 1 : 0;
+        const e = ref - x;
+        if (sampleTs <= 0 || t[i] - last >= sampleTs - 1e-9) {
+          I = Math.max(-10, Math.min(10, I + e * (sampleTs || dt)));
+          const de = (e - pe) / (sampleTs || dt);
+          uHold = Math.max(-20, Math.min(20, kp * e + ki * I + kd * de));
+          pe = e;
+          last = t[i];
+        }
+        const acc = wn * wn * (uHold - x) - 2 * zeta * wn * v;
+        v += acc * dt;
+        x += v * dt;
+        out[i] = x;
+      }
+      return out;
+    }
+
+    const cont = run(dt);
+    const disc = run(Ts);
+    for (let i = 0; i < n; i++) { yc[i] = cont[i]; yd[i] = disc[i]; }
+    return { t, yc, yd, samples: Math.max(1, Math.round(T / Ts)) };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

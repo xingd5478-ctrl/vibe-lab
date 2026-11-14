@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v10";
+const CACHE = "vibe-lab-v11";
 const ASSETS = [
   "./",
   "./index.html",
@@ -29,6 +29,7 @@ const ASSETS = [
   "./control/style.css",
   "./control/chart.js",
   "./control/app.js",
+  "./control/labs.js",
   "./control/manual.js",
   "./simulink/",
   "./simulink/index.html",

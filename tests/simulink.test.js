@@ -158,3 +158,15 @@ test("variant mode selects different controllers", () => {
   assert.ok(open.y[open.y.length - 1] > 0);
   assert.ok(Math.abs(pid.y[pid.y.length - 1] - 1) < 0.02);
 });
+
+test("discrete PID deviates more as Ts grows", () => {
+  const fine = S.discreteDemo(0.002);
+  const coarse = S.discreteDemo(0.2);
+  const err = (r) => {
+    let s = 0;
+    for (let i = 0; i < r.t.length; i++) s += Math.pow(r.yc[i] - r.yd[i], 2);
+    return Math.sqrt(s / r.t.length);
+  };
+  assert.ok(err(fine) < err(coarse), `${err(fine)} < ${err(coarse)}`);
+  assert.ok(fine.samples > coarse.samples);
+});
