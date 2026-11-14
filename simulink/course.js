@@ -171,6 +171,27 @@
       wrap.appendChild(el("p", "guide-goal", examples[lesson.id]));
     }
 
+    const cases = window.SIMULINK_CASES || {};
+    const c = cases[lesson.id];
+    if (c) {
+      wrap.appendChild(el("h4", "", "完整算例"));
+      wrap.appendChild(el("p", "guide-goal", c.setup));
+      wrap.appendChild(el("div", "guide-math", "期望：" + c.expected));
+      wrap.appendChild(el("h4", "", "常见错误"));
+      const errs = el("ol", "guide-list");
+      c.errors.forEach((x) => errs.appendChild(el("li", "", x)));
+      wrap.appendChild(errs);
+      wrap.appendChild(el("h4", "", "自测答案"));
+      const qa = el("div", "guide-quiz");
+      c.answers.forEach((a, i) => {
+        const d = document.createElement("details");
+        d.appendChild(el("summary", "", "答案 " + (i + 1)));
+        d.appendChild(el("p", "", a));
+        qa.appendChild(d);
+      });
+      wrap.appendChild(qa);
+    }
+
     wrap.appendChild(el("h4", "", "自测"));
     const quiz = el("div", "guide-quiz");
     g.quiz.forEach(([q, a]) => {

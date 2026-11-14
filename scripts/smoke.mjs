@@ -161,6 +161,7 @@ async function main() {
     await check("course-example", fileUrl("simulink/course.html") + "#t19", async (e) => {
       await waitFor(async () => (await e("document.querySelector('#lesson-title').textContent")).includes("t19"));
       if (!(await e("document.body.textContent")).includes("小例子")) throw new Error("course: concept example missing");
+      if (!(await e("document.body.textContent")).includes("完整算例")) throw new Error("course: full case missing");
     });
 
     console.log("SMOKE OK (landing + imu + control + about + simulink)");
