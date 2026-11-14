@@ -622,22 +622,6 @@
       draw();
     });
 
-    $("load-real").addEventListener("click", async () => {
-      try {
-        const res = await fetch("sample_real_60s.csv", { cache: "no-store" });
-        if (!res.ok) throw new Error(String(res.status));
-        const rows = parseCSV(await res.text());
-        if (!rows.length) throw new Error("empty");
-        state.rows = rows;
-        state.source = "真实样例（2 h 数据 60 s）";
-        invalidate();
-        fixTime(rows, state.fs);
-        draw();
-      } catch (e) {
-        flash("file:// 下无法自动加载，请用“下载样例 CSV”后手动上传");
-      }
-    });
-
     $("fit").addEventListener("click", () => {
       if (!state.fit) return;
       const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
