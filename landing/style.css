@@ -36,6 +36,11 @@ body {
 
 .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px 48px; }
 
+.topnav { display: flex; flex-wrap: wrap; gap: 16px; padding: 14px 0 0; font-size: 12px; }
+.topnav a { color: var(--muted); text-decoration: none; }
+.topnav a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.topnav [aria-current="page"] { color: var(--accent); font-weight: 600; }
+
 header { padding: 56px 0 28px; border-bottom: 1px solid var(--line); }
 
 .paths { margin: 18px 0 0; }

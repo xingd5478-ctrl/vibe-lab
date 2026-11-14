@@ -157,6 +157,12 @@
     wrap.appendChild(el("h4", "", "新手容易踩的坑"));
     wrap.appendChild(el("p", "guide-warn", g.pitfall));
 
+    const examples = window.SIMULINK_EXAMPLES || {};
+    if (examples[lesson.id]) {
+      wrap.appendChild(el("h4", "", "小例子"));
+      wrap.appendChild(el("p", "guide-goal", examples[lesson.id]));
+    }
+
     wrap.appendChild(el("h4", "", "自测"));
     const quiz = el("div", "guide-quiz");
     g.quiz.forEach(([q, a]) => {

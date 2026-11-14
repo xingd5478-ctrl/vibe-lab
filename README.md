@@ -92,7 +92,7 @@ imu-lab/static/
 - **Control Play**（`/control/`）：二阶 Bode/阶跃/PID + **状态反馈、观测器、根轨迹、离散化 4 个扩展实验**，附 **14 章实验手册**；页面用「实验台 / 扩展实验 / 手册」标签切换；
 - **Simulink 教程**（`/simulink/`）：43 课讲义 + 19 个交互实验 + 43 个 `.slx` 下载；课程按 **精读 / 合格 / 概念** 分级。
 
-首页提供「从哪开始」三条路径；`npm run check:chart` 在 CI 中保证三份 `chart.js` 不漂移。
+首页提供「从哪开始」三条路径 + 全站顶栏；9 门「概念」课带可计算的小例子；`npm run check:chart` 在 CI 中保证三份 `chart.js` 不漂移。
 
 ## 数据层
 

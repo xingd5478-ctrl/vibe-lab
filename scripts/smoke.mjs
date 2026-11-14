@@ -108,6 +108,7 @@ async function main() {
     await check("landing", fileUrl("landing/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 3);
       if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 3) throw new Error("landing: path chooser");
+      if ((await e("document.querySelectorAll('.topnav a').length")) !== 5) throw new Error("landing: global nav");
       if (!(await e("document.title")).includes("vibe-lab")) throw new Error("landing: title");
     });
 
@@ -137,6 +138,11 @@ async function main() {
       } catch {
         console.log("   course content offline (GitHub link fallback)");
       }
+    });
+
+    await check("course-example", fileUrl("simulink/course.html") + "#t19", async (e) => {
+      await waitFor(async () => (await e("document.querySelector('#lesson-title').textContent")).includes("t19"));
+      if (!(await e("document.body.textContent")).includes("小例子")) throw new Error("course: concept example missing");
     });
 
     console.log("SMOKE OK (landing + imu + control + about + simulink)");
