@@ -62,7 +62,21 @@
       <li>源码：<a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">github.com/xingd5478-ctrl/vibe-lab</a>。</li>
     </ul>
 
-    </main>
+    <section class="panel" style="margin-top:24px">
+<h2>MATLAB 对照（真机仿真）</h2>
+<p>用 MATLAB R2025a 对 .slx 实际仿真，与网页 demo 对比。目前完成 4/5 个核心模型。</p>
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+<thead><tr><th align="left">课程</th><th align="left">网页 demo</th><th align="left">.slx 实测</th><th align="left">说明</th></tr></thead>
+<tbody>
+<tr><td>t03 一阶</td><td>终值 1.000，无超调</td><td>峰值 1.000，终值 1.000</td><td>一致</td></tr>
+<tr><td>t04 二阶 ζ=0.2</td><td>超调约 52%</td><td>峰值 1.520，终值 0.996</td><td>一致</td></tr>
+<tr><td>t05 PID</td><td>终值约 1</td><td>峰值 0.978，终值 0.978</td><td>模型参考/限幅不同</td></tr>
+<tr><td>t10 状态反馈</td><td>终值 1（带前馈）</td><td>峰值 0.065，终值 0.063</td><td>原模型无参考前馈，稳态 1/16</td></tr>
+<tr><td>t16 频域</td><td>PM 可算</td><td>仅 tout，待补</td><td>下一步用 freqresp</td></tr>
+</tbody></table>
+<p class="hint">只列已真机跑过的模型；其余后续补。t10 的差异是真实存在的：原 .slx 用 u=−Kx，网页 demo 加了参考前馈。</p>
+</section>
+</main>
 
     <footer>
       <a href="../">← vibe-lab</a> · <a href="../imu/" data-nav="imu">IMU Lab</a> · <a href="../control/" data-nav="control">Control Play</a>
@@ -100,6 +114,7 @@
 </script>
 </body>
 </html>
+
 
 
 
