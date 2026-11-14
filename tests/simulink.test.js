@@ -217,3 +217,16 @@ test("triggered subsystem holds samples", () => {
     assert.ok(Math.abs(dt - 0.05) < 1e-6);
   }
 });
+
+test("lead-lag computes a finite phase margin", () => {
+  const r = S.leadlagDemo(2, 10);
+  assert.ok(isFinite(r.pm) && r.pm > 0 && r.pm < 180, `pm=${r.pm}`);
+  assert.ok(r.y.every((v) => isFinite(v)));
+});
+
+test("system identification recovers K and tau without noise", () => {
+  const r = S.sysidDemo(0, 0.4);
+  assert.ok(Math.abs(r.Kfit - 2) < 0.01);
+  assert.ok(Math.abs(r.tauFit - 0.4) < 0.03);
+  assert.ok(r.rmse < 0.01);
+});

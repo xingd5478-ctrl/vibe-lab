@@ -674,6 +674,72 @@
       },
     },
 
+    leadlag: {
+      title: "t17 · 超前-滞后校正",
+      lesson: "t17",
+      note: "C(s)=(s+z)/(s+p)，对象 1/(s(s+1))。p>z 为超前：抬相位、增裕度；z>p 为滞后。看 Bode 与闭环阶跃。",
+      diagram: {
+        aria: "校正器串联对象，反馈到参考",
+        blocks: [{ label: "Step" }, { label: "C(s)", sub: "(s+z)/(s+p)" }, { label: "1/(s(s+1))" }, { label: "Scope" }],
+      },
+      params: [
+        { id: "z", label: "零点 z", min: 0.5, max: 10, step: 0.1, value: 2 },
+        { id: "p", label: "极点 p", min: 1, max: 30, step: 0.5, value: 10 },
+      ],
+      render(p) {
+        const r = S.leadlagDemo(p.z, p.p);
+        const m = S.metrics(r.t, r.y, 1);
+        plot($("chart-a"), {
+          height: 250, logX: true, xLabel: "ω (rad/s)", yLabel: "开环幅值 (dB)",
+          aria: "校正后开环 Bode 幅频",
+          series: [{ name: "|L|", color: "#1f4e79", width: 1.6, points: r.w.map((w, i) => [w, r.mag[i]]) }],
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "闭环输出",
+          aria: "校正后闭环阶跃",
+          series: [{ name: "y", color: "#2f6b4f", width: 1.8, points: toPts(r.t, r.y) }],
+        });
+        metrics([
+          ["相位裕度", isFinite(r.pm) ? r.pm.toFixed(1) + "°" : "—"],
+          ["超调", f2(m.overshoot) + "%"],
+          ["调节时间", f2(m.settle) + "s"],
+          ["p>z?", p.p > p.z ? "超前" : "滞后"],
+        ]);
+      },
+    },
+
+    sysid: {
+      title: "t18 · 系统辨识",
+      lesson: "t18",
+      note: "对带噪阶跃响应，用终值估 K、63.2% 时间估 τ；虚线是拟合模型。噪声越大，参数越飘。",
+      diagram: {
+        aria: "阶跃输入未知对象，记录数据并拟合",
+        blocks: [{ label: "Step" }, { label: "Unknown Plant" }, { label: "Log Data" }, { label: "Fit" }],
+      },
+      params: [
+        { id: "noise", label: "测量噪声", min: 0, max: 0.3, step: 0.01, value: 0.05 },
+        { id: "tau", label: "真实 τ (s)", min: 0.1, max: 1, step: 0.05, value: 0.4 },
+      ],
+      render(p) {
+        const r = S.sysidDemo(p.noise, p.tau);
+        plot($("chart-a"), {
+          height: 260, xLabel: "时间 (s)", yLabel: "输出 y", yMin: 0, yMax: 2.4,
+          aria: "阶跃响应与拟合",
+          series: [
+            { name: "实测", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.data) },
+            { name: "拟合", color: "#1f4e79", width: 1.6, dash: "5 4", points: toPts(r.t, r.fit) },
+          ],
+        });
+        $("chart-b").innerHTML = "";
+        metrics([
+          ["K 估计", r.Kfit.toFixed(3)],
+          ["τ 估计", r.tauFit.toFixed(2) + "s"],
+          ["RMSE", r.rmse.toFixed(4)],
+          ["真实 τ", p.tau.toFixed(2) + "s"],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",

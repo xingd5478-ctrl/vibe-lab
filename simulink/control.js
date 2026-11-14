@@ -536,7 +536,65 @@
     return { t, y, ts, z, samples: z.length };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, metrics, poles };
+  /* 超前-滞后：C=(s+z)/(s+p)，对象 1/(s(s+1))，算 PM 与闭环阶跃 */
+  function leadlagDemo(z, p) {
+    const a2 = p + 1, a1 = p + z, a0 = z;
+    const dt = 0.002, T = 8, n = Math.round(T / dt);
+    const t = new Float64Array(n), y = new Float64Array(n);
+    let x1 = 0, x2 = 0, x3 = 0;
+    for (let k = 0; k < n; k++) {
+      t[k] = k * dt;
+      const u = t[k] >= 0.5 ? 1 : 0;
+      const dx1 = x2, dx2 = x3;
+      const dx3 = -a0 * x1 - a1 * x2 - a2 * x3 + u;
+      x1 += dx1 * dt; x2 += dx2 * dt; x3 += dx3 * dt;
+      y[k] = z * x1 + x2;
+    }
+    const w = [], mag = [], ph = [];
+    let pm = NaN;
+    for (let e = -2; e <= 2.001; e += 0.02) {
+      const wi = Math.pow(10, e);
+      const Lmag = (Math.hypot(wi, z) / Math.hypot(wi, p)) / (wi * Math.hypot(wi, 1));
+      const phase = Math.atan2(wi, z) - Math.atan2(wi, p) - Math.PI / 2 - Math.atan(wi);
+      w.push(wi);
+      mag.push(20 * Math.log10(Lmag));
+      ph.push((phase * 180) / Math.PI);
+    }
+    for (let i = 1; i < mag.length; i++) {
+      if (mag[i - 1] >= 0 && mag[i] < 0) {
+        const f = mag[i - 1] / (mag[i - 1] - mag[i]);
+        const phc = ph[i - 1] + f * (ph[i] - ph[i - 1]);
+        pm = 180 + phc;
+        break;
+      }
+    }
+    return { t, y, w, mag, ph, pm };
+  }
+
+  /* 系统辨识：对带噪阶跃响应估 K、τ（终值 + 63.2% 时间） */
+  function sysidDemo(noise, tauTrue) {
+    const K = 2, dt = 0.01, T = 4, n = Math.round(T / dt);
+    const t = new Float64Array(n), data = new Float64Array(n);
+    const r = rng(41);
+    for (let k = 0; k < n; k++) {
+      t[k] = k * dt;
+      data[k] = K * (1 - Math.exp(-t[k] / tauTrue)) + (noise ? gauss(r) * noise : 0);
+    }
+    const Kfit = data[n - 1];
+    let tauFit = tauTrue;
+    for (let k = 0; k < n; k++) {
+      if (data[k] >= 0.632 * Kfit) { tauFit = t[k]; break; }
+    }
+    const fit = new Float64Array(n);
+    let se = 0;
+    for (let k = 0; k < n; k++) {
+      fit[k] = Kfit * (1 - Math.exp(-t[k] / tauFit));
+      se += Math.pow(fit[k] - data[k], 2);
+    }
+    return { t, data, fit, Kfit, tauFit, rmse: Math.sqrt(se / n) };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);
