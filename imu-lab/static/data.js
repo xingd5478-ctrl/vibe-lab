@@ -150,7 +150,46 @@
     return "\ufeff" + lines.join("\n");
   }
 
-  const api = { AXES, parseText, parseWithMapping, fromRows, toRows, cleanMask, stats, allan, kf, csv };
+  /* 单位/坐标系经验校验：返回警告列表（不阻断使用） */
+  function validate(rows, fs) {
+    const warns = [];
+    if (!(fs > 0) || fs > 1e6) warns.push("采样率异常，请检查采样率设置");
+    const n = Math.min(rows.length, 3000);
+    if (n > 5) {
+      const mags = { gx: [], gy: [], gz: [] };
+      for (let i = 0; i < n; i++) {
+        const r = rows[i];
+        mags.gx.push(Math.abs(r.gx));
+        mags.gy.push(Math.abs(r.gy));
+        mags.gz.push(Math.abs(r.gz));
+      }
+      const med = (a) => { a.sort((x, y) => x - y); return a[a.length >> 1]; };
+      for (const k of AXES) {
+        if (med(mags[k]) > 500) {
+          warns.push(`轴 ${k.toUpperCase()} 量级异常（|值| 中位数 > 500），请确认单位是否为 °/s`);
+          break;
+        }
+      }
+      let same = true;
+      for (let i = 0; i < n; i++) {
+        const r = rows[i];
+        if (r.gx !== r.gy || r.gx !== r.gz) { same = false; break; }
+      }
+      if (same) warns.push("三轴数值完全相同，疑似同一通道复制");
+      const dts = [];
+      for (let i = 1; i < n; i++) {
+        const d = rows[i].t - rows[i - 1].t;
+        if (isFinite(d) && d > 0) dts.push(d);
+      }
+      if (dts.length > 10) {
+        const mdt = med(dts);
+        if (mdt > 5) warns.push("时间列步长疑似不是秒（中位步长 > 5），请检查时间单位");
+      }
+    }
+    return warns;
+  }
+
+  const api = { AXES, parseText, parseWithMapping, fromRows, toRows, cleanMask, stats, allan, kf, csv, validate };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.IMUData = api;
 })(typeof window !== "undefined" ? window : globalThis);

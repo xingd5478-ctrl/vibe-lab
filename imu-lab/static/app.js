@@ -28,6 +28,7 @@
     pendingName: "",
     cols: null,
     mask: null,
+    warnedVersion: 0,
   };
 
   let dataVersion = 0;
@@ -355,6 +356,12 @@
     }
 
     workerAllan = null;
+    if (state.warnedVersion !== dataVersion) {
+      state.warnedVersion = dataVersion;
+      if (window.IMUData) {
+        IMUData.validate(state.rows, state.fs).slice(0, 2).forEach((w) => flash(w));
+      }
+    }
     if (allanWorker && raw.length > 150000) {
       const n = raw.length;
       const gx = new Float32Array(n), gy = new Float32Array(n), gz = new Float32Array(n);
@@ -669,6 +676,12 @@
     for (let i = 0; i < n; i++) {
       lines.push([series[0][i].tau.toFixed(6)].concat(series.map((s) => s[i].adev.toFixed(9))).join(","));
     }
+    lines.push("# source=" + state.source);
+    lines.push("# fs=" + state.fs);
+    lines.push("# units=deg_per_s");
+    if (state.fit) lines.push("# fit_method=" + state.fit.method);
+    lines.push("# fit_arw=" + (state.fit ? state.fit.arw.toFixed(4) : "n/a"));
+    lines.push("# fit_rrw=" + (state.fit ? state.fit.rrw.toFixed(4) : "n/a"));
     const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
     downloadBlob(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }),
       `imu_allan_${stamp}.csv`);

@@ -1,4 +1,4 @@
-/* Allan 拟合：加权最小二乘（σ² 线性化）+ R² + 回归置信区间（浏览器/Node 通用） */
+/* Allan 拟合：Huber IRLS 稳健加权最小二乘（σ² 线性化）+ R² + 回归置信区间（浏览器/Node 通用） */
 (function (root) {
   "use strict";
 
@@ -19,47 +19,72 @@
 
   /**
    * 拟合 σ² = A·(1/τ) + K²·(τ/3)，A=N²。
-   * 以 σ² 为因变量做普通最小二乘（等价于对 σ² 加权）；失败时回退中位数法。
-   * @returns {N,K,arw,rrw,r,q,r2,nCI,kCI,shortMax,longMin} 或 null
+   * Huber IRLS 加权最小二乘，对离群 τ 段稳健；失败回退中位数法。
+   * @returns {N,K,arw,rrw,r,q,r2,nCI,kCI,shortMax,longMin,method} 或 null
    */
   function fitAllan(pts, dt) {
     if (!pts || pts.length < 6) return null;
-    const tmin = pts[0].tau, tmax = pts[pts.length - 1].tau;
+    const n = pts.length;
+    const x1 = (p) => 1 / p.tau;
+    const x2 = (p) => p.tau / 3;
+    const yv = (p) => p.adev * p.adev;
 
-    let S11 = 0, S12 = 0, S22 = 0, T1 = 0, T2 = 0;
-    for (const p of pts) {
-      const x1 = 1 / p.tau;
-      const x2 = p.tau / 3;
-      const y = p.adev * p.adev;
-      S11 += x1 * x1;
-      S12 += x1 * x2;
-      S22 += x2 * x2;
-      T1 += x1 * y;
-      T2 += x2 * y;
+    // Huber IRLS
+    let A = NaN, B = NaN;
+    let varA = NaN, varB = NaN;
+    let robust = false;
+    let w = new Array(n).fill(1);
+    let S11 = 0, S12 = 0, S22 = 0, T1 = 0, T2 = 0, sw = 0;
+    for (let iter = 0; iter < 25; iter++) {
+      S11 = 0; S12 = 0; S22 = 0; T1 = 0; T2 = 0; sw = 0;
+      for (let i = 0; i < n; i++) {
+        const p = pts[i], wi = w[i];
+        const a = x1(p), b = x2(p), y = yv(p);
+        S11 += wi * a * a; S12 += wi * a * b; S22 += wi * b * b;
+        T1 += wi * a * y; T2 += wi * b * y; sw += wi;
+      }
+      const det = S11 * S22 - S12 * S12;
+      if (Math.abs(det) < 1e-30) break;
+      A = (T1 * S22 - T2 * S12) / det;
+      B = (T2 * S11 - T1 * S12) / det;
+
+      const r = pts.map((p, i) => yv(p) - (A * x1(p) + B * x2(p)));
+      const sorted = [...r].sort((a, b) => a - b);
+      const med = sorted[n >> 1];
+      const dev = sorted.map((v) => Math.abs(v - med)).sort((a, b) => a - b);
+      const s = 1.4826 * dev[n >> 1];
+      if (!isFinite(s) || s <= 0) break;
+      let maxChange = 0;
+      for (let i = 0; i < n; i++) {
+        const z = Math.abs(r[i]) / s;
+        const wn = z <= 1.345 ? 1 : 1.345 / z;
+        maxChange = Math.max(maxChange, Math.abs(wn - w[i]));
+        w[i] = wn;
+      }
+      robust = true;
+      if (maxChange < 1e-6) break;
     }
-    const det = S11 * S22 - S12 * S12;
 
-    let N = NaN, K = NaN, varN2 = NaN, varK2 = NaN;
-    if (Math.abs(det) > 1e-30) {
-      const A = (T1 * S22 - T2 * S12) / det; // N²
-      const B = (T2 * S11 - T1 * S12) / det; // K²
-      if (A > 0 && B > 0) {
-        N = Math.sqrt(A);
-        K = Math.sqrt(B);
-        // 回归残差方差 → 参数协方差
-        let ssResY = 0;
-        for (const p of pts) {
-          const pred = A / p.tau + (B * p.tau) / 3;
-          const r = p.adev * p.adev - pred;
-          ssResY += r * r;
-        }
-        const s2 = ssResY / Math.max(1, pts.length - 2);
-        varN2 = (s2 * S22) / det;
-        varK2 = (s2 * S11) / det;
+    let N = NaN, K = NaN;
+    if (isFinite(A) && isFinite(B) && A > 0 && B > 0 && sw > 2) {
+      N = Math.sqrt(A);
+      K = Math.sqrt(B);
+      // 残差尺度（鲁棒 MAD）→ 参数协方差
+      const r = pts.map((p, i) => yv(p) - (A * x1(p) + B * x2(p)));
+      const med = median(r);
+      const dev = r.map((v) => Math.abs(v - med)).sort((a, b) => a - b);
+      const s2 = Math.pow(1.4826 * (dev[n >> 1] || 0), 2);
+      if (s2 > 0) {
+        const det = S11 * S22 - S12 * S12;
+        varA = (s2 * S22) / det;
+        varB = (s2 * S11) / det;
+      } else {
+        varA = NaN; varB = NaN;
       }
     }
 
     // 回退：短/长段中位数
+    const tmin = pts[0].tau, tmax = pts[pts.length - 1].tau;
     if (!isFinite(N) || !isFinite(K) || N <= 0 || K <= 0) {
       const shortMax0 = Math.min(1.0, tmax / 3);
       const longMin0 = Math.max(2 * tmin, tmax / 4);
@@ -69,8 +94,8 @@
       N = median(short.map((p) => p.adev * Math.sqrt(p.tau)));
       K = median(long.map((p) => p.adev / Math.sqrt(p.tau / 3)));
       if (!isFinite(N) || !isFinite(K) || N <= 0 || K <= 0) return null;
-      varN2 = NaN;
-      varK2 = NaN;
+      varA = NaN; varB = NaN;
+      robust = false;
     }
 
     const logs = pts.map((p) => Math.log(p.adev));
@@ -87,13 +112,15 @@
     let nCI, kCI;
     const Ns = pts.map((p) => p.adev * Math.sqrt(p.tau));
     const Ks = pts.map((p) => p.adev / Math.sqrt(p.tau / 3));
-    if (isFinite(varN2) && varN2 > 0) {
-      const nLo = Math.sqrt(Math.max(0, N * N - 1.96 * Math.sqrt(varN2)));
-      const nHi = Math.sqrt(Math.max(0, N * N + 1.96 * Math.sqrt(varN2)));
-      const kLo2 = Math.max(0, K * K - 1.96 * Math.sqrt(varK2));
-      const kHi2 = Math.max(0, K * K + 1.96 * Math.sqrt(varK2));
-      nCI = [nLo, nHi];
-      kCI = [Math.sqrt(kLo2), Math.sqrt(kHi2)];
+    if (isFinite(varA) && varA > 0 && isFinite(varB) && varB > 0) {
+      nCI = [
+        Math.sqrt(Math.max(0, N * N - 1.96 * Math.sqrt(varA))),
+        Math.sqrt(Math.max(0, N * N + 1.96 * Math.sqrt(varA))),
+      ];
+      kCI = [
+        Math.sqrt(Math.max(0, K * K - 1.96 * Math.sqrt(varB))),
+        Math.sqrt(Math.max(0, K * K + 1.96 * Math.sqrt(varB))),
+      ];
     } else {
       const ns = [...Ns].sort((a, b) => a - b);
       const ks = [...Ks].sort((a, b) => a - b);
@@ -103,6 +130,7 @@
 
     const shortMax = Math.min(1.0, tmax / 3);
     const longMin = Math.max(2 * tmin, tmax / 4);
+    const method = robust ? (w.some((wi) => wi < 0.99) ? "irls" : "wls") : "median";
 
     return {
       N, K,
@@ -115,7 +143,7 @@
       shortMax, longMin,
       nShort: pts.filter((p) => p.tau <= shortMax).length,
       nLong: pts.filter((p) => p.tau >= longMin).length,
-      method: isFinite(varN2) ? "wls" : "median",
+      method,
     };
   }
 

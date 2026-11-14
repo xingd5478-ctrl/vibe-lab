@@ -1,6 +1,6 @@
 # control-play
 
-控制理论 playground：二阶系统的 Bode、阶跃响应与 PID 闭环。**零依赖、自定义 SVG**，视觉与 imu-lab 统一。
+控制理论 playground：二阶系统的 Bode、阶跃响应与 PID 闭环。**零依赖、自定义 SVG**，视觉与 imu-lab 统一；图表基元（hover/刻度/格式化）复用 `imu-lab/static/chart.js`（副本随 Pages 工作流同步）。
 
 **线上：** https://xingd5478-ctrl.github.io/vibe-lab/control/
 
@@ -28,6 +28,7 @@ python -m http.server 8000
 ```
 control-play/
 ├── index.html
+├── chart.js    # 共享图表基元（与 imu-lab 同步）
 ├── app.js      # 计算 + SVG 绘图
 └── style.css
 ```

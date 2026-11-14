@@ -32,6 +32,7 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Assemble site
         run: |
+          cp -f imu-lab/static/chart.js control-play/chart.js
           mkdir -p _site
           cp -r landing/. _site/
           mkdir -p _site/imu _site/control _site/about

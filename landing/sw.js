@@ -26,6 +26,7 @@ const ASSETS = [
   "./control/",
   "./control/index.html",
   "./control/style.css",
+  "./control/chart.js",
   "./control/app.js",
 ];
 

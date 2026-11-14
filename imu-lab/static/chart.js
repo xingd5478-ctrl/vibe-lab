@@ -180,6 +180,12 @@
     return out;
   }
 
+  function path(points, color, width, dash) {
+    let d = "";
+    points.forEach(([x, y], i) => { d += `${i ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`; });
+    return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width || 1.5}" stroke-linejoin="round" stroke-linecap="round"${dash ? ` stroke-dasharray="${dash}"` : ""}/>`;
+  }
+
   function attachHover(el, meta) {
     const svg = el.querySelector("svg");
     if (!svg) return;
@@ -216,19 +222,17 @@
 
     const live = document.getElementById("chart-live");
     const showAt = (xv) => {
-      const first = nearest(meta.series[0].points, xv);
+      const hits = meta.series.map((s) => ({ s, p: nearest(s.points, xv) }));
+      const first = hits[0].p;
       const px = meta.X(first[0]);
       line.setAttribute("x1", px);
       line.setAttribute("x2", px);
       line.setAttribute("opacity", "1");
       dot.setAttribute("cx", px);
-      dot.setAttribute("cy", meta.Y(first[1]));
+      dot.setAttribute("cy", meta.yDot ? meta.yDot(first) : meta.Y(first[1]));
       dot.setAttribute("opacity", "1");
-      let text = `${meta.xLabel} ${fmt(first[0])} · ${meta.series[0].name} ${fmt(first[1])}`;
-      if (meta.series[1]) {
-        const second = nearest(meta.series[1].points, xv);
-        text += ` · ${meta.series[1].name} ${fmt(second[1])}`;
-      }
+      const text = `${meta.xLabel} ${fmt(first[0])} · ` +
+        hits.map((h) => `${h.s.name} ${fmt(h.p[1])}`).join(" · ");
       tip.textContent = text;
       tip.style.left = `${(px / meta.w) * 100}%`;
       tip.style.top = `${Math.max(8, (Number(dot.getAttribute("cy")) / meta.h) * 100 - 4)}%`;
@@ -347,9 +351,9 @@
 
     svg += "</svg>";
     el.innerHTML = svg;
-    attachHover(el, { w, h, pad, series, X, Y, xInv, xLabel: cfg.xLabel || "x", aria: cfg.aria || "" });
+    attachHover(el, { w, h, pad, series, X, yDot: (p) => Y(p[1]), xInv, xLabel: cfg.xLabel || "x", aria: cfg.aria || "" });
   }
 
-  const api = { plot, plotTimeCanvas };
+  const api = { plot, plotTimeCanvas, attachHover, path, fmt, linTicks, logTicks, niceStep, decimate };
   root.IMUChart = api;
 })(typeof window !== "undefined" ? window : globalThis);
