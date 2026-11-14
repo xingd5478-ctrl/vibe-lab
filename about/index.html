@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>方法说明 · vibe-lab</title>
+  <meta name="description" content="vibe-lab 方法说明与局限：CRC 清洗、Allan 方差、ARW/RRW 拟合、R/Q 映射与 PID 仿真。" />
+  <meta name="theme-color" content="#f4f2ec" />
+  <meta property="og:title" content="方法说明 · vibe-lab" />
+  <meta property="og:description" content="每个数字怎么来的，以及哪些地方不能当真。" />
+  <meta property="og:type" content="article" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -21,6 +27,7 @@
     <p><strong>R/Q 映射。</strong>采用 <code>R=(ARW/60)²·Δt</code>、<code>Q=(RRW/60)²·Δt</code>；R/Q 与采样率无关。卡尔曼滤波是一维随机游走模型，只用于演示“Q 大更抖、Q 小更平滑”的定性关系。</p>
     <p><strong>数据来源。</strong>默认加载 60 s 合成数据用于跑通流程；“加载 10 min 真实片段”会读取 2 h 静态实验中的 10 min 截段（含 5 个坏帧），仅作演示，不构成标定数据集。</p>
     <p><strong>键盘操作。</strong>图表可用 Tab 聚焦，`←/→` 或 `↑/↓` 逐点移动，`Home/End` 跳到首尾；当前读数通过屏幕阅读器播报。</p>
+    <p><strong>离线使用。</strong>首次访问后，Service Worker 会缓存页面与脚本，断网仍可打开工具页；数据 CSV 不缓存。</p>
     <div class="note">示例数据是 60 s 合成数据，只能跑通流程；RRW 在短数据上区间很宽（0.63–2.05），真实标定请用 ≥2 h 静态数据。</div>
 
     <h2>2. Control Play</h2>
@@ -45,6 +52,13 @@
     </footer>
   </div>
 
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/(imu|control|about)\/(index\.html)?$/, "");
+      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
+    })();
+  </script>
   <script>
     (function () {
       if (location.protocol !== "file:") return;

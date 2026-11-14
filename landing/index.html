@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>vibe-lab · 传感器与控制可视化实验室</title>
+  <meta name="description" content="传感器与控制可视化实验室：IMU 数据实验室与 Control Play，零依赖、本地计算。" />
+  <meta name="theme-color" content="#f4f2ec" />
+  <meta property="og:title" content="vibe-lab · 传感器与控制可视化实验室" />
+  <meta property="og:description" content="IMU 数据实验室 + Control Play：Allan 方差、R/Q、卡尔曼滤波与 PID 调参。" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -49,6 +55,7 @@
     <footer>
       vibe-lab · 静态站点，数据在浏览器内计算 ·
       <a href="about/">方法说明</a> ·
+      <a href="LICENSE" target="_blank" rel="noreferrer">MIT License</a> ·
       <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">源码</a>
     </footer>
   </div>
@@ -65,6 +72,13 @@
           a.href = base + (t === "imu" ? "imu/" : "control/");
         }
       });
+    })();
+  </script>
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/(imu|control|about)\/(index\.html)?$/, "");
+      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
     })();
   </script>
 </body>

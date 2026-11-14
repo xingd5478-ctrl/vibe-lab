@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IMU 数据实验室 · vibe-lab</title>
+  <meta name="description" content="IMU 数据实验室：上传 MPU6050 CSV，CRC 清洗、Allan 方差、拟合 ARW/RRW、调 R/Q 看卡尔曼滤波。" />
+  <meta name="theme-color" content="#f4f2ec" />
+  <meta property="og:title" content="IMU 数据实验室 · vibe-lab" />
+  <meta property="og:description" content="上传 CSV → CRC 清洗 → 三轴 Allan → 拟合 ARW/RRW → 调 R/Q 看 KF。" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -20,6 +26,7 @@
           <label for="file">数据文件</label>
           <input id="file" type="file" accept=".csv,text/csv" />
           <div class="hint">当前：<span id="source-name">示例数据（合成）</span></div>
+          <div class="hint">也可以把 CSV 直接拖到这个面板。</div>
           <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
           <div class="hint">
             论文在审，仅作演示；完整数据待录用后按期刊政策公开，版权归作者/实验室。
@@ -62,6 +69,10 @@
 
         <div class="field" style="display:flex;gap:8px;">
           <button id="export-csv" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">导出 CSV</button>
+          <button id="export-report" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">导出报告</button>
+        </div>
+        <div class="field" style="display:flex;gap:8px;">
+          <button id="compare" type="button" aria-pressed="false" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">保存对比</button>
           <button id="share" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">复制链接</button>
         </div>
         <div class="hint" id="share-info" aria-live="polite">—</div>
@@ -128,5 +139,12 @@
   <script src="kf.js"></script>
   <script src="fit.js"></script>
   <script src="app.js"></script>
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/(imu|control|about)\/(index\.html)?$/, "");
+      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
+    })();
+  </script>
 </body>
 </html>

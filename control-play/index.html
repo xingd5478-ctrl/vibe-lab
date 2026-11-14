@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Control Play · 二阶系统 · vibe-lab</title>
+  <meta name="description" content="Control Play：二阶系统 Bode、阶跃响应与 PID 调参，零依赖 SVG 可视化。" />
+  <meta name="theme-color" content="#f4f2ec" />
+  <meta property="og:title" content="Control Play · 二阶系统" />
+  <meta property="og:description" content="拖 ωn/ζ/Kp/Ki/Kd，实时看 Bode、超调、调节时间与稳态误差。" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -79,5 +85,12 @@
   <div id="chart-live" class="sr-only" aria-live="polite"></div>
 
   <script src="app.js"></script>
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/(imu|control|about)\/(index\.html)?$/, "");
+      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
+    })();
+  </script>
 </body>
 </html>

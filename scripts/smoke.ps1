@@ -25,6 +25,8 @@ if ($dom -notmatch "演示数据") { throw "imu: demo badge missing" }
 if ($dom -notmatch 'tabindex="0"') { throw "imu: chart not keyboard focusable" }
 if ($dom -notmatch "load-real") { throw "imu: real sample button missing" }
 if ($dom -notmatch "仅演示") { throw "imu: data disclosure missing" }
+if ($dom -notmatch "export-report") { throw "imu: report export missing" }
+if ($dom -notmatch "serviceWorker") { throw "imu: service worker registration missing" }
 
 $control = ([uri](Join-Path $root "control-play\index.html")).AbsoluteUri + "?kp=3&ki=1&kd=0.1"
 $dom2 = Get-Dom $control
@@ -32,6 +34,7 @@ if ($dom2 -notmatch "Kp=3\.00") { throw "control: PID params not applied from UR
 if ($dom2 -notmatch "相位") { throw "control: Bode phase axis missing" }
 if ($dom2 -notmatch "闭环") { throw "control: closed-loop series missing" }
 if ($dom2 -notmatch 'tabindex="0"') { throw "control: chart not keyboard focusable" }
+if ($dom2 -notmatch "serviceWorker") { throw "control: service worker registration missing" }
 
 $landing = ([uri](Join-Path $root "landing\index.html")).AbsoluteUri
 if ((Get-Dom $landing) -notmatch "传感器与控制可视化实验室") { throw "landing: title missing" }

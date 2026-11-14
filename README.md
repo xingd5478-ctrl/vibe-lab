@@ -8,17 +8,17 @@
 
 ```
 vibe-lab/
-├── landing/             # 首页：两个工具的入口
+├── landing/             # 首页 + sw.js（PWA）
 ├── about/               # 方法说明与局限
 ├── imu-lab/
 │   ├── static/          # ① IMU 数据实验室（部署到 /imu/）
 │   └── app.py           #    Streamlit 备份
 ├── control-play/        # ② 二阶系统 + PID（部署到 /control/）
 ├── shared/              # Python 共享算法
-├── tests/               # Node 单测（Allan / KF / 拟合）
-├── scripts/smoke.ps1    # Edge headless DOM 冒烟测试
+├── tests/               # Node 单测 + 视觉基线
+├── scripts/             # smoke / visual 检查
 ├── data/sample/         # 合成样例数据
-└── .github/workflows/   # Pages 部署
+└── .github/workflows/   # Pages 部署 + 单测 CI
 ```
 
 ## 快速开始
@@ -47,6 +47,14 @@ npm run visual:update  # 有意改版后更新基线
 ## 键盘操作
 
 图表可用 Tab 聚焦，`←/→`（或 `↑/↓`）逐点移动，`Home/End` 跳到首尾，读数通过 `aria-live` 播报。
+
+## 离线 / PWA
+
+页面在 https 下注册 `sw.js`，缓存静态资源；IMU/Control/about 可离线打开（数据 CSV 不缓存）。首次访问后断网刷新仍可用。
+
+## 许可
+
+代码与设计采用 MIT（见 `LICENSE`）；实验数据不包含在许可内，不得再发布。
 
 ## 线上结构
 

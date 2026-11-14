@@ -22,12 +22,15 @@
     r: 2.51188643150958e-7,
     q: 2.51188643150958e-9,
     fit: null,
+    compare: null,
   };
 
   let dataVersion = 0;
   let cleanRowsCache = null;
   const allanCache = new Map();
-  let drawTimer = null;
+  const angleCache = new Map();
+  let rafId = 0;
+  let resizeTimer = null;
 
   /* ---------- 数据 ---------- */
   function mulberry32(a) {
@@ -74,16 +77,24 @@
   function parseCSV(text) {
     const lines = text.split(/\r?\n/).filter((l) => l.trim().length);
     if (!lines.length) return [];
-    const head = lines[0].split(",").map((s) => s.trim().toLowerCase());
+    const norm = (s) => s.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    const head = lines[0].split(",").map(norm);
+    const pick = (names) => {
+      for (const n of names) {
+        const i = head.indexOf(n);
+        if (i >= 0) return i;
+      }
+      return -1;
+    };
     let idx = {
-      t: head.indexOf("t"),
-      gx: head.indexOf("gx_dps"),
-      gy: head.indexOf("gy_dps"),
-      gz: head.indexOf("gz_dps"),
-      crc: head.indexOf("crc_ok"),
+      t: pick(["t", "time", "timestamp", "sec", "seconds"]),
+      gx: pick(["gx_dps", "gx", "gyro_x", "gyrox", "gx_deg_s"]),
+      gy: pick(["gy_dps", "gy", "gyro_y", "gyroy", "gy_deg_s"]),
+      gz: pick(["gz_dps", "gz", "gyro_z", "gyroz", "gz_deg_s"]),
+      crc: pick(["crc_ok", "crc", "crcok"]),
     };
     let start = 1;
-    if (idx.gx < 0) {
+    if (idx.gx < 0 || idx.gy < 0 || idx.gz < 0) {
       idx = { t: 0, gx: 1, gy: 2, gz: 3, crc: 4 };
       start = 0;
     }
@@ -97,6 +108,39 @@
       rows.push({ t, gx, gy, gz, crc: isFinite(crc) ? crc : 1 });
     }
     return rows;
+  }
+
+  function loadFile(f) {
+    if (!f) return;
+    if (f.size > 20 * 1024 * 1024) {
+      flash("文件超过 20 MB，请先降采样");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onprogress = (e) => {
+      if (e.lengthComputable) {
+        $("source-name").textContent = `读取中 ${Math.round((e.loaded / e.total) * 100)}%`;
+      }
+    };
+    reader.onload = () => {
+      const rows = parseCSV(String(reader.result));
+      if (!rows.length) {
+        flash("没有解析到有效数据，请检查表头（gx_dps/gy_dps/gz_dps）与分隔符");
+        $("source-name").textContent = state.source;
+        return;
+      }
+      if (rows.length > 200000) {
+        flash("行数超过 20 万，请先降采样再上传");
+        $("source-name").textContent = state.source;
+        return;
+      }
+      state.rows = rows;
+      state.source = f.name;
+      prepare();
+      draw();
+    };
+    reader.onerror = () => flash("文件读取失败");
+    reader.readAsText(f);
   }
 
   function fixTime(rows, fs) {
@@ -162,11 +206,21 @@
     return v.toFixed(2);
   }
 
-  function downsample(pts, max) {
+  /* min/max 包络降采样：保留尖峰，按 x 顺序输出 */
+  function decimate(pts, max) {
     if (pts.length <= max) return pts;
-    const step = pts.length / max, out = [];
-    for (let i = 0; i < pts.length; i += step) out.push(pts[Math.floor(i)]);
-    out.push(pts[pts.length - 1]);
+    const bucket = Math.ceil(pts.length / max);
+    const out = [];
+    for (let i = 0; i < pts.length; i += bucket) {
+      const slice = pts.slice(i, i + bucket);
+      let lo = slice[0], hi = slice[0];
+      for (const p of slice) {
+        if (p[1] < lo[1]) lo = p;
+        if (p[1] > hi[1]) hi = p;
+      }
+      if (lo[0] <= hi[0]) out.push(lo, hi);
+      else out.push(hi, lo);
+    }
     return out;
   }
 
@@ -194,12 +248,14 @@
     svg.appendChild(dot);
 
     const nearest = (pts, xv) => {
-      let best = pts[0], bd = Infinity;
-      for (const p of pts) {
-        const d = Math.abs(p[0] - xv);
-        if (d < bd) { bd = d; best = p; }
+      let lo = 0, hi = pts.length - 1;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (pts[mid][0] < xv) lo = mid + 1;
+        else hi = mid;
       }
-      return best;
+      const a = pts[lo], b = pts[Math.max(0, lo - 1)];
+      return Math.abs(a[0] - xv) <= Math.abs(b[0] - xv) ? a : b;
     };
 
     const live = document.getElementById("chart-live");
@@ -261,7 +317,7 @@
     const h = cfg.height || 230;
     const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
     const series = cfg.series
-      .map((s) => ({ ...s, points: downsample(s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])), 1500) }))
+      .map((s) => ({ ...s, points: decimate(s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])), 1500) }))
       .filter((s) => s.points.length > 1);
 
     if (!series.length) { el.innerHTML = ""; return; }
@@ -339,25 +395,40 @@
   }
 
   /* ---------- 主流程 ---------- */
-  function updateStats(raw, clean) {
-    $("stat-frames").textContent = raw.length.toLocaleString();
-    $("stat-bad").textContent = (raw.length - clean.length).toLocaleString();
-    const dur = raw.length ? raw[raw.length - 1].t - raw[0].t : 0;
-    $("stat-duration").textContent = dur.toFixed(1) + " s";
-    const ch = state.channel;
-    const mean = clean.length ? clean.reduce((a, r) => a + r[ch], 0) / clean.length : 0;
-    $("stat-mean").textContent = mean.toFixed(3) + " °/s";
+  function updateStats() {
+    const s = state.stats;
+    if (!s) return;
+    $("stat-frames").textContent = s.frames.toLocaleString();
+    $("stat-bad").textContent = s.bad.toLocaleString();
+    $("stat-duration").textContent = s.duration.toFixed(1) + " s";
+    $("stat-mean").textContent = (s.means[state.channel] || 0).toFixed(3) + " °/s";
     $("source-name").textContent = state.source;
     const badge = $("demo-badge");
     if (badge) badge.style.display = state.source.startsWith("示例数据") ? "" : "none";
   }
 
+  function prepare() {
+    invalidate();
+    fixTime(state.rows, state.fs);
+    const raw = state.rows;
+    const clean = currentRows();
+    const means = {};
+    AXES.forEach((a) => {
+      means[a.key] = clean.length ? clean.reduce((sum, r) => sum + r[a.key], 0) / clean.length : 0;
+    });
+    state.stats = {
+      frames: raw.length,
+      bad: raw.length - clean.length,
+      duration: raw.length ? raw[raw.length - 1].t - raw[0].t : 0,
+      means,
+    };
+  }
+
   function draw() {
     const raw = state.rows;
     if (!raw.length) return;
-    fixTime(raw, state.fs);
     const clean = currentRows();
-    updateStats(raw, clean);
+    updateStats();
 
     const ch = state.channel;
     plot($("chart-time"), {
@@ -417,28 +488,48 @@
       }
     }
 
-    const angle = integrate(clean.map((r) => r[ch]), state.fs);
+    $("meta-time").textContent = `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
+    $("meta-allan").textContent = fit ? `R²=${fit.r2.toFixed(3)}` : "log-log";
+    drawKF();
+  }
+
+  function drawKF() {
+    const clean = currentRows();
+    if (!clean.length) return;
+    const ch = state.channel;
+    const key = `${dataVersion}|${state.fs}|${state.clean ? 1 : 0}|${ch}`;
+    let angle = angleCache.get(key);
+    if (!angle) {
+      angle = integrate(clean.map((r) => r[ch]), state.fs);
+      angleCache.set(key, angle);
+    }
     const filtered = kf1d(angle, state.r, state.q, angle[0], 1);
+    const series = [
+      { name: "原始积分", color: "#d3ccba", width: 2.6, points: clean.map((r, i) => [r.t, angle[i] - angle[0]]) },
+      { name: "卡尔曼", color: "#2f6b4f", width: 1.3, points: clean.map((r, i) => [r.t, filtered[i] - filtered[0]]) },
+    ];
+    if (state.compare) {
+      const comp = kf1d(angle, state.compare.r, state.compare.q, angle[0], 1);
+      series.push({
+        name: `对比 A (R/Q=${(state.compare.r / state.compare.q).toFixed(1)})`,
+        color: "#b5651d", width: 1.1, dash: "6 4",
+        points: clean.map((r, i) => [r.t, comp[i] - comp[0]]),
+      });
+    }
     plot($("chart-kf"), {
       height: 230,
       xLabel: "时间 (s)",
       yLabel: "角度 (°)",
-      aria: `滤波对比：原始积分与卡尔曼输出，R=${state.r.toExponential(1)}，Q=${state.q.toExponential(1)}`,
-      series: [
-        { name: "原始积分", color: "#d3ccba", width: 2.6, points: clean.map((r, i) => [r.t, angle[i] - angle[0]]) },
-        { name: "卡尔曼", color: "#2f6b4f", width: 1.3, points: clean.map((r, i) => [r.t, filtered[i] - filtered[0]]) },
-      ],
+      aria: `滤波对比：原始积分与卡尔曼输出，R=${state.r.toExponential(1)}，Q=${state.q.toExponential(1)}${state.compare ? "，含对比组" : ""}`,
+      series,
     });
-
-    $("meta-time").textContent = `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
-    $("meta-allan").textContent = fit ? `R²=${fit.r2.toFixed(3)}` : "log-log";
     $("meta-kf").textContent = `R=${state.r.toExponential(2)} · Q=${state.q.toExponential(2)}`;
-    try { syncURL(); } catch (e) { /* ignore */ }
+    syncURL();
   }
 
-  function scheduleDraw() {
-    clearTimeout(drawTimer);
-    drawTimer = setTimeout(draw, 80);
+  function scheduleKF() {
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => { rafId = 0; drawKF(); });
   }
 
   /* ---------- 导出 / 分享 ---------- */
@@ -480,9 +571,9 @@
     flash("CSV 已导出");
   }
 
-  function exportPNG(el, name) {
+  function svgMarkup(el) {
     const svg = el && el.querySelector("svg");
-    if (!svg) return;
+    if (!svg) return "";
     const vb = svg.viewBox.baseVal;
     const clone = svg.cloneNode(true);
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -492,10 +583,17 @@
     style.textContent =
       "text{font-family:'Segoe UI','Microsoft YaHei',sans-serif}" +
       ".grid{stroke:#e7e3d8}.axis{stroke:#1b1d22}" +
-      ".tick-label{fill:#6d685d;font-size:10px;font-family:Consolas,monospace}" +
+      ".tick-label{fill:#6d685d;font-size:11px;font-family:Consolas,monospace}" +
       ".axis-label{fill:#6d685d;font-size:11px}.legend-label{fill:#1b1d22;font-size:11px}";
     clone.insertBefore(style, clone.firstChild);
-    const xml = new XMLSerializer().serializeToString(clone);
+    return new XMLSerializer().serializeToString(clone);
+  }
+
+  function exportPNG(el, name) {
+    const svg = el && el.querySelector("svg");
+    const xml = svgMarkup(el);
+    if (!svg || !xml) return;
+    const vb = svg.viewBox.baseVal;
     const url = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml;charset=utf-8" }));
     const img = new Image();
     img.onload = () => {
@@ -513,6 +611,35 @@
     };
     img.onerror = () => { URL.revokeObjectURL(url); flash("PNG 导出失败"); };
     img.src = url;
+  }
+
+  function exportReport() {
+    const clean = currentRows();
+    if (!clean.length) return;
+    const fit = state.fit;
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const blocks = [["时域", "chart-time"], ["Allan 方差", "chart-allan"], ["滤波对比", "chart-kf"]]
+      .map(([title, id]) => `<h2>${title}</h2>${svgMarkup($(id))}`)
+      .join("");
+    const fitText = $("fit-info").innerText.replace(/\n+/g, "；");
+    const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>IMU Lab 报告</title><style>
+body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:32px auto;padding:0 20px;color:#1b1d22;background:#f4f2ec}
+h1{font-size:22px}h2{font-size:15px;margin-top:28px;border-top:1px solid #d8d3c7;padding-top:14px}
+p,li{font-size:13px;line-height:1.7;color:#3c3a34}
+svg{max-width:100%;height:auto;background:#fffdf8;border:1px solid #d8d3c7;margin-top:8px}
+code{font-family:Consolas,monospace;background:#ece8dd;padding:1px 4px}
+</style></head><body>
+<h1>IMU 数据实验室 · 分析报告</h1>
+<p>生成时间：${new Date().toLocaleString("zh-CN")}</p>
+<p>数据来源：${state.source} · 采样率 ${state.fs} Hz · 主通道 ${state.channel} · 总帧数 ${$("stat-frames").textContent} · 坏帧 ${$("stat-bad").textContent}</p>
+<p>拟合：${fitText || "未完成"}</p>
+<p>滤波参数：R=${state.r.toExponential(3)}，Q=${state.q.toExponential(3)}，R/Q=${(state.r / state.q).toFixed(1)}${fit ? `，拟合 R²=${fit.r2.toFixed(3)}` : ""}</p>
+${blocks}
+<p style="margin-top:28px;color:#6d685d">说明：R/Q 为工程近似映射；演示数据不代表标定结果。页面：https://xingd5478-ctrl.github.io/vibe-lab/imu/</p>
+</body></html>`;
+    downloadBlob(new Blob([html], { type: "text/html;charset=utf-8" }), `imu_report_${stamp}.html`);
+    flash("报告已导出");
   }
 
   function syncURL() {
@@ -556,36 +683,25 @@
   function bind() {
     $("file").addEventListener("change", (ev) => {
       const f = ev.target.files && ev.target.files[0];
-      if (!f) return;
-      if (f.size > 20 * 1024 * 1024) {
-        flash("文件超过 20 MB，请先降采样");
-        ev.target.value = "";
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const text = String(reader.result);
-        const head = text.split(/\r?\n/)[0] || "";
-        if (!/gx_dps/i.test(head) || !/gy_dps/i.test(head) || !/gz_dps/i.test(head)) {
-          flash("CSV 缺少列：gx_dps / gy_dps / gz_dps");
-          return;
-        }
-        const rows = parseCSV(text);
-        if (!rows.length) { flash("没有解析到有效数据，请检查列名与分隔符"); return; }
-        if (rows.length > 200000) { flash("行数超过 20 万，请先降采样再上传"); return; }
-        state.rows = rows;
-        state.source = f.name;
-        invalidate();
-        fixTime(rows, state.fs);
-        draw();
-      };
-      reader.readAsText(f);
+      if (f) loadFile(f);
+      ev.target.value = "";
     });
+
+    const panel = document.querySelector(".controls");
+    if (panel) {
+      ["dragenter", "dragover"].forEach((ev) =>
+        panel.addEventListener(ev, (e) => { e.preventDefault(); panel.classList.add("dragging"); }));
+      ["dragleave", "drop"].forEach((ev) =>
+        panel.addEventListener(ev, (e) => { e.preventDefault(); panel.classList.remove("dragging"); }));
+      panel.addEventListener("drop", (e) => {
+        const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f) loadFile(f);
+      });
+    }
 
     $("fs").addEventListener("change", (ev) => {
       state.fs = Math.max(1, Number(ev.target.value) || 100);
-      invalidate();
-      fixTime(state.rows, state.fs);
+      prepare();
       draw();
     });
 
@@ -596,7 +712,7 @@
 
     $("clean").addEventListener("change", (ev) => {
       state.clean = ev.target.checked;
-      invalidate();
+      prepare();
       draw();
     });
 
@@ -607,7 +723,7 @@
         const v = Math.pow(10, e).toExponential(2);
         $(valId).textContent = v;
         ev.target.setAttribute("aria-valuetext", v);
-        scheduleDraw();
+        scheduleKF();
       });
     };
     bindSlider("logR", "r-val", (e) => { state.r = Math.pow(10, e); });
@@ -618,20 +734,31 @@
       state.source = "示例数据（合成）";
       state.fs = 100;
       $("fs").value = "100";
-      invalidate();
+      prepare();
       draw();
     });
 
     $("load-real").addEventListener("click", async () => {
       try {
-        const res = await fetch("sample_real_10min.csv", { cache: "no-store" });
-        if (!res.ok) throw new Error(String(res.status));
-        const rows = parseCSV(await res.text());
+        let text;
+        try {
+          const res = await fetch("sample_real_10min.csv.gz", { cache: "no-store" });
+          if (!res.ok) throw new Error(String(res.status));
+          if (typeof DecompressionStream !== "undefined" && res.body) {
+            text = await new Response(res.body.pipeThrough(new DecompressionStream("gzip"))).text();
+          } else {
+            throw new Error("no DecompressionStream");
+          }
+        } catch (gzErr) {
+          const res = await fetch("sample_real_10min.csv", { cache: "no-store" });
+          if (!res.ok) throw new Error(String(res.status));
+          text = await res.text();
+        }
+        const rows = parseCSV(text);
         if (!rows.length) throw new Error("empty");
         state.rows = rows;
         state.source = "真实片段（10 min，仅演示）";
-        invalidate();
-        fixTime(rows, state.fs);
+        prepare();
         draw();
       } catch (e) {
         flash("file:// 下无法自动加载，请用“下载片段 CSV”后手动上传");
@@ -649,10 +776,27 @@
       $("logQ").value = lq.toFixed(1);
       $("r-val").textContent = state.r.toExponential(2);
       $("q-val").textContent = state.q.toExponential(2);
-      draw();
+      drawKF();
     });
 
     $("export-csv").addEventListener("click", exportCSV);
+    $("export-report").addEventListener("click", exportReport);
+
+    $("compare").addEventListener("click", () => {
+      const btn = $("compare");
+      if (state.compare) {
+        state.compare = null;
+        btn.textContent = "保存对比";
+        btn.setAttribute("aria-pressed", "false");
+        flash("已清除对比");
+      } else {
+        state.compare = { r: state.r, q: state.q };
+        btn.textContent = "清除对比";
+        btn.setAttribute("aria-pressed", "true");
+        flash(`已保存对比：R/Q=${(state.r / state.q).toFixed(1)}`);
+      }
+      drawKF();
+    });
 
     $("share").addEventListener("click", async () => {
       syncURL();
@@ -670,13 +814,17 @@
       });
     });
 
-    window.addEventListener("resize", scheduleDraw);
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(draw, 120);
+    });
   }
 
   function init() {
     loadURL();
     state.rows = synth();
     bind();
+    prepare();
     draw();
   }
 

@@ -75,6 +75,7 @@ h1 {
 }
 
 .controls { position: sticky; top: 16px; }
+.controls.dragging { outline: 2px dashed var(--accent); outline-offset: 4px; }
 
 .field { margin-bottom: 16px; }
 

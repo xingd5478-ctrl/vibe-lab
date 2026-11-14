@@ -8,6 +8,7 @@ on:
       - "control-play/**"
       - "landing/**"
       - "about/**"
+      - "LICENSE"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -37,6 +38,7 @@ jobs:
           cp -r imu-lab/static/. _site/imu/
           cp -r control-play/. _site/control/
           cp -r about/. _site/about/
+          cp LICENSE _site/LICENSE
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
