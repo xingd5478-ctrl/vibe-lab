@@ -16,6 +16,8 @@ jobs:
         run: npm test
       - name: chart.js copies in sync
         run: node scripts/sync_chart.mjs --check
+      - name: JS/CSS performance budget
+        run: node scripts/budget.mjs
 
   e2e:
     runs-on: windows-latest
