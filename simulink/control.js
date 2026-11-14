@@ -399,7 +399,48 @@
     return { t, y, ts, z, alias, nyquist: fs / 2, aliased: f > fs / 2 };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, metrics, poles };
+  /* ---------- IMU 融合：互补滤波 vs 加速度计 ---------- */
+  function imuFusionDemo(alpha, noiseOn) {
+    const dt = 0.01, T = 20, n = Math.round(T / dt);
+    const t = new Float64Array(n), truth = new Float64Array(n);
+    const acc = new Float64Array(n), comp = new Float64Array(n);
+    const r = rng(31);
+    let est = 0, sa = 0, sc = 0;
+    for (let i = 0; i < n; i++) {
+      t[i] = i * dt;
+      truth[i] = 0.6 * Math.sin(0.35 * t[i]);
+      const rate = 0.6 * 0.35 * Math.cos(0.35 * t[i]) + 0.01;
+      acc[i] = truth[i] + (noiseOn ? gauss(r) * 0.18 : 0);
+      const gyro = rate + (noiseOn ? gauss(r) * 0.05 : 0);
+      est = alpha * (est + gyro * dt) + (1 - alpha) * acc[i];
+      comp[i] = est;
+      sa += Math.pow(acc[i] - truth[i], 2);
+      sc += Math.pow(comp[i] - truth[i], 2);
+    }
+    return {
+      t, truth, acc, comp,
+      rmseAcc: Math.sqrt(sa / n),
+      rmseComp: Math.sqrt(sc / n),
+    };
+  }
+
+  /* ---------- Bus：多路信号打包后按索引选择 ---------- */
+  function busDemo(sel) {
+    const dt = 0.002, T = 4, n = Math.round(T / dt);
+    const t = new Float64Array(n);
+    const sigs = [new Float64Array(n), new Float64Array(n), new Float64Array(n), new Float64Array(n)];
+    for (let i = 0; i < n; i++) {
+      const tt = i * dt;
+      t[i] = tt;
+      sigs[0][i] = Math.sin(2 * Math.PI * 0.5 * tt);
+      sigs[1][i] = Math.cos(2 * Math.PI * 0.5 * tt);
+      sigs[2][i] = tt / T;
+      sigs[3][i] = tt % 1 < 0.5 ? 1 : -1;
+    }
+    return { t, sigs, sel: Math.max(0, Math.min(3, Math.round(sel))) };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

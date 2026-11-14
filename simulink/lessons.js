@@ -69,7 +69,7 @@ window.SIMULINK_LESSONS = {
         { id: "t32", n: 32, title: "EKF 倒立摆", desc: "强非线性、初值收敛", file: "t32_ekf_pendulum.m", model: "tutorial32_pendulum.slx" },
         { id: "t33", n: 33, title: "UKF", desc: "Sigma 点、无迹变换", file: "t33_ukf_basics.m", model: "tutorial33_ukf.slx" },
         { id: "t34", n: 34, title: "EKF vs UKF", desc: "Monte Carlo 统计对比", file: "t34_ekf_vs_ukf.m", model: "tutorial34_ekfvsukf.slx" },
-        { id: "t35", n: 35, title: "IMU 融合", desc: "陀螺+加速度、互补 vs EKF", file: "t35_imu_fusion.m", model: "tutorial35_imu.slx" },
+        { id: "t35", n: 35, title: "IMU 融合", desc: "陀螺+加速度、互补 vs EKF", file: "t35_imu_fusion.m", model: "tutorial35_imu.slx", demo: "imu" },
       ],
     },
     {
@@ -77,7 +77,7 @@ window.SIMULINK_LESSONS = {
       items: [
         { id: "t36", n: 36, title: "Stateflow 状态机", desc: "状态/转移/条件动作", file: "t36_stateflow_basics.m", model: "tutorial36_stateflow.slx" },
         { id: "t37", n: 37, title: "触发/使能子系统", desc: "条件执行、采样保持", file: "t37_triggered_subsystem.m", model: "tutorial37_triggered.slx" },
-        { id: "t38", n: 38, title: "Bus 信号", desc: "打包拆解、按名提取", file: "t38_bus_signals.m", model: "tutorial38_bus.slx" },
+        { id: "t38", n: 38, title: "Bus 信号", desc: "打包拆解、按名提取", file: "t38_bus_signals.m", model: "tutorial38_bus.slx", demo: "bus" },
         { id: "t39", n: 39, title: "模型引用", desc: "Model block 子模型复用", file: "t39_model_referencing.m", model: "tutorial39_top.slx" },
         { id: "t40", n: 40, title: "变体子系统", desc: "一套模型多套方案", file: "t40_variant_subsystem.m", model: "tutorial40_variant.slx" },
         { id: "t41", n: 41, title: "模型回调", desc: "PreLoad/Init/StopFcn", file: "t41_callbacks.m", model: "tutorial41_callbacks.slx" },

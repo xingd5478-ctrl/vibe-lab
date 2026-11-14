@@ -448,6 +448,78 @@
       },
     },
 
+    imu: {
+      title: "t35 · IMU 融合",
+      lesson: "t35",
+      note: "互补滤波：θ̂←α(θ̂+ωdt)+(1−α)θacc。α 大更信陀螺（平滑但漂），α 小更信加速度计（跟得快但抖）。",
+      diagram: {
+        aria: "IMU 融合：陀螺积分与加速度计倾角互补",
+        blocks: [{ label: "Gyro", sub: "积分" }, { label: "互补滤波", sub: "α" }, { label: "Accel", sub: "倾角" }, { label: "Scope" }],
+      },
+      params: [
+        { id: "alpha", label: "互补系数 α", min: 0.8, max: 0.99, step: 0.01, value: 0.95 },
+        { id: "noise", label: "加入噪声/漂移", type: "toggle", value: true },
+      ],
+      render(p) {
+        const r = S.imuFusionDemo(p.alpha, p.noise);
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "倾角 (°)",
+          aria: `IMU 融合，α=${p.alpha}`,
+          series: [
+            { name: "真值", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.truth) },
+            { name: "加速度计", color: "#8a4a12", width: 0.9, points: toPts(r.t, r.acc) },
+            { name: "互补输出", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.comp) },
+          ],
+        });
+        const e1 = new Float64Array(r.t.length), e2 = new Float64Array(r.t.length);
+        for (let i = 0; i < r.t.length; i++) { e1[i] = r.acc[i] - r.truth[i]; e2[i] = r.comp[i] - r.truth[i]; }
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "误差 (°)",
+          aria: "加速度计与互补滤波误差",
+          series: [
+            { name: "加速度计误差", color: "#b9b3a5", width: 0.9, points: toPts(r.t, e1) },
+            { name: "互补误差", color: "#2f6b4f", width: 1.4, points: toPts(r.t, e2) },
+          ],
+        });
+        metrics([
+          ["加速度计 RMSE", r.rmseAcc.toFixed(3)],
+          ["互补 RMSE", r.rmseComp.toFixed(3)],
+          ["α", p.alpha.toFixed(2)],
+        ]);
+      },
+    },
+
+    bus: {
+      title: "t38 · Bus 信号",
+      lesson: "t38",
+      note: "Bus Creator 把 4 路信号打包成一条总线；Bus Selector 按索引/名字取出其中一路。打包不改变信号值。",
+      diagram: {
+        aria: "Bus：四路信号打包后选择一路",
+        blocks: [{ label: "u1..u4" }, { label: "Bus Creator" }, { label: "Bus Selector" }, { label: "Scope" }],
+      },
+      params: [{ id: "sel", label: "选择第几路 (0–3)", min: 0, max: 3, step: 1, value: 1 }],
+      render(p) {
+        const r = S.busDemo(p.sel);
+        const names = ["sin", "cos", "ramp", "square"];
+        const colors = ["#1f4e79", "#2f6b4f", "#8a4a12", "#7a9cc6"];
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "四路信号",
+          aria: "Bus 中的四路信号",
+          series: names.map((n, i) => ({ name: n, color: colors[i], width: 1.2, points: toPts(r.t, r.sigs[i]) })),
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: names[r.sel],
+          aria: `Bus 选择 ${names[r.sel]}`,
+          series: [{ name: names[r.sel], color: "#1f4e79", width: 2.0, points: toPts(r.t, r.sigs[r.sel]) }],
+        });
+        metrics([
+          ["Bus 元素", "4 路"],
+          ["选择", `#${r.sel} ${names[r.sel]}`],
+          ["末值", r.sigs[r.sel][r.sigs[r.sel].length - 1].toFixed(3)],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",

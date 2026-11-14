@@ -129,3 +129,15 @@ test("sampling alias folds above Nyquist", () => {
   assert.equal(bad.aliased, true);
   assert.ok(Math.abs(bad.alias - 10) < 1e-9, `alias=${bad.alias}`);
 });
+
+test("IMU complementary filter beats raw accelerometer", () => {
+  const r = S.imuFusionDemo(0.95, true);
+  assert.ok(r.rmseComp < r.rmseAcc, `comp=${r.rmseComp} acc=${r.rmseAcc}`);
+});
+
+test("Bus selector returns the requested signal", () => {
+  const r = S.busDemo(2);
+  assert.equal(r.sel, 2);
+  assert.equal(r.sigs[r.sel].length, r.t.length);
+  assert.ok(Math.abs(r.sigs[2][r.t.length - 1] - 1) < 0.01);
+});
