@@ -670,7 +670,72 @@
     return { pid: run("pid"), lqr: run("lqr"), K };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, mracDemo, msdCompareDemo, metrics, poles };
+  /* 1/4 车主动悬挂：天棚阻尼 */
+  function suspensionDemo(csky) {
+    const ms = 300, mu = 40, ks = 20000, cs = 1500, kt = 200000;
+    const dt = 0.001, T = 4, n = Math.round(T / dt);
+    const t = new Float64Array(n), acc = new Float64Array(n), load = new Float64Array(n);
+    let xs = 0, vs = 0, xu = 0, vu = 0;
+    for (let k = 0; k < n; k++) {
+      t[k] = k * dt;
+      const zr = t[k] >= 0.5 ? 0.05 : 0;
+      const fs = ks * (xu - xs) + cs * (vu - vs);
+      const u = csky > 0 ? Math.max(-2000, Math.min(2000, -csky * vs)) : 0;
+      const aS = (fs + u) / ms;
+      const aU = (-fs - kt * (xu - zr)) / mu;
+      vs += aS * dt; xs += vs * dt;
+      vu += aU * dt; xu += vu * dt;
+      acc[k] = aS;
+      load[k] = kt * (zr - xu);
+    }
+    return { t, acc, load };
+  }
+
+  /* EKF：Van der Pol，只测 x1 */
+  function ekfDemo(R) {
+    const mu = 1, dt = 0.01, T = 10, n = Math.round(T / dt);
+    const t = new Float64Array(n), truth = new Float64Array(n), meas = new Float64Array(n), est = new Float64Array(n);
+    const r = rng(51);
+    let x1 = 1, x2 = 0, e1 = 1.5, e2 = 0;
+    let P00 = 1, P01 = 0, P10 = 0, P11 = 1;
+    const Q = 1e-3;
+    for (let k = 0; k < n; k++) {
+      t[k] = k * dt;
+      x1 += x2 * dt;
+      x2 += (mu * (1 - x1 * x1) * x2 - x1) * dt;
+      truth[k] = x1;
+      meas[k] = x1 + gauss(r) * 0.1;
+      const F00 = 1, F01 = dt;
+      const F10 = (-1 - 2 * mu * e1 * e2) * dt, F11 = 1 + mu * (1 - e1 * e1) * dt;
+      e1 += e2 * dt;
+      e2 += (mu * (1 - e1 * e1) * e2 - e1) * dt;
+      const n00 = F00 * P00 + F01 * P10, n01 = F00 * P01 + F01 * P11;
+      const n10 = F10 * P00 + F11 * P10, n11 = F10 * P01 + F11 * P11;
+      P00 = n00 * F00 + n01 * F01 + Q;
+      P01 = n00 * F10 + n01 * F11;
+      P10 = n10 * F00 + n11 * F01;
+      P11 = n10 * F10 + n11 * F11 + Q;
+      const S = P00 + R;
+      const K0 = P00 / S, K1 = P10 / S;
+      const innov = meas[k] - e1;
+      e1 += K0 * innov;
+      e2 += K1 * innov;
+      const old00 = P00, old01 = P01;
+      P00 = (1 - K0) * old00;
+      P01 = (1 - K0) * old01;
+      P10 = P10 - K1 * old00;
+      P11 = P11 - K1 * old01;
+      est[k] = e1;
+    }
+    let sm = 0, se = 0;
+    for (let k = 0; k < n; k++) {
+      sm += Math.pow(meas[k] - truth[k], 2);
+      se += Math.pow(est[k] - truth[k], 2);
+    }
+    return { t, truth, meas, est, rmseMeas: Math.sqrt(sm / n), rmseEst: Math.sqrt(se / n) };
+  }
+
+  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, mracDemo, msdCompareDemo, suspensionDemo, ekfDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);

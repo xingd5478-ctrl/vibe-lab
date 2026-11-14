@@ -243,3 +243,17 @@ test("MSD LQR tracks reference with finite gains", () => {
   assert.ok(r.K.every((v) => isFinite(v) && v > 0), `K=${r.K}`);
   assert.ok(Math.abs(r.lqr.y[r.lqr.y.length - 1] - 1) < 0.02);
 });
+
+test("suspension produces finite acceleration and tire load", () => {
+  const r = S.suspensionDemo(1000);
+  assert.ok(r.acc.every((v) => isFinite(v)));
+  assert.ok(r.load.every((v) => isFinite(v)));
+  let pa = 0;
+  r.acc.forEach((v) => { pa = Math.max(pa, Math.abs(v)); });
+  assert.ok(pa > 0 && pa < 50, `peak=${pa}`);
+});
+
+test("EKF improves on noisy Van der Pol measurement", () => {
+  const r = S.ekfDemo(0.05);
+  assert.ok(r.rmseEst < r.rmseMeas, `est=${r.rmseEst} meas=${r.rmseMeas}`);
+});

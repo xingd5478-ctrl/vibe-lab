@@ -810,6 +810,70 @@
       },
     },
 
+    suspension: {
+      title: "t30 · 主动悬挂",
+      lesson: "t30",
+      note: "1/4 车两质量模型，5cm 路面阶跃。csky=0 为被动；增大天棚阻尼看车身加速度与轮胎动载的取舍。",
+      diagram: {
+        aria: "1/4 车：路面经轮胎、悬架到车身",
+        blocks: [{ label: "路面 zr" }, { label: "轮胎 kt" }, { label: "悬架 ks/cs" }, { label: "车身 ms" }],
+      },
+      params: [{ id: "csky", label: "天棚阻尼 csky", min: 0, max: 5000, step: 100, value: 0 }],
+      render(p) {
+        const r = S.suspensionDemo(p.csky);
+        let pa = 0, pl = 0;
+        for (let i = 0; i < r.t.length; i++) {
+          pa = Math.max(pa, Math.abs(r.acc[i]));
+          pl = Math.max(pl, Math.abs(r.load[i]));
+        }
+        plot($("chart-a"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "车身加速度 (m/s²)",
+          aria: "车身加速度",
+          series: [{ name: "a_s", color: "#1f4e79", width: 1.4, points: toPts(r.t, r.acc) }],
+        });
+        plot($("chart-b"), {
+          height: 250, xLabel: "时间 (s)", yLabel: "轮胎动载 (N)",
+          aria: "轮胎动载",
+          series: [{ name: "F_z", color: "#8a4a12", width: 1.4, points: toPts(r.t, r.load) }],
+        });
+        metrics([
+          ["加速度峰值", pa.toFixed(2)],
+          ["动载峰值", pl.toFixed(0) + " N"],
+          ["模式", p.csky > 0 ? "主动" : "被动"],
+          ["csky", String(p.csky)],
+        ]);
+      },
+    },
+
+    ekf: {
+      title: "t31 · EKF",
+      lesson: "t31",
+      note: "Van der Pol 振子只测 x1，EKF 用 Jacobian 局部线性化；R 越大越信模型、估计更平滑但跟踪变慢。",
+      diagram: {
+        aria: "EKF：非线性对象与带噪观测",
+        blocks: [{ label: "Van der Pol" }, { label: "测量 y=x1" }, { label: "EKF", sub: "Jacobian" }, { label: "Scope" }],
+      },
+      params: [{ id: "R", label: "测量噪声 R", min: 0.001, max: 0.5, step: 0.001, value: 0.05 }],
+      render(p) {
+        const r = S.ekfDemo(p.R);
+        plot($("chart-a"), {
+          height: 260, xLabel: "时间 (s)", yLabel: "x1",
+          aria: "EKF 估计与真值",
+          series: [
+            { name: "真值", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.truth) },
+            { name: "测量", color: "#d3ccba", width: 0.8, points: toPts(r.t, r.meas) },
+            { name: "EKF", color: "#1f4e79", width: 1.6, points: toPts(r.t, r.est) },
+          ],
+        });
+        $("chart-b").innerHTML = "";
+        metrics([
+          ["测量 RMSE", r.rmseMeas.toFixed(4)],
+          ["EKF RMSE", r.rmseEst.toFixed(4)],
+          ["R", p.R.toFixed(3)],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",

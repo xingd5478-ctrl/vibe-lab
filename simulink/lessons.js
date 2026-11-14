@@ -63,13 +63,13 @@ window.SIMULINK_LESSONS = {
         { id: "t27", n: 27, title: "MSD 系统建模", desc: "TF/SS/离散/数值积分对比", file: "t27_msd_modeling.m", model: "tutorial27_msd_models.slx", demo: "msd" },
         { id: "t28", n: 28, title: "DSP 基础", desc: "采样定理、FFT、窗函数", file: "t28_dsp_basics.m", model: "tutorial28_dsp.slx", demo: "dsp" },
         { id: "t29", n: 29, title: "MSD 控制对比", desc: "PID vs LQR + 噪声", file: "t29_msd_control.m", model: "tutorial29_control_compare.slx", demo: "msdcompare" },
-        { id: "t30", n: 30, title: "主动悬挂", desc: "1/4 车模型 + PID", file: "t30_active_suspension.m", model: "tutorial30_suspension.slx" },
+        { id: "t30", n: 30, title: "主动悬挂", desc: "1/4 车模型 + PID", file: "t30_active_suspension.m", model: "tutorial30_suspension.slx", demo: "suspension" },
       ],
     },
     {
       id: 7, title: "Phase 7 · 非线性滤波", range: "t31–t35",
       items: [
-        { id: "t31", n: 31, title: "EKF 基础", desc: "Van der Pol、Jacobian", file: "t31_ekf_basics.m", model: "tutorial31_ekf.slx" },
+        { id: "t31", n: 31, title: "EKF 基础", desc: "Van der Pol、Jacobian", file: "t31_ekf_basics.m", model: "tutorial31_ekf.slx", demo: "ekf" },
         { id: "t32", n: 32, title: "EKF 倒立摆", desc: "强非线性、初值收敛", file: "t32_ekf_pendulum.m", model: "tutorial32_pendulum.slx" },
         { id: "t33", n: 33, title: "UKF", desc: "Sigma 点、无迹变换", file: "t33_ukf_basics.m", model: "tutorial33_ukf.slx" },
         { id: "t34", n: 34, title: "EKF vs UKF", desc: "Monte Carlo 统计对比", file: "t34_ekf_vs_ukf.m", model: "tutorial34_ekfvsukf.slx" },
@@ -91,5 +91,6 @@ window.SIMULINK_LESSONS = {
     },
   ],
 };
+
 
 
