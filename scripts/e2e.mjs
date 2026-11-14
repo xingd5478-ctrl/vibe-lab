@@ -149,6 +149,15 @@ async function main() {
     await sleep(800);
     await audit("about");
 
+    await client.send("Page.navigate", { url: `${base}/simulink/index.html` });
+    await waitFor(async () => (await evalJs("document.querySelectorAll('#catalog .lesson').length")) === 43, 12000);
+    await waitFor(() => evalJs("!!document.querySelector('#chart-a svg')"));
+    await evalJs("document.querySelector('#tabs button[data-demo=\"smc\"]').click()");
+    await sleep(350);
+    const simMeta = await evalJs("document.querySelector('#metrics').textContent");
+    if (!/抖振/.test(simMeta)) throw new Error("simulink: SMC metrics missing");
+    await audit("simulink");
+
     client.close();
     console.log("E2E OK");
   } finally {

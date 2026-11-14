@@ -6,6 +6,7 @@ on:
     paths:
       - "imu-lab/static/**"
       - "control-play/**"
+      - "simulink/**"
       - "landing/**"
       - "about/**"
       - "LICENSE"
@@ -33,11 +34,13 @@ jobs:
       - name: Assemble site
         run: |
           cp -f imu-lab/static/chart.js control-play/chart.js
+          cp -f imu-lab/static/chart.js simulink/chart.js
           mkdir -p _site
           cp -r landing/. _site/
-          mkdir -p _site/imu _site/control _site/about
+          mkdir -p _site/imu _site/control _site/about _site/simulink
           cp -r imu-lab/static/. _site/imu/
           cp -r control-play/. _site/control/
+          cp -r simulink/. _site/simulink/
           cp -r about/. _site/about/
           cp LICENSE _site/LICENSE
       - uses: actions/upload-pages-artifact@v3

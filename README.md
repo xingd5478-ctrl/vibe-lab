@@ -14,6 +14,7 @@ vibe-lab/
 │   ├── static/          # ① IMU 数据实验室（部署到 /imu/）
 │   └── app.py           #    Streamlit 备份
 ├── control-play/        # ② 二阶系统 + PID（部署到 /control/）
+├── simulink/            # ③ Simulink 教程交互复现（部署到 /simulink/）
 ├── shared/              # Python 共享算法
 ├── tests/               # Node 单测 + 视觉基线
 ├── scripts/             # smoke / visual 检查
@@ -36,14 +37,15 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test            # 算法单测（10 个）
-npm run smoke       # Edge headless DOM 冒烟
-npm run e2e         # Edge CDP 端到端（拟合、报告下载、URL 恢复、PID）
+npm test            # 算法/数据/Worker/Simulink 单测（26 个）
+npm run smoke       # Edge CDP DOM 冒烟（5 页）
+npm run e2e         # Edge CDP 端到端 + axe 无障碍
+npm run bigtest     # 200k 行 Worker 全链路
 npm run visual      # 截图对比基线
 npm run visual:update  # 有意改版后更新基线
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS 拟合、Worker、列式数据层；E2E 验证交互/下载并跑 **axe-core**（WCAG 2 A/AA），要求 0 serious/critical；视觉回归对比 `tests/baselines/`（CI 用 `tests/baselines-ci/`）。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS/IRLS 拟合、Worker、列式数据层、Simulink 复现；E2E 验证交互/下载并跑 **axe-core**（WCAG 2 A/AA），要求 0 serious/critical；视觉回归对比 `tests/baselines/`（CI 用 `tests/baselines-ci/`）。
 
 ## 键盘操作
 
@@ -63,6 +65,18 @@ imu-lab/static/
 ```
 
 `data.js` 与 `chart.js` 是独立模块，可被其它页面复用；`app.js` 只负责状态与交互。
+
+## Simulink 教程页
+
+`/simulink/` 把 [simulink-control-tutorial](https://github.com/xingd5478-ctrl/simulink-control-tutorial)（43 课 / 8 阶段）做成可检索目录，并提供 5 个浏览器内交互复现：
+
+- t03 一阶系统（τ / K）
+- t04 二阶系统（ωn / ζ）
+- t10 状态反馈 / 极点配置
+- t11 Luenberger 观测器（含测量噪声）
+- t21 滑模控制（边界层与抖振）
+
+仿真内核在 `simulink/control.js`（UMD，可单测），图表复用 `chart.js`。`.slx` 是 MATLAB 二进制模型，浏览器不能直接运行；页面复现的是同一套数学，并链接每课的 `.m` / `.slx`。
 
 ## 数据层
 

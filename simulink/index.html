@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simulink 控制教程 · 交互复现 · vibe-lab</title>
+  <meta name="description" content="43 课 Simulink 控制教程的交互复现：一阶/二阶、状态反馈、观测器、滑模；附 .m/.slx 源文件链接。" />
+  <meta name="theme-color" content="#f4f2ec" />
+  <meta property="og:title" content="Simulink 控制教程 · 交互复现" />
+  <meta property="og:description" content="43 课 / 8 阶段；浏览器里复现同一套控制数学，链接到 MATLAB/Simulink 源文件。" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="../icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">跳到内容</a>
+  <div class="wrap">
+    <header>
+      <div class="kicker">VIBE-LAB / SIMULINK TUTORIAL</div>
+      <h1>Simulink 控制教程 · 交互复现</h1>
+      <p class="sub">
+        43 课 / 8 阶段的 MATLAB + Simulink 教程。.slx 是 MATLAB 二进制模型，浏览器无法直接运行；
+        本页用<b>同一套控制数学</b>做可交互复现，并链接到每课的 <code>.m</code> 与 <code>.slx</code>。
+        <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">GitHub 仓库 →</a>
+      </p>
+    </header>
+
+    <main id="main">
+      <div class="layout">
+        <aside class="panel catalog-panel">
+          <div class="field">
+            <label for="search">课程目录 · 43 课</label>
+            <input id="search" type="search" placeholder="搜索：PID / Kalman / MPC…" />
+          </div>
+          <div id="catalog" class="catalog"></div>
+        </aside>
+
+        <div class="right">
+          <section class="panel demo-panel">
+            <div class="demo-head">
+              <h2 id="demo-title">—</h2>
+              <span id="demo-badge" class="badge">交互复现</span>
+            </div>
+            <div id="tabs" class="tabs" role="tablist" aria-label="交互复现选择"></div>
+            <p id="demo-note" class="hint"></p>
+            <div id="diagram" class="diagram"></div>
+            <div id="controls" class="controls"></div>
+            <div class="charts">
+              <div id="chart-a" class="chart"></div>
+              <div id="chart-b" class="chart"></div>
+            </div>
+            <div id="metrics" class="metrics"></div>
+            <div id="links" class="links"></div>
+          </section>
+
+          <section class="panel">
+            <h2>怎么在 MATLAB 里跑原版</h2>
+            <p class="hint">本页不运行 Simulink，只复现数学；原版模型请按下面三步运行（MATLAB R2020a+）。</p>
+            <pre class="code">git clone https://github.com/xingd5478-ctrl/simulink-control-tutorial.git
+cd simulink-control-tutorial
+>> check_setup            % 环境检查
+>> t03_first_order_sys    % 运行第 3 课，自动生成 .slx 与结果图</pre>
+            <p class="hint">
+              交互复现与 Simulink 的差异：连续模型用固定步长 Euler/离散仿真；观测器/滑模为教学简化版，
+              参数与波形用于理解概念，不代表原模型的数值结果。
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>vibe-lab · Simulink 教程交互复现</span> ·
+      <a href="../">首页</a> ·
+      <a href="../imu-lab/static/index.html" data-nav="imu">IMU 数据实验室</a> ·
+      <a href="../control-play/index.html" data-nav="control">Control Play</a> ·
+      <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">教程源码</a>
+    </footer>
+  </div>
+
+  <div id="chart-live" class="sr-only" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      if (location.protocol !== "file:") return;
+      document.querySelectorAll("[data-nav]").forEach(function (a) {
+        var t = a.getAttribute("data-nav");
+        a.href = t === "imu" ? "../../imu-lab/static/index.html" : "../../control-play/index.html";
+      });
+    })();
+  </script>
+  <script src="chart.js"></script>
+  <script src="lessons.js"></script>
+  <script src="control.js"></script>
+  <script src="app.js"></script>
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/(imu|control|about|simulink)\/(index\.html)?$/, "");
+      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
+    })();
+  </script>
+</body>
+</html>

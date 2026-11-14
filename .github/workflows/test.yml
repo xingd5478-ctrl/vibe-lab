@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: "22"
       - run: npm ci
+      - name: DOM smoke (Edge CDP)
+        run: node scripts/smoke.mjs
       - name: End-to-end (Edge CDP + axe)
         run: node scripts/e2e.mjs
       - name: Big-file pipeline (Edge, 200k rows)

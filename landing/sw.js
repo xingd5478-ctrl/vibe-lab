@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v6";
+const CACHE = "vibe-lab-v7";
 const ASSETS = [
   "./",
   "./index.html",
@@ -28,6 +28,13 @@ const ASSETS = [
   "./control/style.css",
   "./control/chart.js",
   "./control/app.js",
+  "./simulink/",
+  "./simulink/index.html",
+  "./simulink/style.css",
+  "./simulink/app.js",
+  "./simulink/lessons.js",
+  "./simulink/control.js",
+  "./simulink/chart.js",
 ];
 
 self.addEventListener("install", (event) => {

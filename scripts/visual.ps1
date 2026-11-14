@@ -29,11 +29,13 @@ $landing = ([uri](Join-Path $root "landing\index.html")).AbsoluteUri
 $imu = ([uri](Join-Path $root "imu-lab\static\index.html")).AbsoluteUri
 $control = ([uri](Join-Path $root "control-play\index.html")).AbsoluteUri + "?kp=3&ki=1&kd=0.1"
 $about = ([uri](Join-Path $root "about\index.html")).AbsoluteUri
+$sim = ([uri](Join-Path $root "simulink\index.html")).AbsoluteUri
 
 Shot $landing "landing" "1400,1000"
 Shot $imu "imu" "1400,1400"
 Shot $control "control" "1400,1200"
 Shot $about "about" "1200,1600"
+Shot $sim "simulink" "1400,1400"
 Shot $imu "imu-narrow" "520,900"
 
 & $python (Join-Path $PSScriptRoot "check_png.py") $out

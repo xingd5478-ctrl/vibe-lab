@@ -4,8 +4,8 @@
   "private": true,
   "description": "Sensor & control visual lab: IMU data lab, control playground, landing page",
   "scripts": {
-    "test": "node --test tests/allan.test.js tests/kf.test.js tests/fit.test.js tests/worker.test.js tests/data.test.js tests/workers.test.js",
-    "smoke": "pwsh -NoProfile -File scripts/smoke.ps1",
+    "test": "node --test tests/allan.test.js tests/kf.test.js tests/fit.test.js tests/worker.test.js tests/data.test.js tests/workers.test.js tests/simulink.test.js",
+    "smoke": "node scripts/smoke.mjs",
     "visual": "pwsh -NoProfile -File scripts/visual.ps1",
     "visual:update": "pwsh -NoProfile -File scripts/visual.ps1 -Update",
     "e2e": "node scripts/e2e.mjs",

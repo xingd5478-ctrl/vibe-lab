@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>vibe-lab · 传感器与控制可视化实验室</title>
-  <meta name="description" content="传感器与控制可视化实验室：IMU 数据实验室与 Control Play，零依赖、本地计算。" />
+  <meta name="description" content="传感器与控制可视化实验室：IMU 数据实验室、Control Play 与 Simulink 教程交互复现。" />
   <meta name="theme-color" content="#f4f2ec" />
   <meta property="og:title" content="vibe-lab · 传感器与控制可视化实验室" />
-  <meta property="og:description" content="IMU 数据实验室 + Control Play：Allan 方差、R/Q、卡尔曼滤波与 PID 调参。" />
+  <meta property="og:description" content="IMU 数据实验室 + Control Play + Simulink 教程交互复现：Allan、R/Q、卡尔曼、PID、状态反馈、观测器与滑模。" />
   <meta property="og:type" content="website" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -21,8 +21,8 @@
       <div class="kicker">vibe-lab / index</div>
       <h1>传感器与控制可视化实验室</h1>
       <p class="sub">
-        两个零依赖的浏览器工具：一个把 MEMS 陀螺仪数据拆成 Allan 方差与 R/Q，一个把二阶系统与 PID 调参变成可拖动的曲线。
-        全部本地计算，不上传数据。
+        三个零依赖的浏览器工具：把 MEMS 陀螺仪数据拆成 Allan 方差与 R/Q；把二阶系统与 PID 调参变成可拖动的曲线；
+        再用同一套控制数学复现 43 课 Simulink 教程的核心内容。全部本地计算，不上传数据。
       </p>
     </header>
 
@@ -54,7 +54,25 @@
         </svg>
         <span class="go">打开 →</span>
       </a>
-    </section>
+
+      <a class="card" data-target="simulink" href="#">
+        <div class="no">TUTORIAL 03</div>
+        <h2>Simulink 教程 · 交互复现</h2>
+        <p>43 课 / 8 阶段的 Simulink 控制教程：一阶/二阶、状态反馈、Luenberger 观测器、滑模的浏览器复现，附 .m/.slx 源文件。</p>
+        <svg viewBox="0 0 320 92" role="img" aria-label="Simulink 框图示意">
+          <rect x="12" y="30" width="62" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
+          <text x="43" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Step</text>
+          <rect x="112" y="30" width="80" height="32" rx="2" fill="#eef1f4" stroke="#7a9cc6"/>
+          <text x="152" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Σ / K</text>
+          <rect x="230" y="30" width="78" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
+          <text x="269" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">1/s²</text>
+          <line x1="74" y1="46" x2="110" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
+          <line x1="192" y1="46" x2="228" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
+          <path d="M269,62 V80 H43 V64" fill="none" stroke="#2f6b4f" stroke-width="1.1" stroke-dasharray="4 4"/>
+          <circle cx="74" cy="46" r="2" fill="#1b1d22"/>
+        </svg>
+        <span class="go">打开 →</span>
+      </a>
     </main>
 
     <footer>
@@ -72,9 +90,11 @@
       document.querySelectorAll("[data-target]").forEach(function (a) {
         var t = a.getAttribute("data-target");
         if (isFile) {
-          a.href = t === "imu" ? "../imu-lab/static/index.html" : "../control-play/index.html";
+          a.href = t === "imu" ? "../imu-lab/static/index.html"
+            : t === "control" ? "../control-play/index.html"
+            : "../simulink/index.html";
         } else {
-          a.href = base + (t === "imu" ? "imu/" : "control/");
+          a.href = base + (t === "imu" ? "imu/" : t === "control" ? "control/" : "simulink/");
         }
       });
     })();
@@ -82,7 +102,7 @@
   <script>
     (function () {
       if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
-      var root = location.pathname.replace(/(imu|control|about)\/(index\.html)?$/, "");
+      var root = location.pathname.replace(/(imu|control|about|simulink)\/(index\.html)?$/, "");
       navigator.serviceWorker.register(root + "sw.js").catch(function () {});
     })();
   </script>
