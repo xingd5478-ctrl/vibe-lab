@@ -874,6 +874,67 @@
       },
     },
 
+    pendulum: {
+      title: "t32 · 倒立摆 EKF",
+      lesson: "t32",
+      note: "倒立摆由 LQR/PD 稳定；只测角度（带噪），EKF 估角速度，初值故意偏 0.2rad。R 可调。",
+      diagram: {
+        aria: "倒立摆：控制器、EKF 与角度测量",
+        blocks: [{ label: "θ 测量" }, { label: "EKF" }, { label: "Controller" }, { label: "Pendulum" }],
+      },
+      params: [{ id: "R", label: "测量噪声 R", min: 0.001, max: 0.5, step: 0.001, value: 0.05 }],
+      render(p) {
+        const r = S.pendulumEkfDemo(p.R);
+        plot($("chart-a"), {
+          height: 260, xLabel: "时间 (s)", yLabel: "角度 θ (rad)",
+          aria: "倒立摆角度估计",
+          series: [
+            { name: "真值", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.truth) },
+            { name: "测量", color: "#d3ccba", width: 0.8, points: toPts(r.t, r.meas) },
+            { name: "EKF", color: "#1f4e79", width: 1.6, points: toPts(r.t, r.est) },
+          ],
+        });
+        $("chart-b").innerHTML = "";
+        metrics([
+          ["测量 RMSE", r.rmseMeas.toFixed(4)],
+          ["EKF RMSE", r.rmseEst.toFixed(4)],
+          ["R", p.R.toFixed(3)],
+        ]);
+      },
+    },
+
+    foc: {
+      title: "t14 · PMSM / FOC",
+      lesson: "t14",
+      note: "id=0、iq 给转矩：反 Park 到 αβ、再反 Clarke 到三相。拖角度看三相电流与 dq 的对应关系。",
+      diagram: {
+        aria: "FOC：dq 电流经反 Park/Clarke 到三相",
+        blocks: [{ label: "id=0, iq" }, { label: "反 Park" }, { label: "反 Clarke" }, { label: "PWM" }],
+      },
+      params: [
+        { id: "iq", label: "iq (A)", min: 0, max: 5, step: 0.1, value: 2 },
+        { id: "deg", label: "转子角 θ (°)", min: 0, max: 360, step: 5, value: 30 },
+      ],
+      render(p) {
+        const r = S.focDemo(p.iq, p.deg);
+        plot($("chart-a"), {
+          height: 250, xLabel: "θ (°)", yLabel: "三相电流 (A)", yMin: -6, yMax: 6,
+          aria: "三相电流随角度",
+          series: [
+            { name: "ia", color: "#1f4e79", width: 1.4, points: r.ang.map((d, i) => [d, r.A[i]]) },
+            { name: "ib", color: "#2f6b4f", width: 1.4, points: r.ang.map((d, i) => [d, r.B[i]]) },
+            { name: "ic", color: "#8a4a12", width: 1.4, points: r.ang.map((d, i) => [d, r.C[i]]) },
+          ],
+        });
+        $("chart-b").innerHTML = "";
+        metrics([
+          ["θ 处 ia/ib/ic", `${r.ia.toFixed(2)} / ${r.ib.toFixed(2)} / ${r.ic.toFixed(2)}`],
+          ["id / iq", `${r.id} / ${r.iq}`],
+          ["三相和", (r.ia + r.ib + r.ic).toFixed(3)],
+        ]);
+      },
+    },
+
     "first-order": {
       title: "t03 · 一阶系统",
       lesson: "t03",

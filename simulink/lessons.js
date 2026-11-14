@@ -51,7 +51,7 @@ window.SIMULINK_LESSONS = {
       id: 5, title: "Phase 5 · 机电系统与部署", range: "t13–t15, t25",
       items: [
         { id: "t13", n: 13, title: "DC 电机控制", desc: "电磁+机械耦合、级联 PI", file: "t13_dc_motor.m", model: "tutorial13_dc_motor.slx", demo: "motor" },
-        { id: "t14", n: 14, title: "PMSM + FOC", desc: "Clarke/Park、d-q 解耦", file: "t14_foc_pmsm.m", model: "tutorial14_foc.slx" },
+        { id: "t14", n: 14, title: "PMSM + FOC", desc: "Clarke/Park、d-q 解耦", file: "t14_foc_pmsm.m", model: "tutorial14_foc.slx", demo: "foc" },
         { id: "t25", n: 25, title: "Simscape 物理建模", desc: "多域耦合、自动推导", file: "t25_simscape.m", model: "tutorial25_simscape.slx" },
         { id: "t15", n: 15, title: "代码生成", desc: "c2d、dlqr、C 代码、FreeRTOS", file: "t15_code_generation.m", model: "tutorial15_codegen.slx" },
       ],
@@ -70,7 +70,7 @@ window.SIMULINK_LESSONS = {
       id: 7, title: "Phase 7 · 非线性滤波", range: "t31–t35",
       items: [
         { id: "t31", n: 31, title: "EKF 基础", desc: "Van der Pol、Jacobian", file: "t31_ekf_basics.m", model: "tutorial31_ekf.slx", demo: "ekf" },
-        { id: "t32", n: 32, title: "EKF 倒立摆", desc: "强非线性、初值收敛", file: "t32_ekf_pendulum.m", model: "tutorial32_pendulum.slx" },
+        { id: "t32", n: 32, title: "EKF 倒立摆", desc: "强非线性、初值收敛", file: "t32_ekf_pendulum.m", model: "tutorial32_pendulum.slx", demo: "pendulum" },
         { id: "t33", n: 33, title: "UKF", desc: "Sigma 点、无迹变换", file: "t33_ukf_basics.m", model: "tutorial33_ukf.slx" },
         { id: "t34", n: 34, title: "EKF vs UKF", desc: "Monte Carlo 统计对比", file: "t34_ekf_vs_ukf.m", model: "tutorial34_ekfvsukf.slx" },
         { id: "t35", n: 35, title: "IMU 融合", desc: "陀螺+加速度、互补 vs EKF", file: "t35_imu_fusion.m", model: "tutorial35_imu.slx", demo: "imu" },
@@ -91,6 +91,7 @@ window.SIMULINK_LESSONS = {
     },
   ],
 };
+
 
 
 

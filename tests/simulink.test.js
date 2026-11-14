@@ -257,3 +257,14 @@ test("EKF improves on noisy Van der Pol measurement", () => {
   const r = S.ekfDemo(0.05);
   assert.ok(r.rmseEst < r.rmseMeas, `est=${r.rmseEst} meas=${r.rmseMeas}`);
 });
+
+test("pendulum EKF improves angle estimate", () => {
+  const r = S.pendulumEkfDemo(0.05);
+  assert.ok(r.rmseEst < r.rmseMeas, `est=${r.rmseEst} meas=${r.rmseMeas}`);
+});
+
+test("FOC three-phase currents sum to zero", () => {
+  const r = S.focDemo(2, 30);
+  assert.ok(Math.abs(r.ia + r.ib + r.ic) < 1e-9);
+  assert.ok(Math.abs(r.ia - 0) >= 0);
+});

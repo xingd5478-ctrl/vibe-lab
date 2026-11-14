@@ -735,6 +735,71 @@
     return { t, truth, meas, est, rmseMeas: Math.sqrt(sm / n), rmseEst: Math.sqrt(se / n) };
   }
 
+  /* 倒立摆 EKF：只测角度，估角速度 */
+  function pendulumEkfDemo(R) {
+    const g = 9.8, l = 1, dt = 0.002, T = 5, n = Math.round(T / dt);
+    const t = new Float64Array(n), truth = new Float64Array(n), meas = new Float64Array(n), est = new Float64Array(n);
+    const r = rng(61);
+    let th = 0.3, om = 0, e1 = 0.5, e2 = 0;
+    let P00 = 1, P01 = 0, P10 = 0, P11 = 1;
+    const Q = 1e-4;
+    for (let k = 0; k < n; k++) {
+      t[k] = k * dt;
+      const u = Math.max(-20, Math.min(20, -25 * th - 8 * om));
+      const acc = (g / l) * Math.sin(th) + u;
+      om += acc * dt; th += om * dt;
+      truth[k] = th;
+      meas[k] = th + gauss(r) * 0.05;
+      const f1 = (g / l) * Math.cos(e1);
+      e1 += e2 * dt;
+      e2 += (f1 + u) * dt;
+      const F00 = 1, F01 = dt, F10 = f1 * dt, F11 = 1;
+      const n00 = F00 * P00 + F01 * P10, n01 = F00 * P01 + F01 * P11;
+      const n10 = F10 * P00 + F11 * P10, n11 = F10 * P01 + F11 * P11;
+      P00 = n00 * F00 + n01 * F01 + Q;
+      P01 = n00 * F10 + n01 * F11;
+      P10 = n10 * F00 + n11 * F01;
+      P11 = n10 * F10 + n11 * F11 + Q;
+      const S = P00 + R;
+      const K0 = P00 / S, K1 = P10 / S;
+      const inn = meas[k] - e1;
+      e1 += K0 * inn;
+      e2 += K1 * inn;
+      const o00 = P00, o01 = P01;
+      P00 = (1 - K0) * o00;
+      P01 = (1 - K0) * o01;
+      P10 -= K1 * o00;
+      P11 -= K1 * o01;
+      est[k] = e1;
+    }
+    let sm = 0, se = 0;
+    for (let k = 0; k < n; k++) {
+      sm += Math.pow(meas[k] - truth[k], 2);
+      se += Math.pow(est[k] - truth[k], 2);
+    }
+    return { t, truth, meas, est, rmseMeas: Math.sqrt(sm / n), rmseEst: Math.sqrt(se / n) };
+  }
+
+  /* FOC：id=0，给定 iq 与角度，反 Park/Clarke 得三相电流 */
+  function focDemo(iq, deg) {
+    const th = (deg * Math.PI) / 180;
+    const id = 0;
+    const al = id * Math.cos(th) - iq * Math.sin(th);
+    const be = id * Math.sin(th) + iq * Math.cos(th);
+    const ia = al;
+    const ib = -0.5 * al + (Math.sqrt(3) / 2) * be;
+    const ic = -0.5 * al - (Math.sqrt(3) / 2) * be;
+    const ang = [], A = [], B = [], C = [];
+    for (let d = 0; d <= 360; d += 5) {
+      const p = (d * Math.PI) / 180;
+      ang.push(d);
+      A.push(iq * Math.cos(p));
+      B.push(iq * Math.cos(p - (2 * Math.PI) / 3));
+      C.push(iq * Math.cos(p + (2 * Math.PI) / 3));
+    }
+    return { ia, ib, ic, id, iq, ang, A, B, C };
+  }
+
   const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, mracDemo, msdCompareDemo, suspensionDemo, ekfDemo, metrics, poles };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
