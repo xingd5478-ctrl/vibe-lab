@@ -1,5 +1,5 @@
 # Visual check / regression: screenshot key pages (desktop + narrow) and compare with baselines.
-param([switch]$Update)
+param([switch]$Update, [double]$Threshold = 0.003)
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $out = Join-Path $root "artifacts\visual"
@@ -11,6 +11,9 @@ $edge = @(
   "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
 ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 if (-not $edge) { throw "Edge not found" }
+$python = "D:\Anaconda\python.exe"
+if (-not (Test-Path $python)) { $python = (Get-Command python -ErrorAction SilentlyContinue).Source }
+if (-not $python) { throw "python not found" }
 
 function Shot([string]$url, [string]$name, [string]$size) {
   $profile = Join-Path $env:TEMP ("edgeprof_" + [guid]::NewGuid().ToString("N"))
@@ -33,7 +36,7 @@ Shot $control "control" "1400,1200"
 Shot $about "about" "1200,1600"
 Shot $imu "imu-narrow" "520,900"
 
-& "D:\Anaconda\python.exe" (Join-Path $PSScriptRoot "check_png.py") $out
+& $python (Join-Path $PSScriptRoot "check_png.py") $out
 if ($LASTEXITCODE -ne 0) { throw "blank/small screenshot" }
 
 if ($Update) {
@@ -42,6 +45,6 @@ if ($Update) {
   exit 0
 }
 
-& "D:\Anaconda\python.exe" (Join-Path $PSScriptRoot "compare_png.py") $baseline $out 0.003
+& $python (Join-Path $PSScriptRoot "compare_png.py") $baseline $out $Threshold
 if ($LASTEXITCODE -ne 0) { throw "visual regression" }
 Write-Output "VISUAL OK"

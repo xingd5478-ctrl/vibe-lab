@@ -31,6 +31,9 @@
   const angleCache = new Map();
   let rafId = 0;
   let resizeTimer = null;
+  let allanWorker = null;
+  let workerAllan = null;
+  let workerReq = 0;
 
   /* ---------- 数据 ---------- */
   function mulberry32(a) {
@@ -163,12 +166,111 @@
   }
 
   function allanFor(axis) {
+    if (workerAllan && workerAllan[axis]) return workerAllan[axis];
+    if (state.rows.length > 150000 && allanWorker) return [];
     const key = `${dataVersion}|${state.fs}|${state.clean ? 1 : 0}|${axis}`;
     if (!allanCache.has(key)) {
       const rows = currentRows();
       allanCache.set(key, allanDeviation(rows.map((r) => r[axis]), 1 / state.fs));
     }
     return allanCache.get(key);
+  }
+
+  function plotTimeCanvas(el, raw, clean, ch) {
+    const H = 230;
+    const pad = { l: 58, r: 16, t: 28, b: 34 };
+    const w = Math.max(el.clientWidth || 640, 320);
+    let canvas = el.querySelector("canvas");
+    if (!canvas) {
+      el.innerHTML = "";
+      canvas = document.createElement("canvas");
+      el.appendChild(canvas);
+    }
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.width = "100%";
+    canvas.style.height = H + "px";
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, H);
+
+    const iw = w - pad.l - pad.r, ih = H - pad.t - pad.b;
+    const xmin = raw[0].t, xmax = raw[raw.length - 1].t;
+    const ymin = -6, ymax = 6;
+    const X = (t) => pad.l + ((t - xmin) / (xmax - xmin)) * iw;
+    const Y = (v) => pad.t + (1 - (v - ymin) / (ymax - ymin)) * ih;
+
+    ctx.font = "11px Consolas, monospace";
+    ctx.fillStyle = "#5b564c";
+    ctx.strokeStyle = "#e7e3d8";
+    ctx.lineWidth = 1;
+    for (const v of [-5, 0, 5]) {
+      const y = Y(v);
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+      ctx.fillText(String(v), pad.l - 22, y + 4);
+    }
+    for (let i = 0; i <= 5; i++) {
+      const t = xmin + (i / 5) * (xmax - xmin);
+      const x = X(t);
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, H - pad.b); ctx.stroke();
+      ctx.fillText(t.toFixed(1), x - 12, H - pad.b + 15);
+    }
+    ctx.strokeStyle = "#1b1d22";
+    ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b);
+    ctx.lineTo(w - pad.r, H - pad.b); ctx.stroke();
+    ctx.fillStyle = "#5b564c";
+    ctx.fillText("角速度 (°/s)", pad.l, pad.t - 10);
+    ctx.fillText("时间 (s)", w - pad.r - 48, H - 4);
+
+    const drawSeries = (rows, color, width) => {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      let idx = 0;
+      for (let px = 0; px <= iw; px++) {
+        const t = xmin + (px / iw) * (xmax - xmin);
+        let lo = Infinity, hi = -Infinity;
+        while (idx < rows.length && rows[idx].t <= t) {
+          const v = rows[idx][ch];
+          if (v < lo) lo = v;
+          if (v > hi) hi = v;
+          idx++;
+        }
+        if (lo <= hi) {
+          ctx.moveTo(pad.l + px, Y(hi));
+          ctx.lineTo(pad.l + px, Y(lo));
+        }
+      }
+      ctx.stroke();
+    };
+    drawSeries(raw, "#b9b3a5", 0.8);
+    drawSeries(clean, "#1f4e79", 1.0);
+
+    canvas.setAttribute("aria-label", `时域图：${raw.length} 帧，Canvas 绘制`);
+    let tip = el.querySelector(".tip");
+    if (!tip) { tip = document.createElement("div"); tip.className = "tip"; el.appendChild(tip); }
+    canvas.onmousemove = (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const frac = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
+      const t = xmin + frac * (xmax - xmin);
+      let lo = 0, hi = raw.length - 1;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (raw[mid].t < t) lo = mid + 1; else hi = mid;
+      }
+      let l2 = 0, h2 = clean.length - 1;
+      while (l2 < h2) {
+        const mid = (l2 + h2) >> 1;
+        if (clean[mid].t < t) l2 = mid + 1; else h2 = mid;
+      }
+      const r = raw[lo], c = clean[Math.min(l2, clean.length - 1)];
+      tip.textContent = `时间 ${r.t.toFixed(2)} s · 原始 ${r[ch].toFixed(3)} · 清洗 ${c[ch].toFixed(3)} °/s`;
+      tip.style.left = `${frac * 100}%`;
+      tip.style.top = "12%";
+      tip.style.opacity = "1";
+    };
+    canvas.onmouseleave = () => { tip.style.opacity = "0"; };
   }
 
   /* ---------- 绘图 ---------- */
@@ -422,6 +524,23 @@
       duration: raw.length ? raw[raw.length - 1].t - raw[0].t : 0,
       means,
     };
+
+    workerAllan = null;
+    if (allanWorker && raw.length > 150000) {
+      const n = raw.length;
+      const gx = new Float32Array(n), gy = new Float32Array(n), gz = new Float32Array(n);
+      const crc = new Uint8Array(n);
+      for (let i = 0; i < n; i++) {
+        const r = raw[i];
+        gx[i] = r.gx; gy[i] = r.gy; gz[i] = r.gz;
+        crc[i] = r.crc === 1 ? 1 : 0;
+      }
+      workerReq += 1;
+      allanWorker.postMessage(
+        { id: workerReq, gx, gy, gz, crc, fs: state.fs, clean: state.clean },
+        [gx.buffer, gy.buffer, gz.buffer, crc.buffer]
+      );
+    }
   }
 
   function draw() {
@@ -431,22 +550,27 @@
     updateStats();
 
     const ch = state.channel;
-    plot($("chart-time"), {
-      height: 230,
-      xLabel: "时间 (s)",
-      yLabel: "角速度 (°/s)",
-      yMin: -6,
-      yMax: 6,
-      aria: `时域图：${clean.length} 帧角速度，原始与清洗后对比`,
-      series: [
-        { name: "原始", color: "#b9b3a5", width: 0.8, points: raw.map((r) => [r.t, r[ch]]) },
-        { name: "清洗后", color: "#1f4e79", width: 1.0, points: clean.map((r) => [r.t, r[ch]]) },
-      ],
-    });
+    if (raw.length > 100000) {
+      plotTimeCanvas($("chart-time"), raw, clean, ch);
+    } else {
+      plot($("chart-time"), {
+        height: 230,
+        xLabel: "时间 (s)",
+        yLabel: "角速度 (°/s)",
+        yMin: -6,
+        yMax: 6,
+        aria: `时域图：${clean.length} 帧角速度，原始与清洗后对比`,
+        series: [
+          { name: "原始", color: "#b9b3a5", width: 0.8, points: raw.map((r) => [r.t, r[ch]]) },
+          { name: "清洗后", color: "#1f4e79", width: 1.0, points: clean.map((r) => [r.t, r[ch]]) },
+        ],
+      });
+    }
 
     const dt = 1 / state.fs;
     const pts = allanFor(ch);
-    const fit = fitAllan(pts, dt);
+    const pending = !!(allanWorker && raw.length > 150000 && pts.length === 0);
+    const fit = pending ? null : fitAllan(pts, dt);
     state.fit = fit;
     const fitSeries = [];
     if (fit) {
@@ -459,24 +583,30 @@
         points: pts.filter((p) => p.tau >= fit.longMin).map((p) => [p.tau, fit.K * Math.sqrt(p.tau / 3)]),
       });
     }
-    plot($("chart-allan"), {
-      height: 250,
-      logX: true,
-      logY: true,
-      xLabel: "τ (s)",
-      yLabel: "Allan 标准差 (°/s)",
-      aria: `Allan 方差：三轴曲线，${fit ? `R²=${fit.r2.toFixed(3)}` : "未拟合"}`,
-      series: AXES.map((a) => ({
-        name: a.label.split(" · ")[0],
-        color: a.color,
-        width: 1.2,
-        points: allanFor(a.key).map((p) => [p.tau, p.adev]),
-      })).concat(fitSeries),
-    });
+    if (pending) {
+      $("chart-allan").innerHTML = `<div class="hint" style="padding:24px">Allan 计算中…（${(raw.length / 1000).toFixed(0)}k 帧，Worker）</div>`;
+    } else {
+      plot($("chart-allan"), {
+        height: 250,
+        logX: true,
+        logY: true,
+        xLabel: "τ (s)",
+        yLabel: "Allan 标准差 (°/s)",
+        aria: `Allan 方差：三轴曲线，${fit ? `R²=${fit.r2.toFixed(3)}` : "未拟合"}`,
+        series: AXES.map((a) => ({
+          name: a.label.split(" · ")[0],
+          color: a.color,
+          width: 1.2,
+          points: allanFor(a.key).map((p) => [p.tau, p.adev]),
+        })).concat(fitSeries),
+      });
+    }
 
     const fi = $("fit-info");
     if (fi) {
-      if (fit) {
+      if (pending) {
+        fi.textContent = "Allan 计算中…";
+      } else if (fit) {
         const nLo = (fit.nCI[0] * 60).toFixed(2), nHi = (fit.nCI[1] * 60).toFixed(2);
         const kLo = (fit.kCI[0] * 60).toFixed(2), kHi = (fit.kCI[1] * 60).toFixed(2);
         fi.innerHTML =
@@ -489,7 +619,7 @@
     }
 
     $("meta-time").textContent = `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
-    $("meta-allan").textContent = fit ? `R²=${fit.r2.toFixed(3)}` : "log-log";
+    $("meta-allan").textContent = pending ? "计算中…" : (fit ? `R²=${fit.r2.toFixed(3)}` : "log-log");
     drawKF();
   }
 
@@ -629,7 +759,9 @@ h1{font-size:22px}h2{font-size:15px;margin-top:28px;border-top:1px solid #d8d3c7
 p,li{font-size:13px;line-height:1.7;color:#3c3a34}
 svg{max-width:100%;height:auto;background:#fffdf8;border:1px solid #d8d3c7;margin-top:8px}
 code{font-family:Consolas,monospace;background:#ece8dd;padding:1px 4px}
+@media print{body{background:#fff;margin:0;max-width:none}.noprint{display:none}h2{page-break-after:avoid}svg{page-break-inside:avoid}}
 </style></head><body>
+<div class="noprint" style="text-align:right"><button onclick="window.print()" style="padding:8px 14px;border:1px solid #1f4e79;background:#1f4e79;color:#fff;border-radius:2px;cursor:pointer">打印 / 保存为 PDF</button></div>
 <h1>IMU 数据实验室 · 分析报告</h1>
 <p>生成时间：${new Date().toLocaleString("zh-CN")}</p>
 <p>数据来源：${state.source} · 采样率 ${state.fs} Hz · 主通道 ${state.channel} · 总帧数 ${$("stat-frames").textContent} · 坏帧 ${$("stat-bad").textContent}</p>
@@ -821,6 +953,23 @@ ${blocks}
   }
 
   function init() {
+    if (window.Worker) {
+      try {
+        allanWorker = new Worker("allan-worker.js");
+        allanWorker.onmessage = (e) => {
+          if (e.data.id !== workerReq) return;
+          workerAllan = e.data.results;
+          draw();
+        };
+        allanWorker.onerror = () => {
+          allanWorker = null;
+          workerAllan = null;
+          draw();
+        };
+      } catch (e) {
+        allanWorker = null;
+      }
+    }
     loadURL();
     state.rows = synth();
     bind();

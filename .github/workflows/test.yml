@@ -14,3 +14,14 @@ jobs:
           node-version: "22"
       - name: Run unit tests
         run: npm test
+
+  visual:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow
+      - name: Visual regression (Edge)
+        run: pwsh -NoProfile -File scripts/visual.ps1 -Threshold 0.02

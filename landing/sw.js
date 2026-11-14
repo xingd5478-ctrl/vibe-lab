@@ -1,10 +1,13 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v2";
+const CACHE = "vibe-lab-v3";
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./robots.txt",
+  "./manifest.webmanifest",
+  "./icon-192.png",
+  "./icon-512.png",
   "./about/",
   "./about/index.html",
   "./about/style.css",
@@ -12,6 +15,7 @@ const ASSETS = [
   "./imu/index.html",
   "./imu/style.css",
   "./imu/app.js",
+  "./imu/allan-worker.js",
   "./imu/allan.js",
   "./imu/kf.js",
   "./imu/fit.js",

@@ -22,7 +22,8 @@ python -m http.server 8000
 - **拖拽上传**、读取进度、列名自动识别（`gx/gy/gz`、`gyro_x` 等别名）
 - **导出 CSV / 单图 PNG / HTML 报告**（报告含三张图、统计与拟合结果）
 - **A/B 对比**：保存一组 R/Q，与当前滤波曲线叠加
-- **PWA/离线**：Service Worker 缓存静态资源（数据文件不缓存）
+- **大文件**：>100k 帧时域走 Canvas，>150k 帧 Allan 走 Worker
+- **PWA/离线**：Service Worker 缓存静态资源（数据文件不缓存），支持安装到主屏幕
 - 原始 / 清洗后时域对比，坏帧计数
 - 三轴 Allan 标准差（log-log，1-2-5 刻度）
 - **拟合 ARW/RRW + R² + 95% 分位区间**，图上叠加虚线拟合段

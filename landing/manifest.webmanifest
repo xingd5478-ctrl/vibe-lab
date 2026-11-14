@@ -1,0 +1,16 @@
+{
+  "name": "vibe-lab · 传感器与控制可视化实验室",
+  "short_name": "vibe-lab",
+  "description": "IMU 数据实验室与 Control Play：Allan 方差、R/Q、卡尔曼滤波与 PID 调参。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f2ec",
+  "theme_color": "#1f4e79",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

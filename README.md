@@ -48,9 +48,15 @@ npm run visual:update  # 有意改版后更新基线
 
 图表可用 Tab 聚焦，`←/→`（或 `↑/↓`）逐点移动，`Home/End` 跳到首尾，读数通过 `aria-live` 播报。
 
+## 大文件路径
+
+- ≤100k 帧：全部 SVG 渲染；
+- >100k 帧：时域图改 Canvas（逐像素 min/max），>150k 帧时 Allan 交给 `allan-worker.js`，主线程不阻塞；
+- 2 h 数据（~720k 帧）可直接上传，K/V 仍在主线程（约 45 ms）。
+
 ## 离线 / PWA
 
-页面在 https 下注册 `sw.js`，缓存静态资源；IMU/Control/about 可离线打开（数据 CSV 不缓存）。首次访问后断网刷新仍可用。
+页面在 https 下注册 `sw.js`，缓存静态资源；IMU/Control/about 可离线打开（数据 CSV 不缓存）。`manifest.webmanifest` 提供安装信息与图标，支持“添加到主屏幕”。
 
 ## 许可
 
