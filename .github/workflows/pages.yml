@@ -30,6 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Clone tutorial content
+        run: git clone --depth 1 https://github.com/xingd5478-ctrl/simulink-control-tutorial.git "$RUNNER_TEMP/simtut" || echo "clone failed"
       - uses: actions/configure-pages@v5
       - name: Assemble site
         run: |
@@ -41,6 +43,11 @@ jobs:
           cp -r imu-lab/static/. _site/imu/
           cp -r control-play/. _site/control/
           cp -r simulink/. _site/simulink/
+          mkdir -p _site/simulink/course-src _site/simulink/course-img
+          if [ -d "$RUNNER_TEMP/simtut" ]; then
+            cp "$RUNNER_TEMP"/simtut/t*.m _site/simulink/course-src/ 2>/dev/null || true
+            cp "$RUNNER_TEMP"/simtut/docs/images/*.png _site/simulink/course-img/ 2>/dev/null || true
+          fi
           cp -r about/. _site/about/
           cp LICENSE _site/LICENSE
       - uses: actions/upload-pages-artifact@v3

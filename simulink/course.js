@@ -7,7 +7,8 @@
   const REPO = DATA.repo;
   const CDN = "https://cdn.jsdelivr.net/gh/xingd5478-ctrl/simulink-control-tutorial@main/";
   const RAW = "https://raw.githubusercontent.com/xingd5478-ctrl/simulink-control-tutorial/main/";
-  const IMG = CDN + "docs/images/";
+  const LOCAL = "course-src/";
+  const LOCAL_IMG = "course-img/";
   const MULTI = { t16: 4, t17: 2, t19: 3, t21: 2, t22: 3, t24: 2 };
 
   const lessons = [];
@@ -191,12 +192,13 @@
       const fig = el("figure", "reader-fig");
       const img = document.createElement("img");
       img.loading = "lazy";
-      img.src = IMG + name;
+      img.src = LOCAL_IMG + name;
       img.alt = `${lesson.title} 结果图 ${i + 1}`;
       img.addEventListener("error", () => {
-        if (img.dataset.fallback === "1") { fig.remove(); return; }
-        img.dataset.fallback = "1";
-        img.src = RAW + "docs/images/" + name;
+        const stage = img.dataset.stage || "0";
+        if (stage === "0") { img.dataset.stage = "1"; img.src = CDN + "docs/images/" + name; }
+        else if (stage === "1") { img.dataset.stage = "2"; img.src = RAW + "docs/images/" + name; }
+        else { fig.remove(); }
       });
       const cap = el("figcaption", "", `docs/images/${name}`);
       fig.appendChild(img);
@@ -256,7 +258,7 @@
     setStatus("正在读取讲义…");
     try {
       let text = null;
-      for (const base of [CDN, RAW]) {
+      for (const base of [LOCAL, CDN, RAW]) {
         try {
           const res = await fetch(base + lesson.file, { mode: "cors" });
           if (res.ok) { text = await res.text(); break; }
