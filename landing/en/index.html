@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>vibe-lab · sensors &amp; control, visualized</title>
+  <meta name="description" content="A static lab for sensor and control visualization: IMU Allan analysis, PID and state-feedback demos, and 43 interactive Simulink lessons." />
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
+  <meta property="og:title" content="vibe-lab · sensors &amp; control, visualized" />
+  <meta property="og:description" content="IMU data lab + Control Play + interactive Simulink lessons: Allan deviation, R/Q, Kalman, PID, state feedback, observers and sliding mode." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="../icon-192.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/en/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://xingd5478-ctrl.github.io/vibe-lab/" />
+  <link rel="alternate" hreflang="en" href="https://xingd5478-ctrl.github.io/vibe-lab/en/" />
+  <link rel="alternate" hreflang="x-default" href="https://xingd5478-ctrl.github.io/vibe-lab/" />
+  <meta property="og:image" content="https://xingd5478-ctrl.github.io/vibe-lab/icon-512.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Site navigation">
+      <a href="./" aria-current="page" data-local="index.html">Home</a>
+      <a href="../imu/" data-local="../../imu-lab/static/index.html">IMU</a>
+      <a href="../control/" data-local="../../control-play/index.html">Control</a>
+      <a href="../simulink/" data-local="../../simulink/index.html">Simulink</a>
+      <a href="../about/" data-local="../../about/index.html">Method</a>
+      <a href="../" hreflang="zh-CN" lang="zh-CN" data-local="../index.html">中文</a>
+    </nav>
+    <header>
+      <div class="kicker">vibe-lab / index</div>
+      <h1>Sensors and control, visualized</h1>
+      <p class="sub">
+        Three zero-dependency browser tools: break MEMS gyro data into Allan deviation and R/Q; drag second-order
+        and PID curves; and revisit the core math of a 43-lesson Simulink course. Everything runs locally — no data
+        leaves your browser.
+      </p>
+      <p class="lang-note">The three tools and their lesson notes are written in Chinese; this page is an English overview.</p>
+    </header>
+
+    <section class="paths" aria-label="Choose a starting point">
+      <h2>Where to start?</h2>
+      <div class="paths-grid">
+        <a data-path="imu" href="../imu/"><b>① I have sensor data</b><span>IMU data lab · 10-chapter manual</span></a>
+        <a data-path="control" href="../control/"><b>② I want to tune a controller</b><span>Control Play · 14-chapter manual + 4 labs</span></a>
+        <a data-path="simulink" href="../simulink/"><b>③ I want to learn control systematically</b><span>Simulink · 43 lessons, 19 interactive demos</span></a>
+      </div>
+    </section>
+
+    <main id="main">
+    <section class="cards">
+      <a class="card" data-target="imu" href="../imu/">
+        <div class="no">INSTRUMENT 01</div>
+        <h2>IMU data lab</h2>
+        <p>Upload CSV → CRC cleaning → three-axis Allan → fit ARW/RRW → tune R/Q and watch a Kalman filter. Includes a 10-chapter lab manual, PNG/CSV export and shareable parameter links.</p>
+        <svg viewBox="0 0 320 92" role="img" aria-label="Allan deviation illustration">
+          <path class="fig-accent" d="M12,22 C70,32 120,58 175,66 C225,73 270,62 308,50" fill="none" stroke="#1f4e79" stroke-width="2"/>
+          <path class="fig-green" d="M12,28 C70,38 120,62 175,70 C225,77 270,68 308,58" fill="none" stroke="#2f6b4f" stroke-width="1.4" opacity="0.7"/>
+          <path class="fig-orange" d="M12,30 L308,86" fill="none" stroke="#b5651d" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+          <line class="fig-axis" x1="12" y1="86" x2="308" y2="86" stroke="#d8d3c7"/>
+          <line class="fig-axis" x1="12" y1="12" x2="12" y2="86" stroke="#d8d3c7"/>
+        </svg>
+        <span class="go">Open →</span>
+      </a>
+
+      <a class="card" data-target="control" href="../control/">
+        <div class="no">INSTRUMENT 02</div>
+        <h2>Control Play</h2>
+        <p>Bode, step and PID loops for a second-order plant, plus four extra labs: state feedback, observer, root locus and discretization. Includes a 14-chapter manual.</p>
+        <svg viewBox="0 0 320 92" role="img" aria-label="Step response illustration">
+          <path class="fig-green" d="M12,86 L60,40 C72,22 86,20 98,34 C112,50 120,56 140,54 L308,52" fill="none" stroke="#2f6b4f" stroke-width="2"/>
+          <line class="fig-ref" x1="12" y1="52" x2="308" y2="52" stroke="#b9b3a5" stroke-width="1" stroke-dasharray="4 4"/>
+          <line class="fig-axis" x1="12" y1="86" x2="308" y2="86" stroke="#d8d3c7"/>
+          <line class="fig-axis" x1="12" y1="12" x2="12" y2="86" stroke="#d8d3c7"/>
+        </svg>
+        <span class="go">Open →</span>
+      </a>
+
+      <a class="card" data-target="simulink" href="../simulink/">
+        <div class="no">TUTORIAL 03</div>
+        <h2>Simulink tutorial · interactive</h2>
+        <p>43 lessons across 8 stages: 43 beginner guides and 19 interactive reproductions (signals, PID, Kalman, Bode, MPC, sliding mode, root locus, fuzzy, IMU, Stateflow…), with .m/.slx sources.</p>
+        <svg viewBox="0 0 320 92" role="img" aria-label="Simulink block diagram illustration">
+          <rect class="fig-box" x="12" y="30" width="62" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
+          <text class="fig-ink" x="43" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Step</text>
+          <rect class="fig-sum" x="112" y="30" width="80" height="32" rx="2" fill="#eef1f4" stroke="#7a9cc6"/>
+          <text class="fig-ink" x="152" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Σ / K</text>
+          <rect class="fig-box" x="230" y="30" width="78" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
+          <text class="fig-ink" x="269" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">1/s²</text>
+          <line class="fig-arrow" x1="74" y1="46" x2="110" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
+          <line class="fig-arrow" x1="192" y1="46" x2="228" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
+          <path class="fig-green" d="M269,62 V80 H43 V64" fill="none" stroke="#2f6b4f" stroke-width="1.1" stroke-dasharray="4 4"/>
+          <circle class="fig-ink" cx="74" cy="46" r="2" fill="#1b1d22"/>
+        </svg>
+        <span class="go">Open →</span>
+      </a>
+    </section>
+    </main>
+
+    <footer>
+      vibe-lab · static site, computed in your browser ·
+      <a href="../about/" data-local="../../about/index.html">Method</a> ·
+      <a href="../LICENSE" data-local="../../LICENSE" target="_blank" rel="noreferrer">MIT License</a> ·
+      <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">Source</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var isFile = location.protocol === "file:";
+      var local = isFile || /\/landing\//.test(location.pathname);
+      if (local) {
+        document.querySelectorAll("[data-local]").forEach(function (a) {
+          a.href = a.getAttribute("data-local");
+        });
+      }
+      document.querySelectorAll("[data-target], [data-path]").forEach(function (a) {
+        var t = a.getAttribute("data-target") || a.getAttribute("data-path");
+        if (local) {
+          a.href = t === "imu" ? "../../imu-lab/static/index.html"
+            : t === "control" ? "../../control-play/index.html"
+            : "../../simulink/index.html";
+        } else {
+          a.href = t === "imu" ? "../imu/" : t === "control" ? "../control/" : "../simulink/";
+        }
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/(imu|control|about|simulink|en)\/(index\.html)?$/, "");
+      navigator.serviceWorker.register(root + "sw.js").then(function (reg) {
+        reg.addEventListener("updatefound", function () {
+          var w = reg.installing;
+          if (!w) return;
+          w.addEventListener("statechange", function () {
+            if (w.state !== "installed" || !navigator.serviceWorker.controller) return;
+            var d = document.createElement("div");
+            d.textContent = "The site was updated. Click to refresh.";
+            d.setAttribute("role", "status");
+            d.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:999;background:#1b1d22;color:#fff;padding:8px 12px;border-radius:3px;font:12px Segoe UI,sans-serif;cursor:pointer";
+            d.addEventListener("click", function () { location.reload(); });
+            document.body.appendChild(d);
+          });
+        });
+      }).catch(function () {});
+    })();
+  </script>
+</body>
+</html>

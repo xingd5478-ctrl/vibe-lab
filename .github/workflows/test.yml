@@ -29,8 +29,12 @@ jobs:
       - run: npm ci
       - name: DOM smoke (Edge CDP)
         run: node scripts/smoke.mjs
-      - name: End-to-end (Edge CDP + axe)
+      - name: End-to-end (Edge CDP + axe, light/dark)
         run: node scripts/e2e.mjs
+      - name: Runtime performance budget
+        env:
+          PERF_SCALE: "2"
+        run: node scripts/perf.mjs
       - name: Big-file pipeline (Edge, 200k rows)
         run: node scripts/bigtest.mjs
 

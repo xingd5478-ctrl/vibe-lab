@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IMU 数据实验室 · vibe-lab</title>
   <meta name="description" content="IMU 数据实验室：上传 MPU6050 CSV，CRC 清洗、Allan 方差、拟合 ARW/RRW、调 R/Q 看卡尔曼滤波。" />
-  <meta name="theme-color" content="#f4f2ec" />
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
   <meta property="og:title" content="IMU 数据实验室 · vibe-lab" />
   <meta property="og:description" content="上传 CSV → CRC 清洗 → 三轴 Allan → 拟合 ARW/RRW → 调 R/Q 看 KF。" />
   <meta property="og:type" content="website" />
@@ -48,7 +49,7 @@
             <label>GZ <select id="map-gz"></select></label>
             <button id="map-apply" type="button" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">应用映射</button>
           </div>
-          <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
+          <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
           <div class="hint">
             论文在审，仅作演示；完整数据待录用后按期刊政策公开，版权归作者/实验室。
             <a href="sample_real_10min.csv" download>下载片段 CSV</a>
@@ -89,15 +90,15 @@
         </div>
 
         <div class="field" style="display:flex;gap:8px;">
-          <button id="export-csv" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">导出 CSV</button>
-          <button id="export-report" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">导出报告</button>
+          <button id="export-csv" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">导出 CSV</button>
+          <button id="export-report" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">导出报告</button>
         </div>
         <div class="field" style="display:flex;gap:8px;">
-          <button id="compare" type="button" aria-pressed="false" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">保存对比</button>
-          <button id="share" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">复制链接</button>
+          <button id="compare" type="button" aria-pressed="false" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">保存对比</button>
+          <button id="share" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">复制链接</button>
         </div>
         <div class="field">
-          <button id="export-allan" type="button" style="width:100%;padding:7px;border:1px solid var(--line);background:#fff;cursor:pointer;border-radius:2px;">导出 Allan CSV</button>
+          <button id="export-allan" type="button" style="width:100%;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">导出 Allan CSV</button>
         </div>
         <div class="hint" id="share-info" aria-live="polite">—</div>
 
@@ -109,7 +110,7 @@
         </div>
 
         <div class="field" style="margin-top:14px">
-          <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:#fff;cursor:pointer;">重置为示例数据</button>
+          <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;">重置为示例数据</button>
         </div>
 
         <p class="hint">CSV 列名：<code>gx_dps/gy_dps/gz_dps</code>，可选 <code>crc_ok</code>、<code>t</code>。没有表头时按 t,gx,gy,gz,crc 解析。</p>

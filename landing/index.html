@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>vibe-lab · 传感器与控制可视化实验室</title>
   <meta name="description" content="传感器与控制可视化实验室：IMU 数据实验室、Control Play 与 Simulink 教程交互复现。" />
-  <meta name="theme-color" content="#f4f2ec" />
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
   <meta property="og:title" content="vibe-lab · 传感器与控制可视化实验室" />
   <meta property="og:description" content="IMU 数据实验室 + Control Play + Simulink 教程交互复现：Allan、R/Q、卡尔曼、PID、状态反馈、观测器与滑模。" />
   <meta property="og:type" content="website" />
@@ -14,6 +15,9 @@
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="stylesheet" href="style.css" />
   <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://xingd5478-ctrl.github.io/vibe-lab/" />
+  <link rel="alternate" hreflang="en" href="https://xingd5478-ctrl.github.io/vibe-lab/en/" />
+  <link rel="alternate" hreflang="x-default" href="https://xingd5478-ctrl.github.io/vibe-lab/" />
   <meta property="og:image" content="https://xingd5478-ctrl.github.io/vibe-lab/icon-512.png" />
   <meta name="twitter:card" content="summary_large_image" />
 </head>
@@ -26,6 +30,7 @@
       <a href="control/">Control</a>
       <a href="simulink/">Simulink</a>
       <a href="about/">方法</a>
+      <a href="en/" hreflang="en" lang="en">EN</a>
     </nav>
     <header>
       <div class="kicker">vibe-lab / index</div>
@@ -52,11 +57,11 @@
         <h2>IMU 数据实验室</h2>
         <p>上传 CSV → CRC 清洗 → 三轴 Allan → 拟合 ARW/RRW → 调 R/Q 看卡尔曼滤波。附 10 章实验手册、PNG/CSV 导出与参数链接。</p>
         <svg viewBox="0 0 320 92" role="img" aria-label="Allan 曲线示意">
-          <path d="M12,22 C70,32 120,58 175,66 C225,73 270,62 308,50" fill="none" stroke="#1f4e79" stroke-width="2"/>
-          <path d="M12,28 C70,38 120,62 175,70 C225,77 270,68 308,58" fill="none" stroke="#2f6b4f" stroke-width="1.4" opacity="0.7"/>
-          <path d="M12,30 L308,86" fill="none" stroke="#b5651d" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
-          <line x1="12" y1="86" x2="308" y2="86" stroke="#d8d3c7"/>
-          <line x1="12" y1="12" x2="12" y2="86" stroke="#d8d3c7"/>
+          <path class="fig-accent" d="M12,22 C70,32 120,58 175,66 C225,73 270,62 308,50" fill="none" stroke="#1f4e79" stroke-width="2"/>
+          <path class="fig-green" d="M12,28 C70,38 120,62 175,70 C225,77 270,68 308,58" fill="none" stroke="#2f6b4f" stroke-width="1.4" opacity="0.7"/>
+          <path class="fig-orange" d="M12,30 L308,86" fill="none" stroke="#b5651d" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+          <line class="fig-axis" x1="12" y1="86" x2="308" y2="86" stroke="#d8d3c7"/>
+          <line class="fig-axis" x1="12" y1="12" x2="12" y2="86" stroke="#d8d3c7"/>
         </svg>
         <span class="go">打开 →</span>
       </a>
@@ -66,10 +71,10 @@
         <h2>Control Play</h2>
         <p>二阶系统的 Bode、阶跃与 PID 闭环，外加状态反馈、观测器、根轨迹、离散化 4 个扩展实验；附 14 章实验手册。</p>
         <svg viewBox="0 0 320 92" role="img" aria-label="阶跃响应示意">
-          <path d="M12,86 L60,40 C72,22 86,20 98,34 C112,50 120,56 140,54 L308,52" fill="none" stroke="#2f6b4f" stroke-width="2"/>
-          <line x1="12" y1="52" x2="308" y2="52" stroke="#b9b3a5" stroke-width="1" stroke-dasharray="4 4"/>
-          <line x1="12" y1="86" x2="308" y2="86" stroke="#d8d3c7"/>
-          <line x1="12" y1="12" x2="12" y2="86" stroke="#d8d3c7"/>
+          <path class="fig-green" d="M12,86 L60,40 C72,22 86,20 98,34 C112,50 120,56 140,54 L308,52" fill="none" stroke="#2f6b4f" stroke-width="2"/>
+          <line class="fig-ref" x1="12" y1="52" x2="308" y2="52" stroke="#b9b3a5" stroke-width="1" stroke-dasharray="4 4"/>
+          <line class="fig-axis" x1="12" y1="86" x2="308" y2="86" stroke="#d8d3c7"/>
+          <line class="fig-axis" x1="12" y1="12" x2="12" y2="86" stroke="#d8d3c7"/>
         </svg>
         <span class="go">打开 →</span>
       </a>
@@ -79,16 +84,16 @@
         <h2>Simulink 教程 · 交互复现</h2>
         <p>43 课 / 8 阶段的 Simulink 控制教程：43 篇新手讲义 + 19 个交互复现（信号、PID、Kalman、Bode、MPC、滑模、根轨迹、模糊、IMU、Stateflow…），附 .m/.slx 源文件。</p>
         <svg viewBox="0 0 320 92" role="img" aria-label="Simulink 框图示意">
-          <rect x="12" y="30" width="62" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
-          <text x="43" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Step</text>
-          <rect x="112" y="30" width="80" height="32" rx="2" fill="#eef1f4" stroke="#7a9cc6"/>
-          <text x="152" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Σ / K</text>
-          <rect x="230" y="30" width="78" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
-          <text x="269" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">1/s²</text>
-          <line x1="74" y1="46" x2="110" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
-          <line x1="192" y1="46" x2="228" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
-          <path d="M269,62 V80 H43 V64" fill="none" stroke="#2f6b4f" stroke-width="1.1" stroke-dasharray="4 4"/>
-          <circle cx="74" cy="46" r="2" fill="#1b1d22"/>
+          <rect class="fig-box" x="12" y="30" width="62" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
+          <text class="fig-ink" x="43" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Step</text>
+          <rect class="fig-sum" x="112" y="30" width="80" height="32" rx="2" fill="#eef1f4" stroke="#7a9cc6"/>
+          <text class="fig-ink" x="152" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Σ / K</text>
+          <rect class="fig-box" x="230" y="30" width="78" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
+          <text class="fig-ink" x="269" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">1/s²</text>
+          <line class="fig-arrow" x1="74" y1="46" x2="110" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
+          <line class="fig-arrow" x1="192" y1="46" x2="228" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
+          <path class="fig-green" d="M269,62 V80 H43 V64" fill="none" stroke="#2f6b4f" stroke-width="1.1" stroke-dasharray="4 4"/>
+          <circle class="fig-ink" cx="74" cy="46" r="2" fill="#1b1d22"/>
         </svg>
         <span class="go">打开 →</span>
       </a>
@@ -132,7 +137,7 @@
   var p = location.pathname;
   var pre = p.indexOf("/imu-lab/static/") >= 0 ? "../../" : "../";
   var home = p.indexOf("/landing/") >= 0 ? "index.html" : pre + "landing/index.html";
-  var hrefs = [home, pre + "imu-lab/static/index.html", pre + "control-play/index.html", pre + "simulink/index.html", pre + "about/index.html"];
+  var hrefs = [home, pre + "imu-lab/static/index.html", pre + "control-play/index.html", pre + "simulink/index.html", pre + "about/index.html", "en/index.html"];
   document.querySelectorAll(".topnav a").forEach(function (a, i) { if (hrefs[i]) a.href = hrefs[i]; });
 })();
 </script>

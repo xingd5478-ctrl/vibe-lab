@@ -1,6 +1,6 @@
 # vibe-lab
 
-传感器与控制的可视化实验室：两个零依赖的浏览器工具 + 一个说明页。
+传感器与控制的可视化实验室：三个零依赖的浏览器工具 + 方法页 + 英文首页。
 
 **线上：** https://xingd5478-ctrl.github.io/vibe-lab/
 
@@ -8,7 +8,7 @@
 
 ```
 vibe-lab/
-├── landing/             # 首页 + sw.js（PWA）
+├── landing/             # 首页 + en/ 英文首页 + sw.js（PWA）
 ├── about/               # 方法说明与局限
 ├── imu-lab/
 │   ├── static/          # ① IMU 数据实验室（部署到 /imu/）
@@ -28,6 +28,7 @@ vibe-lab/
 # 本地预览（推荐，避免 file:// 的浏览器限制）
 python -m http.server 8000
 # 首页：http://localhost:8000/landing/
+# 英文首页：http://localhost:8000/landing/en/
 # IMU：http://localhost:8000/imu-lab/static/
 # 控制：http://localhost:8000/control-play/
 ```
@@ -37,15 +38,16 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test            # 算法/数据/Worker/Simulink/控制实验单测（46 个）
-npm run smoke       # Edge CDP DOM 冒烟（5 页）
-npm run e2e         # Edge CDP 端到端 + axe 无障碍
+npm test            # 算法/数据/Worker/Simulink/控制实验/图表配色单测（58 个）
+npm run smoke       # Edge CDP DOM 冒烟（9 项）
+npm run e2e         # Edge CDP 端到端 + axe 无障碍（浅色/深色各跑一遍）
+npm run perf        # 运行时性能预算：导航、长任务、交互延迟
 npm run bigtest     # 200k 行 Worker 全链路
 npm run visual      # 截图对比基线
 npm run visual:update  # 有意改版后更新基线
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS/IRLS 拟合、Worker、列式数据层、Simulink 复现；E2E 验证交互/下载并跑 **axe-core**（WCAG 2 A/AA），要求 0 serious/critical；视觉回归对比 `tests/baselines/`（CI 用 `tests/baselines-ci/`）。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS/IRLS 拟合、Worker、列式数据层、Simulink 复现；E2E 验证交互/下载并跑 **axe-core**（WCAG 2 A/AA，浅色 + 深色），要求 0 serious/critical；运行时预算默认按本机计时，CI 用 `PERF_SCALE=2` 放宽；视觉回归对比 `tests/baselines/`（CI 用 `tests/baselines-ci/`）。
 
 ## 键盘操作
 
@@ -92,7 +94,7 @@ imu-lab/static/
 - **Control Play**（`/control/`）：二阶 Bode/阶跃/PID + **状态反馈、观测器、根轨迹、离散化 4 个扩展实验**，附 **14 章实验手册**；页面用「实验台 / 扩展实验 / 手册」标签切换；
 - **Simulink 教程**（`/simulink/`）：43 课讲义 + 19 个交互实验 + 43 个 `.slx` 下载；课程按 **精读 / 合格 / 概念** 分级。
 
-首页提供「从哪开始」三条路径 + 全站顶栏；9 门「概念」课带可计算的小例子；`npm run check:chart` 在 CI 中保证三份 `chart.js` 不漂移。
+首页提供「从哪开始」三条路径 + 全站顶栏；`/en/` 是英文概览页（工具与讲义仍为中文），带 hreflang 与语言切换；9 门「概念」课带可计算的小例子；`npm run check:chart` 在 CI 中保证三份 `chart.js` 不漂移。
 
 ## 数据层
 
@@ -109,9 +111,13 @@ imu-lab/static/
 - >100k 帧：时域图改 Canvas（逐像素 min/max），>150k 帧时 Allan 交给 `allan-worker.js`，主线程不阻塞；
 - 2 h 数据（~720k 帧）可直接上传，K/V 仍在主线程（约 45 ms）。
 
+## 深色模式
+
+跟随系统 `prefers-color-scheme`：面板、代码块、提示框用 CSS 变量统一切换；SVG/Canvas 图表通过 `--chart-*` 变量换色，系统主题切换时实时重绘。`npm run e2e` 会在深色仿真下再跑一遍 axe（WCAG 2 A/AA），要求 0 serious/critical。
+
 ## 离线 / PWA
 
-页面在 https 下注册 `sw.js`，缓存静态资源；IMU/Control/about 可离线打开（数据 CSV 不缓存）。`manifest.webmanifest` 提供安装信息与图标，支持“添加到主屏幕”。
+页面在 https 下注册 `sw.js`，缓存静态资源；IMU/Control/about/英文首页可离线打开（数据 CSV 不缓存）。`manifest.webmanifest` 提供安装信息与图标，支持“添加到主屏幕”。
 
 ## 许可
 
@@ -122,6 +128,7 @@ imu-lab/static/
 | 路径 | 内容 |
 |---|---|
 | `/` | 首页（landing） |
+| `/en/` | 英文首页（English overview） |
 | `/imu/` | IMU 数据实验室 |
 | `/control/` | Control Play |
 | `/about/` | 方法说明与局限 |

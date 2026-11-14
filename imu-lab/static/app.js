@@ -633,6 +633,15 @@
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     clone.setAttribute("width", vb.width);
     clone.setAttribute("height", vb.height);
+    const light = window.IMUChart && window.IMUChart.lightColor;
+    if (light) {
+      clone.querySelectorAll("[stroke], [fill]").forEach((n) => {
+        ["stroke", "fill"].forEach((attr) => {
+          const v = n.getAttribute(attr);
+          if (v && v[0] === "#") n.setAttribute(attr, light(v));
+        });
+      });
+    }
     const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
     style.textContent =
       "text{font-family:'Segoe UI','Microsoft YaHei',sans-serif}" +
@@ -943,6 +952,10 @@ ${blocks}
     bind();
     prepare();
     draw();
+    if (window.matchMedia) {
+      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+      if (mq.addEventListener) mq.addEventListener("change", draw);
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

@@ -1,6 +1,50 @@
 (function (root) {
   "use strict";
 
+  /* 主题色：调用方仍传浅色主题的十六进制值，深色模式由 CSS 变量接管。 */
+  const CHART_VARS = {
+    "#1f4e79": "--chart-1",
+    "#2f6b4f": "--chart-2",
+    "#b5651d": "--chart-3",
+    "#7a9cc6": "--chart-4",
+    "#c9a27a": "--chart-5",
+    "#b9b3a5": "--chart-raw",
+    "#d3ccba": "--chart-raw2",
+    "#8a4a12": "--chart-warn",
+    "#6d685d": "--chart-muted",
+    "#1b1d22": "--chart-axis",
+    "#5b564c": "--chart-muted",
+  };
+
+  function cssVar(name, fallback) {
+    if (typeof document === "undefined") return fallback;
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  }
+
+  function themed(color) {
+    const key = String(color || "").toLowerCase();
+    const name = CHART_VARS[key];
+    return name ? cssVar(name, color) : color;
+  }
+
+  /* 导出报告/PNG 用浅色底：把深色模式的高亮系列色换回浅色主题色。 */
+  const LIGHT_COLORS = {
+    "#7fb3e0": "#1f4e79",
+    "#7fc9a3": "#2f6b4f",
+    "#e0a36a": "#b5651d",
+    "#8db3d8": "#7a9cc6",
+    "#d8a97a": "#c9a27a",
+    "#9a9488": "#b9b3a5",
+    "#b3ada0": "#d3ccba",
+    "#a49e90": "#6d685d",
+    "#e7e2d6": "#1b1d22",
+  };
+
+  function lightColor(color) {
+    return LIGHT_COLORS[String(color || "").toLowerCase()] || color;
+  }
+
   function plotTimeCanvas(el, raw, clean, ch) {
     const H = 230;
     const pad = { l: 58, r: 16, t: 28, b: 34 };
@@ -27,8 +71,11 @@
     const Y = (v) => pad.t + (1 - (v - ymin) / (ymax - ymin)) * ih;
 
     ctx.font = "11px Consolas, monospace";
-    ctx.fillStyle = "#5b564c";
-    ctx.strokeStyle = "#e7e3d8";
+    const muted = cssVar("--muted", "#5b564c");
+    const grid = cssVar("--grid", "#e7e3d8");
+    const ink = cssVar("--ink", "#1b1d22");
+    ctx.fillStyle = muted;
+    ctx.strokeStyle = grid;
     ctx.lineWidth = 1;
     for (const v of [-5, 0, 5]) {
       const y = Y(v);
@@ -41,10 +88,10 @@
       ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, H - pad.b); ctx.stroke();
       ctx.fillText(t.toFixed(1), x - 12, H - pad.b + 15);
     }
-    ctx.strokeStyle = "#1b1d22";
+    ctx.strokeStyle = ink;
     ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b);
     ctx.lineTo(w - pad.r, H - pad.b); ctx.stroke();
-    ctx.fillStyle = "#5b564c";
+    ctx.fillStyle = muted;
     ctx.fillText("角速度 (°/s)", pad.l, pad.t - 10);
     ctx.fillText("时间 (s)", w - pad.r - 48, H - 4);
 
@@ -69,8 +116,8 @@
       }
       ctx.stroke();
     };
-    drawSeries(raw, "#b9b3a5", 0.8);
-    drawSeries(clean, "#1f4e79", 1.0);
+    drawSeries(raw, themed("#b9b3a5"), 0.8);
+    drawSeries(clean, themed("#1f4e79"), 1.0);
 
     canvas.setAttribute("aria-label", `时域图：${raw.length} 帧，Canvas 绘制`);
     let tip = el.querySelector(".tip");
@@ -277,7 +324,7 @@
     const h = cfg.height || 230;
     const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
     const series = cfg.series
-      .map((s) => ({ ...s, points: decimate(s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])), 1500) }))
+      .map((s) => ({ ...s, color: themed(s.color), points: decimate(s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])), 1500) }))
       .filter((s) => s.points.length > 1 || s.marker);
 
     if (!series.length) { el.innerHTML = ""; return; }
@@ -389,6 +436,6 @@
     attachHover(el, { w, h, pad, series, X, yDot: (p) => Y(p[1]), xInv, xLabel: cfg.xLabel || "x", aria: cfg.aria || "" });
   }
 
-  const api = { plot, plotTimeCanvas, attachHover, path, fmt, linTicks, logTicks, niceStep, decimate };
+  const api = { plot, plotTimeCanvas, attachHover, path, fmt, linTicks, logTicks, niceStep, decimate, themed, lightColor };
   root.IMUChart = api;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -4,6 +4,10 @@
   --muted: #5b564c;
   --line: #d8d3c7;
   --accent: #1f4e79;
+  --panel: #fffdf8;
+  --code-bg: #ece8dd;
+  --note-bg: #fbf9f2;
+  --ink-soft: #3c3a34;
 }
 
 * { box-sizing: border-box; }
@@ -66,7 +70,7 @@ li { margin-bottom: 6px; }
 code {
   font-family: "Cascadia Mono", Consolas, monospace;
   font-size: 0.9em;
-  background: #ece8dd;
+  background: var(--code-bg);
   padding: 1px 5px;
   border-radius: 2px;
 }
@@ -74,7 +78,7 @@ code {
 .note {
   border-left: 2px solid var(--accent);
   padding: 8px 14px;
-  background: #fbf9f2;
+  background: var(--note-bg);
   color: var(--muted);
   font-size: 13px;
   margin: 18px 0;
@@ -91,15 +95,22 @@ footer a { color: var(--accent); text-decoration: underline; text-underline-offs
 
 a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 
+table { border-collapse: collapse; width: 100%; }
+th, td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertical-align: top; text-align: left; }
+th { color: var(--muted); font-weight: 600; }
+tbody tr:last-child td { border-bottom: 0; }
+
 /* 深色模式：跟随系统 */
 :root { color-scheme: light dark; }
 @media (prefers-color-scheme: dark) {
   :root {
     --paper: #15171c; --ink: #e7e2d6; --muted: #a49e90;
     --line: #33363d; --grid: #23262c; --panel: #1b1e24;
+    --code-bg: #242830; --note-bg: #222831; --ink-soft: #d6d0c4;
   }
   body { background: var(--paper); color: var(--ink); }
-  .card, .panel, .manual-card, .lab-card, .metric, .ctl, .tabs-bar,
-  input, select, textarea { background-color: var(--panel); color: var(--ink); }
-  a { color: #8db3d8; }
+  .panel { background: var(--panel); }
+  a, .topnav a:hover, .topnav [aria-current="page"], footer a { color: #8db3d8; }
+  :focus-visible { outline-color: #8db3d8; }
+  th { color: var(--muted); }
 }

@@ -126,8 +126,18 @@ async function main() {
     await check("landing", fileUrl("landing/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 3);
       if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 3) throw new Error("landing: path chooser");
-      if ((await e("document.querySelectorAll('.topnav a').length")) !== 5) throw new Error("landing: global nav");
+      if ((await e("document.querySelectorAll('.topnav a').length")) !== 6) throw new Error("landing: global nav");
       if (!(await e("document.title")).includes("vibe-lab")) throw new Error("landing: title");
+    });
+
+    await check("landing-en", fileUrl("landing/en/index.html"), async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 3);
+      if ((await e("document.documentElement.lang")) !== "en") throw new Error("landing-en: lang");
+      if ((await e("document.querySelectorAll('.topnav a').length")) !== 6) throw new Error("landing-en: global nav");
+      if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 3) throw new Error("landing-en: path chooser");
+      if (!(await e("document.title")).includes("sensors")) throw new Error("landing-en: title");
+      const zh = await e("document.querySelector('.topnav a[hreflang=\"zh-CN\"]').getAttribute('href')");
+      if (!/index\.html$/.test(zh)) throw new Error("landing-en: language switch");
     });
 
     await check("about", fileUrl("about/index.html"), async (e) => {
@@ -164,7 +174,7 @@ async function main() {
       if (!(await e("document.body.textContent")).includes("完整算例")) throw new Error("course: full case missing");
     });
 
-    console.log("SMOKE OK (landing + imu + control + about + simulink)");
+    console.log("SMOKE OK (landing + landing-en + imu + control + about + simulink)");
   } finally {
     edge.kill();
     await new Promise((r) => { edge.once("exit", r); setTimeout(r, 1500); });

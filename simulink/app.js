@@ -46,8 +46,8 @@
     const gap = 34, y = 26, bh = 52;
     let svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${spec.aria || "Simulink 框图"}">
       <defs>
-        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#1b1d22"/></marker>
-        <marker id="ah2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2f6b4f"/></marker>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="arrow-head" d="M0,0 L8,4 L0,8 z" fill="#1b1d22"/></marker>
+        <marker id="ah2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="fb-head" d="M0,0 L8,4 L0,8 z" fill="#2f6b4f"/></marker>
       </defs>`;
     spec.blocks.forEach((b, i) => {
       const x = 20 + i * (bw + gap);
@@ -81,16 +81,16 @@
     const tx = ox + a.ex * scale, ty = oy - a.ey * scale;
     el.innerHTML =
       `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="两连杆机械臂，末端 ${a.ex.toFixed(2)},${a.ey.toFixed(2)}">
-        <line x1="0" y1="${oy}" x2="${W}" y2="${oy}" stroke="#e7e3d8"/>
-        <line x1="${ox}" y1="0" x2="${ox}" y2="${H}" stroke="#e7e3d8"/>
-        <circle cx="${ox}" cy="${oy}" r="7" fill="#1b1d22"/>
-        <line x1="${ox}" y1="${oy}" x2="${x1}" y2="${y1}" stroke="#1f4e79" stroke-width="7" stroke-linecap="round"/>
-        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2f6b4f" stroke-width="7" stroke-linecap="round"/>
-        <circle cx="${x1}" cy="${y1}" r="6" fill="#fff" stroke="#1f4e79" stroke-width="2"/>
-        <circle cx="${x2}" cy="${y2}" r="8" fill="${a.reachable ? "#1f4e79" : "#8a4a12"}"/>
-        <line x1="${tx - 7}" y1="${ty}" x2="${tx + 7}" y2="${ty}" stroke="#8a4a12" stroke-width="1.5"/>
-        <line x1="${tx}" y1="${ty - 7}" x2="${tx}" y2="${ty + 7}" stroke="#8a4a12" stroke-width="1.5"/>
-        <text x="${ox + 8}" y="${oy - 8}" font-size="11" fill="#5b564c" font-family="Consolas">base</text>
+        <line class="arm-grid" x1="0" y1="${oy}" x2="${W}" y2="${oy}" stroke="#e7e3d8"/>
+        <line class="arm-grid" x1="${ox}" y1="0" x2="${ox}" y2="${H}" stroke="#e7e3d8"/>
+        <circle class="arm-base" cx="${ox}" cy="${oy}" r="7" fill="#1b1d22"/>
+        <line class="arm-link-1" x1="${ox}" y1="${oy}" x2="${x1}" y2="${y1}" stroke="#1f4e79" stroke-width="7" stroke-linecap="round"/>
+        <line class="arm-link-2" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2f6b4f" stroke-width="7" stroke-linecap="round"/>
+        <circle class="arm-joint" cx="${x1}" cy="${y1}" r="6" fill="#fff" stroke="#1f4e79" stroke-width="2"/>
+        <circle class="arm-target${a.reachable ? "" : " bad"}" cx="${x2}" cy="${y2}" r="8" fill="${a.reachable ? "#1f4e79" : "#8a4a12"}"/>
+        <line class="arm-cross" x1="${tx - 7}" y1="${ty}" x2="${tx + 7}" y2="${ty}" stroke="#8a4a12" stroke-width="1.5"/>
+        <line class="arm-cross" x1="${tx}" y1="${ty - 7}" x2="${tx}" y2="${ty + 7}" stroke="#8a4a12" stroke-width="1.5"/>
+        <text class="arm-label" x="${ox + 8}" y="${oy - 8}" font-size="11" fill="#5b564c" font-family="Consolas">base</text>
       </svg>`;
   }
 
@@ -1258,6 +1258,10 @@
   const hash = location.hash.replace(/^#/, "");
   const byLesson = Object.keys(DEMOS).find((id) => DEMOS[id].lesson === hash);
   selectDemo(byLesson || (DEMOS[hash] ? hash : "signal"));
+  if (window.matchMedia) {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", refresh);
+  }
   window.addEventListener("resize", () => {
     clearTimeout(window.__simT);
     window.__simT = setTimeout(() => { diagram(DEMOS[current].diagram); refresh(); }, 120);

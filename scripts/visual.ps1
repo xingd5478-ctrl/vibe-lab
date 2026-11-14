@@ -26,6 +26,7 @@ function Shot([string]$url, [string]$name, [string]$size) {
 }
 
 $landing = ([uri](Join-Path $root "landing\index.html")).AbsoluteUri
+$landingEn = ([uri](Join-Path $root "landing\en\index.html")).AbsoluteUri
 $imu = ([uri](Join-Path $root "imu-lab\static\index.html")).AbsoluteUri
 $control = ([uri](Join-Path $root "control-play\index.html")).AbsoluteUri + "?kp=3&ki=1&kd=0.1"
 $controlIndex = ([uri](Join-Path $root "control-play\index.html")).AbsoluteUri
@@ -33,6 +34,7 @@ $about = ([uri](Join-Path $root "about\index.html")).AbsoluteUri
 $sim = ([uri](Join-Path $root "simulink\index.html")).AbsoluteUri
 
 Shot $landing "landing" "1400,1000"
+Shot $landingEn "landing-en" "1400,1000"
 Shot $imu "imu" "1400,1400"
 Shot ($imu + "#manual") "imu-manual" "1400,1400"
 Shot $control "control" "1400,1200"

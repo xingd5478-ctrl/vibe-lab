@@ -101,20 +101,26 @@ async function main() {
       return r.result.value;
     };
 
-    const audit = async (label) => {
+    const audit = async (label, dark = false) => {
       if (!AXE) return;
+      await client.send("Emulation.setEmulatedMedia", {
+        features: [{ name: "prefers-color-scheme", value: dark ? "dark" : "light" }],
+      });
+      await sleep(150);
       await evalJs(AXE);
       const res = await evalJs(
         'axe.run(document,{runOnly:{type:"tag",values:["wcag2a","wcag2aa"]}})' +
         '.then(r=>r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.slice(0,3).map(n=>n.target)})))'
       );
       const bad = res.filter((v) => v.impact === "serious" || v.impact === "critical");
-      console.log("A11Y", label, "violations:", res.length, "serious/critical:", bad.length);
-      if (bad.length) throw new Error(`${label} a11y: ${JSON.stringify(bad)}`);
+      const tag = dark ? `${label}-dark` : label;
+      console.log("A11Y", tag, "violations:", res.length, "serious/critical:", bad.length);
+      if (bad.length) throw new Error(`${tag} a11y: ${JSON.stringify(bad)}`);
     };
 
     await waitFor(() => evalJs("!!document.querySelector('#chart-time svg')"));
     await audit("imu");
+    await audit("imu", true);
     const fit = await evalJs("document.querySelector('#fit-info').textContent");
     if (!/ARW=/.test(fit) || !/R²=/.test(fit)) throw new Error("fit info missing");
     const before = await evalJs("document.querySelector('#r-val').textContent");
@@ -140,14 +146,26 @@ async function main() {
     const meta = await evalJs("document.querySelector('#meta-step').textContent");
     if (!/Kp=3\.00/.test(meta)) throw new Error("PID slider not wired");
     await audit("control");
+    await audit("control", true);
 
     await client.send("Page.navigate", { url: `${base}/landing/index.html` });
     await sleep(1000);
     await audit("landing");
+    await audit("landing", true);
+
+    await client.send("Page.navigate", { url: `${base}/landing/en/index.html` });
+    await sleep(700);
+    if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("landing-en: lang");
+    if ((await evalJs("document.querySelectorAll('.topnav a').length")) !== 6) throw new Error("landing-en: global nav");
+    if ((await evalJs("document.querySelectorAll('.card').length")) !== 3) throw new Error("landing-en: cards");
+    if (!(await evalJs("document.title")).includes("sensors")) throw new Error("landing-en: title");
+    await audit("landing-en");
+    await audit("landing-en", true);
 
     await client.send("Page.navigate", { url: `${base}/about/index.html` });
     await sleep(800);
     await audit("about");
+    await audit("about", true);
 
     await client.send("Page.navigate", { url: `${base}/simulink/index.html` });
     await waitFor(async () => (await evalJs("document.querySelectorAll('#phases .phase-link').length")) === 8, 12000);
@@ -157,6 +175,7 @@ async function main() {
     const simMeta = await evalJs("document.querySelector('#metrics').textContent");
     if (!/抖振/.test(simMeta)) throw new Error("simulink: SMC metrics missing");
     await audit("simulink");
+    await audit("simulink", true);
 
     await client.send("Page.navigate", { url: `${base}/simulink/course.html?id=t03` });
     await sleep(900);
@@ -169,6 +188,7 @@ async function main() {
     const head = fs.readFileSync(slx).subarray(0, 2);
     if (head[0] !== 0x50 || head[1] !== 0x4b) throw new Error("course: downloaded .slx is not a zip");
     await audit("course");
+    await audit("course", true);
 
     client.close();
     console.log("E2E OK");
