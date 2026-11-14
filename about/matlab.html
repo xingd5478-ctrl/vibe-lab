@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MATLAB 对照 · 43 个模型 · vibe-lab</title>
+  <meta name="description" content="MATLAB R2025a 对 43 个 Simulink .slx 模型逐一仿真：模型哈希、求解器、停止时间、输出统计与网页 demo 对照。" />
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
+  <meta property="og:title" content="MATLAB 对照 · 43 个模型 · vibe-lab" />
+  <meta property="og:description" content="43/43 个 Simulink 模型真机仿真，公开模型哈希、求解器与输出统计。" />
+  <meta property="og:type" content="article" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="../icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/about/matlab.html" />
+  <meta property="og:image" content="https://xingd5478-ctrl.github.io/vibe-lab/icon-512.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+</head>
+<body class="wide">
+  <a class="skip" href="#main">跳到内容</a>
+  <div class="wrap">
+    <nav class="topnav" aria-label="全站导航">
+      <a href="../" data-local="../landing/index.html">首页</a>
+      <a href="../imu/" data-local="../imu-lab/static/index.html">IMU</a>
+      <a href="../control/" data-local="../control-play/index.html">Control</a>
+      <a href="../simulink/" data-local="../simulink/index.html">Simulink</a>
+      <a href="./" data-local="index.html" aria-current="page">方法</a>
+      <a href="../en/" data-local="../landing/en/index.html" hreflang="en" lang="en">EN</a>
+    </nav>
+    <header>
+      <div class="kicker">vibe-lab / method / matlab</div>
+      <h1>MATLAB 对照：43 / 43</h1>
+      <p class="sub">用 MATLAB 25.1.0.2943329 对仓库里的 43 个 <code>.slx</code> 逐一仿真；每个模型都记录 SHA-256、求解器、停止时间与输出统计，再与网页 demo 对照。</p>
+      <p class="matlab-meta">生成时间：2026-11-15 02:15:02 · 43/43 通过 · 110 个工具箱 · <a href="../data/matlab-probes.json" download>下载原始 JSON</a> · <a href="./">返回方法说明</a></p>
+    </header>
+
+    <main id="main">
+      <section class="panel">
+        <div class="matlab-toolbar">
+          <label for="matlab-search">筛选</label>
+          <input id="matlab-search" type="search" placeholder="课程、指标、说明、求解器…" autocomplete="off" />
+          <span id="matlab-count" class="count">43 / 43</span>
+        </div>
+        <div class="matlab-table-wrap">
+          <table class="matlab-table">
+            <thead><tr><th>课程</th><th>网页 demo</th><th>.slx 实测</th><th>说明</th><th>出处</th></tr></thead>
+            <tbody id="matlab-rows">
+        <tr data-search="t01 信号基础 signal 峰值 5.997，末值 -3.264 信号、增益、示波器；结构课 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t01">t01</a> 信号基础
+            <a class="slx" href="../simulink/models/tutorial01_signals.slx" download title="下载 tutorial01_signals.slx">.slx</a></td>
+          <td><a href="../simulink/#signal">signal</a></td>
+          <td>峰值 5.997，末值 -3.264</td>
+          <td>信号、增益、示波器；结构课</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: c93e44c3e3b2321339e4e386a6d55b3d57e19f72d56a2900980cd2f14a2c9215">c93e44c3e3</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t02 数学运算 signal 峰值 7.696，末值 -7.660 Sum/Product/Mux/Demux；结构课 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t02">t02</a> 数学运算
+            <a class="slx" href="../simulink/models/tutorial02_math.slx" download title="下载 tutorial02_math.slx">.slx</a></td>
+          <td><a href="../simulink/#signal">signal</a></td>
+          <td>峰值 7.696，末值 -7.660</td>
+          <td>Sum/Product/Mux/Demux；结构课</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: e27020d6c90c17c170058beee723a2787e48455345c8b52cb424ef1137ca76e0">e27020d6c9</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t03 一阶系统 first-order 峰值 1.000，终值 1.000 与网页 demo 一致 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t03">t03</a> 一阶系统
+            <a class="slx" href="../simulink/models/tutorial03_first_order.slx" download title="下载 tutorial03_first_order.slx">.slx</a></td>
+          <td><a href="../simulink/#first-order">first-order</a></td>
+          <td>峰值 1.000，终值 1.000</td>
+          <td>与网页 demo 一致</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: daf21f6cf5eeb0b3c6da16719080951faed5b00158a7bf0bae4bfd38dafff1b9">daf21f6cf5</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t04 二阶系统 second-order ζ=0.2 峰值 1.520，终值 0.996 与网页 demo 一致（ζ=0.2） VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t04">t04</a> 二阶系统
+            <a class="slx" href="../simulink/models/tutorial04_second_order.slx" download title="下载 tutorial04_second_order.slx">.slx</a></td>
+          <td><a href="../simulink/#second-order">second-order</a></td>
+          <td>ζ=0.2 峰值 1.520，终值 0.996</td>
+          <td>与网页 demo 一致（ζ=0.2）</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: ac217447b2437ae47ad04826e675cfc7504af8d97153ce980e8b28e4ba0e39af">ac217447b2</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t05 PID 控制 pid 峰值 0.978，终值 0.978 模型参考/限幅与 demo 不同 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t05">t05</a> PID 控制
+            <a class="slx" href="../simulink/models/tutorial05_pid.slx" download title="下载 tutorial05_pid.slx">.slx</a></td>
+          <td><a href="../simulink/#pid">pid</a></td>
+          <td>峰值 0.978，终值 0.978</td>
+          <td>模型参考/限幅与 demo 不同</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: a4868d1326dbd55f7c53e3af7c66fbd5d951b8f37c9ee01d04db1e5c271b223c">a4868d1326</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t06 信号源与输出 signal 峰值 20.00，末值 0 Workspace 导入导出；探针需初始化 u_input VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t06">t06</a> 信号源与输出
+            <a class="slx" href="../simulink/models/tutorial06_sources_sinks.slx" download title="下载 tutorial06_sources_sinks.slx">.slx</a></td>
+          <td><a href="../simulink/#signal">signal</a></td>
+          <td>峰值 20.00，末值 0</td>
+          <td>Workspace 导入导出；探针需初始化 u_input</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: b22e46d63dd86ba46f66e0abf37fadc486e644435a0768f079112dafae87772c">b22e46d63d</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t07 子系统  峰值 39.98，末值 -21.76 子系统层级；结构课 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t07">t07</a> 子系统
+            <a class="slx" href="../simulink/models/tutorial07_subsystem.slx" download title="下载 tutorial07_subsystem.slx">.slx</a></td>
+          <td>—</td>
+          <td>峰值 39.98，末值 -21.76</td>
+          <td>子系统层级；结构课</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 60d33aaa5de82b41ffa42cf8285780a7db19e16a695de0d42610851afb017c65">60d33aaa5d</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t08 Mask 封装  输出1 峰值 8.101，末值 7.417；输出2 峰值 16.57，末值 13.02 Mask 参数化；三路输出 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t08">t08</a> Mask 封装
+            <a class="slx" href="../simulink/models/tutorial08_masking.slx" download title="下载 tutorial08_masking.slx">.slx</a></td>
+          <td>—</td>
+          <td>输出1 峰值 8.101，末值 7.417；输出2 峰值 16.57，末值 13.02</td>
+          <td>Mask 参数化；三路输出</td>
+          <td><code>VariableStepAuto</code><br>15 s · <span class="hash" title="SHA-256: cd706553e3946229d000a9f2e57a32b673d8981f111c81ecc3647b246c71284c">cd706553e3</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t09 状态空间模型  峰值 0.4182，末值 0.2383；峰值 0.4182，末值 0.2383 TF/SS/MA 三种实现对比 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t09">t09</a> 状态空间模型
+            <a class="slx" href="../simulink/models/tutorial09_state_space.slx" download title="下载 tutorial09_state_space.slx">.slx</a></td>
+          <td>—</td>
+          <td>峰值 0.4182，末值 0.2383；峰值 0.4182，末值 0.2383</td>
+          <td>TF/SS/MA 三种实现对比</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 2b2f87969c68d8da7577a931ab05194c9d4607e84b00862e7c8c0bf32aeb6811">2b2f87969c</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t10 状态反馈 / LQR state-feedback 峰值 0.065，终值 0.063（PP） 原模型无参考前馈，稳态约 1/16 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t10">t10</a> 状态反馈 / LQR
+            <a class="slx" href="../simulink/models/tutorial10_state_feedback.slx" download title="下载 tutorial10_state_feedback.slx">.slx</a></td>
+          <td><a href="../simulink/#state-feedback">state-feedback</a></td>
+          <td>峰值 0.065，终值 0.063（PP）</td>
+          <td>原模型无参考前馈，稳态约 1/16</td>
+          <td><code>VariableStepAuto</code><br>8 s · <span class="hash" title="SHA-256: 5cbdd65b43598b0bc369f11675d0df3822da151068d05bb1a5d993c1005e5b9c">5cbdd65b43</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t11 状态观测器 observer 最大误差 0.300，末值 0.000 估计误差收敛；与 demo 一致 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t11">t11</a> 状态观测器
+            <a class="slx" href="../simulink/models/tutorial11_observer.slx" download title="下载 tutorial11_observer.slx">.slx</a></td>
+          <td><a href="../simulink/#observer">observer</a></td>
+          <td>最大误差 0.300，末值 0.000</td>
+          <td>估计误差收敛；与 demo 一致</td>
+          <td><code>VariableStepAuto</code><br>5 s · <span class="hash" title="SHA-256: 0fc9ca2bc0899195adceb4abfb3a68f94cc78521528c0865f8a68fe3647e5c27">0fc9ca2bc0</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t12 Kalman 滤波 kalman Kalman RMSE 0.455，测量 1.149 Kalman 明显优于 Luenberger/测量 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t12">t12</a> Kalman 滤波
+            <a class="slx" href="../simulink/models/tutorial12_kalman.slx" download title="下载 tutorial12_kalman.slx">.slx</a></td>
+          <td><a href="../simulink/#kalman">kalman</a></td>
+          <td>Kalman RMSE 0.455，测量 1.149</td>
+          <td>Kalman 明显优于 Luenberger/测量</td>
+          <td><code>VariableStepAuto</code><br>5 s · <span class="hash" title="SHA-256: 3b116c0236048a3555f132f9ee488f58067eb455fbba142dcd0204f2a3576355">3b116c0236</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t13 DC 电机控制 motor 峰值 192.44，终值 137.09 速度 PI 有超调，稳态有差 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t13">t13</a> DC 电机控制
+            <a class="slx" href="../simulink/models/tutorial13_dc_motor.slx" download title="下载 tutorial13_dc_motor.slx">.slx</a></td>
+          <td><a href="../simulink/#motor">motor</a></td>
+          <td>峰值 192.44，终值 137.09</td>
+          <td>速度 PI 有超调，稳态有差</td>
+          <td><code>VariableStepAuto</code><br>1.5 s · <span class="hash" title="SHA-256: b448c3850008a64494ca0a555b5099cc26ceff23b43f87623c73207cb83180e3">b448c38500</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t14 PMSM + FOC foc 峰值 228.6，末值 145.7；范围 0–410.1，末值 410.1 FOC 与 DC 对比；末值差异大 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t14">t14</a> PMSM + FOC
+            <a class="slx" href="../simulink/models/tutorial14_foc.slx" download title="下载 tutorial14_foc.slx">.slx</a></td>
+          <td><a href="../simulink/#foc">foc</a></td>
+          <td>峰值 228.6，末值 145.7；范围 0–410.1，末值 410.1</td>
+          <td>FOC 与 DC 对比；末值差异大</td>
+          <td><code>VariableStepAuto</code><br>0.15 s · <span class="hash" title="SHA-256: e892b089bfcfc442a052abc59c61f85c77e9b593418cb20594a8cfd9be29fa32">e892b089bf</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t15 代码生成  峰值 0.0288，末值 0.0161 代码生成模型；固定步长 1 ms VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t15">t15</a> 代码生成
+            <a class="slx" href="../simulink/models/tutorial15_codegen.slx" download title="下载 tutorial15_codegen.slx">.slx</a></td>
+          <td>—</td>
+          <td>峰值 0.0288，末值 0.0161</td>
+          <td>代码生成模型；固定步长 1 ms</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 1ba16fac5da720d711fb553980abc54b584cec9c82b65956679265e2e593f666">1ba16fac5d</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t16 频域分析 bode Plant 4/(s²+0.5s+4)：Gm=∞，PM=20.4° Plant 4/(s²+0.5s+4)；PM 20.4° VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t16">t16</a> 频域分析
+            <a class="slx" href="../simulink/models/tutorial16_freq.slx" download title="下载 tutorial16_freq.slx">.slx</a></td>
+          <td><a href="../simulink/#bode">bode</a></td>
+          <td>Plant 4/(s²+0.5s+4)：Gm=∞，PM=20.4°</td>
+          <td>Plant 4/(s²+0.5s+4)；PM 20.4°</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 87defe848fa95e6319b5a6c0c36edc41114eee98e0c48370e8f64b750a0812e6">87defe848f</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t17 超前-滞后校正 leadlag 校正后 峰值 0.5216，末值 0.5000；参考 峰值 0.2000，末值 0.2000 Lead/Lag 校正；输入/输出稳态 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t17">t17</a> 超前-滞后校正
+            <a class="slx" href="../simulink/models/tutorial17_leadlag.slx" download title="下载 tutorial17_leadlag.slx">.slx</a></td>
+          <td><a href="../simulink/#leadlag">leadlag</a></td>
+          <td>校正后 峰值 0.5216，末值 0.5000；参考 峰值 0.2000，末值 0.2000</td>
+          <td>Lead/Lag 校正；输入/输出稳态</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 59e6d4f6348bd214acdc404583cb1d8c687556a142af4794c58b56bf3fdb7329">59e6d4f634</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t18 系统辨识 sysid 范围 0–3.831，末值 3.831 阶跃辨识；输出饱和/限幅需注意 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t18">t18</a> 系统辨识
+            <a class="slx" href="../simulink/models/tutorial18_sysid.slx" download title="下载 tutorial18_sysid.slx">.slx</a></td>
+          <td><a href="../simulink/#sysid">sysid</a></td>
+          <td>范围 0–3.831，末值 3.831</td>
+          <td>阶跃辨识；输出饱和/限幅需注意</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: dd78435049291f5841491d0282d7fbbb03552f5d16e538dac06f139de723e8fe">dd78435049</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t19 H∞ 鲁棒控制  输出 峰值 0.6719，末值 0.5000 H∞ 鲁棒控制；输出稳态 0.5 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t19">t19</a> H∞ 鲁棒控制
+            <a class="slx" href="../simulink/models/tutorial19_robust.slx" download title="下载 tutorial19_robust.slx">.slx</a></td>
+          <td>—</td>
+          <td>输出 峰值 0.6719，末值 0.5000</td>
+          <td>H∞ 鲁棒控制；输出稳态 0.5</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 81eb9d7f4075069a6753cd4abe7d1e10bbbbe12bcf2f5c620d6360b4aa3c6be4">81eb9d7f40</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t20 模型预测控制 MPC mpc 峰值 0.562，10 s 终值 0.562 原 .slx 实为 PID，不是 MPC；10 s 仍在上升 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t20">t20</a> 模型预测控制 MPC
+            <a class="slx" href="../simulink/models/tutorial20_mpc.slx" download title="下载 tutorial20_mpc.slx">.slx</a></td>
+          <td><a href="../simulink/#mpc">mpc</a></td>
+          <td>峰值 0.562，10 s 终值 0.562</td>
+          <td>原 .slx 实为 PID，不是 MPC；10 s 仍在上升</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: b61b40e3977070417bf3e52d5e824781fa2e11b29ffd151e818d2a8206eb8e15">b61b40e397</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t21 滑模控制 SMC smc SMC 峰值 0.724，终值 0.600；PID 峰值 0.636，终值 0.636 原 .slx 是符号继电器：u 仅 0→3，无抖振 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t21">t21</a> 滑模控制 SMC
+            <a class="slx" href="../simulink/models/tutorial21_smc.slx" download title="下载 tutorial21_smc.slx">.slx</a></td>
+          <td><a href="../simulink/#smc">smc</a></td>
+          <td>SMC 峰值 0.724，终值 0.600；PID 峰值 0.636，终值 0.636</td>
+          <td>原 .slx 是符号继电器：u 仅 0→3，无抖振</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 664b5046495168707eca5e3722b662e69ad8c8390f8a4ee303eed0481d93f257">664b504649</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t22 根轨迹法 rootlocus 峰值 1.289，终值 0.825 对应当前 K 的稳态偏差 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t22">t22</a> 根轨迹法
+            <a class="slx" href="../simulink/models/tutorial22_root_locus.slx" download title="下载 tutorial22_root_locus.slx">.slx</a></td>
+          <td><a href="../simulink/#rootlocus">rootlocus</a></td>
+          <td>峰值 1.289，终值 0.825</td>
+          <td>对应当前 K 的稳态偏差</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 4e2d552bec2d705b9a4ffa65cdd335d97f4212a0d88893c76e92b00a6b2f821c">4e2d552bec</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t23 MRAC 自适应 mrac 参考 范围 0–2.000，末值 2.000；对象 峰值 2.106，末值 2.000；控制 范围 0–3.000，末值 3.000 MRAC 参考/对象跟踪；控制量 3 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t23">t23</a> MRAC 自适应
+            <a class="slx" href="../simulink/models/tutorial23_mrac.slx" download title="下载 tutorial23_mrac.slx">.slx</a></td>
+          <td><a href="../simulink/#mrac">mrac</a></td>
+          <td>参考 范围 0–2.000，末值 2.000；对象 峰值 2.106，末值 2.000；控制 范围 0–3.000，末值 3.000</td>
+          <td>MRAC 参考/对象跟踪；控制量 3</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 4cf10d192e1c10c7a628401c3355ba5ac5126cb156920273177247399e32541e">4cf10d192e</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t24 模糊逻辑控制 fuzzy 范围 0–0，末值 0；范围 0–0.7473，末值 0.7473 探针用最小 FIS 占位；原讲义 FIS 未随模型分发，模糊输出 0 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t24">t24</a> 模糊逻辑控制
+            <a class="slx" href="../simulink/models/tutorial24_fuzzy.slx" download title="下载 tutorial24_fuzzy.slx">.slx</a></td>
+          <td><a href="../simulink/#fuzzy">fuzzy</a></td>
+          <td>范围 0–0，末值 0；范围 0–0.7473，末值 0.7473</td>
+          <td>探针用最小 FIS 占位；原讲义 FIS 未随模型分发，模糊输出 0</td>
+          <td><code>VariableStepAuto</code><br>15 s · <span class="hash" title="SHA-256: b18aa1a00928c1d81c56471a206972cf7344a251a5b1c76bac79d1e6a886d8d1">b18aa1a009</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t25 Simscape 物理建模  峰值 2.091，末值 1.134 Simscape 物理模型；位移有超调 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t25">t25</a> Simscape 物理建模
+            <a class="slx" href="../simulink/models/tutorial25_simscape.slx" download title="下载 tutorial25_simscape.slx">.slx</a></td>
+          <td>—</td>
+          <td>峰值 2.091，末值 1.134</td>
+          <td>Simscape 物理模型；位移有超调</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 5901a9db1ed5a3ef7a55ad53a6e7b9c9141ac3afc34bb1037157aa872b9e02a9">5901a9db1e</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t26 机器人运动学 arm 运行通过；无记录信号 Stateflow 运动学；模型无 Scope/To Workspace VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t26">t26</a> 机器人运动学
+            <a class="slx" href="../simulink/models/tutorial26_kinematics.slx" download title="下载 tutorial26_kinematics.slx">.slx</a></td>
+          <td><a href="../simulink/#arm">arm</a></td>
+          <td>运行通过；无记录信号</td>
+          <td>Stateflow 运动学；模型无 Scope/To Workspace</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 7cb4ff610c6dab72bbcc4f5914f63d7b9cfe34c3ffe4f521b32dafb094029f2b">7cb4ff610c</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t27 MSD 系统建模 msd 峰值 0.1779，末值 0.0998；峰值 0.1779，末值 0.0998 TF/SS 数值积分对比；两者重合 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t27">t27</a> MSD 系统建模
+            <a class="slx" href="../simulink/models/tutorial27_msd_models.slx" download title="下载 tutorial27_msd_models.slx">.slx</a></td>
+          <td><a href="../simulink/#msd">msd</a></td>
+          <td>峰值 0.1779，末值 0.0998；峰值 0.1779，末值 0.0998</td>
+          <td>TF/SS 数值积分对比；两者重合</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 9c610c685d4b502072a8d61722c8ee4e95353b36b49575b09719173e948f0b92">9c610c685d</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t28 DSP 基础 dsp 峰值 4.533，末值 2.178 DSP 采样/FFT；5.6k 点 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t28">t28</a> DSP 基础
+            <a class="slx" href="../simulink/models/tutorial28_dsp.slx" download title="下载 tutorial28_dsp.slx">.slx</a></td>
+          <td><a href="../simulink/#dsp">dsp</a></td>
+          <td>峰值 4.533，末值 2.178</td>
+          <td>DSP 采样/FFT；5.6k 点</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: da64cd953588519fcfc4af5c431f4164c5ae15bc5f93c6cd828afa6e60f0b76f">da64cd9535</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t29 MSD 控制对比 msdcompare PID 峰值 3.965，末值 1.814；LQR 范围 0–1.000，末值 1.000 PID vs LQR；PID 超调大 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t29">t29</a> MSD 控制对比
+            <a class="slx" href="../simulink/models/tutorial29_control_compare.slx" download title="下载 tutorial29_control_compare.slx">.slx</a></td>
+          <td><a href="../simulink/#msdcompare">msdcompare</a></td>
+          <td>PID 峰值 3.965，末值 1.814；LQR 范围 0–1.000，末值 1.000</td>
+          <td>PID vs LQR；PID 超调大</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: e08ed366c871401cc24e0f019e60d530e2d232eedd86b668722b00dcae1d27de">e08ed366c8</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t30 主动悬挂 suspension 车身位移 峰值 10.06，末值 0.0016 1/4 车主动悬挂；位移峰值 10 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t30">t30</a> 主动悬挂
+            <a class="slx" href="../simulink/models/tutorial30_suspension.slx" download title="下载 tutorial30_suspension.slx">.slx</a></td>
+          <td><a href="../simulink/#suspension">suspension</a></td>
+          <td>车身位移 峰值 10.06，末值 0.0016</td>
+          <td>1/4 车主动悬挂；位移峰值 10</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 02ba20cb39cb53f8ca4f53d85336ac38d5f4806754a326510fa35f585c0a622b">02ba20cb39</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t31 EKF 基础 ekf 测量 RMSE 0.053；EKF x₁ RMSE 0.049（按讲义离线） 模型只输出真值/含噪测量；EKF 按讲义离线实现 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t31">t31</a> EKF 基础
+            <a class="slx" href="../simulink/models/tutorial31_ekf.slx" download title="下载 tutorial31_ekf.slx">.slx</a></td>
+          <td><a href="../simulink/#ekf">ekf</a></td>
+          <td>测量 RMSE 0.053；EKF x₁ RMSE 0.049（按讲义离线）</td>
+          <td>模型只输出真值/含噪测量；EKF 按讲义离线实现</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 22f159bd7dc5d10332ac100583ae38820c4025293695a5d3a65aa41503062d78">22f159bd7d</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t32 EKF 倒立摆 pendulum 范围 0.5000–30.53，末值 30.53 倒立摆模型未闭环稳定，角度发散 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t32">t32</a> EKF 倒立摆
+            <a class="slx" href="../simulink/models/tutorial32_pendulum.slx" download title="下载 tutorial32_pendulum.slx">.slx</a></td>
+          <td><a href="../simulink/#pendulum">pendulum</a></td>
+          <td>范围 0.5000–30.53，末值 30.53</td>
+          <td>倒立摆模型未闭环稳定，角度发散</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: f62548e5fb99b6e9bcdd18b1470cc3fc8f87a1944b4bb08421c5e6277bcf2d46">f62548e5fb</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t33 UKF  峰值 1.875，末值 -1.810 UKF 数据采集；模型无 UKF 模块 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t33">t33</a> UKF
+            <a class="slx" href="../simulink/models/tutorial33_ukf.slx" download title="下载 tutorial33_ukf.slx">.slx</a></td>
+          <td>—</td>
+          <td>峰值 1.875，末值 -1.810</td>
+          <td>UKF 数据采集；模型无 UKF 模块</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 62f240975eba441090976e1e354a95c121b4dc190bb210a32879db07949067d2">62f240975e</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t34 EKF vs UKF  峰值 1.875，末值 -1.810 EKF vs UKF 数据；模型无滤波器模块 ode45">
+          <td><a href="../simulink/course.html?id=t34">t34</a> EKF vs UKF
+            <a class="slx" href="../simulink/models/tutorial34_ekfvsukf.slx" download title="下载 tutorial34_ekfvsukf.slx">.slx</a></td>
+          <td>—</td>
+          <td>峰值 1.875，末值 -1.810</td>
+          <td>EKF vs UKF 数据；模型无滤波器模块</td>
+          <td><code>ode45</code><br>10 s · <span class="hash" title="SHA-256: 201535bbfce5f947b804c03287e60d4b2f80ec89a1f8b3dabca1bd78c2a237d7">201535bbfc</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t35 IMU 融合 imu 范围 0.0001–3.479，末值 3.479 互补滤波；theta_cf_sim 与 t_mdl 同值，建议复查连线 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t35">t35</a> IMU 融合
+            <a class="slx" href="../simulink/models/tutorial35_imu.slx" download title="下载 tutorial35_imu.slx">.slx</a></td>
+          <td><a href="../simulink/#imu">imu</a></td>
+          <td>范围 0.0001–3.479，末值 3.479</td>
+          <td>互补滤波；theta_cf_sim 与 t_mdl 同值，建议复查连线</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 58782d3c8d6e326bdf992ba6be67eba3cd7455167098d75ce1d189f16a988e86">58782d3c8d</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t36 Stateflow 状态机 stateflow 峰值 2.000，末值 0；峰值 227.7，末值 84.58 Stateflow 状态机；模式 0/1/2 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t36">t36</a> Stateflow 状态机
+            <a class="slx" href="../simulink/models/tutorial36_stateflow.slx" download title="下载 tutorial36_stateflow.slx">.slx</a></td>
+          <td><a href="../simulink/#stateflow">stateflow</a></td>
+          <td>峰值 2.000，末值 0；峰值 227.7，末值 84.58</td>
+          <td>Stateflow 状态机；模式 0/1/2</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 7fadb2106a55e032acd6c3aabd6920dfc4896e6a42678190288dd1b17e369fea">7fadb2106a</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t37 触发/使能子系统 triggered 峰值 0.9801，末值 0.7994；峰值 0.9801，末值 -0.6020 触发/使能子系统；保持/复位 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t37">t37</a> 触发/使能子系统
+            <a class="slx" href="../simulink/models/tutorial37_triggered.slx" download title="下载 tutorial37_triggered.slx">.slx</a></td>
+          <td><a href="../simulink/#triggered">triggered</a></td>
+          <td>峰值 0.9801，末值 0.7994；峰值 0.9801，末值 -0.6020</td>
+          <td>触发/使能子系统；保持/复位</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: af10b39e2b9ead772adb2ab8b3d8edb008521448b264c793496565626a2fed57">af10b39e2b</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t38 Bus 信号 bus 峰值 0.9996，末值 -0.9589；峰值 3.000，末值 0.8510；峰值 1.581，末值 -0.9050 Bus 打包/拆解；三路信号 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t38">t38</a> Bus 信号
+            <a class="slx" href="../simulink/models/tutorial38_bus.slx" download title="下载 tutorial38_bus.slx">.slx</a></td>
+          <td><a href="../simulink/#bus">bus</a></td>
+          <td>峰值 0.9996，末值 -0.9589；峰值 3.000，末值 0.8510；峰值 1.581，末值 -0.9050</td>
+          <td>Bus 打包/拆解；三路信号</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 66f1a2fba9c4c5bd2465a0a3f20a71d6a935709d4728f2df9568138351a75436">66f1a2fba9</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t39 模型引用  范围 0–0.8571，末值 0.8571 模型引用；refs/ 下附带两个子模型 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t39">t39</a> 模型引用
+            <a class="slx" href="../simulink/models/tutorial39_top.slx" download title="下载 tutorial39_top.slx">.slx</a></td>
+          <td>—</td>
+          <td>范围 0–0.8571，末值 0.8571</td>
+          <td>模型引用；refs/ 下附带两个子模型</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 878938967bc662f2dcddcbdb01f994aea93c385ae9391b0dbc234559153418e0">878938967b</span> +2 refs<br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t40 变体子系统 variant 变体输出 峰值 1.255，末值 0.6802 变体子系统；ctrl_type=1 选 PID VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t40">t40</a> 变体子系统
+            <a class="slx" href="../simulink/models/tutorial40_variant.slx" download title="下载 tutorial40_variant.slx">.slx</a></td>
+          <td><a href="../simulink/#variant">variant</a></td>
+          <td>变体输出 峰值 1.255，末值 0.6802</td>
+          <td>变体子系统；ctrl_type=1 选 PID</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 9da1cf13c7554999e0cdcdbb9983fc86885a49a6c0a31c63c58c7617b7de9e0e">9da1cf13c7</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t41 模型回调  PI 输出 峰值 1.423，末值 1.279 PreLoad/Init/StopFcn；InitFcn 需 Kp/Ki VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t41">t41</a> 模型回调
+            <a class="slx" href="../simulink/models/tutorial41_callbacks.slx" download title="下载 tutorial41_callbacks.slx">.slx</a></td>
+          <td>—</td>
+          <td>PI 输出 峰值 1.423，末值 1.279</td>
+          <td>PreLoad/Init/StopFcn；InitFcn 需 Kp/Ki</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 74e9aa534b7edd473db34cba62af06ac9822252ffd81a994b0f365ae94e85897">74e9aa534b</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t42 S-Function  峰值 1.999，末值 -1.088；峰值 1.999，末值 -1.088 Level-2 MATLAB S-Function；deadzone_sfcn VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t42">t42</a> S-Function
+            <a class="slx" href="../simulink/models/tutorial42_sfunction.slx" download title="下载 tutorial42_sfunction.slx">.slx</a></td>
+          <td>—</td>
+          <td>峰值 1.999，末值 -1.088；峰值 1.999，末值 -1.088</td>
+          <td>Level-2 MATLAB S-Function；deadzone_sfcn</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 55cd700db0e3a9691f014b3140355557ebef3bb5b43411fcbd8488498856e3c9">55cd700db0</span><br><span class="status ok">ok</span></td>
+        </tr>
+        <tr data-search="t43 Model Advisor  峰值 9.998，末值 9.195 Model Advisor/代数环；仿真通过 VariableStepAuto">
+          <td><a href="../simulink/course.html?id=t43">t43</a> Model Advisor
+            <a class="slx" href="../simulink/models/tutorial43_advisor.slx" download title="下载 tutorial43_advisor.slx">.slx</a></td>
+          <td>—</td>
+          <td>峰值 9.998，末值 9.195</td>
+          <td>Model Advisor/代数环；仿真通过</td>
+          <td><code>VariableStepAuto</code><br>10 s · <span class="hash" title="SHA-256: 2ebd9365a6667751c791e558976d2911fc6cc136cf68d531e8c43b676df8eaaa">2ebd9365a6</span><br><span class="status ok">ok</span></td>
+        </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="hint">只列真机跑过的模型，没有用网页结果反填。t20/t21/t31 的差异见各行的“说明”；t24 的 FIS 是探针占位，原讲义 FIS 未随模型分发；t26 的 Stateflow 模型没有记录输出。JSON 里保留了每个模型的关键信号统计；模型文件变化时 <code>npm run check:matlab</code> 会报哈希不一致。</p>
+      </section>
+    </main>
+
+    <footer>
+      <a href="../" data-local="../landing/index.html">← vibe-lab</a> ·
+      <a href="../imu/" data-local="../imu-lab/static/index.html">IMU Lab</a> ·
+      <a href="../control/" data-local="../control-play/index.html">Control Play</a> ·
+      <a href="../simulink/" data-local="../simulink/index.html">Simulink</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      if (location.protocol === "file:") {
+        document.querySelectorAll("[data-local]").forEach(function (a) {
+          a.href = a.getAttribute("data-local");
+        });
+      }
+      var q = document.getElementById("matlab-search");
+      var rows = Array.prototype.slice.call(document.querySelectorAll("#matlab-rows tr"));
+      var count = document.getElementById("matlab-count");
+      q.addEventListener("input", function () {
+        var v = q.value.trim().toLowerCase();
+        var n = 0;
+        rows.forEach(function (tr) {
+          var hit = !v || (tr.getAttribute("data-search") || "").toLowerCase().indexOf(v) >= 0;
+          tr.hidden = !hit;
+          if (hit) n++;
+        });
+        count.textContent = n + " / " + rows.length;
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/(imu|control|about|simulink|en)\/(index\.html|matlab\.html)?$/, "");
+      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
+    })();
+  </script>
+</body>
+</html>

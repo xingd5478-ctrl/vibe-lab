@@ -35,6 +35,7 @@
     </header>
 
     <main id="main">
+    <div class="tabs-bar" id="tabs-bar" role="tablist" aria-label="页面分区"></div>
     <div class="layout">
       <aside class="panel controls">
         <div class="field">
@@ -116,6 +117,7 @@
 
   <div id="chart-live" class="sr-only" aria-live="polite"></div>
 
+  <script src="../shared/i18n.js"></script>
   <script src="chart.js"></script>
   <script src="app.js"></script>
   <script src="../simulink/control.js"></script>
@@ -133,10 +135,13 @@
       const manual = document.getElementById("manual");
       if (manual) panels.push({ id: "manual", name: "14 章手册", el: manual });
       if (panels.length < 2) return;
-      const bar = document.createElement("div");
-      bar.className = "tabs-bar";
-      bar.setAttribute("role", "tablist");
-      bar.setAttribute("aria-label", "页面分区");
+      const bar = document.getElementById("tabs-bar") || document.createElement("div");
+      if (!bar.parentNode) {
+        bar.className = "tabs-bar";
+        bar.setAttribute("role", "tablist");
+        bar.setAttribute("aria-label", "页面分区");
+        main.insertBefore(bar, panels[0].el);
+      }
       const btns = panels.map((p) => {
         const b = document.createElement("button");
         b.type = "button";

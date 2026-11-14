@@ -1,0 +1,1864 @@
+{
+  "schema": 1,
+  "generated_at": "2026-11-15 02:15:02",
+  "matlab_version": "25.1.0.2943329 (R2025a)",
+  "probe_script": "tools/probe_all.m",
+  "model_count": 43,
+  "ok_count": 43,
+  "toolbox_count": 110,
+  "models": [
+    {
+      "id": "t01",
+      "n": 1,
+      "title": "信号基础",
+      "model": "tutorial01_signals.slx",
+      "demo": "signal",
+      "sha256": "c93e44c3e3b2321339e4e386a6d55b3d57e19f72d56a2900980cd2f14a2c9215",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 51,
+      "signals_count": 2,
+      "metric": "峰值 5.997，末值 -3.264",
+      "note": "信号、增益、示波器；结构课",
+      "signals": [
+        {
+          "name": "gain_out",
+          "n": 51,
+          "min": -5.976988,
+          "max": 5.997442,
+          "final": -3.264127
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 51,
+          "min": -5.976988,
+          "max": 5.997442,
+          "final": -3.264127
+        }
+      ]
+    },
+    {
+      "id": "t02",
+      "n": 2,
+      "title": "数学运算",
+      "model": "tutorial02_math.slx",
+      "demo": "signal",
+      "sha256": "e27020d6c90c17c170058beee723a2787e48455345c8b52cb424ef1137ca76e0",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 51,
+      "signals_count": 10,
+      "metric": "峰值 7.696，末值 -7.660",
+      "note": "Sum/Product/Mux/Demux；结构课",
+      "signals": [
+        {
+          "name": "Demux1",
+          "n": 51,
+          "min": -0.996165,
+          "max": 0.999574,
+          "final": -0.544021
+        },
+        {
+          "name": "Demux2",
+          "n": 51,
+          "min": -0.996165,
+          "max": 0.999793,
+          "final": -0.988032
+        },
+        {
+          "name": "Demux3",
+          "n": 51,
+          "min": -7.660264,
+          "max": 7.696011,
+          "final": -7.660264
+        },
+        {
+          "name": "Product",
+          "n": 51,
+          "min": -7.660264,
+          "max": 7.696011,
+          "final": -7.660264
+        },
+        {
+          "name": "Sine1",
+          "n": 51,
+          "min": -0.996165,
+          "max": 0.999574,
+          "final": -0.544021
+        },
+        {
+          "name": "Sine2",
+          "n": 51,
+          "min": -0.996165,
+          "max": 0.999793,
+          "final": -0.988032
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 51,
+          "min": -7.660264,
+          "max": 7.696011,
+          "final": -7.660264
+        },
+        {
+          "name": "probe_s2_p1",
+          "n": 51,
+          "min": -0.996165,
+          "max": 0.999574,
+          "final": -0.544021
+        },
+        {
+          "name": "probe_s2_p2",
+          "n": 51,
+          "min": -0.996165,
+          "max": 0.999793,
+          "final": -0.988032
+        },
+        {
+          "name": "probe_s2_p3",
+          "n": 51,
+          "min": -7.660264,
+          "max": 7.696011,
+          "final": -7.660264
+        }
+      ]
+    },
+    {
+      "id": "t03",
+      "n": 3,
+      "title": "一阶系统",
+      "model": "tutorial03_first_order.slx",
+      "demo": "first-order",
+      "sha256": "daf21f6cf5eeb0b3c6da16719080951faed5b00158a7bf0bae4bfd38dafff1b9",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 53,
+      "signals_count": 6,
+      "metric": "峰值 1.000，终值 1.000",
+      "note": "与网页 demo 一致",
+      "signals": [
+        {
+          "name": "TF_tau_0p5",
+          "n": 53,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        },
+        {
+          "name": "TF_tau_2",
+          "n": 53,
+          "min": 0,
+          "max": 0.988891,
+          "final": 0.988891
+        },
+        {
+          "name": "TF_tau_5",
+          "n": 53,
+          "min": 0,
+          "max": 0.834701,
+          "final": 0.834701
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 53,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 53,
+          "min": 0,
+          "max": 0.988891,
+          "final": 0.988891
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 53,
+          "min": 0,
+          "max": 0.834701,
+          "final": 0.834701
+        }
+      ]
+    },
+    {
+      "id": "t04",
+      "n": 4,
+      "title": "二阶系统",
+      "model": "tutorial04_second_order.slx",
+      "demo": "second-order",
+      "sha256": "ac217447b2437ae47ad04826e675cfc7504af8d97153ce980e8b28e4ba0e39af",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 56,
+      "signals_count": 6,
+      "metric": "ζ=0.2 峰值 1.520，终值 0.996",
+      "note": "与网页 demo 一致（ζ=0.2）",
+      "signals": [
+        {
+          "name": "TF_zeta0.2",
+          "n": 56,
+          "min": 0,
+          "max": 1.520005,
+          "final": 0.995663
+        },
+        {
+          "name": "TF_zeta1.0",
+          "n": 56,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        },
+        {
+          "name": "TF_zeta2.0",
+          "n": 56,
+          "min": 0,
+          "max": 0.991336,
+          "final": 0.991336
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 56,
+          "min": 0,
+          "max": 1.520005,
+          "final": 0.995663
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 56,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 56,
+          "min": 0,
+          "max": 0.991336,
+          "final": 0.991336
+        }
+      ]
+    },
+    {
+      "id": "t05",
+      "n": 5,
+      "title": "PID 控制",
+      "model": "tutorial05_pid.slx",
+      "demo": "pid",
+      "sha256": "a4868d1326dbd55f7c53e3af7c66fbd5d951b8f37c9ee01d04db1e5c271b223c",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 322,
+      "signals_count": 4,
+      "metric": "峰值 0.978，终值 0.978",
+      "note": "模型参考/限幅与 demo 不同",
+      "signals": [
+        {
+          "name": "y_out",
+          "n": 322,
+          "min": 0,
+          "max": 0.977513,
+          "final": 0.977513
+        },
+        {
+          "name": "r_ref",
+          "n": 322,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 322,
+          "min": 0,
+          "max": 0.977513,
+          "final": 0.977513
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 322,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        }
+      ]
+    },
+    {
+      "id": "t06",
+      "n": 6,
+      "title": "信号源与输出",
+      "model": "tutorial06_sources_sinks.slx",
+      "demo": "signal",
+      "sha256": "b22e46d63dd86ba46f66e0abf37fadc486e644435a0768f079112dafae87772c",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 244,
+      "signals_count": 2,
+      "metric": "峰值 20.00，末值 0",
+      "note": "Workspace 导入导出；探针需初始化 u_input",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 244,
+          "min": -0.999923,
+          "max": 20,
+          "final": 0
+        },
+        {
+          "name": "saved_data",
+          "n": 244,
+          "min": -0.999923,
+          "max": 20,
+          "final": 0
+        }
+      ]
+    },
+    {
+      "id": "t07",
+      "n": 7,
+      "title": "子系统",
+      "model": "tutorial07_subsystem.slx",
+      "demo": null,
+      "sha256": "60d33aaa5de82b41ffa42cf8285780a7db19e16a695de0d42610851afb017c65",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 51,
+      "signals_count": 6,
+      "metric": "峰值 39.98，末值 -21.76",
+      "note": "子系统层级；结构课",
+      "signals": [
+        {
+          "name": "NestedOut",
+          "n": 51,
+          "min": -39.846584,
+          "max": 39.982944,
+          "final": -21.760844
+        },
+        {
+          "name": "SignalProcOut",
+          "n": 51,
+          "min": -13.412362,
+          "max": 13.518336,
+          "final": -1.49383
+        },
+        {
+          "name": "SineIn",
+          "n": 51,
+          "min": -4.980823,
+          "max": 4.997868,
+          "final": -2.720106
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 51,
+          "min": -13.412362,
+          "max": 13.518336,
+          "final": -1.49383
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 51,
+          "min": -4.980823,
+          "max": 4.997868,
+          "final": -2.720106
+        },
+        {
+          "name": "probe_s2_p1",
+          "n": 51,
+          "min": -39.846584,
+          "max": 39.982944,
+          "final": -21.760844
+        }
+      ]
+    },
+    {
+      "id": "t08",
+      "n": 8,
+      "title": "Mask 封装",
+      "model": "tutorial08_masking.slx",
+      "demo": null,
+      "sha256": "cd706553e3946229d000a9f2e57a32b673d8981f111c81ecc3647b246c71284c",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 15,
+      "samples": 52,
+      "signals_count": 6,
+      "metric": "输出1 峰值 8.101，末值 7.417；输出2 峰值 16.57，末值 13.02",
+      "note": "Mask 参数化；三路输出",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 52,
+          "min": -8.020266,
+          "max": 8.100561,
+          "final": 7.416885
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 52,
+          "min": -13.274486,
+          "max": 16.56858,
+          "final": 13.024619
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 52,
+          "min": -2.994391,
+          "max": 2.993931,
+          "final": 1.950864
+        },
+        {
+          "name": "sig_in",
+          "n": 52,
+          "min": -2.994391,
+          "max": 2.993931,
+          "final": 1.950864
+        },
+        {
+          "name": "sig_out1",
+          "n": 52,
+          "min": -8.020266,
+          "max": 8.100561,
+          "final": 7.416885
+        },
+        {
+          "name": "sig_out2",
+          "n": 52,
+          "min": -13.274486,
+          "max": 16.56858,
+          "final": 13.024619
+        }
+      ]
+    },
+    {
+      "id": "t09",
+      "n": 9,
+      "title": "状态空间模型",
+      "model": "tutorial09_state_space.slx",
+      "demo": null,
+      "sha256": "2b2f87969c68d8da7577a931ab05194c9d4607e84b00862e7c8c0bf32aeb6811",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 53,
+      "signals_count": 9,
+      "metric": "峰值 0.4182，末值 0.2383；峰值 0.4182，末值 0.2383",
+      "note": "TF/SS/MA 三种实现对比",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 53,
+          "min": 0,
+          "max": 0.418188,
+          "final": 0.238336
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 53,
+          "min": 0,
+          "max": 0.418188,
+          "final": 0.238336
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 53,
+          "min": 0,
+          "max": 0.418188,
+          "final": 0.238336
+        },
+        {
+          "name": "probe_s1_p4",
+          "n": 53,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        },
+        {
+          "name": "x1_data",
+          "n": 53,
+          "min": 0,
+          "max": 0.418188,
+          "final": 0.238336
+        },
+        {
+          "name": "x2_data",
+          "n": 53,
+          "min": -0.276226,
+          "max": 0.412542,
+          "final": -0.044426
+        },
+        {
+          "name": "y_ma",
+          "n": 53,
+          "min": 0,
+          "max": 0.418188,
+          "final": 0.238336
+        },
+        {
+          "name": "y_ss",
+          "n": 53,
+          "min": 0,
+          "max": 0.418188,
+          "final": 0.238336
+        },
+        {
+          "name": "y_tf",
+          "n": 53,
+          "min": 0,
+          "max": 0.418188,
+          "final": 0.238336
+        }
+      ]
+    },
+    {
+      "id": "t10",
+      "n": 10,
+      "title": "状态反馈 / LQR",
+      "model": "tutorial10_state_feedback.slx",
+      "demo": "state-feedback",
+      "sha256": "5cbdd65b43598b0bc369f11675d0df3822da151068d05bb1a5d993c1005e5b9c",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 8,
+      "samples": 54,
+      "signals_count": 8,
+      "metric": "峰值 0.065，终值 0.063（PP）",
+      "note": "原模型无参考前馈，稳态约 1/16",
+      "signals": [
+        {
+          "name": "u_LQ1",
+          "n": 54,
+          "min": 0,
+          "max": 0.885352,
+          "final": 0.628609
+        },
+        {
+          "name": "u_LQ3",
+          "n": 54,
+          "min": -0.023913,
+          "max": 0.047182,
+          "final": 0.00761
+        },
+        {
+          "name": "u_OL",
+          "n": 54,
+          "min": 0,
+          "max": 0,
+          "final": 0
+        },
+        {
+          "name": "u_PP",
+          "n": 54,
+          "min": 0,
+          "max": 0.979089,
+          "final": 0.75
+        },
+        {
+          "name": "y_LQ1",
+          "n": 54,
+          "min": 0,
+          "max": 0.102216,
+          "final": 0.092848
+        },
+        {
+          "name": "y_LQ3",
+          "n": 54,
+          "min": 0,
+          "max": 0.402479,
+          "final": 0.262622
+        },
+        {
+          "name": "y_OL",
+          "n": 54,
+          "min": 0,
+          "max": 0.41819,
+          "final": 0.272447
+        },
+        {
+          "name": "y_PP",
+          "n": 54,
+          "min": 0,
+          "max": 0.065203,
+          "final": 0.0625
+        }
+      ]
+    },
+    {
+      "id": "t11",
+      "n": 11,
+      "title": "状态观测器",
+      "model": "tutorial11_observer.slx",
+      "demo": "observer",
+      "sha256": "0fc9ca2bc0899195adceb4abfb3a68f94cc78521528c0865f8a68fe3647e5c27",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 5,
+      "samples": 62,
+      "signals_count": 8,
+      "metric": "最大误差 0.300，末值 0.000",
+      "note": "估计误差收敛；与 demo 一致",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 62,
+          "min": -0.076299,
+          "max": 0.3,
+          "final": 0.0625
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 62,
+          "min": -0.067991,
+          "max": 0.253965,
+          "final": 0.0625
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 62,
+          "min": -0.88807,
+          "max": 0.236648,
+          "final": -0.000003
+        },
+        {
+          "name": "probe_s1_p4",
+          "n": 62,
+          "min": -0.479072,
+          "max": 0.27766,
+          "final": -0.000003
+        },
+        {
+          "name": "x1_hat",
+          "n": 62,
+          "min": -0.067991,
+          "max": 0.253965,
+          "final": 0.0625
+        },
+        {
+          "name": "x1_true",
+          "n": 62,
+          "min": -0.076299,
+          "max": 0.3,
+          "final": 0.0625
+        },
+        {
+          "name": "x2_hat",
+          "n": 62,
+          "min": -0.479072,
+          "max": 0.27766,
+          "final": -0.000003
+        },
+        {
+          "name": "x2_true",
+          "n": 62,
+          "min": -0.88807,
+          "max": 0.236648,
+          "final": -0.000003
+        }
+      ]
+    },
+    {
+      "id": "t12",
+      "n": 12,
+      "title": "Kalman 滤波",
+      "model": "tutorial12_kalman.slx",
+      "demo": "kalman",
+      "sha256": "3b116c0236048a3555f132f9ee488f58067eb455fbba142dcd0204f2a3576355",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 5,
+      "samples": 96,
+      "signals_count": 10,
+      "metric": "Kalman RMSE 0.455，测量 1.149",
+      "note": "Kalman 明显优于 Luenberger/测量",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 96,
+          "min": -0.400022,
+          "max": 0.304107,
+          "final": -0.039574
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 96,
+          "min": -1.714945,
+          "max": 2.191196,
+          "final": 0.015239
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 96,
+          "min": -0.647828,
+          "max": 0.739411,
+          "final": 0.08538
+        },
+        {
+          "name": "x1_true",
+          "n": 96,
+          "min": -0.400022,
+          "max": 0.304107,
+          "final": -0.039574
+        },
+        {
+          "name": "x2_Kalman",
+          "n": 96,
+          "min": -1.0372,
+          "max": 1.141551,
+          "final": -0.345986
+        },
+        {
+          "name": "x2_Luenberger",
+          "n": 96,
+          "min": -4.3948,
+          "max": 5.454743,
+          "final": -0.544232
+        },
+        {
+          "name": "x2_true",
+          "n": 96,
+          "min": -1.19334,
+          "max": 1.401917,
+          "final": -0.42289
+        },
+        {
+          "name": "y_Kalman",
+          "n": 96,
+          "min": -0.647828,
+          "max": 0.739411,
+          "final": 0.08538
+        },
+        {
+          "name": "y_Luenberger",
+          "n": 96,
+          "min": -1.714945,
+          "max": 2.191196,
+          "final": 0.015239
+        },
+        {
+          "name": "y_noisy_data",
+          "n": 96,
+          "min": -1.995288,
+          "max": 2.581185,
+          "final": -1.678719
+        }
+      ]
+    },
+    {
+      "id": "t13",
+      "n": 13,
+      "title": "DC 电机控制",
+      "model": "tutorial13_dc_motor.slx",
+      "demo": "motor",
+      "sha256": "b448c3850008a64494ca0a555b5099cc26ceff23b43f87623c73207cb83180e3",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 1.5,
+      "samples": 162,
+      "signals_count": 4,
+      "metric": "峰值 192.44，终值 137.09",
+      "note": "速度 PI 有超调，稳态有差",
+      "signals": [
+        {
+          "name": "i_PI",
+          "n": 162,
+          "min": -7.430477,
+          "max": 5.991317,
+          "final": -7.029816
+        },
+        {
+          "name": "omega_LQR",
+          "n": 162,
+          "min": 0,
+          "max": 52.622423,
+          "final": 52.622423
+        },
+        {
+          "name": "omega_OL",
+          "n": 162,
+          "min": 0,
+          "max": 1871.780634,
+          "final": 1871.780634
+        },
+        {
+          "name": "omega_PI",
+          "n": 162,
+          "min": 0,
+          "max": 192.439453,
+          "final": 137.094545
+        }
+      ]
+    },
+    {
+      "id": "t14",
+      "n": 14,
+      "title": "PMSM + FOC",
+      "model": "tutorial14_foc.slx",
+      "demo": "foc",
+      "sha256": "e892b089bfcfc442a052abc59c61f85c77e9b593418cb20594a8cfd9be29fa32",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 0.15,
+      "samples": 202,
+      "signals_count": 2,
+      "metric": "峰值 228.6，末值 145.7；范围 0–410.1，末值 410.1",
+      "note": "FOC 与 DC 对比；末值差异大",
+      "signals": [
+        {
+          "name": "w_DC",
+          "n": 202,
+          "min": 0,
+          "max": 410.069189,
+          "final": 410.069189
+        },
+        {
+          "name": "w_FOC",
+          "n": 202,
+          "min": 0,
+          "max": 228.569104,
+          "final": 145.684051
+        }
+      ]
+    },
+    {
+      "id": "t15",
+      "n": 15,
+      "title": "代码生成",
+      "model": "tutorial15_codegen.slx",
+      "demo": null,
+      "sha256": "1ba16fac5da720d711fb553980abc54b584cec9c82b65956679265e2e593f666",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 2003,
+      "signals_count": 2,
+      "metric": "峰值 0.0288，末值 0.0161",
+      "note": "代码生成模型；固定步长 1 ms",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 2003,
+          "min": 0,
+          "max": 0.028764,
+          "final": 0.016118
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 2003,
+          "min": 0,
+          "max": 0.028775,
+          "final": 0.016166
+        }
+      ]
+    },
+    {
+      "id": "t16",
+      "n": 16,
+      "title": "频域分析",
+      "model": "tutorial16_freq.slx",
+      "demo": "bode",
+      "sha256": "87defe848fa95e6319b5a6c0c36edc41114eee98e0c48370e8f64b750a0812e6",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 52,
+      "signals_count": 1,
+      "metric": "Plant 4/(s²+0.5s+4)：Gm=∞，PM=20.4°",
+      "note": "Plant 4/(s²+0.5s+4)；PM 20.4°",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 52,
+          "min": -1.387688,
+          "max": 1.478508,
+          "final": -0.557744
+        }
+      ]
+    },
+    {
+      "id": "t17",
+      "n": 17,
+      "title": "超前-滞后校正",
+      "model": "tutorial17_leadlag.slx",
+      "demo": "leadlag",
+      "sha256": "59e6d4f6348bd214acdc404583cb1d8c687556a142af4794c58b56bf3fdb7329",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 56,
+      "signals_count": 2,
+      "metric": "校正后 峰值 0.5216，末值 0.5000；参考 峰值 0.2000，末值 0.2000",
+      "note": "Lead/Lag 校正；输入/输出稳态",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 56,
+          "min": 0,
+          "max": 0.521589,
+          "final": 0.50004
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 56,
+          "min": 0,
+          "max": 0.200041,
+          "final": 0.200013
+        }
+      ]
+    },
+    {
+      "id": "t18",
+      "n": 18,
+      "title": "系统辨识",
+      "model": "tutorial18_sysid.slx",
+      "demo": "sysid",
+      "sha256": "dd78435049291f5841491d0282d7fbbb03552f5d16e538dac06f139de723e8fe",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 54,
+      "signals_count": 2,
+      "metric": "范围 0–3.831，末值 3.831",
+      "note": "阶跃辨识；输出饱和/限幅需注意",
+      "signals": [
+        {
+          "name": "y_plant",
+          "n": 54,
+          "min": 0,
+          "max": 3.831425,
+          "final": 3.831425
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 54,
+          "min": 0,
+          "max": 3.831425,
+          "final": 3.831425
+        }
+      ]
+    },
+    {
+      "id": "t19",
+      "n": 19,
+      "title": "H∞ 鲁棒控制",
+      "model": "tutorial19_robust.slx",
+      "demo": null,
+      "sha256": "81eb9d7f4075069a6753cd4abe7d1e10bbbbe12bcf2f5c620d6360b4aa3c6be4",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 54,
+      "signals_count": 1,
+      "metric": "输出 峰值 0.6719，末值 0.5000",
+      "note": "H∞ 鲁棒控制；输出稳态 0.5",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 54,
+          "min": 0,
+          "max": 0.671932,
+          "final": 0.500039
+        }
+      ]
+    },
+    {
+      "id": "t20",
+      "n": 20,
+      "title": "模型预测控制 MPC",
+      "model": "tutorial20_mpc.slx",
+      "demo": "mpc",
+      "sha256": "b61b40e3977070417bf3e52d5e824781fa2e11b29ffd151e818d2a8206eb8e15",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 1024,
+      "signals_count": 1,
+      "metric": "峰值 0.562，10 s 终值 0.562",
+      "note": "原 .slx 实为 PID，不是 MPC；10 s 仍在上升",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 1024,
+          "min": 0,
+          "max": 0.561836,
+          "final": 0.561836
+        }
+      ]
+    },
+    {
+      "id": "t21",
+      "n": 21,
+      "title": "滑模控制 SMC",
+      "model": "tutorial21_smc.slx",
+      "demo": "smc",
+      "sha256": "664b5046495168707eca5e3722b662e69ad8c8390f8a4ee303eed0481d93f257",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 1025,
+      "signals_count": 2,
+      "metric": "SMC 峰值 0.724，终值 0.600；PID 峰值 0.636，终值 0.636",
+      "note": "原 .slx 是符号继电器：u 仅 0→3，无抖振",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 1025,
+          "min": 0,
+          "max": 0.724728,
+          "final": 0.599952
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 1025,
+          "min": 0,
+          "max": 0.635794,
+          "final": 0.635794
+        }
+      ]
+    },
+    {
+      "id": "t22",
+      "n": 22,
+      "title": "根轨迹法",
+      "model": "tutorial22_root_locus.slx",
+      "demo": "rootlocus",
+      "sha256": "4e2d552bec2d705b9a4ffa65cdd335d97f4212a0d88893c76e92b00a6b2f821c",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 57,
+      "signals_count": 2,
+      "metric": "峰值 1.289，终值 0.825",
+      "note": "对应当前 K 的稳态偏差",
+      "signals": [
+        {
+          "name": "y_out",
+          "n": 57,
+          "min": 0,
+          "max": 1.289277,
+          "final": 0.824547
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 57,
+          "min": 0,
+          "max": 1.289277,
+          "final": 0.824547
+        }
+      ]
+    },
+    {
+      "id": "t23",
+      "n": 23,
+      "title": "MRAC 自适应",
+      "model": "tutorial23_mrac.slx",
+      "demo": "mrac",
+      "sha256": "4cf10d192e1c10c7a628401c3355ba5ac5126cb156920273177247399e32541e",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 54,
+      "signals_count": 3,
+      "metric": "参考 范围 0–2.000，末值 2.000；对象 峰值 2.106，末值 2.000；控制 范围 0–3.000，末值 3.000",
+      "note": "MRAC 参考/对象跟踪；控制量 3",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 54,
+          "min": 0,
+          "max": 2,
+          "final": 2
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 54,
+          "min": 0,
+          "max": 2.105831,
+          "final": 2.000048
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 54,
+          "min": 0,
+          "max": 3,
+          "final": 3
+        }
+      ]
+    },
+    {
+      "id": "t24",
+      "n": 24,
+      "title": "模糊逻辑控制",
+      "model": "tutorial24_fuzzy.slx",
+      "demo": "fuzzy",
+      "sha256": "b18aa1a00928c1d81c56471a206972cf7344a251a5b1c76bac79d1e6a886d8d1",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 15,
+      "samples": 104,
+      "signals_count": 5,
+      "metric": "范围 0–0，末值 0；范围 0–0.7473，末值 0.7473",
+      "note": "探针用最小 FIS 占位；原讲义 FIS 未随模型分发，模糊输出 0",
+      "signals": [
+        {
+          "name": "y_fuzzy",
+          "n": 104,
+          "min": 0,
+          "max": 0,
+          "final": 0
+        },
+        {
+          "name": "y_pid",
+          "n": 104,
+          "min": 0,
+          "max": 0.747303,
+          "final": 0.747303
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 104,
+          "min": 0,
+          "max": 0,
+          "final": 0
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 104,
+          "min": 0,
+          "max": 0.747303,
+          "final": 0.747303
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 104,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        }
+      ]
+    },
+    {
+      "id": "t25",
+      "n": 25,
+      "title": "Simscape 物理建模",
+      "model": "tutorial25_simscape.slx",
+      "demo": null,
+      "sha256": "5901a9db1ed5a3ef7a55ad53a6e7b9c9141ac3afc34bb1037157aa872b9e02a9",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 54,
+      "signals_count": 3,
+      "metric": "峰值 2.091，末值 1.134",
+      "note": "Simscape 物理模型；位移有超调",
+      "signals": [
+        {
+          "name": "y_phys",
+          "n": 54,
+          "min": 0,
+          "max": 2.090942,
+          "final": 1.133718
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 54,
+          "min": 0,
+          "max": 2.090942,
+          "final": 1.133718
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 54,
+          "min": 0,
+          "max": 2.090942,
+          "final": 1.133718
+        }
+      ]
+    },
+    {
+      "id": "t26",
+      "n": 26,
+      "title": "机器人运动学",
+      "model": "tutorial26_kinematics.slx",
+      "demo": "arm",
+      "sha256": "7cb4ff610c6dab72bbcc4f5914f63d7b9cfe34c3ffe4f521b32dafb094029f2b",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 51,
+      "signals_count": 0,
+      "metric": "运行通过；无记录信号",
+      "note": "Stateflow 运动学；模型无 Scope/To Workspace",
+      "signals": []
+    },
+    {
+      "id": "t27",
+      "n": 27,
+      "title": "MSD 系统建模",
+      "model": "tutorial27_msd_models.slx",
+      "demo": "msd",
+      "sha256": "9c610c685d4b502072a8d61722c8ee4e95353b36b49575b09719173e948f0b92",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 54,
+      "signals_count": 5,
+      "metric": "峰值 0.1779，末值 0.0998；峰值 0.1779，末值 0.0998",
+      "note": "TF/SS 数值积分对比；两者重合",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 54,
+          "min": -0.213597,
+          "max": 0.273357,
+          "final": -0.029324
+        },
+        {
+          "name": "probe_s2_p1",
+          "n": 54,
+          "min": 0,
+          "max": 0.177935,
+          "final": 0.099777
+        },
+        {
+          "name": "probe_s2_p2",
+          "n": 54,
+          "min": 0,
+          "max": 0.177935,
+          "final": 0.099777
+        },
+        {
+          "name": "y_ss_sim",
+          "n": 54,
+          "min": 0,
+          "max": 0.177935,
+          "final": 0.099777
+        },
+        {
+          "name": "y_tf_sim",
+          "n": 54,
+          "min": 0,
+          "max": 0.177935,
+          "final": 0.099777
+        }
+      ]
+    },
+    {
+      "id": "t28",
+      "n": 28,
+      "title": "DSP 基础",
+      "model": "tutorial28_dsp.slx",
+      "demo": "dsp",
+      "sha256": "da64cd953588519fcfc4af5c431f4164c5ae15bc5f93c6cd828afa6e60f0b76f",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 5673,
+      "signals_count": 2,
+      "metric": "峰值 4.533，末值 2.178",
+      "note": "DSP 采样/FFT；5.6k 点",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 5673,
+          "min": -3.645078,
+          "max": 4.533121,
+          "final": 2.177826
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 5673,
+          "min": -3.520873,
+          "max": 4.322621,
+          "final": -0.29187
+        }
+      ]
+    },
+    {
+      "id": "t29",
+      "n": 29,
+      "title": "MSD 控制对比",
+      "model": "tutorial29_control_compare.slx",
+      "demo": "msdcompare",
+      "sha256": "e08ed366c871401cc24e0f019e60d530e2d232eedd86b668722b00dcae1d27de",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 689,
+      "signals_count": 2,
+      "metric": "PID 峰值 3.965，末值 1.814；LQR 范围 0–1.000，末值 1.000",
+      "note": "PID vs LQR；PID 超调大",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 689,
+          "min": -3.006737,
+          "max": 3.964674,
+          "final": 1.813843
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 689,
+          "min": 0,
+          "max": 1,
+          "final": 1
+        }
+      ]
+    },
+    {
+      "id": "t30",
+      "n": 30,
+      "title": "主动悬挂",
+      "model": "tutorial30_suspension.slx",
+      "demo": "suspension",
+      "sha256": "02ba20cb39cb53f8ca4f53d85336ac38d5f4806754a326510fa35f585c0a622b",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 717,
+      "signals_count": 3,
+      "metric": "车身位移 峰值 10.06，末值 0.0016",
+      "note": "1/4 车主动悬挂；位移峰值 10",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 717,
+          "min": -5.692087,
+          "max": 10.059424,
+          "final": 0.001586
+        },
+        {
+          "name": "probe_s2_p1",
+          "n": 239,
+          "min": 0,
+          "max": 0.05,
+          "final": 0.05
+        },
+        {
+          "name": "probe_s2_p2",
+          "n": 239,
+          "min": 0,
+          "max": 0.033507,
+          "final": 0.015285
+        }
+      ]
+    },
+    {
+      "id": "t31",
+      "n": 31,
+      "title": "EKF 基础",
+      "model": "tutorial31_ekf.slx",
+      "demo": "ekf",
+      "sha256": "22f159bd7dc5d10332ac100583ae38820c4025293695a5d3a65aa41503062d78",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 1001,
+      "signals_count": 4,
+      "metric": "测量 RMSE 0.053；EKF x₁ RMSE 0.049（按讲义离线）",
+      "note": "模型只输出真值/含噪测量；EKF 按讲义离线实现",
+      "signals": [
+        {
+          "name": "u_data",
+          "n": 1001,
+          "min": -0.5,
+          "max": 0.499999,
+          "final": 0.494679
+        },
+        {
+          "name": "x1_true",
+          "n": 1001,
+          "min": -1.898037,
+          "max": 1.805539,
+          "final": -1.866159
+        },
+        {
+          "name": "x2_true",
+          "n": 1001,
+          "min": -2.939797,
+          "max": 2.585632,
+          "final": 0.313342
+        },
+        {
+          "name": "y_noisy",
+          "n": 1001,
+          "min": -1.942427,
+          "max": 1.831488,
+          "final": -1.757275
+        }
+      ]
+    },
+    {
+      "id": "t32",
+      "n": 32,
+      "title": "EKF 倒立摆",
+      "model": "tutorial32_pendulum.slx",
+      "demo": "pendulum",
+      "sha256": "f62548e5fb99b6e9bcdd18b1470cc3fc8f87a1944b4bb08421c5e6277bcf2d46",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 1005,
+      "signals_count": 4,
+      "metric": "范围 0.5000–30.53，末值 30.53",
+      "note": "倒立摆模型未闭环稳定，角度发散",
+      "signals": [
+        {
+          "name": "u_data",
+          "n": 1005,
+          "min": 0,
+          "max": 0.3,
+          "final": 0
+        },
+        {
+          "name": "x1_true",
+          "n": 1005,
+          "min": 0.5,
+          "max": 30.529753,
+          "final": 30.529753
+        },
+        {
+          "name": "x2_true",
+          "n": 1005,
+          "min": 0,
+          "max": 6.511161,
+          "final": 3.219942
+        },
+        {
+          "name": "y_noisy",
+          "n": 1005,
+          "min": 0.510696,
+          "max": 30.595083,
+          "final": 30.595083
+        }
+      ]
+    },
+    {
+      "id": "t33",
+      "n": 33,
+      "title": "UKF",
+      "model": "tutorial33_ukf.slx",
+      "demo": null,
+      "sha256": "62f240975eba441090976e1e354a95c121b4dc190bb210a32879db07949067d2",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 1001,
+      "signals_count": 4,
+      "metric": "峰值 1.875，末值 -1.810",
+      "note": "UKF 数据采集；模型无 UKF 模块",
+      "signals": [
+        {
+          "name": "u_data",
+          "n": 1001,
+          "min": -0.5,
+          "max": 0.499999,
+          "final": 0.494679
+        },
+        {
+          "name": "x1_true",
+          "n": 1001,
+          "min": -1.809697,
+          "max": 1.874819,
+          "final": -1.809697
+        },
+        {
+          "name": "x2_true",
+          "n": 1001,
+          "min": -3.351333,
+          "max": 3.20459,
+          "final": -0.967143
+        },
+        {
+          "name": "y_noisy",
+          "n": 1001,
+          "min": -1.848045,
+          "max": 1.884726,
+          "final": -1.700814
+        }
+      ]
+    },
+    {
+      "id": "t34",
+      "n": 34,
+      "title": "EKF vs UKF",
+      "model": "tutorial34_ekfvsukf.slx",
+      "demo": null,
+      "sha256": "201535bbfce5f947b804c03287e60d4b2f80ec89a1f8b3dabca1bd78c2a237d7",
+      "status": "ok",
+      "solver": "ode45",
+      "stop_time": 10,
+      "samples": 1001,
+      "signals_count": 4,
+      "metric": "峰值 1.875，末值 -1.810",
+      "note": "EKF vs UKF 数据；模型无滤波器模块",
+      "signals": [
+        {
+          "name": "demo_u",
+          "n": 1001,
+          "min": -0.5,
+          "max": 0.499999,
+          "final": 0.494679
+        },
+        {
+          "name": "demo_x1true",
+          "n": 1001,
+          "min": -1.809697,
+          "max": 1.874819,
+          "final": -1.809697
+        },
+        {
+          "name": "demo_x2true",
+          "n": 1001,
+          "min": -3.351333,
+          "max": 3.20459,
+          "final": -0.967143
+        },
+        {
+          "name": "demo_y",
+          "n": 1001,
+          "min": -1.874136,
+          "max": 1.905651,
+          "final": -1.655712
+        }
+      ]
+    },
+    {
+      "id": "t35",
+      "n": 35,
+      "title": "IMU 融合",
+      "model": "tutorial35_imu.slx",
+      "demo": "imu",
+      "sha256": "58782d3c8d6e326bdf992ba6be67eba3cd7455167098d75ce1d189f16a988e86",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 51,
+      "signals_count": 2,
+      "metric": "范围 0.0001–3.479，末值 3.479",
+      "note": "互补滤波；theta_cf_sim 与 t_mdl 同值，建议复查连线",
+      "signals": [
+        {
+          "name": "t_mdl",
+          "n": 51,
+          "min": 0.000108,
+          "max": 3.478788,
+          "final": 3.478788
+        },
+        {
+          "name": "theta_cf_sim",
+          "n": 51,
+          "min": 0.000108,
+          "max": 3.478788,
+          "final": 3.478788
+        }
+      ]
+    },
+    {
+      "id": "t36",
+      "n": 36,
+      "title": "Stateflow 状态机",
+      "model": "tutorial36_stateflow.slx",
+      "demo": "stateflow",
+      "sha256": "7fadb2106a55e032acd6c3aabd6920dfc4896e6a42678190288dd1b17e369fea",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 71,
+      "signals_count": 6,
+      "metric": "峰值 2.000，末值 0；峰值 227.7，末值 84.58",
+      "note": "Stateflow 状态机；模式 0/1/2",
+      "signals": [
+        {
+          "name": "mode_data",
+          "n": 71,
+          "min": 0,
+          "max": 2,
+          "final": 0
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 71,
+          "min": 0,
+          "max": 227.707463,
+          "final": 84.576286
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 71,
+          "min": 0,
+          "max": 100,
+          "final": 100
+        },
+        {
+          "name": "probe_s1_p3",
+          "n": 71,
+          "min": 0,
+          "max": 2,
+          "final": 0
+        },
+        {
+          "name": "speed_data",
+          "n": 71,
+          "min": 0,
+          "max": 227.707463,
+          "final": 84.576286
+        },
+        {
+          "name": "volt_data",
+          "n": 71,
+          "min": -94.580081,
+          "max": 15.473946,
+          "final": 0
+        }
+      ]
+    },
+    {
+      "id": "t37",
+      "n": 37,
+      "title": "触发/使能子系统",
+      "model": "tutorial37_triggered.slx",
+      "demo": "triggered",
+      "sha256": "af10b39e2b9ead772adb2ab8b3d8edb008521448b264c793496565626a2fed57",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 203,
+      "signals_count": 3,
+      "metric": "峰值 0.9801，末值 0.7994；峰值 0.9801，末值 -0.6020",
+      "note": "触发/使能子系统；保持/复位",
+      "signals": [
+        {
+          "name": "cont_out",
+          "n": 203,
+          "min": -0.980556,
+          "max": 0.980108,
+          "final": 0.799354
+        },
+        {
+          "name": "en_out",
+          "n": 203,
+          "min": -0.601994,
+          "max": 0.980108,
+          "final": -0.601994
+        },
+        {
+          "name": "trig_out",
+          "n": 203,
+          "min": -0.99999,
+          "max": 0.999574,
+          "final": 0.912945
+        }
+      ]
+    },
+    {
+      "id": "t38",
+      "n": 38,
+      "title": "Bus 信号",
+      "model": "tutorial38_bus.slx",
+      "demo": "bus",
+      "sha256": "66f1a2fba9c4c5bd2465a0a3f20a71d6a935709d4728f2df9568138351a75436",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 51,
+      "signals_count": 3,
+      "metric": "峰值 0.9996，末值 -0.9589；峰值 3.000，末值 0.8510；峰值 1.581，末值 -0.9050",
+      "note": "Bus 打包/拆解；三路信号",
+      "signals": [
+        {
+          "name": "pos_out",
+          "n": 51,
+          "min": -0.999923,
+          "max": 0.999574,
+          "final": -0.958924
+        },
+        {
+          "name": "spd_out",
+          "n": 51,
+          "min": -2.997405,
+          "max": 3,
+          "final": 0.850987
+        },
+        {
+          "name": "torque_out",
+          "n": 51,
+          "min": -1.5,
+          "max": 1.580828,
+          "final": -0.904955
+        }
+      ]
+    },
+    {
+      "id": "t39",
+      "n": 39,
+      "title": "模型引用",
+      "model": "tutorial39_top.slx",
+      "demo": null,
+      "sha256": "878938967bc662f2dcddcbdb01f994aea93c385ae9391b0dbc234559153418e0",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 59,
+      "signals_count": 2,
+      "metric": "范围 0–0.8571，末值 0.8571",
+      "note": "模型引用；refs/ 下附带两个子模型",
+      "signals": [
+        {
+          "name": "plant_y_sub",
+          "n": 59,
+          "min": 0,
+          "max": 0.857143,
+          "final": 0.857143
+        },
+        {
+          "name": "probe_s1_p1",
+          "n": 59,
+          "min": 0,
+          "max": 0.857143,
+          "final": 0.857143
+        }
+      ],
+      "refs": [
+        {
+          "model": "tutorial39_controller.slx",
+          "sha256": "ad68dd410b566062218a2ca938ecee3a63d39ff678583793ca2cc59d51011840"
+        },
+        {
+          "model": "tutorial39_plant.slx",
+          "sha256": "dfbd3510f22ab1f111cdc23e6d9bd21f46d2fd69fd70fbfd7d18b6849423bb77"
+        }
+      ]
+    },
+    {
+      "id": "t40",
+      "n": 40,
+      "title": "变体子系统",
+      "model": "tutorial40_variant.slx",
+      "demo": "variant",
+      "sha256": "9da1cf13c7554999e0cdcdbb9983fc86885a49a6c0a31c63c58c7617b7de9e0e",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 54,
+      "signals_count": 1,
+      "metric": "变体输出 峰值 1.255，末值 0.6802",
+      "note": "变体子系统；ctrl_type=1 选 PID",
+      "signals": [
+        {
+          "name": "y_data",
+          "n": 54,
+          "min": 0,
+          "max": 1.254565,
+          "final": 0.680231
+        }
+      ]
+    },
+    {
+      "id": "t41",
+      "n": 41,
+      "title": "模型回调",
+      "model": "tutorial41_callbacks.slx",
+      "demo": null,
+      "sha256": "74e9aa534b7edd473db34cba62af06ac9822252ffd81a994b0f365ae94e85897",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 54,
+      "signals_count": 1,
+      "metric": "PI 输出 峰值 1.423，末值 1.279",
+      "note": "PreLoad/Init/StopFcn；InitFcn 需 Kp/Ki",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 54,
+          "min": 0,
+          "max": 1.423202,
+          "final": 1.279336
+        }
+      ]
+    },
+    {
+      "id": "t42",
+      "n": 42,
+      "title": "S-Function",
+      "model": "tutorial42_sfunction.slx",
+      "demo": null,
+      "sha256": "55cd700db0e3a9691f014b3140355557ebef3bb5b43411fcbd8488498856e3c9",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 51,
+      "signals_count": 4,
+      "metric": "峰值 1.999，末值 -1.088；峰值 1.999，末值 -1.088",
+      "note": "Level-2 MATLAB S-Function；deadzone_sfcn",
+      "signals": [
+        {
+          "name": "probe_s1_p1",
+          "n": 51,
+          "min": -1.992329,
+          "max": 1.999147,
+          "final": -1.088042
+        },
+        {
+          "name": "probe_s1_p2",
+          "n": 51,
+          "min": -1.992329,
+          "max": 1.999147,
+          "final": -1.088042
+        },
+        {
+          "name": "sfcn_in",
+          "n": 51,
+          "min": -1.992329,
+          "max": 1.999147,
+          "final": -1.088042
+        },
+        {
+          "name": "sfcn_out",
+          "n": 51,
+          "min": -1.992329,
+          "max": 1.999147,
+          "final": -1.088042
+        }
+      ]
+    },
+    {
+      "id": "t43",
+      "n": 43,
+      "title": "Model Advisor",
+      "model": "tutorial43_advisor.slx",
+      "demo": null,
+      "sha256": "2ebd9365a6667751c791e558976d2911fc6cc136cf68d531e8c43b676df8eaaa",
+      "status": "ok",
+      "solver": "VariableStepAuto",
+      "stop_time": 10,
+      "samples": 51,
+      "signals_count": 2,
+      "metric": "峰值 9.998，末值 9.195",
+      "note": "Model Advisor/代数环；仿真通过",
+      "signals": [
+        {
+          "name": "advisor_out",
+          "n": 51,
+          "min": 0,
+          "max": 9.998465,
+          "final": 9.195358
+        },
+        {
+          "name": "loop_out",
+          "n": 51,
+          "min": -1.992329,
+          "max": 1.999147,
+          "final": -1.088042
+        }
+      ]
+    }
+  ]
+}

@@ -62,6 +62,9 @@ async function main() {
       await client.open;
       await client.send("Page.enable");
       await client.send("Runtime.enable");
+      await client.send("Page.addScriptToEvaluateOnNewDocument", {
+        source: 'try { localStorage.setItem("vibe-lang", "zh"); } catch (e) {}',
+      });
       await client.send("Page.navigate", { url });
       const evalJs = async (expr) => {
         const r = await client.send("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true });
@@ -144,6 +147,21 @@ async function main() {
       if (!(await e("document.body.textContent")).includes("方法说明")) throw new Error("about: content");
     });
 
+    await check("about-matlab", fileUrl("about/matlab.html"), async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('#matlab-rows tr').length")) === 43);
+      if (!(await e("document.body.textContent")).includes("43 / 43")) throw new Error("about-matlab: header");
+      if ((await e("document.querySelector('#matlab-count').textContent")).trim() !== "43 / 43") throw new Error("about-matlab: count");
+      await e("(() => { const q = document.querySelector('#matlab-search'); q.value = 't31'; q.dispatchEvent(new Event('input', { bubbles: true })); })()");
+      await waitFor(async () => (await e("document.querySelector('#matlab-count').textContent")).trim() === "1 / 43");
+      if (!(await e("document.querySelector('#matlab-rows tr:not([hidden])').textContent")).includes("t31")) throw new Error("about-matlab: filter");
+    });
+
+    await check("about-en", fileUrl("about/en.html"), async (e) => {
+      if ((await e("document.documentElement.lang")) !== "en") throw new Error("about-en: lang");
+      if (!(await e("document.body.textContent")).includes("Methods & limitations")) throw new Error("about-en: content");
+      if (!(await e("document.body.textContent")).includes("43/43")) throw new Error("about-en: matlab");
+    });
+
     await check("simulink", fileUrl("simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#phases .phase-link').length")) === 8, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));
@@ -174,7 +192,7 @@ async function main() {
       if (!(await e("document.body.textContent")).includes("完整算例")) throw new Error("course: full case missing");
     });
 
-    console.log("SMOKE OK (landing + landing-en + imu + control + about + simulink)");
+    console.log("SMOKE OK (landing + landing-en + imu + control + about + matlab + about-en + simulink)");
   } finally {
     edge.kill();
     await new Promise((r) => { edge.once("exit", r); setTimeout(r, 1500); });

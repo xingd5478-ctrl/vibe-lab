@@ -16,6 +16,8 @@ jobs:
         run: npm test
       - name: chart.js copies in sync
         run: node scripts/sync_chart.mjs --check
+      - name: MATLAB provenance and table sync
+        run: npm run check:matlab
       - name: JS/CSS performance budget
         run: node scripts/budget.mjs
 
@@ -55,6 +57,8 @@ jobs:
             pwsh -NoProfile -File scripts/visual.ps1 -BaselineDir "tests/baselines-ci" -Update
             Write-Output "CI baselines bootstrapped (commit tests/baselines-ci from artifact)"
           }
+      - name: Dark visual regression
+        run: node scripts/dark_shots.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

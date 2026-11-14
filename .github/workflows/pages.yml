@@ -9,6 +9,8 @@ on:
       - "simulink/**"
       - "landing/**"
       - "about/**"
+      - "data/**"
+      - "shared/i18n.js"
       - "LICENSE"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -51,6 +53,9 @@ jobs:
             python3 -c "import json,os; d='_site/simulink/course-img'; json.dump(sorted(f for f in os.listdir(d) if f.endswith('.png')), open(os.path.join(d,'manifest.json'),'w'))"
           fi
           cp -r about/. _site/about/
+          mkdir -p _site/data _site/shared
+          cp data/matlab-probes.json _site/data/
+          cp shared/i18n.js _site/shared/
           cp LICENSE _site/LICENSE
       - uses: actions/upload-pages-artifact@v3
         with:

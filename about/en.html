@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Methods &amp; limitations · vibe-lab</title>
+  <meta name="description" content="How every number on vibe-lab is produced, and what not to over-interpret: CRC cleaning, Allan deviation, ARW/RRW, R/Q, PID simulation and MATLAB comparison." />
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
+  <meta property="og:title" content="Methods &amp; limitations · vibe-lab" />
+  <meta property="og:description" content="What each number means, and where the limits are." />
+  <meta property="og:type" content="article" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="../icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/about/en.html" />
+  <link rel="alternate" hreflang="zh-CN" href="https://xingd5478-ctrl.github.io/vibe-lab/about/" />
+  <link rel="alternate" hreflang="en" href="https://xingd5478-ctrl.github.io/vibe-lab/about/en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://xingd5478-ctrl.github.io/vibe-lab/about/" />
+  <meta property="og:image" content="https://xingd5478-ctrl.github.io/vibe-lab/icon-512.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Site navigation">
+      <a href="../en/" data-local="../landing/en/index.html">Home</a>
+      <a href="../imu/?lang=en" data-local="../imu-lab/static/index.html?lang=en">IMU</a>
+      <a href="../control/?lang=en" data-local="../control-play/index.html?lang=en">Control</a>
+      <a href="../simulink/?lang=en" data-local="../simulink/index.html?lang=en">Simulink</a>
+      <a href="./en.html" aria-current="page">Method</a>
+      <a href="index.html" hreflang="zh-CN" lang="zh-CN">中文</a>
+    </nav>
+    <header>
+      <div class="kicker">vibe-lab / method</div>
+      <h1>Methods &amp; limitations</h1>
+      <p class="sub">How every number is produced, and where the teaching demo stops and real calibration begins.</p>
+    </header>
+
+    <main id="main">
+      <h2>1. IMU data lab</h2>
+      <p><strong>CRC cleaning.</strong> At rest, a gyro sample of ±200 °/s is physically impossible; it comes from a serial bit error. The page first drops frames with <code>crc_ok=0</code>, then drops frames whose angular rate exceeds 5 °/s. Without this step, a short burst of bad frames lifts the short-τ Allan curve by an order of magnitude.</p>
+      <p><strong>Allan deviation.</strong> For each cluster time τ, the overlapping Allan deviation estimates the noise structure. White noise gives σ(τ)=N/√τ; rate random walk gives σ(τ)=K√(τ/3).</p>
+      <p><strong>ARW / RRW fit.</strong> Treating σ²(τ)=N²/τ+K²τ/3 as a linear model, a Huber IRLS weighted least-squares fit on (1/τ, τ/3) gives N and K. R² is computed in log space; the 95% interval comes from the regression covariance. If the fit fails (too little data or negative coefficients), the page falls back to a short/long-segment median. Unit and axis sanity checks run on load.</p>
+      <p><strong>R/Q mapping.</strong> The page uses <code>R=(ARW/60)²·Δt</code> and <code>Q=(RRW/60)²·Δt</code>; R/Q are independent of sample rate. The Kalman filter is a one-dimensional random-walk model, used only to show the qualitative “larger Q = noisier, smaller Q = smoother” relation.</p>
+      <p><strong>Data.</strong> The default sample is 60 s of synthetic data to exercise the pipeline. The “load 10-min real excerpt” button reads a 10-minute slice of a 2-hour static experiment (with five bad frames); it is a demo, not a calibration dataset.</p>
+      <div class="note">The sample data is 60 s and synthetic. On short recordings the RRW interval is very wide (0.63–2.05). Use at least 2 h of static data for real calibration.</div>
+
+      <h2>2. Control Play</h2>
+      <p><strong>Plant.</strong> G(s)=ωn²/(s²+2ζωn·s+ωn²). The Bode plot is computed analytically.</p>
+      <p><strong>Closed-loop simulation.</strong> PID control uses <code>u=Kp·e+Ki∫e+Kd·ė</code>, integral clamp ±10, control clamp ±20, and explicit Euler integration at a 2 ms step. Overshoot, peak time, settling time and steady-state error are computed from the simulated sequence.</p>
+      <div class="note">This is a teaching demo, not a control-design tool. At aggressive gains, Euler integration loses accuracy, and there is no anti-windup or measurement-noise filter.</div>
+
+      <h2>3. MATLAB comparison (43/43)</h2>
+      <p>All 43 vendored <code>.slx</code> models were simulated with MATLAB R2025a. Each row in the <a href="matlab.html">comparison table</a> records the model SHA-256, solver, stop time and signal statistics; the table is generated from <a href="../data/matlab-probes.json" download>the JSON dataset</a>, not hand-copied. The table labels are Chinese; the numbers and provenance are language-independent.</p>
+      <p>The comparison is deliberately honest about mismatches: t10 has no reference feed-forward in the original model, t20’s <code>.slx</code> is a PID rather than an MPC, t21’s <code>.slx</code> is a relay rather than a sliding-mode controller with a boundary layer, and t31’s model only logs truth/noisy measurements — its EKF is implemented offline from the lesson equations.</p>
+
+      <h2>4. Data availability</h2>
+      <p>A 10-minute excerpt of the static dataset is provided for demonstration only. The full dataset is available from the corresponding author upon reasonable request while the paper is under review. The excerpt remains copyright of the authors/lab; do not redistribute or use it commercially.</p>
+
+      <h2>5. Reproducibility</h2>
+      <ul>
+        <li>All computation runs in the browser; there is no backend and no data upload.</li>
+        <li>Parameters are written to the URL, so an R/Q or PID setting can be shared.</li>
+        <li>The algorithm modules <code>allan.js</code>, <code>kf.js</code>, <code>fit.js</code> and the chart/i18n layers have Node tests.</li>
+        <li>Source: <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">github.com/xingd5478-ctrl/vibe-lab</a>.</li>
+      </ul>
+    </main>
+
+    <footer>
+      <a href="../en/" data-local="../landing/en/index.html">← vibe-lab</a> ·
+      <a href="index.html">中文方法页</a> ·
+      <a href="matlab.html">MATLAB 43/43</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      if (location.protocol !== "file:") return;
+      document.querySelectorAll("[data-local]").forEach(function (a) {
+        a.href = a.getAttribute("data-local");
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      var root = location.pathname.replace(/about\/(en|index)\.html$/, "");
+      navigator.serviceWorker.register(root + "sw.js").catch(function () {});
+    })();
+  </script>
+</body>
+</html>

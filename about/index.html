@@ -15,6 +15,9 @@
   <link rel="apple-touch-icon" href="../icon-192.png" />
   <link rel="stylesheet" href="style.css" />
   <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/about/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://xingd5478-ctrl.github.io/vibe-lab/about/" />
+  <link rel="alternate" hreflang="en" href="https://xingd5478-ctrl.github.io/vibe-lab/about/en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://xingd5478-ctrl.github.io/vibe-lab/about/" />
   <meta property="og:image" content="https://xingd5478-ctrl.github.io/vibe-lab/icon-512.png" />
   <meta name="twitter:card" content="summary_large_image" />
 </head>
@@ -65,8 +68,8 @@
 
     <section class="panel" style="margin-top:24px">
 <h2>MATLAB 对照（真机仿真）</h2>
-<p>用 MATLAB R2025a 对 .slx 实际仿真，与网页 demo 对比。目前完成 12 个模型（9 个核心 + 3 个进阶）。</p>
-<p class="hint">复现：在仓库根目录运行 <code>matlab -batch "addpath('tools'); probe_cases"</code>。t20/t21/t31 用 0.01 s 上限步长；t31 的 EKF 按讲义离线实现。</p>
+<p>用 MATLAB R2025a 对 .slx 实际仿真，与网页 demo 对比。目前完成 <strong>43/43</strong> 个模型；下面只列 12 个关键对照，完整 43 行（含 SHA-256、求解器、逐信号统计）在 <a href="matlab.html">MATLAB 对照页</a>。</p>
+<p class="hint">复现：在仓库根目录运行 <code>matlab -batch "addpath('tools'); probe_all"</code>，再执行 <code>node scripts/build_matlab_data.mjs && node scripts/build_matlab_table.mjs</code>。t20/t21/t31 用 0.01 s 上限步长；t31 的 EKF 按讲义离线实现。</p>
 <table style="width:100%;border-collapse:collapse;font-size:13px">
 <thead><tr><th align="left">课程</th><th align="left">网页 demo</th><th align="left">.slx 实测</th><th align="left">说明</th></tr></thead>
 <tbody>
@@ -83,12 +86,12 @@
 <tr><td>t21 滑模</td><td>终值 1.000，t&gt;1 s 最大误差 0.278</td><td>SMC 峰值 0.724，终值 0.600；PID 峰值 0.636，终值 0.636</td><td>原 .slx 是符号继电器：u 仅 0→3，无抖振</td></tr>
 <tr><td>t31 EKF</td><td>测量 RMSE 0.101，EKF 0.031</td><td>模型只输出真值/含噪测量，测量 RMSE 0.053</td><td>无 EKF 模块；按讲义实现 x₁ RMSE 0.049（R=0.005）</td></tr>
 </tbody></table>
-<p class="hint">只列已真机跑过的模型；其余后续补。t10 的差异是真实存在的：原 .slx 用 u=−Kx，网页 demo 加了参考前馈。t20/t21/t31 也一样：t20 的 .slx 是 PID 跟踪二阶对象，t21 的 .slx 是符号继电器（u 只有 0/3，不抖），t31 的 .slx 只采集数据、没有 EKF 模块；EKF 数字按讲义离线实现，参数与网页 demo 不同，不为了让两边对上而改数。</p>
+<p class="hint">只列真机跑过的模型；完整 43 行见 <a href="matlab.html">MATLAB 对照页</a>。t10 的差异是真实存在的：原 .slx 用 u=−Kx，网页 demo 加了参考前馈。t20/t21/t31 也一样：t20 的 .slx 是 PID 跟踪二阶对象，t21 的 .slx 是符号继电器（u 只有 0/3，不抖），t31 的 .slx 只采集数据、没有 EKF 模块；EKF 数字按讲义离线实现，参数与网页 demo 不同，不为了让两边对上而改数。</p>
 </section>
 </main>
 
     <footer>
-      <a href="../">← vibe-lab</a> · <a href="../imu/" data-nav="imu">IMU Lab</a> · <a href="../control/" data-nav="control">Control Play</a>
+      <a href="../">← vibe-lab</a> · <a href="../imu/" data-nav="imu">IMU Lab</a> · <a href="../control/" data-nav="control">Control Play</a> · <a href="en.html" hreflang="en" lang="en">English</a>
     </footer>
   </div>
 
@@ -121,6 +124,7 @@
   document.querySelectorAll(".topnav a").forEach(function (a, i) { if (hrefs[i]) a.href = hrefs[i]; });
 })();
 </script>
+<script src="../shared/i18n.js"></script>
 </body>
 </html>
 

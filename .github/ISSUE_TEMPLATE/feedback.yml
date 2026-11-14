@@ -1,0 +1,38 @@
+name: Feedback
+description: Report a bug, a lesson problem, or suggest a new lab
+title: "[feedback] "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping. Please do not paste embargoed data or personal information.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type
+      options:
+        - Bug
+        - Lesson / content issue
+        - New lab idea
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page / lesson
+      placeholder: /imu/, /simulink/course.html?id=t21, ...
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What happened?
+      description: Browser, steps, expected vs actual; for content issues, quote the sentence.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context (optional)
+      description: Screenshots, console errors, or data shape. No private data.

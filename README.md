@@ -1,6 +1,6 @@
 # vibe-lab
 
-传感器与控制的可视化实验室：三个零依赖的浏览器工具 + 方法页 + 英文首页。
+传感器与控制的可视化实验室：三个零依赖的浏览器工具 + 方法页 + 英文首页 + 43/43 MATLAB 对照。
 
 **线上：** https://xingd5478-ctrl.github.io/vibe-lab/
 
@@ -8,17 +8,17 @@
 
 ```
 vibe-lab/
-├── landing/             # 首页 + en/ 英文首页 + sw.js（PWA）
-├── about/               # 方法说明与局限
+├── landing/             # 首页 + en/ 英文首页 + 404/反馈 + sw.js（PWA）
+├── about/               # 方法说明、en.html、matlab.html（43/43 对照）
 ├── imu-lab/
 │   ├── static/          # ① IMU 数据实验室（部署到 /imu/）
 │   └── app.py           #    Streamlit 备份
 ├── control-play/        # ② 二阶系统 + PID（部署到 /control/）
 ├── simulink/            # ③ Simulink 教程交互复现（部署到 /simulink/）
-├── shared/              # Python 共享算法
-├── tests/               # Node 单测 + 视觉基线
-├── scripts/             # smoke / visual 检查
-├── data/sample/         # 合成样例数据
+├── shared/              # Python 共享算法 + i18n.js
+├── data/                # 样例数据 + matlab-probes.json（模型哈希/求解器/信号）
+├── tests/               # Node 单测 + 浅色/深色视觉基线
+├── scripts/             # smoke / visual / perf / MATLAB 数据检查
 └── .github/workflows/   # Pages 部署 + 单测 CI
 ```
 
@@ -38,16 +38,18 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test            # 算法/数据/Worker/Simulink/控制实验/图表配色单测（58 个）
-npm run smoke       # Edge CDP DOM 冒烟（9 项）
-npm run e2e         # Edge CDP 端到端 + axe 无障碍（浅色/深色各跑一遍）
-npm run perf        # 运行时性能预算：导航、长任务、交互延迟
+npm test            # 算法/数据/Worker/Simulink/图表配色/MATLAB 数据单测（62 个）
+npm run smoke       # Edge CDP DOM 冒烟（11 项）
+npm run e2e         # Edge CDP 端到端 + axe（浅色/深色/英文 UI）
+npm run perf        # 运行时预算：ready/LCP/CLS/长任务/交互延迟
+npm run check:matlab# 校验 43 个模型哈希与 matlab.html 是否同步
 npm run bigtest     # 200k 行 Worker 全链路
-npm run visual      # 截图对比基线
-npm run visual:update  # 有意改版后更新基线
+npm run visual      # 浅色截图对比基线
+npm run visual:dark # 深色截图对比基线
+npm run visual:update / visual:dark:update  # 有意改版后更新基线
 ```
 
-覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS/IRLS 拟合、Worker、列式数据层、Simulink 复现；E2E 验证交互/下载并跑 **axe-core**（WCAG 2 A/AA，浅色 + 深色），要求 0 serious/critical；运行时预算默认按本机计时，CI 用 `PERF_SCALE=2` 放宽；视觉回归对比 `tests/baselines/`（CI 用 `tests/baselines-ci/`）。
+覆盖：Allan 方差、坏帧清洗、R/Q 映射、KF 收敛、积分、WLS/IRLS 拟合、Worker、列式数据层、Simulink 复现；E2E 验证交互/下载、英文 UI，并跑 **axe-core**（WCAG 2 A/AA，浅色 + 深色），要求 0 serious/critical；运行时预算含 ready/LCP/CLS/长任务，CI 用 `PERF_SCALE=2` 放宽；浅色与深色截图分别对比 `tests/baselines*`。
 
 ## 键盘操作
 
@@ -96,6 +98,17 @@ imu-lab/static/
 
 首页提供「从哪开始」三条路径 + 全站顶栏；`/en/` 是英文概览页（工具与讲义仍为中文），带 hreflang 与语言切换；9 门「概念」课带可计算的小例子；`npm run check:chart` 在 CI 中保证三份 `chart.js` 不漂移。
 
+## MATLAB 43/43 对照
+
+- `tools/probe_all.m` 对 43 个 `.slx` 逐一仿真；t39 的引用子模型放在 `simulink/models/refs/`，t42 的 S-Function 在 `tools/deadzone_sfcn.m`。
+- `artifacts/simulink/probes.json` 是 MATLAB 原始输出（gitignore）；`node scripts/build_matlab_data.mjs` 加上 **SHA-256、MATLAB 版本、solver、停止时间、信号统计**，写出 `data/matlab-probes.json`。
+- `node scripts/build_matlab_table.mjs` 从 JSON 生成 `about/matlab.html`，不再手抄表格；`npm run check:matlab` 校验模型哈希与表格同步。
+- 43/43 全部可仿真；t24 的 FIS 是探针占位、t35 的输出疑似连线问题、t32 的倒立摆未闭环稳定等差异都在表里写明。
+
+## 英文 UI（beta）
+
+`?lang=en` 或 `localStorage("vibe-lang")` 启用 `shared/i18n.js`：翻译导航、控件标签、图表轴/图例、指标名与 43 课标题；讲义正文与部分长提示仍为中文，页面顶部有明确提示。英文首页 `/en/`、英文方法页 `/about/en.html`；中文页面顶部自动出现 EN/中文切换。`npm run e2e` 会验证英文 UI 与 axe。
+
 ## 数据层
 
 `imu-lab/static/data.js` 是列式核心（Float32Array/typed arrays）：
@@ -113,11 +126,11 @@ imu-lab/static/
 
 ## 深色模式
 
-跟随系统 `prefers-color-scheme`：面板、代码块、提示框用 CSS 变量统一切换；SVG/Canvas 图表通过 `--chart-*` 变量换色，系统主题切换时实时重绘。`npm run e2e` 会在深色仿真下再跑一遍 axe（WCAG 2 A/AA），要求 0 serious/critical。
+跟随系统 `prefers-color-scheme`：面板、代码块、提示框用 CSS 变量统一切换；SVG/Canvas 图表通过 `--chart-*` 变量换色，系统主题切换时实时重绘。`npm run e2e` 在深色仿真下再跑一遍 axe；`npm run visual:dark` 对比 `tests/baselines-dark/`；`tests/contrast.test.js` 校验深色图表系列/坐标轴和控件边框的 **WCAG 1.4.11 ≥3:1**。
 
 ## 离线 / PWA
 
-页面在 https 下注册 `sw.js`，缓存静态资源；IMU/Control/about/英文首页可离线打开（数据 CSV 不缓存）。`manifest.webmanifest` 提供安装信息与图标，支持“添加到主屏幕”。
+页面在 https 下注册 `sw.js`，缓存静态资源；IMU/Control/about/MATLAB 对照/英文页可离线打开（数据 CSV 不缓存）。`manifest.webmanifest` 提供安装信息与图标，支持“添加到主屏幕”。
 
 ## 许可
 
@@ -129,6 +142,9 @@ imu-lab/static/
 |---|---|
 | `/` | 首页（landing） |
 | `/en/` | 英文首页（English overview） |
+| `/about/matlab.html` | MATLAB 43/43 对照（哈希/求解器/信号） |
+| `/about/en.html` | 英文方法说明 |
+| `/feedback.html` | 反馈入口（GitHub issue 模板） |
 | `/imu/` | IMU 数据实验室 |
 | `/control/` | Control Play |
 | `/about/` | 方法说明与局限 |

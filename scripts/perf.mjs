@@ -29,12 +29,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* Budgets in ms at scale 1; CI sets PERF_SCALE=2 for slower runners. */
 const BUDGETS = {
-  landing: { ready: 900, longTask: 250, longTotal: 400 },
-  "landing-en": { ready: 900, longTask: 250, longTotal: 400 },
-  imu: { ready: 1500, longTask: 300, longTotal: 600, fit: 400, channel: 400, q: 400 },
-  control: { ready: 900, longTask: 250, longTotal: 400, kp: 250, tab: 600 },
-  simulink: { ready: 1100, longTask: 250, longTotal: 400, tab: 500 },
-  about: { ready: 600, longTask: 250, longTotal: 400 },
+  landing: { ready: 900, longTask: 250, longTotal: 400, lcp: 1500, cls: 0.05 },
+  "landing-en": { ready: 900, longTask: 250, longTotal: 400, lcp: 1500, cls: 0.05 },
+  imu: { ready: 1500, longTask: 300, longTotal: 600, fit: 400, channel: 400, q: 400, lcp: 1800, cls: 0.08 },
+  control: { ready: 900, longTask: 250, longTotal: 400, kp: 250, tab: 600, lcp: 1500, cls: 0.05 },
+  simulink: { ready: 1100, longTask: 250, longTotal: 400, tab: 500, lcp: 1600, cls: 0.06 },
+  about: { ready: 600, longTask: 250, longTotal: 400, lcp: 1000, cls: 0.03 },
 };
 
 function serve() {
@@ -109,10 +109,19 @@ async function main() {
     await client.send("Page.addScriptToEvaluateOnNewDocument", {
       source: `
         window.__lt = [];
+        window.__lcp = 0;
+        window.__cls = 0;
         try {
           new PerformanceObserver((list) => {
             for (const e of list.getEntries()) window.__lt.push(Math.round(e.duration));
           }).observe({ entryTypes: ["longtask"] });
+          new PerformanceObserver((list) => {
+            const es = list.getEntries();
+            window.__lcp = Math.round(es[es.length - 1].startTime);
+          }).observe({ type: "largest-contentful-paint", buffered: true });
+          new PerformanceObserver((list) => {
+            for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value;
+          }).observe({ type: "layout-shift", buffered: true });
         } catch (e) {}
       `,
     });
@@ -138,6 +147,8 @@ async function main() {
           dcl: Math.round(n.domContentLoadedEventEnd),
           load: Math.round(n.loadEventEnd),
           fcp: fcp ? Math.round(fcp.startTime) : null,
+          lcp: Math.round(window.__lcp || (fcp ? fcp.startTime : 0) || n.domContentLoadedEventEnd),
+          cls: +(window.__cls || 0).toFixed(4),
           longTask: lt.length ? Math.max(...lt) : 0,
           longTotal: lt.reduce((a, b) => a + b, 0),
           longCount: lt.length,
@@ -154,13 +165,16 @@ async function main() {
     }
 
     async function measurePage(name, file, readySelector) {
+      console.log(`  measuring ${name}…`);
       await nav(`${base}/${file}`);
       if (readySelector) await waitFor(() => evalJs(readySelector), 25000);
       const m = await baseMetrics();
       const b = BUDGETS[name];
       const ready = Math.max(m.load, m.dcl, readySelector ? m.now : 0);
-      const row = { page: name, ready, dcl: m.dcl, load: m.load, fcp: m.fcp, longTask: m.longTask, longTotal: m.longTotal };
+      const row = { page: name, ready, dcl: m.dcl, load: m.load, fcp: m.fcp, lcp: m.lcp, cls: m.cls, longTask: m.longTask, longTotal: m.longTotal };
       if (ready > b.ready * SCALE) failures.push(`${name}: ready ${ready}ms > ${Math.round(b.ready * SCALE)}ms`);
+      if (m.lcp > b.lcp * SCALE) failures.push(`${name}: LCP ${m.lcp}ms > ${Math.round(b.lcp * SCALE)}ms`);
+      if (m.cls > b.cls * SCALE) failures.push(`${name}: CLS ${m.cls} > ${+(b.cls * SCALE).toFixed(3)}`);
       if (m.longTask > b.longTask * SCALE) failures.push(`${name}: long task ${m.longTask}ms > ${Math.round(b.longTask * SCALE)}ms`);
       if (m.longTotal > b.longTotal * SCALE) failures.push(`${name}: long tasks total ${m.longTotal}ms > ${Math.round(b.longTotal * SCALE)}ms`);
       results.push(row);
@@ -169,6 +183,7 @@ async function main() {
 
     await measurePage("landing", "landing/index.html", null);
     await measurePage("landing-en", "landing/en/index.html", null);
+    await evalJs("localStorage.setItem('vibe-lang', 'zh')");
 
     const imu = await measurePage("imu", "imu-lab/static/index.html", "!!document.querySelector('#chart-time svg')");
     imu.interactions = [];
@@ -215,9 +230,9 @@ async function main() {
       .map((m) => [m.name, Math.round(m.value)]));
 
     console.log(`runtime perf budget (scale x${SCALE})`);
-    console.log("page      ready   dcl    load   fcp     long(max/total)");
+    console.log("page      ready   dcl    load   fcp     lcp     cls     long(max/total)");
     for (const r of results) {
-      console.log(`${r.page.padEnd(9)} ${String(r.ready).padStart(5)}ms ${String(r.dcl).padStart(5)}ms ${String(r.load).padStart(5)}ms ${String(r.fcp ?? "-").padStart(5)}ms ${String(r.longTask + "/" + r.longTotal).padStart(12)}`);
+      console.log(`${r.page.padEnd(9)} ${String(r.ready).padStart(5)}ms ${String(r.dcl).padStart(5)}ms ${String(r.load).padStart(5)}ms ${String(r.fcp ?? "-").padStart(5)}ms ${String(r.lcp).padStart(5)}ms ${String(r.cls).padStart(6)} ${String(r.longTask + "/" + r.longTotal).padStart(12)}`);
       for (const i of r.interactions || []) console.log(`  ${i.label.padEnd(12)} ${String(i.ms).padStart(5)}ms`);
     }
     console.log(`JS heap ${(heap.JSHeapUsedSize / 1048576).toFixed(1)}MB, ${heap.Nodes} nodes, ${heap.Documents} documents`);

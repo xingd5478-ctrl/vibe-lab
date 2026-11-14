@@ -100,6 +100,27 @@ th, td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertical-align:
 th { color: var(--muted); font-weight: 600; }
 tbody tr:last-child td { border-bottom: 0; }
 
+/* MATLAB 43 模型对照页 */
+body.wide .wrap { max-width: 1120px; }
+.matlab-meta { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+.matlab-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 14px; }
+.matlab-toolbar label { font-size: 12px; color: var(--muted); }
+.matlab-toolbar input {
+  flex: 1 1 260px; min-width: 180px; padding: 7px 9px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  font: inherit; font-size: 13px; border-radius: 2px;
+}
+.matlab-toolbar .count { font: 12px var(--mono, Consolas, monospace); color: var(--muted); }
+.matlab-table-wrap { overflow-x: auto; }
+.matlab-table { font-size: 12.5px; }
+.matlab-table th { position: sticky; top: 0; background: var(--paper); z-index: 1; }
+.matlab-table td { line-height: 1.55; }
+.matlab-table .slx { margin-left: 4px; font-size: 10.5px; color: var(--muted); }
+.matlab-table .hash { font-family: Consolas, monospace; color: var(--muted); font-size: 10.5px; }
+.matlab-table .status { font-size: 10.5px; color: #2f6b4f; }
+.matlab-table .status.blocked { color: #9b2c2c; }
+.matlab-table tr[hidden] { display: none; }
+
 /* 深色模式：跟随系统 */
 :root { color-scheme: light dark; }
 @media (prefers-color-scheme: dark) {
@@ -113,4 +134,7 @@ tbody tr:last-child td { border-bottom: 0; }
   a, .topnav a:hover, .topnav [aria-current="page"], footer a { color: #8db3d8; }
   :focus-visible { outline-color: #8db3d8; }
   th { color: var(--muted); }
+  .matlab-table .status { color: #7fc9a3; }
+  .matlab-table .status.blocked { color: #e08a8a; }
+  .matlab-toolbar input { border-color: #666b75; }
 }

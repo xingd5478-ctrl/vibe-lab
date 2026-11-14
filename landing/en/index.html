@@ -22,16 +22,17 @@
   <link rel="alternate" hreflang="x-default" href="https://xingd5478-ctrl.github.io/vibe-lab/" />
   <meta property="og:image" content="https://xingd5478-ctrl.github.io/vibe-lab/icon-512.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"vibe-lab","url":"https://xingd5478-ctrl.github.io/vibe-lab/en/","inLanguage":["en","zh-CN"],"description":"Sensors and control, visualized: IMU data lab, Control Play and 43 interactive Simulink lessons."}</script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <div class="wrap">
     <nav class="topnav" aria-label="Site navigation">
       <a href="./" aria-current="page" data-local="index.html">Home</a>
-      <a href="../imu/" data-local="../../imu-lab/static/index.html">IMU</a>
-      <a href="../control/" data-local="../../control-play/index.html">Control</a>
-      <a href="../simulink/" data-local="../../simulink/index.html">Simulink</a>
-      <a href="../about/" data-local="../../about/index.html">Method</a>
+      <a href="../imu/?lang=en" data-local="../../imu-lab/static/index.html?lang=en">IMU</a>
+      <a href="../control/?lang=en" data-local="../../control-play/index.html?lang=en">Control</a>
+      <a href="../simulink/?lang=en" data-local="../../simulink/index.html?lang=en">Simulink</a>
+      <a href="../about/en.html" data-local="../../about/en.html">Method</a>
       <a href="../" hreflang="zh-CN" lang="zh-CN" data-local="../index.html">中文</a>
     </nav>
     <header>
@@ -106,7 +107,8 @@
 
     <footer>
       vibe-lab · static site, computed in your browser ·
-      <a href="../about/" data-local="../../about/index.html">Method</a> ·
+      <a href="../about/en.html" data-local="../../about/en.html">Method</a> ·
+      <a href="../feedback.html" data-local="../../feedback.html">Feedback</a> ·
       <a href="../LICENSE" data-local="../../LICENSE" target="_blank" rel="noreferrer">MIT License</a> ·
       <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">Source</a>
     </footer>
@@ -116,6 +118,11 @@
     (function () {
       var isFile = location.protocol === "file:";
       var local = isFile || /\/landing\//.test(location.pathname);
+      try { localStorage.setItem("vibe-lang", "en"); } catch (e) {}
+      var zh = document.querySelector('a[hreflang="zh-CN"]');
+      if (zh) zh.addEventListener("click", function () {
+        try { localStorage.setItem("vibe-lang", "zh"); } catch (e) {}
+      });
       if (local) {
         document.querySelectorAll("[data-local]").forEach(function (a) {
           a.href = a.getAttribute("data-local");
@@ -124,11 +131,11 @@
       document.querySelectorAll("[data-target], [data-path]").forEach(function (a) {
         var t = a.getAttribute("data-target") || a.getAttribute("data-path");
         if (local) {
-          a.href = t === "imu" ? "../../imu-lab/static/index.html"
-            : t === "control" ? "../../control-play/index.html"
-            : "../../simulink/index.html";
+          a.href = t === "imu" ? "../../imu-lab/static/index.html?lang=en"
+            : t === "control" ? "../../control-play/index.html?lang=en"
+            : "../../simulink/index.html?lang=en";
         } else {
-          a.href = t === "imu" ? "../imu/" : t === "control" ? "../control/" : "../simulink/";
+          a.href = t === "imu" ? "../imu/?lang=en" : t === "control" ? "../control/?lang=en" : "../simulink/?lang=en";
         }
       });
     })();

@@ -121,6 +121,16 @@ async function main() {
     await waitFor(() => evalJs("!!document.querySelector('#chart-time svg')"));
     await audit("imu");
     await audit("imu", true);
+
+    await client.send("Page.navigate", { url: `${base}/imu-lab/static/index.html?lang=en` });
+    await waitFor(() => evalJs("!!document.querySelector('#chart-time svg')"));
+    if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("imu-en: lang");
+    if (!(await evalJs("document.querySelector('h1').textContent")).includes("IMU data lab")) throw new Error("imu-en: h1");
+    if (!(await evalJs("!!document.querySelector('.lang-banner')"))) throw new Error("imu-en: banner");
+    if ((await evalJs("document.querySelector('.lang-switch').textContent")) !== "中文") throw new Error("imu-en: switch");
+    await audit("imu-en");
+    await audit("imu-en", true);
+    await evalJs("localStorage.setItem('vibe-lang', 'zh')");
     const fit = await evalJs("document.querySelector('#fit-info').textContent");
     if (!/ARW=/.test(fit) || !/R²=/.test(fit)) throw new Error("fit info missing");
     const before = await evalJs("document.querySelector('#r-val').textContent");
@@ -167,6 +177,22 @@ async function main() {
     await audit("about");
     await audit("about", true);
 
+    await client.send("Page.navigate", { url: `${base}/about/matlab.html` });
+    await waitFor(async () => (await evalJs("document.querySelectorAll('#matlab-rows tr').length")) === 43, 12000);
+    if ((await evalJs("document.querySelector('#matlab-count').textContent")).trim() !== "43 / 43") throw new Error("matlab: count");
+    await evalJs("(() => { const q = document.querySelector('#matlab-search'); q.value = 't31'; q.dispatchEvent(new Event('input', { bubbles: true })); })()");
+    await waitFor(async () => (await evalJs("document.querySelector('#matlab-count').textContent")).trim() === "1 / 43");
+    await audit("matlab");
+    await audit("matlab", true);
+
+    await client.send("Page.navigate", { url: `${base}/about/en.html` });
+    await sleep(400);
+    if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("about-en: lang");
+    if (!(await evalJs("document.body.textContent")).includes("Methods & limitations")) throw new Error("about-en: content");
+    await audit("about-en");
+    await audit("about-en", true);
+    await evalJs("localStorage.setItem('vibe-lang', 'zh')");
+
     await client.send("Page.navigate", { url: `${base}/simulink/index.html` });
     await waitFor(async () => (await evalJs("document.querySelectorAll('#phases .phase-link').length")) === 8, 12000);
     await waitFor(() => evalJs("!!document.querySelector('#chart-a svg')"));
@@ -189,6 +215,15 @@ async function main() {
     if (head[0] !== 0x50 || head[1] !== 0x4b) throw new Error("course: downloaded .slx is not a zip");
     await audit("course");
     await audit("course", true);
+
+    await client.send("Page.navigate", { url: `${base}/simulink/index.html?lang=en` });
+    await waitFor(async () => (await evalJs("document.querySelectorAll('#phases .phase-link').length")) === 8, 12000);
+    await waitFor(() => evalJs("!!document.querySelector('#chart-a svg')"));
+    await sleep(350);
+    if (!/Signals|Signal/.test(await evalJs("document.querySelector('#demo-title').textContent"))) throw new Error("simulink-en: demo title");
+    if (!(await evalJs("!!document.querySelector('.lang-banner')"))) throw new Error("simulink-en: banner");
+    await audit("simulink-en");
+    await audit("simulink-en", true);
 
     client.close();
     console.log("E2E OK");
