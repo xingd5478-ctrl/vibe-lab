@@ -30,7 +30,7 @@ python -m http.server 8000
 - **一键把拟合值回填 R/Q**（log10 滑杆）
 - **导出 Allan CSV**（τ 与三轴 σ）
 - **列名映射**：未识别时可选列；时间戳非单调会自动重建并提示
-- **分片解析 + 进度**：>4 MB 文件按 2 万行分片，避免长任务冻结；上限 100 万行
+- **大文件**：>4 MB 在 `data-worker.js` 解析（主线程只分片建行）；>100k 帧时域走 Canvas；>150k 帧 Allan/`kf-worker.js` 走 Worker
 - 实时 KF：积分角度 vs 滤波输出
 - **加载真实样例**：10 min 真实片段（论文在审，仅演示）
 - **悬浮/触摸/键盘十字线读数**：指针拖动，或 Tab 聚焦后用 `←/→`、`Home/End`（Canvas 大图同样支持）
@@ -42,6 +42,7 @@ python -m http.server 8000
 ## 模块
 
 - `data.js`：列式解析/清洗/统计/Allan/KF/CSV；
+- `data-worker.js` / `kf-worker.js` / `allan-worker.js`：大文件解析、KF、Allan 的 Worker；
 - `chart.js`：SVG 图 + Canvas 大图 + hover/键盘；
 - `fit.js`：WLS 拟合；`allan.js`/`kf.js`：算法；`app.js`：交互与导出。
 
@@ -56,9 +57,10 @@ python -m http.server 8000
 ## 测试
 
 ```bash
-npm test        # 算法/数据层单测
+npm test        # 算法/数据层/Worker 单测
 npm run smoke   # DOM 冒烟
 npm run e2e     # Edge CDP + axe 无障碍
+npm run bigtest # 200k 行 Worker 全链路
 npm run visual  # 截图回归
 ```
 

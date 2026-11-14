@@ -4,11 +4,12 @@
   "private": true,
   "description": "Sensor & control visual lab: IMU data lab, control playground, landing page",
   "scripts": {
-    "test": "node --test tests/allan.test.js tests/kf.test.js tests/fit.test.js tests/worker.test.js tests/data.test.js",
+    "test": "node --test tests/allan.test.js tests/kf.test.js tests/fit.test.js tests/worker.test.js tests/data.test.js tests/workers.test.js",
     "smoke": "pwsh -NoProfile -File scripts/smoke.ps1",
     "visual": "pwsh -NoProfile -File scripts/visual.ps1",
     "visual:update": "pwsh -NoProfile -File scripts/visual.ps1 -Update",
-    "e2e": "node scripts/e2e.mjs"
+    "e2e": "node scripts/e2e.mjs",
+    "bigtest": "node scripts/bigtest.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.14.0"

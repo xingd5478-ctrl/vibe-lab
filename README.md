@@ -73,7 +73,7 @@ imu-lab/static/
 - `cleanMask / stats`：按 CRC 与物理阈值生成掩码、统计；
 - `allan / kf / csv`：Allan、KF、导出复用同一份列式数据。
 
-小文件路径已切到该层（统计/Allan/CSV）；大文件仍走 Worker/Canvas 分支，后续把解析与 KF 也迁入 Worker。
+小文件路径已切到该层（统计/Allan/CSV）；大文件（>150k 帧）在 `data-worker.js` 解析、`allan-worker.js`/`kf-worker.js` 计算，主线程只负责渲染（Canvas 大图）。
 
 - ≤100k 帧：全部 SVG 渲染；
 - >100k 帧：时域图改 Canvas（逐像素 min/max），>150k 帧时 Allan 交给 `allan-worker.js`，主线程不阻塞；

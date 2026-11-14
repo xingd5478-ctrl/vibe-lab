@@ -39,6 +39,11 @@
   let allanWorker = null;
   let workerAllan = null;
   let workerReq = 0;
+  let parseWorker = null;
+  let parsePending = 0;
+  let kfWorker = null;
+  let kfPending = 0;
+  let kfRateKey = "";
 
   /* ---------- 数据 ---------- */
   function mulberry32(a) {
@@ -192,6 +197,23 @@
     return rows;
   }
 
+  function buildRowsChunked(cols, f, text) {
+    const n = cols.n;
+    if (!n) { finishLoad([], f, text); return; }
+    const rows = new Array(n);
+    let i = 0;
+    const step = () => {
+      const end = Math.min(n, i + 50000);
+      for (; i < end; i++) {
+        rows[i] = { t: cols.t[i], gx: cols.gx[i], gy: cols.gy[i], gz: cols.gz[i], crc: cols.crc[i] };
+      }
+      $("source-name").textContent = `解析中 ${Math.round((i / n) * 100)}%`;
+      if (i < n) setTimeout(step, 0);
+      else finishLoad(rows, f, text);
+    };
+    step();
+  }
+
   function finishLoad(rows, f, text) {
     if (!rows.length) {
       showMapping(text, f.name);
@@ -222,12 +244,29 @@
       const text = String(reader.result);
       $("source-name").textContent = "解析中…";
       if (text.length > 4000000) {
-        parseCSVChunked(text, (p) => { $("source-name").textContent = `解析中 ${p}%`; })
-          .then((rows) => finishLoad(rows, f, text))
-          .catch(() => {
-            flash("解析失败，请检查文件格式");
-            $("source-name").textContent = state.source;
-          });
+        if (parseWorker) {
+          parsePending += 1;
+          const id = parsePending;
+          $("source-name").textContent = "解析中…（Worker）";
+          parseWorker.onmessage = (e) => {
+            const m = e.data;
+            if (m.id !== id) return;
+            if (!m.ok) {
+              showMapping(text, f.name);
+              $("source-name").textContent = state.source;
+              return;
+            }
+            buildRowsChunked({ t: m.t, gx: m.gx, gy: m.gy, gz: m.gz, crc: m.crc, n: m.n }, f, text);
+          };
+          parseWorker.postMessage({ id, text });
+        } else {
+          parseCSVChunked(text, (p) => { $("source-name").textContent = `解析中 ${p}%`; })
+            .then((rows) => finishLoad(rows, f, text))
+            .catch(() => {
+              flash("解析失败，请检查文件格式");
+              $("source-name").textContent = state.source;
+            });
+        }
       } else {
         setTimeout(() => finishLoad(parseCSV(text), f, text), 20);
       }
@@ -452,11 +491,52 @@
     drawKF();
   }
 
+  function onKFReply(e) {
+    const m = e.data;
+    if (m.id !== kfPending) return;
+    const series = [
+      { name: "原始积分", color: "#d3ccba", width: 2.6, points: m.angle },
+      { name: "卡尔曼", color: "#2f6b4f", width: 1.3, points: m.kf },
+    ];
+    if (state.compare && m.comp && m.comp.length) {
+      series.push({
+        name: `对比 A (R/Q=${(state.compare.r / state.compare.q).toFixed(1)})`,
+        color: "#b5651d", width: 1.1, dash: "6 4",
+        points: m.comp,
+      });
+    }
+    plot($("chart-kf"), {
+      height: 230,
+      xLabel: "时间 (s)",
+      yLabel: "角度 (°)",
+      aria: `滤波对比：原始积分与卡尔曼输出，R=${state.r.toExponential(1)}，Q=${state.q.toExponential(1)}${state.compare ? "，含对比组" : ""}`,
+      series,
+    });
+    $("meta-kf").textContent = `R=${state.r.toExponential(2)} · Q=${state.q.toExponential(2)}`;
+    updateSRSummary();
+  }
+
   function drawKF() {
     const clean = currentRows();
     if (!clean.length) return;
     const ch = state.channel;
     const key = `${dataVersion}|${state.fs}|${state.clean ? 1 : 0}|${ch}`;
+
+    if (clean.length > 150000 && kfWorker) {
+      if (kfRateKey !== key) {
+        const rate = new Float32Array(clean.length);
+        for (let i = 0; i < clean.length; i++) rate[i] = clean[i][ch];
+        kfRateKey = key;
+        kfWorker.postMessage({ type: "set", rate, fs: state.fs }, [rate.buffer]);
+      }
+      kfPending += 1;
+      kfWorker.postMessage({ type: "compute", id: kfPending, r: state.r, q: state.q, compare: state.compare });
+      $("meta-kf").textContent = "计算中…";
+      updateSRSummary();
+      syncURL();
+      return;
+    }
+
     let angle = angleCache.get(key);
     if (!angle) {
       angle = integrate(clean.map((r) => r[ch]), state.fs);
@@ -826,6 +906,23 @@ ${blocks}
         };
       } catch (e) {
         allanWorker = null;
+      }
+      try {
+        parseWorker = new Worker("data-worker.js");
+        parseWorker.onerror = () => { parseWorker = null; };
+      } catch (e) {
+        parseWorker = null;
+      }
+      try {
+        kfWorker = new Worker("kf-worker.js");
+        kfWorker.onmessage = onKFReply;
+        kfWorker.onerror = () => {
+          kfWorker = null;
+          kfRateKey = "";
+          drawKF();
+        };
+      } catch (e) {
+        kfWorker = null;
       }
     }
     loadURL();
