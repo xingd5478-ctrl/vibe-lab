@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IMU 数据实验室 · vibe-lab</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="kicker">vibe-lab / instrument 01</div>
+      <h1>IMU 数据实验室</h1>
+      <p class="sub">上传 MPU6050 CSV → CRC 清洗 → Allan 方差 → 拖动 R/Q 看滤波。全部在浏览器内计算，无后端。</p>
+    </header>
+
+    <div class="layout">
+      <aside class="panel controls">
+        <div class="field">
+          <label for="file">数据文件</label>
+          <input id="file" type="file" accept=".csv,text/csv" />
+          <div class="hint">当前：<span id="source-name">示例数据（合成）</span></div>
+        </div>
+
+        <div class="field">
+          <label for="fs">采样率 (Hz)</label>
+          <input id="fs" type="number" min="1" max="2000" step="1" value="100" />
+        </div>
+
+        <div class="field">
+          <label for="channel">主通道</label>
+          <select id="channel">
+            <option value="gz">GZ · yaw rate</option>
+            <option value="gy">GY · pitch rate</option>
+            <option value="gx">GX · roll rate</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="switch"><input id="clean" type="checkbox" checked /> CRC / 物理坏帧清洗</label>
+        </div>
+
+        <div class="field">
+          <label>log10(R) <output id="r-val">2.51e-7</output></label>
+          <input id="logR" type="range" min="-10" max="-2" step="0.1" value="-6.6" />
+        </div>
+
+        <div class="field">
+          <label>log10(Q) <output id="q-val">2.51e-9</output></label>
+          <input id="logQ" type="range" min="-12" max="-4" step="0.1" value="-8.6" />
+        </div>
+
+        <div class="stats">
+          <div>总帧数<b id="stat-frames">0</b></div>
+          <div>坏帧<b id="stat-bad">0</b></div>
+          <div>时长<b id="stat-duration">0 s</b></div>
+          <div>主通道均值<b id="stat-mean">0 °/s</b></div>
+        </div>
+
+        <div class="field" style="margin-top:14px">
+          <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:#fff;cursor:pointer;">重置为示例数据</button>
+        </div>
+
+        <p class="hint">CSV 列名：<code>gx_dps/gy_dps/gz_dps</code>，可选 <code>crc_ok</code>、<code>t</code>。没有表头时按 t,gx,gy,gz,crc 解析。</p>
+      </aside>
+
+      <section class="charts">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>时域</h2>
+            <span class="meta" id="meta-time">—</span>
+          </div>
+          <div class="chart" id="chart-time"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Allan 方差</h2>
+            <span class="meta" id="meta-allan">—</span>
+          </div>
+          <div class="chart" id="chart-allan"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>滤波对比</h2>
+            <span class="meta" id="meta-kf">—</span>
+          </div>
+          <div class="chart" id="chart-kf"></div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      vibe-lab · 数据与算法在浏览器内运行 · 工程近似：R=(ARW/60)²·Δt，Q=(RRW/60)²·Δt ·
+      仅用于教学/演示，真实标定以论文流程为准。
+    </footer>
+  </div>
+
+  <script src="allan.js"></script>
+  <script src="kf.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
