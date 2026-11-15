@@ -59,9 +59,13 @@
       <h2>4. Data availability</h2>
       <p>A 10-minute excerpt of the static dataset is provided for demonstration only. The full dataset is available from the corresponding author upon reasonable request while the paper is under review. The excerpt remains copyright of the authors/lab; do not redistribute or use it commercially.</p>
 
-      <h2>5. Reproducibility</h2>
+      <h2>Architecture: local-first</h2>
+      <p>CSV cleaning, Allan deviation, R/Q, Kalman filtering and the Control playground all run in the browser: data is never uploaded and there is no backend. The 43 Simulink models are simulated offline with MATLAB R2025a; their results, SHA-256, solver and sparkline data ship as JSON. The browser displays and reproduces them; it does not run MATLAB.</p>
+      <p>This is not a “we did not want to pay for a server” compromise. It buys privacy, zero backend operations, offline use and low latency. The trade-off is no accounts, cloud sync or multi-user collaboration, and it is not suitable for huge datasets inside the browser. If those are needed later, add serverless functions for accounts, storage and sharing while keeping the core computation local.</p>
+
+      <h2>Reproducibility</h2>
       <ul>
-        <li>All computation runs in the browser; there is no backend and no data upload.</li>
+        <li>Interactive computation runs in the browser; there is no backend and no data upload. The 43 Simulink models are simulated offline in MATLAB R2025a, and their results and hashes ship with the site.</li>
         <li>Parameters are written to the URL, so an R/Q or PID setting can be shared.</li>
         <li>The algorithm modules <code>allan.js</code>, <code>kf.js</code>, <code>fit.js</code> and the chart/i18n layers have Node tests.</li>
         <li>Source: <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">github.com/xingd5478-ctrl/vibe-lab</a>.</li>

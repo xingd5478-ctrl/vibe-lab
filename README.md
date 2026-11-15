@@ -2,6 +2,8 @@
 
 传感器与控制的可视化实验室：三个零依赖的浏览器工具 + 方法页 + 英文首页 + 43/43 MATLAB 对照。
 
+架构是 **local-first**：CSV/Allan/Kalman/Control 在浏览器内计算，数据不上传；43 个 Simulink 模型由 MATLAB R2025a 离线仿真，结果和 SHA-256 随静态站分发。没有账号/云同步是取舍，不是缺失的后端。
+
 **线上：** https://xingd5478-ctrl.github.io/vibe-lab/
 
 ## 目录

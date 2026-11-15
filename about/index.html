@@ -58,9 +58,13 @@
     <p>论文在审期间，仅提供 10 min 静态片段用于演示；完整数据在录用后按期刊政策公开，或向通讯作者合理索取。片段版权归作者/实验室，请勿用于再发布或商业用途。</p>
     <p lang="en">A 10-minute excerpt of the static dataset is provided on this site for demonstration only. The full dataset is available from the corresponding author upon reasonable request, as it is under embargo during peer review.</p>
 
-    <h2>4. 可复现性</h2>
+    <h2>架构：本地优先</h2>
+    <p>CSV 清洗、Allan 方差、R/Q、Kalman 和 Control 的交互计算都在浏览器内完成，数据不上传、没有后端。43 个 Simulink 模型由 MATLAB R2025a 离线仿真，结果、SHA-256、solver 和 sparkline 随站点作为 JSON 分发；浏览器只展示和复现，不在浏览器里跑 MATLAB。</p>
+    <p>这样做不是“省服务器”：它换来的是数据不离开设备、零后端运维、可离线、低延迟。代价是没有账号/云同步/多人协作，也不适合在浏览器里处理超大数据；如果以后需要这些，再加 Serverless 做账号、存储和分享，核心计算仍可留在本地。</p>
+
+    <h2>可复现性</h2>
     <ul>
-      <li>全部计算在浏览器内完成，无后端、无数据上传；</li>
+      <li>交互计算在浏览器内完成，无后端、无数据上传；43 个 Simulink 模型由 MATLAB 离线仿真，结果和哈希随站点分发；</li>
       <li>参数写入 URL，可直接复现同一组 R/Q 或 PID；</li>
       <li>算法模块 <code>allan.js</code>、<code>kf.js</code>、<code>fit.js</code> 有 Node 单测；</li>
       <li>源码：<a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">github.com/xingd5478-ctrl/vibe-lab</a>。</li>
