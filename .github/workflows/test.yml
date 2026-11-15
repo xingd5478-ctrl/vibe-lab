@@ -16,6 +16,10 @@ jobs:
         run: npm test
       - name: chart.js copies in sync
         run: node scripts/sync_chart.mjs --check
+      - name: Static HTML/JS checks
+        run: npm run check:static
+      - name: SW asset manifest
+        run: npm run check:sw
       - name: MATLAB provenance and table sync
         run: npm run check:matlab
       - name: JS/CSS performance budget

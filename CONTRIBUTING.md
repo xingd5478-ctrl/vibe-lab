@@ -13,6 +13,8 @@ python -m http.server 8000 -d _site
 
 ```bash
 npm test
+npm run check:static
+npm run check:sw
 npm run check:matlab
 npm run smoke
 npm run e2e

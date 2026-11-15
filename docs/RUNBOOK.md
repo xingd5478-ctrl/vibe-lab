@@ -13,6 +13,8 @@ Do not open `landing/index.html` via `file://` for production checks; relative l
 
 ```bash
 npm test
+npm run check:static
+npm run check:sw
 npm run check:matlab
 npm run check:matlab
 npm run smoke
