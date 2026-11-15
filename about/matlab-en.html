@@ -17,6 +17,9 @@
     .metric { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
     .spark { width: 120px; height: 28px; color: var(--accent); }
     .hint { color: var(--muted); font-size: 12px; }
+    .caveats { border-left: 2px solid #b58a3a; padding-left: 12px; margin: 18px 0; }
+    .caveats h2 { margin: 0 0 6px; font-size: 14px; }
+    .caveats ul { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.65; color: var(--muted); }
     @media (prefers-color-scheme: dark) { .spark { color: #7fb3e0; } }
   </style>
 </head>
@@ -34,6 +37,19 @@
       <p class="hint">Generated 2026-11-15 10:03:00 · 43/43 models · 110 toolboxes · <a href="../data/matlab-probes.json" download>raw JSON</a> · <a href="en.html">method</a></p>
     </header>
     <main id="main">
+      <section class="caveats">
+        <h2>Caveats</h2>
+        <ul>
+          <li><b>t10</b> — the original .slx uses u=−Kx without reference feedforward; its steady state is about 1/16.</li>
+          <li><b>t20</b> — the original .slx is a PID loop, not MPC; it is still rising at 10 s.</li>
+          <li><b>t21</b> — the original .slx is a sign relay (u is only 0/3), so it does not chatter.</li>
+          <li><b>t31</b> — the .slx only records true/noisy data; the EKF numbers come from the offline lecture implementation.</li>
+          <li><b>t32</b> — the model has a PD state feedback added (K1=20, K2=8) to keep the inverted pendulum bounded.</li>
+          <li><b>t35</b> — the time channel was fixed: t_mdl is recorded from a Clock instead of SumFusion.</li>
+          <li><b>t24 / t26</b> — the FIS is rebuilt from the lecture (25 Sugeno rules); t26 probes record the end-effector x/y/z outputs.</li>
+          <li><b>t12 / t16 / t31</b> — these rows carry an <i>Offline lecture value</i> badge; the number is not recomputed from this probe's time series.</li>
+        </ul>
+      </section>
       <table>
         <thead><tr><th>Lesson</th><th>Demo</th><th>Probe metric</th><th>Source</th><th>Model</th></tr></thead>
         <tbody>

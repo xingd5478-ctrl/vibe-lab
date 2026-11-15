@@ -86,9 +86,15 @@ const html = `<!DOCTYPE html>
     .dl { font-size: 12px; color: var(--muted); margin-top: 12px; }
     h2 { margin-top: 28px; font-size: 16px; }
     h2 .range { color: var(--muted); font-weight: 400; font-size: 12px; }
+    .guide-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 18px 0 4px; }
+    .guide-tools input { flex: 1 1 280px; padding: 8px 10px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; border-radius: 2px; }
+    .guide-tools button { padding: 7px 10px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; border-radius: 2px; cursor: pointer; }
+    .guide-tools button:hover { border-color: var(--accent); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <div class="wrap">
     <nav class="topnav" aria-label="Site navigation">
       <a href="./">Home</a>
@@ -105,11 +111,41 @@ const html = `<!DOCTYPE html>
       <p class="hint">This is the readable English companion to the interactive demos. The original Chinese lesson prose is not hidden here as a requirement; it is linked per lesson.</p>
     </header>
     <main id="main">
+      <div class="guide-tools">
+        <label for="guide-search" class="sr-only">Search lessons</label>
+        <input id="guide-search" type="search" placeholder="Search 43 lessons: PID, Kalman, root locus…" />
+        <button type="button" id="guide-expand">Expand all</button>
+        <button type="button" id="guide-collapse">Collapse all</button>
+        <span id="guide-count" class="hint">43 lessons</span>
+      </div>
       <p class="hint"><a href="lessons.html">← compact lesson index</a> · <a href="../simulink/index.html?lang=en">interactive labs</a></p>
 ${phases}
     </main>
     <footer><a href="./">← vibe-lab</a> · <a href="lessons.html">43-lesson index</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">Tutorial source</a></footer>
   </div>
+  <script>
+    (function () {
+      var cards = Array.prototype.slice.call(document.querySelectorAll(".lesson"));
+      var q = document.getElementById("guide-search");
+      var count = document.getElementById("guide-count");
+      if (q) {
+        q.addEventListener("input", function () {
+          var text = q.value.trim().toLowerCase();
+          var shown = 0;
+          cards.forEach(function (card) {
+            var hit = !text || card.textContent.toLowerCase().indexOf(text) >= 0;
+            card.hidden = !hit;
+            if (hit) { shown++; if (text) card.open = true; }
+          });
+          if (count) count.textContent = shown + " / " + cards.length + " lessons";
+        });
+      }
+      var ex = document.getElementById("guide-expand");
+      if (ex) ex.addEventListener("click", function () { cards.forEach(function (c) { if (!c.hidden) c.open = true; }); });
+      var co = document.getElementById("guide-collapse");
+      if (co) co.addEventListener("click", function () { cards.forEach(function (c) { c.open = false; }); });
+    })();
+  </script>
   <script>
     (function () {
       if (location.protocol !== "https:") return;
