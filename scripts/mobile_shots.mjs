@@ -68,6 +68,7 @@ async function main() {
     await c.send("Page.enable");
     await c.send("Runtime.enable");
     await c.send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+  await c.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "light" }] });
     await c.send("Emulation.setTouchEmulationEnabled", { enabled: true });
     const ev = async (expr) => {
       const r = await c.send("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true });
