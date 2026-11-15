@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>43 lessons · Simulink tutorial · vibe-lab</title>
+  <meta name="description" content="English index of the 43-lesson Simulink control tutorial: model downloads, MATLAB sources and interactive demos." />
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/en/lessons.html" />
+  <link rel="alternate" hreflang="zh-CN" href="https://xingd5478-ctrl.github.io/vibe-lab/simulink/course.html" />
+  <link rel="alternate" hreflang="en" href="https://xingd5478-ctrl.github.io/vibe-lab/en/lessons.html" />
+  <style>
+    .wrap { max-width: 1100px; }
+    .lesson-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .lesson-table th, .lesson-table td { border-bottom: 1px solid var(--line); padding: 7px 8px; text-align: left; vertical-align: top; }
+    .lesson-table th { color: var(--muted); font-weight: 600; }
+    .lesson-table .n { font-family: "Cascadia Mono", Consolas, monospace; color: var(--muted); margin-right: 6px; }
+    .note { border-left: 2px solid var(--accent); background: #fbf9f2; color: var(--muted); padding: 8px 12px; font-size: 13px; margin: 18px 0; }
+    @media (prefers-color-scheme: dark) { .note { background: #222831; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Site navigation">
+      <a href="./">Home</a>
+      <a href="../imu/?lang=en">IMU</a>
+      <a href="../control/?lang=en">Control</a>
+      <a href="../simulink/index.html?lang=en">Simulink</a>
+      <a href="../about/en.html">Method</a>
+      <a href="../simulink/course.html" data-local="../../simulink/course.html">Chinese</a>
+    </nav>
+    <header>
+      <div class="kicker">vibe-lab / simulink / 43 lessons</div>
+      <h1>43 lessons, in English index form</h1>
+      <p class="sub">The interactive demos and model downloads are here; the long-form lesson prose is currently Chinese-only. Every row links to the original <code>.m</code> and the vendored <code>.slx</code>.</p>
+    </header>
+    <main id="main">
+      <div class="note">The course reader at <a href="../simulink/course.html">/simulink/course.html</a> contains the Chinese lesson notes. This page is the English navigation layer; the interactive demos are fully usable in English.</div>
+      <table class="lesson-table">
+        <thead><tr><th>Lesson</th><th>Notes</th><th>MATLAB source</th><th>Simulink model</th></tr></thead>
+        <tbody>
+      <tr>
+        <td><span class="n">t01</span> Signals · <a href="../simulink/index.html?lang=en#t01">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t01" data-local="../../simulink/course.html?id=t01">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t01_signal_basics.m" target="_blank" rel="noreferrer">t01_signal_basics.m</a></td>
+        <td><a href="../simulink/models/tutorial01_signals.slx" data-local="../../simulink/models/tutorial01_signals.slx" download>tutorial01_signals.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t02</span> Math blocks · <a href="../simulink/index.html?lang=en#t02">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t02" data-local="../../simulink/course.html?id=t02">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t02_math_blocks.m" target="_blank" rel="noreferrer">t02_math_blocks.m</a></td>
+        <td><a href="../simulink/models/tutorial02_math.slx" data-local="../../simulink/models/tutorial02_math.slx" download>tutorial02_math.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t03</span> First order · <a href="../simulink/index.html?lang=en#t03">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t03" data-local="../../simulink/course.html?id=t03">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t03_first_order_sys.m" target="_blank" rel="noreferrer">t03_first_order_sys.m</a></td>
+        <td><a href="../simulink/models/tutorial03_first_order.slx" data-local="../../simulink/models/tutorial03_first_order.slx" download>tutorial03_first_order.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t04</span> Second order · <a href="../simulink/index.html?lang=en#t04">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t04" data-local="../../simulink/course.html?id=t04">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t04_second_order_sys.m" target="_blank" rel="noreferrer">t04_second_order_sys.m</a></td>
+        <td><a href="../simulink/models/tutorial04_second_order.slx" data-local="../../simulink/models/tutorial04_second_order.slx" download>tutorial04_second_order.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t05</span> PID control · <a href="../simulink/index.html?lang=en#t05">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t05" data-local="../../simulink/course.html?id=t05">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t05_pid_control.m" target="_blank" rel="noreferrer">t05_pid_control.m</a></td>
+        <td><a href="../simulink/models/tutorial05_pid.slx" data-local="../../simulink/models/tutorial05_pid.slx" download>tutorial05_pid.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t06</span> Sources & sinks · <a href="../simulink/index.html?lang=en#t06">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t06" data-local="../../simulink/course.html?id=t06">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t06_sources_and_sinks.m" target="_blank" rel="noreferrer">t06_sources_and_sinks.m</a></td>
+        <td><a href="../simulink/models/tutorial06_sources_sinks.slx" data-local="../../simulink/models/tutorial06_sources_sinks.slx" download>tutorial06_sources_sinks.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t07</span> Subsystems</td>
+        <td><a href="../simulink/course.html?id=t07" data-local="../../simulink/course.html?id=t07">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t07_subsystem.m" target="_blank" rel="noreferrer">t07_subsystem.m</a></td>
+        <td><a href="../simulink/models/tutorial07_subsystem.slx" data-local="../../simulink/models/tutorial07_subsystem.slx" download>tutorial07_subsystem.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t08</span> Masks</td>
+        <td><a href="../simulink/course.html?id=t08" data-local="../../simulink/course.html?id=t08">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t08_masking.m" target="_blank" rel="noreferrer">t08_masking.m</a></td>
+        <td><a href="../simulink/models/tutorial08_masking.slx" data-local="../../simulink/models/tutorial08_masking.slx" download>tutorial08_masking.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t16</span> Lesson 16 · <a href="../simulink/index.html?lang=en#t16">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t16" data-local="../../simulink/course.html?id=t16">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t16_freq_domain.m" target="_blank" rel="noreferrer">t16_freq_domain.m</a></td>
+        <td><a href="../simulink/models/tutorial16_freq.slx" data-local="../../simulink/models/tutorial16_freq.slx" download>tutorial16_freq.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t17</span> Lesson 17 · <a href="../simulink/index.html?lang=en#t17">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t17" data-local="../../simulink/course.html?id=t17">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t17_lead_lag.m" target="_blank" rel="noreferrer">t17_lead_lag.m</a></td>
+        <td><a href="../simulink/models/tutorial17_leadlag.slx" data-local="../../simulink/models/tutorial17_leadlag.slx" download>tutorial17_leadlag.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t22</span> Root locus · <a href="../simulink/index.html?lang=en#t22">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t22" data-local="../../simulink/course.html?id=t22">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t22_root_locus.m" target="_blank" rel="noreferrer">t22_root_locus.m</a></td>
+        <td><a href="../simulink/models/tutorial22_root_locus.slx" data-local="../../simulink/models/tutorial22_root_locus.slx" download>tutorial22_root_locus.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t09</span> State space</td>
+        <td><a href="../simulink/course.html?id=t09" data-local="../../simulink/course.html?id=t09">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t09_state_space.m" target="_blank" rel="noreferrer">t09_state_space.m</a></td>
+        <td><a href="../simulink/models/tutorial09_state_space.slx" data-local="../../simulink/models/tutorial09_state_space.slx" download>tutorial09_state_space.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t10</span> State feedback / LQR · <a href="../simulink/index.html?lang=en#t10">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t10" data-local="../../simulink/course.html?id=t10">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t10_state_feedback.m" target="_blank" rel="noreferrer">t10_state_feedback.m</a></td>
+        <td><a href="../simulink/models/tutorial10_state_feedback.slx" data-local="../../simulink/models/tutorial10_state_feedback.slx" download>tutorial10_state_feedback.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t11</span> Observer · <a href="../simulink/index.html?lang=en#t11">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t11" data-local="../../simulink/course.html?id=t11">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t11_observer.m" target="_blank" rel="noreferrer">t11_observer.m</a></td>
+        <td><a href="../simulink/models/tutorial11_observer.slx" data-local="../../simulink/models/tutorial11_observer.slx" download>tutorial11_observer.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t12</span> Kalman filter · <a href="../simulink/index.html?lang=en#t12">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t12" data-local="../../simulink/course.html?id=t12">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t12_kalman_filter.m" target="_blank" rel="noreferrer">t12_kalman_filter.m</a></td>
+        <td><a href="../simulink/models/tutorial12_kalman.slx" data-local="../../simulink/models/tutorial12_kalman.slx" download>tutorial12_kalman.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t18</span> System ID · <a href="../simulink/index.html?lang=en#t18">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t18" data-local="../../simulink/course.html?id=t18">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t18_system_id.m" target="_blank" rel="noreferrer">t18_system_id.m</a></td>
+        <td><a href="../simulink/models/tutorial18_sysid.slx" data-local="../../simulink/models/tutorial18_sysid.slx" download>tutorial18_sysid.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t19</span> H-infinity</td>
+        <td><a href="../simulink/course.html?id=t19" data-local="../../simulink/course.html?id=t19">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t19_robust_control.m" target="_blank" rel="noreferrer">t19_robust_control.m</a></td>
+        <td><a href="../simulink/models/tutorial19_robust.slx" data-local="../../simulink/models/tutorial19_robust.slx" download>tutorial19_robust.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t20</span> MPC · <a href="../simulink/index.html?lang=en#t20">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t20" data-local="../../simulink/course.html?id=t20">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t20_mpc.m" target="_blank" rel="noreferrer">t20_mpc.m</a></td>
+        <td><a href="../simulink/models/tutorial20_mpc.slx" data-local="../../simulink/models/tutorial20_mpc.slx" download>tutorial20_mpc.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t21</span> Sliding mode · <a href="../simulink/index.html?lang=en#t21">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t21" data-local="../../simulink/course.html?id=t21">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t21_sliding_mode.m" target="_blank" rel="noreferrer">t21_sliding_mode.m</a></td>
+        <td><a href="../simulink/models/tutorial21_smc.slx" data-local="../../simulink/models/tutorial21_smc.slx" download>tutorial21_smc.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t23</span> MRAC · <a href="../simulink/index.html?lang=en#t23">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t23" data-local="../../simulink/course.html?id=t23">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t23_mrac.m" target="_blank" rel="noreferrer">t23_mrac.m</a></td>
+        <td><a href="../simulink/models/tutorial23_mrac.slx" data-local="../../simulink/models/tutorial23_mrac.slx" download>tutorial23_mrac.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t24</span> Fuzzy logic · <a href="../simulink/index.html?lang=en#t24">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t24" data-local="../../simulink/course.html?id=t24">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t24_fuzzy_control.m" target="_blank" rel="noreferrer">t24_fuzzy_control.m</a></td>
+        <td><a href="../simulink/models/tutorial24_fuzzy.slx" data-local="../../simulink/models/tutorial24_fuzzy.slx" download>tutorial24_fuzzy.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t13</span> DC motor · <a href="../simulink/index.html?lang=en#t13">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t13" data-local="../../simulink/course.html?id=t13">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t13_dc_motor.m" target="_blank" rel="noreferrer">t13_dc_motor.m</a></td>
+        <td><a href="../simulink/models/tutorial13_dc_motor.slx" data-local="../../simulink/models/tutorial13_dc_motor.slx" download>tutorial13_dc_motor.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t14</span> PMSM + FOC · <a href="../simulink/index.html?lang=en#t14">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t14" data-local="../../simulink/course.html?id=t14">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t14_foc_pmsm.m" target="_blank" rel="noreferrer">t14_foc_pmsm.m</a></td>
+        <td><a href="../simulink/models/tutorial14_foc.slx" data-local="../../simulink/models/tutorial14_foc.slx" download>tutorial14_foc.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t25</span> Simscape</td>
+        <td><a href="../simulink/course.html?id=t25" data-local="../../simulink/course.html?id=t25">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t25_simscape.m" target="_blank" rel="noreferrer">t25_simscape.m</a></td>
+        <td><a href="../simulink/models/tutorial25_simscape.slx" data-local="../../simulink/models/tutorial25_simscape.slx" download>tutorial25_simscape.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t15</span> Code generation</td>
+        <td><a href="../simulink/course.html?id=t15" data-local="../../simulink/course.html?id=t15">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t15_code_generation.m" target="_blank" rel="noreferrer">t15_code_generation.m</a></td>
+        <td><a href="../simulink/models/tutorial15_codegen.slx" data-local="../../simulink/models/tutorial15_codegen.slx" download>tutorial15_codegen.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t26</span> Robot kinematics · <a href="../simulink/index.html?lang=en#t26">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t26" data-local="../../simulink/course.html?id=t26">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t26_robot_kinematics.m" target="_blank" rel="noreferrer">t26_robot_kinematics.m</a></td>
+        <td><a href="../simulink/models/tutorial26_kinematics.slx" data-local="../../simulink/models/tutorial26_kinematics.slx" download>tutorial26_kinematics.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t27</span> MSD modeling · <a href="../simulink/index.html?lang=en#t27">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t27" data-local="../../simulink/course.html?id=t27">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t27_msd_modeling.m" target="_blank" rel="noreferrer">t27_msd_modeling.m</a></td>
+        <td><a href="../simulink/models/tutorial27_msd_models.slx" data-local="../../simulink/models/tutorial27_msd_models.slx" download>tutorial27_msd_models.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t28</span> DSP basics · <a href="../simulink/index.html?lang=en#t28">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t28" data-local="../../simulink/course.html?id=t28">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t28_dsp_basics.m" target="_blank" rel="noreferrer">t28_dsp_basics.m</a></td>
+        <td><a href="../simulink/models/tutorial28_dsp.slx" data-local="../../simulink/models/tutorial28_dsp.slx" download>tutorial28_dsp.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t29</span> MSD control compare · <a href="../simulink/index.html?lang=en#t29">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t29" data-local="../../simulink/course.html?id=t29">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t29_msd_control.m" target="_blank" rel="noreferrer">t29_msd_control.m</a></td>
+        <td><a href="../simulink/models/tutorial29_control_compare.slx" data-local="../../simulink/models/tutorial29_control_compare.slx" download>tutorial29_control_compare.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t30</span> Active suspension · <a href="../simulink/index.html?lang=en#t30">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t30" data-local="../../simulink/course.html?id=t30">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t30_active_suspension.m" target="_blank" rel="noreferrer">t30_active_suspension.m</a></td>
+        <td><a href="../simulink/models/tutorial30_suspension.slx" data-local="../../simulink/models/tutorial30_suspension.slx" download>tutorial30_suspension.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t31</span> EKF basics · <a href="../simulink/index.html?lang=en#t31">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t31" data-local="../../simulink/course.html?id=t31">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t31_ekf_basics.m" target="_blank" rel="noreferrer">t31_ekf_basics.m</a></td>
+        <td><a href="../simulink/models/tutorial31_ekf.slx" data-local="../../simulink/models/tutorial31_ekf.slx" download>tutorial31_ekf.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t32</span> EKF pendulum · <a href="../simulink/index.html?lang=en#t32">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t32" data-local="../../simulink/course.html?id=t32">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t32_ekf_pendulum.m" target="_blank" rel="noreferrer">t32_ekf_pendulum.m</a></td>
+        <td><a href="../simulink/models/tutorial32_pendulum.slx" data-local="../../simulink/models/tutorial32_pendulum.slx" download>tutorial32_pendulum.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t33</span> UKF</td>
+        <td><a href="../simulink/course.html?id=t33" data-local="../../simulink/course.html?id=t33">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t33_ukf_basics.m" target="_blank" rel="noreferrer">t33_ukf_basics.m</a></td>
+        <td><a href="../simulink/models/tutorial33_ukf.slx" data-local="../../simulink/models/tutorial33_ukf.slx" download>tutorial33_ukf.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t34</span> EKF vs UKF</td>
+        <td><a href="../simulink/course.html?id=t34" data-local="../../simulink/course.html?id=t34">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t34_ekf_vs_ukf.m" target="_blank" rel="noreferrer">t34_ekf_vs_ukf.m</a></td>
+        <td><a href="../simulink/models/tutorial34_ekfvsukf.slx" data-local="../../simulink/models/tutorial34_ekfvsukf.slx" download>tutorial34_ekfvsukf.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t35</span> IMU fusion · <a href="../simulink/index.html?lang=en#t35">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t35" data-local="../../simulink/course.html?id=t35">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t35_imu_fusion.m" target="_blank" rel="noreferrer">t35_imu_fusion.m</a></td>
+        <td><a href="../simulink/models/tutorial35_imu.slx" data-local="../../simulink/models/tutorial35_imu.slx" download>tutorial35_imu.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t36</span> Stateflow · <a href="../simulink/index.html?lang=en#t36">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t36" data-local="../../simulink/course.html?id=t36">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t36_stateflow_basics.m" target="_blank" rel="noreferrer">t36_stateflow_basics.m</a></td>
+        <td><a href="../simulink/models/tutorial36_stateflow.slx" data-local="../../simulink/models/tutorial36_stateflow.slx" download>tutorial36_stateflow.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t37</span> Triggered / enabled · <a href="../simulink/index.html?lang=en#t37">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t37" data-local="../../simulink/course.html?id=t37">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t37_triggered_subsystem.m" target="_blank" rel="noreferrer">t37_triggered_subsystem.m</a></td>
+        <td><a href="../simulink/models/tutorial37_triggered.slx" data-local="../../simulink/models/tutorial37_triggered.slx" download>tutorial37_triggered.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t38</span> Bus signals · <a href="../simulink/index.html?lang=en#t38">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t38" data-local="../../simulink/course.html?id=t38">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t38_bus_signals.m" target="_blank" rel="noreferrer">t38_bus_signals.m</a></td>
+        <td><a href="../simulink/models/tutorial38_bus.slx" data-local="../../simulink/models/tutorial38_bus.slx" download>tutorial38_bus.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t39</span> Model reference</td>
+        <td><a href="../simulink/course.html?id=t39" data-local="../../simulink/course.html?id=t39">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t39_model_referencing.m" target="_blank" rel="noreferrer">t39_model_referencing.m</a></td>
+        <td><a href="../simulink/models/tutorial39_top.slx" data-local="../../simulink/models/tutorial39_top.slx" download>tutorial39_top.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t40</span> Variant subsystem · <a href="../simulink/index.html?lang=en#t40">interactive</a></td>
+        <td><a href="../simulink/course.html?id=t40" data-local="../../simulink/course.html?id=t40">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t40_variant_subsystem.m" target="_blank" rel="noreferrer">t40_variant_subsystem.m</a></td>
+        <td><a href="../simulink/models/tutorial40_variant.slx" data-local="../../simulink/models/tutorial40_variant.slx" download>tutorial40_variant.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t41</span> Model callbacks</td>
+        <td><a href="../simulink/course.html?id=t41" data-local="../../simulink/course.html?id=t41">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t41_callbacks.m" target="_blank" rel="noreferrer">t41_callbacks.m</a></td>
+        <td><a href="../simulink/models/tutorial41_callbacks.slx" data-local="../../simulink/models/tutorial41_callbacks.slx" download>tutorial41_callbacks.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t42</span> S-Function</td>
+        <td><a href="../simulink/course.html?id=t42" data-local="../../simulink/course.html?id=t42">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t42_sfunction_basics.m" target="_blank" rel="noreferrer">t42_sfunction_basics.m</a></td>
+        <td><a href="../simulink/models/tutorial42_sfunction.slx" data-local="../../simulink/models/tutorial42_sfunction.slx" download>tutorial42_sfunction.slx</a></td>
+      </tr>
+      <tr>
+        <td><span class="n">t43</span> Model Advisor</td>
+        <td><a href="../simulink/course.html?id=t43" data-local="../../simulink/course.html?id=t43">Chinese notes</a></td>
+        <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t43_model_advisor.m" target="_blank" rel="noreferrer">t43_model_advisor.m</a></td>
+        <td><a href="../simulink/models/tutorial43_advisor.slx" data-local="../../simulink/models/tutorial43_advisor.slx" download>tutorial43_advisor.slx</a></td>
+      </tr>
+        </tbody>
+      </table>
+    </main>
+    <footer><a href="./">← vibe-lab</a> · <a href="../about/en.html">Method</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">Tutorial source</a></footer>
+  </div>
+  <script>
+    (function () {
+      if (location.protocol !== "file:") return;
+      document.querySelectorAll("[data-local]").forEach(function (a) { a.href = a.getAttribute("data-local"); });
+    })();
+  </script>
+</body>
+</html>
+

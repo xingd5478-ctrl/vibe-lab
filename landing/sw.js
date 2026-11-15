@@ -5,6 +5,7 @@ const ASSETS = [
   "./index.html",
   "./en/",
   "./en/index.html",
+  "./en/lessons.html",
   "./style.css",
   "./feedback.html",
   "./preview-imu.png",

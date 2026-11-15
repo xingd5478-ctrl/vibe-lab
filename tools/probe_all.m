@@ -61,7 +61,10 @@ for k = 1:numel(files)
                 "tutorial34_ekfvsukf"])
             set_param(name, "MaxStep", "0.01");
         end
-        m.probe_blocks = add_scope_probes(name);
+        if name == "tutorial26_kinematics"
+            m.probe_blocks = add_output_probes(name, "DH_FK", ["fk_x", "fk_y", "fk_z"]);
+        end
+        m.probe_blocks = m.probe_blocks + add_scope_probes(name);
         out = sim(name);
         [m.samples, m.signals] = collect_signals(out);
         m.status = "ok";
@@ -97,20 +100,31 @@ switch name
         t = (0:0.1:10)';
         assignin("base", "u_input", timeseries(sin(t), t));
     case "tutorial24_fuzzy"
-        fis = mamfis("Name", "fis");
-        fis = addInput(fis, [-10 10], "Name", "e");
-        fis = addInput(fis, [-10 10], "Name", "de");
-        fis = addOutput(fis, [-10 10], "Name", "u");
-        fis = addMF(fis, "e", "trimf", [-10 -10 0], "Name", "N");
-        fis = addMF(fis, "e", "trimf", [-10 0 10], "Name", "Z");
-        fis = addMF(fis, "e", "trimf", [0 10 10], "Name", "P");
-        fis = addMF(fis, "de", "trimf", [-10 -10 0], "Name", "N");
-        fis = addMF(fis, "de", "trimf", [-10 0 10], "Name", "Z");
-        fis = addMF(fis, "de", "trimf", [0 10 10], "Name", "P");
-        fis = addMF(fis, "u", "trimf", [-10 -10 0], "Name", "N");
-        fis = addMF(fis, "u", "trimf", [-10 0 10], "Name", "Z");
-        fis = addMF(fis, "u", "trimf", [0 10 10], "Name", "P");
-        fis = addRule(fis, [1 1 1 1 1; 2 2 2 1 1; 3 3 3 1 1]);
+        fis = sugfis("Name", "Fuzzy_PI");
+        fis = addInput(fis, [-3 3], "Name", "e");
+        fis = addMF(fis, "e", "gaussmf", [0.8 -3], "Name", "NB");
+        fis = addMF(fis, "e", "gaussmf", [0.8 -1.5], "Name", "NS");
+        fis = addMF(fis, "e", "gaussmf", [0.5 0], "Name", "ZE");
+        fis = addMF(fis, "e", "gaussmf", [0.8 1.5], "Name", "PS");
+        fis = addMF(fis, "e", "gaussmf", [0.8 3], "Name", "PB");
+        fis = addInput(fis, [-6 6], "Name", "de");
+        fis = addMF(fis, "de", "gaussmf", [1.5 -6], "Name", "NB");
+        fis = addMF(fis, "de", "gaussmf", [1.5 -3], "Name", "NS");
+        fis = addMF(fis, "de", "gaussmf", [1.0 0], "Name", "ZE");
+        fis = addMF(fis, "de", "gaussmf", [1.5 3], "Name", "PS");
+        fis = addMF(fis, "de", "gaussmf", [1.5 6], "Name", "PB");
+        fis = addOutput(fis, [-5 5], "Name", "du");
+        fis = addMF(fis, "du", "constant", -5, "Name", "NB");
+        fis = addMF(fis, "du", "constant", -2.5, "Name", "NS");
+        fis = addMF(fis, "du", "constant", 0, "Name", "ZE");
+        fis = addMF(fis, "du", "constant", 2.5, "Name", "PS");
+        fis = addMF(fis, "du", "constant", 5, "Name", "PB");
+        rules = [1 1 1 1 1; 1 2 1 1 1; 1 3 2 1 1; 1 4 3 1 1; 1 5 3 1 1;
+                 2 1 1 1 1; 2 2 2 1 1; 2 3 2 1 1; 2 4 3 1 1; 2 5 4 1 1;
+                 3 1 2 1 1; 3 2 2 1 1; 3 3 3 1 1; 3 4 4 1 1; 3 5 4 1 1;
+                 4 1 3 1 1; 4 2 3 1 1; 4 3 4 1 1; 4 4 4 1 1; 4 5 5 1 1;
+                 5 1 3 1 1; 5 2 3 1 1; 5 3 4 1 1; 5 4 5 1 1; 5 5 5 1 1];
+        fis = addRule(fis, rules);
         assignin("base", "fis", fis);
     case "tutorial35_imu"
         t = (0:0.01:10)';
@@ -121,6 +135,25 @@ switch name
     case "tutorial41_callbacks"
         assignin("base", "Kp", 2);
         assignin("base", "Ki", 1);
+end
+end
+
+
+% -------------------------------------------------------------------------
+function n = add_output_probes(name, blockName, varNames)
+n = 0;
+ph = get_param(name + "/" + blockName, "PortHandles");
+for k = 1:min(numel(varNames), numel(ph.Outport))
+    varName = varNames(k);
+    try
+        blk = add_block("simulink/Sinks/To Workspace", name + "/" + varName, ...
+            "VariableName", varName, "SaveFormat", "Timeseries", ...
+            "Position", [900, 40 + 35 * n, 960, 60 + 35 * n]);
+        bph = get_param(blk, "PortHandles");
+        add_line(name, ph.Outport(k), bph.Inport(1), "autorouting", "on");
+        n = n + 1;
+    catch
+    end
 end
 end
 

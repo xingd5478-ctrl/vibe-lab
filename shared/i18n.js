@@ -108,7 +108,7 @@
     "实验台": "Workbench", "10 章手册": "10-chapter manual",
     "检测到列名无法识别，请手动映射。": "Columns not recognized; map them manually.",
     "角速度 (°/s)": "Angular rate (°/s)", "时间 (s)": "Time (s)",
-    "Allan 标准差 (°/s)": "Allan deviation (°/s)", "角度 (°)": "Angle (°)",
+    "Allan 标准差 (°/s)": "Allan deviation (°/s)", "Allan 方差数据（抽样）": "Allan deviation data (sampled)", "角度 (°)": "Angle (°)",
     "幅值 (dB)": "Magnitude (dB)", "相位 (°)": "Phase (°)",
     "幅值": "Mag.", "相位": "Phase", "频率": "Frequency",
     "自然频率 ωn": "Natural frequency ωn", "阻尼比 ζ": "Damping ratio ζ",
@@ -132,7 +132,7 @@
     "超调量": "Overshoot", "末值误差": "Final error", "贴限幅比例": "Saturation ratio",
     "测量 RMSE": "Meas. RMSE", "滤波 RMSE": "Filter RMSE", "EKF RMSE": "EKF RMSE",
     "抖振指标 mean|Δu|": "Chattering mean|Δu|", "t>1s 最大误差": "Max error after 1 s",
-    "输入幅度": "Input amplitude", "输出幅度": "Output amplitude", "噪声": "Noise",
+    "输入幅度": "Input amplitude", "输出幅度": "Output amplitude", "输入幅值": "Input amplitude", "输出幅值": "Output amplitude", "噪声": "Noise",
     "无": "none", "有": "yes", "开环": "Open", "闭环": "Closed loop", "闭环 PID": "PID",
     "连续 PID": "Cont. PID", "离散 PID": "Disc. PID", "真实": "True", "估计值": "Estimate",
     "采样点连线": "S&H", "真实正弦": "True sine", "重建": "Reconstructed",
@@ -208,6 +208,10 @@
   function translateText(node) {
     if (skipNode(node)) return;
     const v = node.nodeValue;
+    if (node.parentElement && node.parentElement.id === "sr-summary" && /[\u4e00-\u9fff]/.test(v)) {
+      node.nodeValue = "Summary: chart values update with the selected channel and R/Q.";
+      return;
+    }
     const t = translateString(v);
     if (t !== v) node.nodeValue = t;
   }
@@ -261,7 +265,7 @@
     }
     a.hreflang = target === "en" ? "en" : "zh-CN";
     a.lang = target === "en" ? "en" : "zh-CN";
-    a.textContent = target === "en" ? "EN" : "中文";
+    a.textContent = target === "en" ? "EN" : "Chinese";
     const url = new URL(location.href);
     url.searchParams.set("lang", target);
     a.href = target === "en" && /\/about\//.test(location.pathname) ? "en.html" : url.href;
@@ -275,8 +279,84 @@
     d.className = "lang-banner";
     d.setAttribute("data-i18n-skip", "");
     d.style.cssText = "margin:10px 0 0;padding:7px 10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12px;border-radius:2px";
-    d.innerHTML = "English UI (beta): tool labels and charts are translated; lesson notes and some hints remain in Chinese. <a href=\"?lang=zh\">中文</a>";
+    d.innerHTML = "English UI: tools and charts are translated. Chinese-only manuals and long lesson notes are hidden; switch to <a href=\"?lang=zh\">Chinese</a> for the full content.";
     wrap.insertBefore(d, wrap.querySelector("header"));
+  }
+
+  let curated = false;
+  function enIndexHref() {
+    return location.protocol === "file:" ? "../landing/en/lessons.html" : "../en/lessons.html";
+  }
+  function addNote(text, after) {
+    const p = document.createElement("p");
+    p.className = "hint en-scope-note";
+    p.setAttribute("data-i18n-skip", "");
+    p.textContent = text;
+    const main = document.querySelector("main");
+    if (after && after.parentNode) after.parentNode.insertBefore(p, after.nextSibling);
+    else if (main) main.appendChild(p);
+  }
+  function repointCourseLinks() {
+    const href = enIndexHref();
+    document.querySelectorAll('a[href*="course.html"]').forEach((a) => {
+      if (a.closest("[data-i18n-skip]")) return;
+      a.href = href;
+    });
+  }
+  function englishCuration() {
+    if (curated) return;
+    if (document.getElementById("lesson-body")) {
+      location.replace(enIndexHref());
+      return;
+    }
+    const isImu = !!(document.getElementById("chart-allan") && document.getElementById("chart-time"));
+    const isCtrl = !!(document.getElementById("bode") && document.getElementById("step"));
+    const isSim = !!(document.getElementById("tabs") && document.getElementById("phases"));
+    if (!isImu && !isCtrl && !isSim) return;
+    curated = true;
+    const footer = document.querySelector("footer");
+    if (footer) {
+      footer.innerHTML = 'vibe-lab · static site · <a href="../">Home</a> · <a href="../about/en.html">Method</a> · <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">Source</a>';
+    }
+    if (isImu) {
+      const sub = document.querySelector("header .sub");
+      if (sub) {
+        const badge = sub.querySelector(".badge");
+        sub.textContent = "Upload MPU6050 CSV → CRC cleaning → Allan deviation → drag R/Q to filter. Everything runs in your browser; no backend. ";
+        if (badge) { badge.textContent = "Demo data"; sub.appendChild(badge); }
+      }
+      const csv = [...document.querySelectorAll(".hint")].find((h) => h.textContent.includes("CSV 列名") || h.textContent.includes("gx_dps") || h.textContent.includes("CSV columns"));
+      if (csv) csv.innerHTML = "CSV columns: <code>gx_dps/gy_dps/gz_dps</code>, optional <code>crc_ok</code>, <code>t</code>. Without a header, rows are parsed as t,gx,gy,gz,crc.";
+      const file = document.getElementById("file");
+      if (file && !document.getElementById("file-en")) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.id = "file-en";
+        b.className = "mini";
+        b.style.cssText = "width:100%;margin:0 0 6px;padding:8px;font-size:12px";
+        b.textContent = "Choose CSV";
+        b.addEventListener("click", () => file.click());
+        file.style.display = "none";
+        file.parentNode.insertBefore(b, file);
+      }
+      addNote("The 10-chapter lab manual is Chinese-only and hidden in English mode; switch to Chinese for the full manual.");
+    }
+    if (isCtrl) {
+      const sub = document.querySelector("header .sub");
+      if (sub) sub.textContent = "G(s)=ωn²/(s²+2ζωn·s+ωn²). Drag the sliders to see the Bode plot and step response in real time.";
+      const hint = document.querySelector(".controls .hint");
+      if (hint) hint.textContent = "Kp speeds up the response but increases overshoot; Ki removes steady-state error but can oscillate; Kd reduces overshoot and amplifies noise. Drag the sliders to compare open and closed loop.";
+      addNote("Extended labs and the 14-chapter manual are Chinese-only and hidden in English mode; switch to Chinese for them.");
+    }
+    if (isSim) {
+      const sub = document.querySelector("header .sub");
+      if (sub) {
+        sub.innerHTML = 'A 43-lesson / 8-stage MATLAB + Simulink tutorial. <code>.slx</code> files are binary models the browser cannot run; this page reproduces the same control math interactively. <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">GitHub repo →</a>';
+      }
+      repointCourseLinks();
+      const note = document.getElementById("demo-note");
+      addNote("Interactive reproduction. The Chinese lesson notes are linked from the English lesson index; use the lesson index for .m/.slx downloads.", note);
+    }
   }
 
   if (document.readyState === "loading") {
@@ -284,6 +364,8 @@
       walk(document.body);
       addBanner();
       addSwitch("zh");
+      setTimeout(englishCuration, 0);
+      window.addEventListener("load", englishCuration);
       mo.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "title", "aria-label", "alt"] });
       document.title = translateString(document.title);
     });
@@ -291,6 +373,8 @@
     walk(document.body);
     addBanner();
     addSwitch("zh");
+    setTimeout(englishCuration, 0);
+    window.addEventListener("load", englishCuration);
     mo.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "title", "aria-label", "alt"] });
     document.title = translateString(document.title);
   }

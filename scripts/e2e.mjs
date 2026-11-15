@@ -101,8 +101,7 @@ async function main() {
       return r.result.value;
     };
 
-    const audit = async (label, dark = false) => {
-      if (!AXE) return;
+    const audit = async (label, dark = false) => {      if (!AXE) return;
       await client.send("Emulation.setEmulatedMedia", {
         features: [{ name: "prefers-color-scheme", value: dark ? "dark" : "light" }],
       });
@@ -127,7 +126,8 @@ async function main() {
     if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("imu-en: lang");
     if (!(await evalJs("document.querySelector('h1').textContent")).includes("IMU data lab")) throw new Error("imu-en: h1");
     if (!(await evalJs("!!document.querySelector('.lang-banner')"))) throw new Error("imu-en: banner");
-    if ((await evalJs("document.querySelector('.lang-switch').textContent")) !== "中文") throw new Error("imu-en: switch");
+    if ((await evalJs("document.querySelector('.lang-switch').textContent")) !== "Chinese") throw new Error("imu-en: switch");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("imu-en: Chinese text remains");
     await audit("imu-en");
     await audit("imu-en", true);
     await evalJs("localStorage.setItem('vibe-lang', 'zh')");
@@ -169,6 +169,7 @@ async function main() {
     if ((await evalJs("document.querySelectorAll('.topnav a').length")) !== 6) throw new Error("landing-en: global nav");
     if ((await evalJs("document.querySelectorAll('.card').length")) !== 3) throw new Error("landing-en: cards");
     if (!(await evalJs("document.title")).includes("sensors")) throw new Error("landing-en: title");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("English text check failed");
     await audit("landing-en");
     await audit("landing-en", true);
 
@@ -189,6 +190,7 @@ async function main() {
     await sleep(400);
     if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("about-en: lang");
     if (!(await evalJs("document.body.textContent")).includes("Methods & limitations")) throw new Error("about-en: content");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("English text check failed");
     await audit("about-en");
     await audit("about-en", true);
     await evalJs("localStorage.setItem('vibe-lang', 'zh')");
@@ -222,6 +224,7 @@ async function main() {
     await sleep(350);
     if (!/Signals|Signal/.test(await evalJs("document.querySelector('#demo-title').textContent"))) throw new Error("simulink-en: demo title");
     if (!(await evalJs("!!document.querySelector('.lang-banner')"))) throw new Error("simulink-en: banner");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("English text check failed");
     await audit("simulink-en");
     await audit("simulink-en", true);
 

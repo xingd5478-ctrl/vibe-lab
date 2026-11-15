@@ -88,7 +88,7 @@
 <tr><td>t31 EKF</td><td>测量 RMSE 0.101，EKF 0.031</td><td>模型只输出真值/含噪测量，测量 RMSE 0.053</td><td>无 EKF 模块；按讲义实现 x₁ RMSE 0.049（R=0.005）</td></tr>
 </tbody></table>
 </div>
-<p class="hint">只列真机跑过的模型；完整 43 行见 <a href="matlab.html">MATLAB 对照页</a>。t10 的差异是真实存在的：原 .slx 用 u=−Kx，网页 demo 加了参考前馈。t20/t21/t31 也一样：t20 的 .slx 是 PID 跟踪二阶对象，t21 的 .slx 是符号继电器（u 只有 0/3，不抖），t31 的 .slx 只采集数据、没有 EKF 模块；EKF 数字按讲义离线实现，参数与网页 demo 不同，不为了让两边对上而改数。</p>
+<p class="hint">只列真机跑过的模型；完整 43 行见 <a href="matlab.html">MATLAB 对照页</a>。t10 的差异是真实存在的：原 .slx 用 u=−Kx，网页 demo 加了参考前馈。t20/t21/t31 也一样：t20 的 .slx 是 PID 跟踪二阶对象，t21 的 .slx 是符号继电器（u 只有 0/3，不抖），t31 的 .slx 只采集数据、没有 EKF 模块；EKF 数字按讲义离线实现，参数与网页 demo 不同，不为了让两边对上而改数。t24/t26/t32/t35 的模型问题已直接修：t24 用讲义原 FIS、t26 补末端输出、t32 加 PD 稳定、t35 修时间通道。</p>
 </section>
 </main>
 
