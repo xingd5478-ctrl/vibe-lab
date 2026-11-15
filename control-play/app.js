@@ -50,14 +50,19 @@
     let peak = -Infinity, tPeak = 0;
     for (let i = 0; i < y.length; i++) if (y[i] > peak) { peak = y[i]; tPeak = t[i]; }
     const overshoot = peak > 1 ? (peak - 1) * 100 : 0;
-    let settle = t[t.length - 1];
+    let settle = 0, settled = true;
     for (let i = y.length - 1; i >= 0; i--) {
-      if (Math.abs(y[i] - 1) > 0.02) { settle = t[Math.min(i + 1, y.length - 1)]; break; }
+      if (Math.abs(y[i] - 1) > 0.02) {
+        if (i === y.length - 1) { settle = null; settled = false; }
+        else settle = t[Math.min(i + 1, y.length - 1)];
+        break;
+      }
     }
-    return { overshoot, tPeak, settle, ess: Math.abs(1 - y[y.length - 1]) };
+    return { overshoot, tPeak, settle, settled, ess: Math.abs(1 - y[y.length - 1]) };
   }
 
   const { attachHover, path, fmt, linTicks, logTicks } = window.IMUChart;
+  const tr = (s) => (window.VibeI18n ? window.VibeI18n.translate(s) : s);
 
   function plotBode(el, b) {
     const w = Math.max(el.clientWidth || 640, 320), h = 300;
@@ -92,25 +97,25 @@
     svg += `<line class="axis" x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${h - PAD.b}"/>`;
     svg += `<line class="axis" x1="${w - PAD.r}" y1="${PAD.t}" x2="${w - PAD.r}" y2="${h - PAD.b}"/>`;
     svg += `<line class="axis" x1="${PAD.l}" y1="${h - PAD.b}" x2="${w - PAD.r}" y2="${h - PAD.b}"/>`;
-    svg += `<text class="axis-label" x="${PAD.l}" y="${PAD.t - 10}">幅值 (dB)</text>`;
-    svg += `<text class="axis-label" x="${w - PAD.r}" y="${PAD.t - 10}" text-anchor="end">相位 (°)</text>`;
+    svg += `<text class="axis-label" x="${PAD.l}" y="${PAD.t - 10}">${tr("幅值 (dB)")}</text>`;
+    svg += `<text class="axis-label" x="${w - PAD.r}" y="${PAD.t - 10}" text-anchor="end">${tr("相位 (°)")}</text>`;
     svg += `<text class="axis-label" x="${w - PAD.r}" y="${h - 4}" text-anchor="end">ω (rad/s)</text>`;
 
     svg += path(b.w.map((v, i) => [X(v), Ym(b.mag[i])]), "#1f4e79", 1.8);
     svg += path(b.w.map((v, i) => [X(v), Yp(b.phase[i])]), "#b5651d", 1.8);
 
     svg += `<line x1="${PAD.l + 118}" y1="${PAD.t - 18}" x2="${PAD.l + 132}" y2="${PAD.t - 18}" stroke="#1f4e79" stroke-width="2"/>`;
-    svg += `<text class="legend-label" x="${PAD.l + 137}" y="${PAD.t - 14}">幅值</text>`;
+    svg += `<text class="legend-label" x="${PAD.l + 137}" y="${PAD.t - 14}">${tr("幅值")}</text>`;
     svg += `<line x1="${PAD.l + 188}" y1="${PAD.t - 18}" x2="${PAD.l + 202}" y2="${PAD.t - 18}" stroke="#b5651d" stroke-width="2"/>`;
-    svg += `<text class="legend-label" x="${PAD.l + 207}" y="${PAD.t - 14}">相位</text>`;
+    svg += `<text class="legend-label" x="${PAD.l + 207}" y="${PAD.t - 14}">${tr("相位")}</text>`;
     svg += "</svg>";
     el.innerHTML = svg;
 
     attachHover(el, {
       w, h, pad: PAD, X, xInv, xLabel: "ω",
       series: [
-        { name: "幅值", points: b.w.map((v, i) => [v, b.mag[i]]) },
-        { name: "相位", points: b.w.map((v, i) => [v, b.phase[i]]) },
+        { name: tr("幅值"), points: b.w.map((v, i) => [v, b.mag[i]]) },
+        { name: tr("相位"), points: b.w.map((v, i) => [v, b.phase[i]]) },
       ],
       yDot: (p) => Ym(p[1]),
     });
@@ -146,17 +151,17 @@
     svg += path(Array.from(closed.t, (v, i) => [X(v), Y(closed.y[i])]), "#2f6b4f", 1.8);
 
     svg += `<line x1="${PAD.l + 78}" y1="${PAD.t - 18}" x2="${PAD.l + 92}" y2="${PAD.t - 18}" stroke="#b9b3a5" stroke-width="1.2" stroke-dasharray="5 4"/>`;
-    svg += `<text class="legend-label" x="${PAD.l + 97}" y="${PAD.t - 14}">开环</text>`;
+    svg += `<text class="legend-label" x="${PAD.l + 97}" y="${PAD.t - 14}">${tr("开环")}</text>`;
     svg += `<line x1="${PAD.l + 138}" y1="${PAD.t - 18}" x2="${PAD.l + 152}" y2="${PAD.t - 18}" stroke="#2f6b4f" stroke-width="2"/>`;
-    svg += `<text class="legend-label" x="${PAD.l + 157}" y="${PAD.t - 14}">闭环 PID</text>`;
+    svg += `<text class="legend-label" x="${PAD.l + 157}" y="${PAD.t - 14}">${tr("闭环 PID")}</text>`;
     svg += "</svg>";
     el.innerHTML = svg;
 
     attachHover(el, {
       w, h, pad: PAD, X, xInv, xLabel: "t",
       series: [
-        { name: "开环", points: Array.from(open.t, (v, i) => [v, open.y[i]]) },
-        { name: "闭环", points: Array.from(closed.t, (v, i) => [v, closed.y[i]]) },
+        { name: tr("开环"), points: Array.from(open.t, (v, i) => [v, open.y[i]]) },
+        { name: tr("闭环"), points: Array.from(closed.t, (v, i) => [v, closed.y[i]]) },
       ],
       yDot: (p) => Y(p[1]),
     });
@@ -186,9 +191,11 @@
     plotStep($("step"), open, closed);
 
     const m = metrics(closed.t, closed.y);
+    const tEnd = closed.t[closed.t.length - 1];
+    const peakAtEnd = m.tPeak >= tEnd - 1e-9;
     $("overshoot").textContent = m.overshoot.toFixed(1) + " %";
-    $("peak").textContent = m.tPeak.toFixed(2) + " s";
-    $("settle").textContent = m.settle.toFixed(2) + " s";
+    $("peak").textContent = peakAtEnd ? `>${tEnd.toFixed(1)} s` : m.tPeak.toFixed(2) + " s";
+    $("settle").textContent = m.settled ? m.settle.toFixed(2) + " s" : `>${tEnd.toFixed(1)} s`;
     $("ess").textContent = m.ess.toFixed(3);
     $("meta-bode").textContent = `ωn=${wn.toFixed(1)} · ζ=${zeta.toFixed(2)}`;
     $("meta-step").textContent = `Kp=${kp.toFixed(2)} · Ki=${ki.toFixed(2)} · Kd=${kd.toFixed(3)}`;

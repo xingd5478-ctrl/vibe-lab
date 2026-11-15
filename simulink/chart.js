@@ -323,8 +323,9 @@
     const w = Math.max(el.clientWidth || 640, 320);
     const h = cfg.height || 230;
     const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    const tr = (s) => (root.VibeI18n ? root.VibeI18n.translate(s) : s);
     const series = cfg.series
-      .map((s) => ({ ...s, color: themed(s.color), points: decimate(s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])), 1500) }))
+      .map((s) => ({ ...s, name: tr(s.name), color: themed(s.color), points: decimate(s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])), 1500) }))
       .filter((s) => s.points.length > 1 || s.marker);
 
     if (!series.length) { el.innerHTML = ""; return; }
@@ -389,8 +390,8 @@
 
     svg += `<line class="axis" x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${h - pad.b}"/>`;
     svg += `<line class="axis" x1="${pad.l}" y1="${h - pad.b}" x2="${w - pad.r}" y2="${h - pad.b}"/>`;
-    svg += `<text class="axis-label" x="${w - pad.r}" y="${h - 4}" text-anchor="end">${cfg.xLabel || ""}</text>`;
-    svg += `<text class="axis-label" x="${pad.l}" y="${pad.t - 10}">${cfg.yLabel || ""}</text>`;
+    svg += `<text class="axis-label" x="${w - pad.r}" y="${h - 4}" text-anchor="end">${tr(cfg.xLabel || "")}</text>`;
+    svg += `<text class="axis-label" x="${pad.l}" y="${pad.t - 10}">${tr(cfg.yLabel || "")}</text>`;
 
     svg += `<g clip-path="url(#${clipId})">`;
     const marker = (kind, cx, cy, color, r) => {

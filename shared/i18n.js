@@ -58,6 +58,34 @@
     "跳到内容": "Skip to content", "全站导航": "Site navigation", "首页": "Home", "方法": "Method",
     "方法说明": "Method", "方法说明与局限": "Methods & limitations",
     "IMU 数据实验室": "IMU data lab", "Control Play · 二阶系统": "Control Play · second-order systems",
+    "上传 MPU6050 CSV → CRC 清洗 → Allan 方差 → 拖动 R/Q 看滤波。全部在浏览器内计算，无后端。":
+      "Upload MPU6050 CSV → CRC cleaning → Allan deviation → drag R/Q to filter. Everything runs in your browser; no backend.",
+    "演示数据": "Demo data",
+    "43 课 / 8 阶段的 MATLAB + Simulink 教程。.slx 是 MATLAB 二进制模型，浏览器无法直接运行；":
+      "A 43-lesson / 8-stage MATLAB + Simulink tutorial. `.slx` is a binary MATLAB model the browser cannot run;",
+    "43 课 / 8 阶段的 MATLAB + Simulink 教程。.slx 是 MATLAB 二进制模型，浏览器无法直接运行； 本页用":
+      "A 43-lesson / 8-stage MATLAB + Simulink tutorial. `.slx` is a binary MATLAB model the browser cannot run; this page uses",
+    "本页用": "this page uses",
+    "做可交互复现，并链接到每课的": " to reproduce the same math interactively, with links to each lesson's",
+    "与": "and",
+    "同一套控制数学": "the same control math",
+    "输出 y=K·u": "Output y=K·u",
+    "y(t)=Ku(t)。先看输入，再看放大后的输出；打开噪声模拟真实传感器。":
+      "y(t)=Ku(t). Compare the input and the scaled output; enable noise to model a real sensor.",
+    "y(t)=Ku(t). 先看输入，再看放大后的输出；打开噪声模拟真实传感器。":
+      "y(t)=Ku(t). Compare the input and the scaled output; enable noise to model a real sensor.",
+    "GitHub 仓库 →": "GitHub repo →",
+    "Phase 1 · Simulink 基础与动力学": "Phase 1 · Simulink & dynamics",
+    "Phase 2 · 经典控制设计": "Phase 2 · Classical control",
+    "Phase 3 · 现代控制": "Phase 3 · Modern control",
+    "Phase 4 · 高级控制": "Phase 4 · Advanced control",
+    "Phase 5 · 机电系统与部署": "Phase 5 · Mechatronics & deployment",
+    "Phase 6 · 综合案例": "Phase 6 · Case studies",
+    "Phase 7 · 非线性滤波": "Phase 7 · Nonlinear filtering",
+    "Phase 8 · Simulink 进阶": "Phase 8 · Advanced Simulink",
+    "增益 K": "Gain K", "频率 (Hz)": "Frequency (Hz)", "叠加噪声": "Add noise",
+    "y(t)=Ku(t). 先看输入，再看放大后的输出；打开噪声模拟真实传感器。":
+      "y(t)=Ku(t). Compare the input and the scaled output; enable noise to model a real sensor.",
     "Simulink 控制教程 · 交互复现": "Simulink control tutorial · interactive",
     "IMU 数据实验室 · vibe-lab": "IMU data lab · vibe-lab",
     "Control Play · 二阶系统 · vibe-lab": "Control Play · second-order systems · vibe-lab",
@@ -82,7 +110,7 @@
     "角速度 (°/s)": "Angular rate (°/s)", "时间 (s)": "Time (s)",
     "Allan 标准差 (°/s)": "Allan deviation (°/s)", "角度 (°)": "Angle (°)",
     "幅值 (dB)": "Magnitude (dB)", "相位 (°)": "Phase (°)",
-    "幅值": "Magnitude", "相位": "Phase", "频率": "Frequency",
+    "幅值": "Mag.", "相位": "Phase", "频率": "Frequency",
     "自然频率 ωn": "Natural frequency ωn", "阻尼比 ζ": "Damping ratio ζ",
     "比例增益 Kp": "Proportional gain Kp", "积分增益 Ki": "Integral gain Ki",
     "微分增益 Kd": "Derivative gain Kd", "超调量（闭环）": "Overshoot (closed loop)",
@@ -92,22 +120,22 @@
     "14 章手册": "14-chapter manual", "Control Play 实验手册 · 10 章": "Control Play manual · 10 chapters",
     "课程阶段 · 8 个": "Course stages · 8", "阅读 43 课完整讲义 →": "Read all 43 lessons →",
     "交互复现": "Interactive reproduction", "怎么在 MATLAB 里跑原版": "Run the originals in MATLAB",
-    "ARW 拟合": "ARW fit", "RRW 拟合": "RRW fit", "原始": "Raw", "清洗后": "Cleaned",
-    "原始积分": "Raw integration", "卡尔曼": "Kalman", "真值": "Truth", "测量": "Measurement",
+    "ARW 拟合": "ARW fit", "RRW 拟合": "RRW fit", "原始": "Raw", "清洗后": "Clean",
+    "原始积分": "Raw", "卡尔曼": "KF", "真值": "Truth", "测量": "Measurement",
     "估计": "Estimate", "参考": "Reference", "输入 u": "Input u", "输出 y": "Output y",
-    "测量 z": "Measurement z", "估计 x̂": "Estimate x̂", "测量误差": "Measurement error",
-    "滤波误差": "Filter error", "加速度计": "Accelerometer", "互补输出": "Complementary output",
-    "加速度计误差": "Accelerometer error", "互补误差": "Complementary error",
+    "测量 z": "Measurement z", "估计 x̂": "Estimate x̂", "测量误差": "Meas. err",
+    "滤波误差": "Filter err", "加速度计": "Accel", "互补输出": "Complementary",
+    "加速度计误差": "Accel err", "互补误差": "Comp err",
     "连续输入": "Continuous input", "保持输出": "Held output", "实测": "Measured", "拟合": "Fit",
-    "参考模型": "Reference model", "对象 y": "Plant y", "位置": "Position", "速度": "Speed",
+    "参考模型": "Ref model", "对象 y": "Plant y", "位置": "Position", "速度": "Speed",
     "力矩": "Torque", "转速": "Speed", "电流": "Current", "误差": "Error",
     "超调量": "Overshoot", "末值误差": "Final error", "贴限幅比例": "Saturation ratio",
     "测量 RMSE": "Meas. RMSE", "滤波 RMSE": "Filter RMSE", "EKF RMSE": "EKF RMSE",
     "抖振指标 mean|Δu|": "Chattering mean|Δu|", "t>1s 最大误差": "Max error after 1 s",
     "输入幅度": "Input amplitude", "输出幅度": "Output amplitude", "噪声": "Noise",
-    "无": "none", "有": "yes", "开环": "Open loop", "闭环 PID": "Closed-loop PID",
-    "连续 PID": "Continuous PID", "离散 PID": "Discrete PID", "真实": "True", "估计值": "Estimate",
-    "采样点连线": "Sample-and-hold", "真实正弦": "True sine", "重建": "Reconstructed",
+    "无": "none", "有": "yes", "开环": "Open", "闭环": "Closed loop", "闭环 PID": "PID",
+    "连续 PID": "Cont. PID", "离散 PID": "Disc. PID", "真实": "True", "估计值": "Estimate",
+    "采样点连线": "S&H", "真实正弦": "True sine", "重建": "Reconstructed",
     "上升时间": "Rise time", "峰值": "Peak", "终值": "Final value", "稳态": "Steady state",
     "计算中…": "Computing…", "Allan 计算中…": "Computing Allan…",
     "拟合失败：数据太短或曲线异常": "Fit failed: data too short or curve abnormal",
@@ -134,6 +162,7 @@
     [/^(\d[\d,]*) 帧$/, "$1 frames"],
     [/^(\d+) 章手册$/, "$1-chapter manual"],
     [/^(\d+) 课$/, "$1 lessons"],
+    [/^(\d+) 课 · (.+)$/, "$1 lessons · $2"],
     [/^(\d+) 个交互$/, "$1 interactive demos"],
     [/^(\d+) 个$/, "$1"],
     [/^(?:t|T)(\d+) · (.+)$/, (m, n, title) => `${m.startsWith("T") ? "T" : "t"}${n} · ${DEMO_TITLES[title] || TITLES[title] || title}`],
@@ -144,7 +173,7 @@
     if (!value) return value;
     const trimmed = value.trim();
     if (!trimmed) return value;
-    let out = EN[trimmed];
+    let out = EN[trimmed] || EN[trimmed.replace(/\s+/g, " ")];
     if (!out) {
       for (const [re, rep] of PATTERNS) {
         if (re.test(trimmed)) {
@@ -166,6 +195,7 @@
   }
 
   const SKIP = new Set(["SCRIPT", "STYLE", "CODE", "PRE", "TEXTAREA"]);
+  window.VibeI18n = { lang: "en", translate: translateString };
   function skipNode(node) {
     let p = node.nodeType === 1 ? node : node.parentElement;
     while (p) {
