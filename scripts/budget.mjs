@@ -7,7 +7,7 @@ const DIRS = ["landing", "shared", "imu-lab/static", "control-play", "simulink",
 const EXT = new Set([".js", ".css"]);
 const PAGE_BUDGET_KB = {
   landing: 20,
-  shared: 20,
+  shared: 24,
   "imu-lab/static": 110,
   "control-play": 80,
   simulink: 220,

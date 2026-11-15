@@ -26,6 +26,14 @@
       <p class="sub">发现错误、讲义讲不清、或者想要一个新实验？直接开一个 GitHub issue，附上复现信息即可。</p>
     </header>
     <main id="main">
+      <section class="panel" aria-labelledby="feedback-metrics-title" style="margin-bottom:18px">
+        <h2 id="feedback-metrics-title">反馈数据</h2>
+        <p class="sub" id="feedback-summary">正在读取公开 issue 统计…</p>
+        <p class="hint" id="feedback-rates"></p>
+        <div class="paths-grid" id="feedback-labels" aria-label="按标签统计"></div>
+        <ul id="feedback-issues" class="hint" style="margin-top:10px"></ul>
+        <p class="hint">数据来自公开 GitHub Issues；由 <code>scripts/sync_feedback.mjs</code> 生成，不包含邮箱或私人信息。</p>
+      </section>
       <section class="paths">
         <h2>选一个类型</h2>
         <div class="paths-grid">
@@ -45,5 +53,66 @@
     </main>
     <footer><a href="./">← vibe-lab</a> · <a href="./about/">方法说明</a> · <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">源码</a></footer>
   </div>
+  <script>
+    (function () {
+      var repo = "xingd5478-ctrl/vibe-lab";
+      var isFile = location.protocol === "file:";
+      function render(d) {
+        var summary = document.getElementById("feedback-summary");
+        var rates = document.getElementById("feedback-rates");
+        summary.textContent = d.total + " 个 issue · " + d.open + " open · " + d.closed + " closed";
+        var parts = [];
+        if (d.median_first_response_hours != null) parts.push("首响中位数 " + d.median_first_response_hours.toFixed(1) + " h");
+        if (d.median_close_hours != null) parts.push("关闭中位数 " + d.median_close_hours.toFixed(1) + " h");
+        rates.textContent = parts.join(" · ") || "还没有足够数据计算首响/关闭时间。";
+        var labels = document.getElementById("feedback-labels");
+        labels.textContent = "";
+        Object.keys(d.labels || {}).forEach(function (k) {
+          var a = document.createElement("a");
+          a.href = "https://github.com/" + repo + "/issues?q=label%3A" + encodeURIComponent(k);
+          a.innerHTML = "<b>" + k + "</b><span>" + d.labels[k] + " 个</span>";
+          labels.appendChild(a);
+        });
+        var list = document.getElementById("feedback-issues");
+        list.textContent = "";
+        (d.issues || []).forEach(function (it) {
+          var li = document.createElement("li");
+          var a = document.createElement("a");
+          a.href = it.url; a.textContent = "#" + it.number + " " + it.title;
+          li.appendChild(a);
+          li.appendChild(document.createTextNode(" · " + it.state));
+          list.appendChild(li);
+        });
+        if (!(d.issues || []).length) list.textContent = "还没有 issue；第一个反馈会出现在这里。";
+      }
+      function local() {
+        fetch(isFile ? "../data/feedback.json" : "data/feedback.json", { cache: "no-store" })
+          .then(function (r) { return r.json(); })
+          .then(render)
+          .catch(function () {
+            document.getElementById("feedback-summary").textContent = "统计暂不可用；GitHub issue 入口仍然可用。";
+          });
+      }
+      fetch("https://api.github.com/repos/" + repo + "/issues?state=all&per_page=100", {
+        cache: "no-store", headers: { Accept: "application/vnd.github+json" }
+      }).then(function (r) {
+        if (!r.ok) throw new Error("api");
+        return r.json();
+      }).then(function (items) {
+        var issues = items.filter(function (i) { return !i.pull_request; });
+        var labels = {};
+        issues.forEach(function (it) { (it.labels || []).forEach(function (l) { labels[l.name] = (labels[l.name] || 0) + 1; }); });
+        render({
+          total: issues.length,
+          open: issues.filter(function (i) { return i.state === "open"; }).length,
+          closed: issues.filter(function (i) { return i.state === "closed"; }).length,
+          labels: labels,
+          issues: issues.slice(0, 10).map(function (i) {
+            return { number: i.number, title: i.title, state: i.state, url: i.html_url };
+          })
+        });
+      }).catch(local);
+    })();
+  </script>
 </body>
 </html>

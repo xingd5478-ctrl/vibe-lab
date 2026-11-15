@@ -21,7 +21,8 @@
     "bigtest": "node scripts/bigtest.mjs",
     "visual:mobile": "node scripts/mobile_shots.mjs",
     "visual:mobile:update": "node scripts/mobile_shots.mjs --update",
-    "domain": "node scripts/set_domain.mjs"
+    "domain": "node scripts/set_domain.mjs",
+    "sync:feedback": "node scripts/sync_feedback.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.14.0"
