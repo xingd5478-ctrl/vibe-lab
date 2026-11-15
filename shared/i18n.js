@@ -425,9 +425,6 @@
   }
 
   let curated = false;
-  function enIndexHref() {
-    return location.protocol === "file:" ? "../landing/en/lessons.html" : "../en/lessons.html";
-  }
   function enGuideHref() {
     return location.protocol === "file:" ? "../landing/en/guide.html" : "../en/guide.html";
   }

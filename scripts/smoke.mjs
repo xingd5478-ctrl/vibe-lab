@@ -77,7 +77,6 @@ async function main() {
     await waitFor(async () => (await fetch(`http://127.0.0.1:${port}/json/version`)).ok, 20000);
 
     async function check(name, url, fn) {
-      const baseUrl = url.split("#")[0];
       const target = await (await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: "PUT" })).json();
       const client = cdp(target.webSocketDebuggerUrl);
       await client.open;
@@ -134,9 +133,6 @@ async function main() {
       if (!(await e("!!document.querySelector('#lab-sf-a svg')"))) throw new Error("control: state feedback lab chart");
       if ((await e("document.querySelectorAll('#lab-rl-a svg circle').length")) < 3)
         throw new Error("control: root locus pole markers");
-      const cy0 = await e(
-        "[...document.querySelectorAll('#lab-rl-a svg circle')].map(c=>c.getAttribute('cy')).join(',')"
-      );
       const setK = async (v) => {
         await e(
           `(() => { const i = document.querySelector('#lab-rl input[type=range]'); i.value = '${v}'; i.dispatchEvent(new Event('input', { bubbles: true })); })()`

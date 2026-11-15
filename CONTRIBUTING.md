@@ -44,6 +44,17 @@ Do not edit generated files by hand:
 
 Edit the generator or source data and regenerate.
 
+## Navigation
+
+The static top navigation is generated from `scripts/site_layout.mjs` (single source of labels, hrefs, language switch and active state). After editing it:
+
+```bash
+npm run layout
+npm run check:layout
+```
+
+The generated pages are committed; CI fails if a page nav and the shared source drift. The footer remains page-specific.
+
 ## Conventions
 
 - No runtime npm dependencies; no external animation/font libraries.
