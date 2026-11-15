@@ -15,7 +15,16 @@ let failed = 0;
 for (const [path, needle] of checks) {
   const url = BASE + path + (path.includes("?") ? "&" : "?") + "v=" + Date.now();
   try {
-    const r = await fetch(url, { headers: { "Cache-Control": "no-cache" }, redirect: "follow" });
+    let r;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        r = await fetch(url, { headers: { "Cache-Control": "no-cache" }, redirect: "follow" });
+        if (r.ok) break;
+      } catch (e) {
+        if (attempt === 2) throw e;
+        await new Promise((resolve) => setTimeout(resolve, 400 * (attempt + 1)));
+      }
+    }
     const text = await r.text();
     const ok = r.ok && text.includes(needle);
     console.log(`${ok ? "ok  " : "FAIL"} ${r.status} ${path} (${text.length}b)`);
