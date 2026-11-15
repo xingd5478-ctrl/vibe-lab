@@ -31,3 +31,52 @@
 - 200% 缩放、横屏、减少动态效果各看一次。
 
 在这些完成前，页面不宣称“移动端/读屏已验收”。
+## 4. 一键切换域名（有域名后）
+
+```bash
+node scripts/set_domain.mjs https://vibe-lab.dev
+git add -A && git commit -m "chore: switch to custom domain" && git push
+```
+
+脚本会改写 canonical / OG / Sitemap / robots / README 中的站点 URL，并生成 `landing/CNAME`。
+随后在 GitHub → Settings → Pages 填同一个域名并勾选 Enforce HTTPS；DNS 用 CNAME 指到
+`xingd5478-ctrl.github.io`（Apex 用 ALIAS/ANAME）。没有域名时可先用免费子域
+`vibe-lab.is-a.dev`（GitHub PR + CNAME），或继续用 `github.io`。
+
+## 5. 统计（隐私友好，二选一）
+
+### 方案 A：GoatCounter（免费、无 Cookie、适合静态站）
+
+1. 在 https://www.goatcounter.com/ 注册一个站点，得到 `https://YOURCODE.goatcounter.com/count`。
+2. 在每个页面的 `</body>` 前加：
+
+```html
+<script data-goatcounter="https://YOURCODE.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+```
+
+3. 关键事件不要用自定义维度，直接发路径：
+
+```js
+if (window.goatcounter) goatcounter.count({ path: "event/imu-fit" });
+if (window.goatcounter) goatcounter.count({ path: "event/export-report" });
+if (window.goatcounter) goatcounter.count({ path: "event/course-next" });
+```
+
+### 方案 B：Cloudflare Web Analytics（域名托管在 Cloudflare 时免费）
+
+在 Cloudflare Dashboard → Analytics → Web Analytics 添加站点，复制 beacon `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"..."}'></script>`。
+
+- 两者都不记录 CSV、R/Q 参数或个人信息；不需要 cookie banner。
+- GitHub Pages 自带的 Traffic 只有仓库管理员可见、14 天，不能当公开统计。
+- 如果暂时不接第三方：至少每周从 GitHub Insights 记录 stars / issues / referrers 三项，作为反馈闭环的基线。
+
+## 6. 反馈闭环（不写后端）
+
+现有 `/feedback.html` + `.github/ISSUE_TEMPLATE/feedback.yml` 已经把反馈落到 GitHub Issues。建议补三件事：
+
+1. **标签**：`bug`、`content`、`idea`、`question`、`wontfix`；每月统计 open/closed、首响时间、修复率。
+2. **非 GitHub 用户**：加一个 Tally / Formspree 表单（免费档），提交后邮件通知；表单字段与 issue 模板一致（页面、浏览器、复现步骤、是否可公开）。
+3. **公开回复**：每个 issue 关闭时写一句“改了什么/为什么不做”，这是“反馈闭环数据”里最有价值的部分。
+
+如果以后要仪表盘，再把 Tally CSV 或 Issues 导出到 Sheets/Supabase；不要为了统计给静态站加后端。
