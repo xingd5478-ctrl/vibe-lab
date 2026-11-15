@@ -41,7 +41,7 @@ git add -A && git commit -m "chore: switch to custom domain" && git push
 脚本会改写 canonical / OG / Sitemap / robots / README 中的站点 URL，并生成 `landing/CNAME`。
 随后在 GitHub → Settings → Pages 填同一个域名并勾选 Enforce HTTPS；DNS 用 CNAME 指到
 `xingd5478-ctrl.github.io`（Apex 用 ALIAS/ANAME）。没有域名时可先用免费子域
-`vibe-lab.is-a.dev`（GitHub PR + CNAME），或继续用 `github.io`。
+`vibe-lab.dev`（约 $12/年）或 Cloudflare Pages 的 `vibe-lab.pages.dev`（免费、无内容审核）；is-a.dev 已因 not dev related 被拒，不再使用。
 
 ## 5. 统计（隐私友好，二选一）
 

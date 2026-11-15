@@ -1,5 +1,14 @@
 # 全免费上线方案（0 元）
 
+> **2026-11-15 更新：** is-a.dev PR #61406 已被关闭，理由是 `reason: not dev related`（根子域必须与软件开发相关）。不要重复提交同一个根域。
+>
+> 免费替代：
+> 1. **Cloudflare Pages**：`vibe-lab.pages.dev`，无内容审核，免费账号 + 免费 Web Analytics；需要把托管从 GitHub Pages 迁到 Pages。
+> 2. **js.org**：`vibe-lab.js.org`，开源 JS 项目可申请，保留 GitHub Pages；仍需 PR 审核，不保证通过。
+> 3. **买域名**：约 $12/年，`scripts/set_domain.mjs` 已准备好。
+>
+> 下面的 is-a.dev 流程保留作记录，不再推荐。
+
 目标：保留现在的 GitHub Pages 托管，用免费子域 + 免费统计 + 免费反馈，不买服务器、不买数据库。
 
 | 项 | 选型 | 费用 | 需要谁操作 |
