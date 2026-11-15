@@ -23,6 +23,7 @@
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"vibe-lab","url":"https://xingd5478-ctrl.github.io/vibe-lab/","inLanguage":["zh-CN","en"],"description":"传感器与控制可视化实验室：IMU 数据实验室、Control Play 与 Simulink 教程交互复现。"}</script>
 </head>
 <body>
+  <div class="scroll-progress" aria-hidden="true"></div>
   <a class="skip" href="#main">跳到内容</a>
   <div class="wrap">
     <nav class="topnav" aria-label="全站导航">
@@ -47,6 +48,11 @@
           <source srcset="preview-imu-dark.png" media="(prefers-color-scheme: dark)" />
           <img src="preview-imu.png" alt="IMU 数据实验室界面" width="640" height="360" />
         </picture>
+        <div class="scope" id="hero-scope" tabindex="0" role="button" aria-label="重播实时波形" title="悬停重播">
+          <div class="scope-meta"><span class="dot"></span>SCOPE <span>100 Hz</span></div>
+          <canvas id="scope-canvas" width="300" height="64" aria-hidden="true"></canvas>
+          <div class="scope-hint">悬停重播</div>
+        </div>
         <figcaption>IMU 数据实验室 · 全部本地计算</figcaption>
       </figure>
     </header>
@@ -151,5 +157,6 @@
     document.head.appendChild(s);
   })();
 </script>
+  <script src="motion.js" defer></script>
 </body>
 </html>

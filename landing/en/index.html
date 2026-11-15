@@ -25,6 +25,7 @@
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"vibe-lab","url":"https://xingd5478-ctrl.github.io/vibe-lab/en/","inLanguage":["en","zh-CN"],"description":"Sensors and control, visualized: IMU data lab, Control Play and 43 interactive Simulink lessons."}</script>
 </head>
 <body>
+  <div class="scroll-progress" aria-hidden="true"></div>
   <a class="skip" href="#main">Skip to content</a>
   <div class="wrap">
     <nav class="topnav" aria-label="Site navigation">
@@ -49,6 +50,11 @@
           <source srcset="../preview-imu-en-dark.png" media="(prefers-color-scheme: dark)" />
           <img src="../preview-imu-en.png" alt="IMU data lab screenshot" width="640" height="360" />
         </picture>
+        <div class="scope" id="hero-scope" tabindex="0" role="button" aria-label="Replay live trace" title="hover to replay">
+          <div class="scope-meta"><span class="dot"></span>SCOPE <span>100 Hz</span></div>
+          <canvas id="scope-canvas" width="300" height="64" aria-hidden="true"></canvas>
+          <div class="scope-hint">hover to replay</div>
+        </div>
         <figcaption>IMU data lab · everything local</figcaption>
       </figure>
     </header>
@@ -167,5 +173,6 @@
     document.head.appendChild(s);
   })();
 </script>
+  <script src="../motion.js" defer></script>
 </body>
 </html>
