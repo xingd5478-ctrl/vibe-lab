@@ -38,3 +38,9 @@ test("MATLAB table has 43 rows and links the raw dataset", () => {
   assert.match(html, /43 \/ 43/);
   assert.match(html, /data\/matlab-probes\.json/);
 });
+
+test("English MATLAB table has 43 rows and no Chinese", () => {
+  const html = fs.readFileSync(path.join(ROOT, "about", "matlab-en.html"), "utf8");
+  assert.equal((html.match(/<tr>/g) || []).length, 44);
+  assert.equal((html.match(/[\u4e00-\u9fff]/g) || []).length, 0);
+});

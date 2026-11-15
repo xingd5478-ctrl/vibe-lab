@@ -53,7 +53,7 @@
       <div class="note">This is a teaching demo, not a control-design tool. At aggressive gains, Euler integration loses accuracy, and there is no anti-windup or measurement-noise filter.</div>
 
       <h2>3. MATLAB comparison (43/43)</h2>
-      <p>All 43 vendored <code>.slx</code> models were simulated with MATLAB R2025a. Each row in the <a href="matlab.html">comparison table</a> records the model SHA-256, solver, stop time and signal statistics; the table is generated from <a href="../data/matlab-probes.json" download>the JSON dataset</a>, not hand-copied. The table labels are Chinese; the numbers and provenance are language-independent.</p>
+      <p>All 43 vendored <code>.slx</code> models were simulated with MATLAB R2025a. Each row in the <a href="matlab-en.html">English comparison table</a> records the model SHA-256, solver, stop time and signal statistics; the table is generated from <a href="../data/matlab-probes.json" download>the JSON dataset</a>, not hand-copied. The English table keeps the numeric provenance; the <a href="matlab.html">Chinese table</a> has the per-model caveats.</p>
       <p>The comparison is deliberately honest about mismatches: t10 has no reference feed-forward in the original model, t20’s <code>.slx</code> is a PID rather than an MPC, t21’s <code>.slx</code> is a relay rather than a sliding-mode controller with a boundary layer, and t31’s model only logs truth/noisy measurements — its EKF is implemented offline from the lesson equations.</p>
 
       <h2>4. Data availability</h2>

@@ -23,7 +23,8 @@
     "visual:mobile:update": "node scripts/mobile_shots.mjs --update",
     "domain": "node scripts/set_domain.mjs",
     "sync:feedback": "node scripts/sync_feedback.mjs",
-    "build:guide": "node scripts/build_en_guide.mjs"
+    "build:guide": "node scripts/build_en_guide.mjs",
+    "build:matlab-en": "node scripts/build_matlab_table_en.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.14.0"

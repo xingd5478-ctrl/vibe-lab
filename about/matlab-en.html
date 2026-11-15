@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MATLAB comparison: 43/43 · vibe-lab</title>
+  <meta name="description" content="English provenance table for 43 MATLAB/Simulink models: SHA-256, solver, stop time, signal statistics and model downloads." />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/about/matlab-en.html" />
+  <link rel="alternate" hreflang="zh-CN" href="https://xingd5478-ctrl.github.io/vibe-lab/about/matlab.html" />
+  <link rel="alternate" hreflang="en" href="https://xingd5478-ctrl.github.io/vibe-lab/about/matlab-en.html" />
+  <style>
+    .wrap { max-width: 1120px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 8px 7px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    .metric { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+    .spark { width: 120px; height: 28px; color: var(--accent); }
+    .hint { color: var(--muted); font-size: 12px; }
+    @media (prefers-color-scheme: dark) { .spark { color: #7fb3e0; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Site navigation">
+      <a href="../">Home</a><a href="../imu/?lang=en">IMU</a><a href="../control/?lang=en">Control</a>
+      <a href="../simulink/index.html?lang=en">Simulink</a><a href="en.html">Method</a>
+      <a href="matlab.html">Chinese</a>
+    </nav>
+    <header>
+      <div class="kicker">vibe-lab / method / matlab</div>
+      <h1>MATLAB comparison: 43/43</h1>
+      <p class="sub">Every vendored <code>.slx</code> was simulated with MATLAB 25.1.0.2943329 (R2025a). The table links model downloads and records the probe metric; the Chinese table keeps the per-model caveats.</p>
+      <p class="hint">Generated 2026-11-15 10:03:00 · 43/43 models · 110 toolboxes · <a href="../data/matlab-probes.json" download>raw JSON</a> · <a href="en.html">method</a></p>
+    </header>
+    <main id="main">
+      <table>
+        <thead><tr><th>Lesson</th><th>Demo</th><th>Probe metric</th><th>Source</th><th>Model</th></tr></thead>
+        <tbody>
+      <tr>
+        <td><b>t01</b> Signals</td>
+        <td><a href="../simulink/index.html?lang=en#t01">signal</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,15.0 2.6,13.0 5.1,11.1 7.7,9.4 10.2,7.8 12.8,6.6 15.3,5.7 17.9,5.1 20.4,5.2 23.0,5.9 25.5,6.9 28.1,8.2 30.6,9.8 33.2,11.7 35.7,13.6 38.3,15.6 40.9,17.6 43.4,19.4 46.0,21.1 48.5,22.6 51.1,23.8 53.6,24.6 56.2,25.0 58.7,25.0 61.3,23.9 63.8,22.8 66.4,21.3 68.9,19.7 71.5,17.8 74.0,15.8 76.6,13.8 79.1,11.9 81.7,10.1 84.3,8.4 86.8,7.1 89.4,6.0 91.9,5.3 94.5,5.0 97.0,5.1 99.6,5.6 102.1,7.6 104.7,9.1 107.2,10.9 109.8,12.8 112.3,14.8 114.9,16.8 117.4,18.7 120.0,20.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 5.997, final -3.264</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial01_signals.slx" download>tutorial01_signals.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t02</b> Math blocks</td>
+        <td><a href="../simulink/index.html?lang=en#t02">signal</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,15.0 2.6,10.1 5.1,6.4 7.7,5.0 10.2,6.0 12.8,8.6 15.3,11.8 17.9,14.3 20.4,13.7 23.0,10.9 25.5,7.7 28.1,5.5 30.6,5.2 33.2,7.3 35.7,11.4 38.3,16.5 40.9,21.2 43.4,24.3 46.0,25.0 48.5,23.4 51.1,20.5 53.6,17.4 56.2,15.3 58.7,15.2 61.3,20.1 63.8,23.1 66.4,24.9 68.9,24.5 71.5,21.7 74.0,17.2 76.6,12.0 79.1,7.7 81.7,5.3 84.3,5.3 86.8,7.4 89.4,10.5 91.9,13.4 94.5,14.9 97.0,14.5 99.6,12.2 102.1,6.2 104.7,5.0 107.2,6.1 109.8,9.5 112.3,14.4 114.9,19.4 117.4,23.3 120.0,25.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 7.696, final -7.660</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial02_math.slx" download>tutorial02_math.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t03</b> First order</td>
+        <td><a href="../simulink/index.html?lang=en#t03">first-order</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,25.0 17.9,18.4 20.4,14.0 23.0,11.0 25.5,9.0 28.1,7.7 30.6,6.8 33.2,6.2 35.7,5.8 38.3,5.4 40.9,5.2 43.4,5.2 46.0,5.1 48.5,5.1 51.1,5.0 53.6,5.0 56.2,5.0 58.7,5.0 61.3,5.0 63.8,5.0 66.4,5.0 68.9,5.0 71.5,5.0 74.0,5.0 76.6,5.0 79.1,5.0 81.7,5.0 84.3,5.0 86.8,5.0 89.4,5.0 91.9,5.0 94.5,5.0 97.0,5.0 99.6,5.0 102.1,5.0 104.7,5.0 107.2,5.0 109.8,5.0 112.3,5.0 114.9,5.0 117.4,5.0 120.0,5.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>τ=0.5 response range 0–1.0000, final 1.0000</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial03_first_order.slx" download>tutorial03_first_order.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t04</b> Second order</td>
+        <td><a href="../simulink/index.html?lang=en#t04">second-order</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,25.0 17.9,24.8 20.4,24.3 23.0,21.4 25.5,18.7 28.1,15.3 30.6,11.4 33.2,8.2 35.7,5.9 38.3,5.0 40.9,6.1 43.4,7.8 46.0,9.9 48.5,11.9 51.1,13.6 53.6,15.4 56.2,15.3 58.7,14.8 61.3,13.9 63.8,12.8 66.4,11.7 68.9,10.2 71.5,9.9 74.0,9.9 76.6,10.2 79.1,10.7 81.7,11.2 84.3,12.3 86.8,12.6 89.4,12.8 91.9,12.8 94.5,12.6 97.0,12.4 99.6,11.8 102.1,11.5 104.7,11.3 107.2,11.2 109.8,11.2 112.3,11.3 114.9,11.6 117.4,11.8 120.0,11.8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>ζ=0.2 response peak 1.520, final 0.9957</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial04_second_order.slx" download>tutorial04_second_order.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t05</b> PID control</td>
+        <td><a href="../simulink/index.html?lang=en#t05">pid</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,20.7 7.7,16.7 10.2,13.3 12.8,11.0 15.3,9.4 17.9,8.3 20.4,7.6 23.0,7.1 25.5,6.7 28.1,6.4 30.6,6.2 33.2,6.1 35.7,6.0 38.3,5.9 40.9,5.8 43.4,5.7 46.0,5.7 48.5,5.6 51.1,5.6 53.6,5.6 56.2,5.5 58.7,5.5 61.3,5.5 63.8,5.4 66.4,5.4 68.9,5.4 71.5,5.4 74.0,5.3 76.6,5.3 79.1,5.3 81.7,5.3 84.3,5.2 86.8,5.2 89.4,5.2 91.9,5.2 94.5,5.2 97.0,5.1 99.6,5.1 102.1,5.1 104.7,5.1 107.2,5.1 109.8,5.1 112.3,5.0 114.9,5.0 117.4,5.0 120.0,5.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>output range 0–0.9775, final 0.9775</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial05_pid.slx" download>tutorial05_pid.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t06</b> Sources &amp; sinks</td>
+        <td><a href="../simulink/index.html?lang=en#t06">signal</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,24.0 2.6,22.6 5.1,20.6 7.7,18.6 10.2,16.6 12.8,15.6 15.3,13.8 17.9,12.0 20.4,11.0 23.0,8.6 25.5,7.0 28.1,5.0 30.6,19.0 33.2,24.0 35.7,24.0 38.3,24.0 40.9,24.0 43.4,19.0 46.0,24.0 48.5,19.0 51.1,24.0 53.6,24.0 56.2,24.0 58.7,24.0 61.3,23.8 63.8,23.1 66.4,23.1 68.9,24.0 71.5,24.8 74.0,25.0 76.6,24.7 79.1,24.3 81.7,23.4 84.3,23.0 86.8,23.5 89.4,24.5 91.9,24.0 94.5,24.0 97.0,24.0 99.6,24.0 102.1,23.0 104.7,23.0 107.2,23.0 109.8,24.0 112.3,24.0 114.9,24.0 117.4,24.0 120.0,24.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 20.00, final 0</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial06_sources_sinks.slx" download>tutorial06_sources_sinks.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t07</b> Subsystems</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,15.0 2.6,13.0 5.1,11.1 7.7,9.4 10.2,7.8 12.8,6.6 15.3,5.7 17.9,5.1 20.4,5.2 23.0,5.9 25.5,6.9 28.1,8.2 30.6,9.8 33.2,11.7 35.7,13.6 38.3,15.6 40.9,17.6 43.4,19.4 46.0,21.1 48.5,22.6 51.1,23.8 53.6,24.6 56.2,25.0 58.7,25.0 61.3,23.9 63.8,22.8 66.4,21.3 68.9,19.7 71.5,17.8 74.0,15.8 76.6,13.8 79.1,11.9 81.7,10.1 84.3,8.4 86.8,7.1 89.4,6.0 91.9,5.3 94.5,5.0 97.0,5.1 99.6,5.6 102.1,7.6 104.7,9.1 107.2,10.9 109.8,12.8 112.3,14.8 114.9,16.8 117.4,18.7 120.0,20.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 39.98, final -21.76</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial07_subsystem.slx" download>tutorial07_subsystem.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t08</b> Masks</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,15.0 2.6,14.2 5.1,12.5 7.7,10.3 10.2,8.1 12.8,6.4 15.3,5.0 17.9,5.6 20.4,7.0 23.0,9.1 25.5,11.8 28.1,14.7 30.6,17.7 33.2,20.4 35.7,22.7 38.3,24.2 40.9,25.0 43.4,24.8 46.0,22.0 48.5,19.6 51.1,16.8 53.6,13.8 56.2,10.9 58.7,8.4 61.3,6.5 63.8,5.4 66.4,5.1 68.9,5.7 71.5,7.1 74.0,9.3 76.6,14.9 79.1,17.9 81.7,20.6 84.3,22.8 86.8,24.3 89.4,25.0 91.9,24.8 94.5,23.7 97.0,21.9 99.6,19.5 102.1,16.6 104.7,13.6 107.2,8.3 109.8,6.4 112.3,5.3 114.9,5.1 117.4,5.7 120.0,5.8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>output1 peak 8.101, final 7.417; output2 peak 16.57, final 13.02</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial08_masking.slx" download>tutorial08_masking.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t09</b> State space</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,25.0 17.9,24.1 20.4,21.6 23.0,18.1 25.5,14.1 28.1,10.4 30.6,7.4 33.2,5.5 35.7,5.0 38.3,7.5 40.9,9.9 43.4,12.5 46.0,15.0 48.5,17.0 51.1,18.2 53.6,18.4 56.2,17.9 58.7,16.7 61.3,13.2 63.8,11.6 66.4,10.3 68.9,9.6 71.5,9.4 74.0,9.8 76.6,10.7 79.1,11.8 81.7,13.0 84.3,14.9 86.8,15.4 89.4,15.5 91.9,15.2 94.5,14.6 97.0,13.8 99.6,13.0 102.1,12.3 104.7,11.7 107.2,11.4 109.8,11.6 112.3,12.1 114.9,12.6 117.4,13.1 120.0,13.6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 0.4182, final 0.2383; peak 0.4182, final 0.2383</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial09_state_space.slx" download>tutorial09_state_space.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t10</b> State feedback / LQR</td>
+        <td><a href="../simulink/index.html?lang=en#t10">state-feedback</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,22.1 17.9,16.7 20.4,11.6 23.0,8.0 25.5,6.0 28.1,5.1 30.6,5.0 33.2,5.2 35.7,5.5 38.3,5.6 40.9,5.7 43.4,5.7 46.0,5.7 48.5,5.7 51.1,5.7 53.6,5.7 56.2,5.7 58.7,5.7 61.3,5.7 63.8,5.7 66.4,5.7 68.9,5.7 71.5,5.7 74.0,5.7 76.6,5.7 79.1,5.7 81.7,5.7 84.3,5.7 86.8,5.7 89.4,5.7 91.9,5.7 94.5,5.7 97.0,5.7 99.6,5.7 102.1,5.7 104.7,5.7 107.2,5.7 109.8,5.7 112.3,5.7 114.9,5.7 117.4,5.7 120.0,5.7" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>PP output peak 0.0652, final 0.0625</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial10_state_feedback.slx" download>tutorial10_state_feedback.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t11</b> Observer</td>
+        <td><a href="../simulink/index.html?lang=en#t11">observer</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,5.0 2.6,5.0 5.1,5.0 7.7,5.0 10.2,5.0 12.8,5.2 15.3,7.2 17.9,9.3 20.4,12.1 23.0,19.3 25.5,22.0 28.1,22.0 30.6,24.2 33.2,25.0 35.7,24.8 38.3,23.9 40.9,21.4 43.4,20.3 46.0,19.3 48.5,18.0 51.1,17.7 53.6,17.5 56.2,17.4 58.7,17.4 61.3,17.4 63.8,17.5 66.4,17.5 68.9,17.6 71.5,17.6 74.0,17.6 76.6,17.6 79.1,17.6 81.7,17.6 84.3,17.6 86.8,17.6 89.4,17.6 91.9,17.6 94.5,17.6 97.0,17.6 99.6,17.6 102.1,17.6 104.7,17.6 107.2,17.6 109.8,17.6 112.3,17.6 114.9,17.6 117.4,17.6 120.0,17.6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>maximumerror 0.300, final 0.000</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial11_observer.slx" download>tutorial11_observer.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t12</b> Kalman filter</td>
+        <td><a href="../simulink/index.html?lang=en#t12">kalman</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,14.5 2.6,14.5 5.1,14.5 7.7,13.6 10.2,5.0 12.8,7.2 15.3,6.9 17.9,8.5 20.4,9.0 23.0,9.9 25.5,12.5 28.1,18.6 30.6,18.4 33.2,14.4 35.7,13.1 38.3,10.0 40.9,10.1 43.4,7.3 46.0,10.1 48.5,18.0 51.1,24.7 53.6,17.6 56.2,13.1 58.7,15.3 61.3,18.1 63.8,16.9 66.4,9.8 68.9,8.5 71.5,6.0 74.0,6.2 76.6,15.4 79.1,18.2 81.7,20.9 84.3,25.0 86.8,12.3 89.4,7.7 91.9,11.9 94.5,16.7 97.0,16.2 99.6,11.5 102.1,17.0 104.7,18.9 107.2,16.6 109.8,9.1 112.3,9.3 114.9,6.1 117.4,10.7 120.0,13.1" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Kalman RMSE 0.455, measurement 1.149</span></div></td>
+        <td>Offline lecture value</td>
+        <td><a href="../simulink/models/tutorial12_kalman.slx" download>tutorial12_kalman.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t13</b> DC motor</td>
+        <td><a href="../simulink/index.html?lang=en#t13">motor</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,25.0 17.9,25.0 20.4,25.0 23.0,25.0 25.5,24.9 28.1,24.9 30.6,24.8 33.2,24.7 35.7,24.6 38.3,24.3 40.9,23.8 43.4,22.1 46.0,20.0 48.5,18.5 51.1,16.4 53.6,15.0 56.2,13.5 58.7,11.6 61.3,10.3 63.8,8.5 66.4,7.2 68.9,5.9 71.5,5.0 74.0,5.0 76.6,5.0 79.1,5.0 81.7,5.0 84.3,5.0 86.8,5.0 89.4,5.0 91.9,5.0 94.5,5.1 97.0,5.1 99.6,5.2 102.1,5.3 104.7,5.8 107.2,7.6 109.8,9.7 112.3,10.4 114.9,10.4 117.4,10.5 120.0,10.8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>speed peak 192.4, final 137.1</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial13_dc_motor.slx" download>tutorial13_dc_motor.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t14</b> PMSM + FOC</td>
+        <td><a href="../simulink/index.html?lang=en#t14">foc</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,25.0 17.9,24.9 20.4,24.7 23.0,24.2 25.5,23.1 28.1,19.1 30.6,18.2 33.2,15.7 35.7,11.3 38.3,7.0 40.9,5.0 43.4,6.4 46.0,11.0 48.5,15.9 51.1,17.8 53.6,15.8 56.2,12.3 58.7,8.9 61.3,11.4 63.8,14.5 66.4,14.5 68.9,12.0 71.5,11.0 74.0,13.3 76.6,13.2 79.1,11.4 81.7,12.5 84.3,12.8 86.8,11.9 89.4,12.5 91.9,12.2 94.5,12.1 97.0,12.2 99.6,12.3 102.1,12.2 104.7,12.2 107.2,12.2 109.8,12.3 112.3,12.1 114.9,12.3 117.4,12.2 120.0,12.1" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 228.6, final 145.7; range 0–410.1, final 410.1</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial14_foc.slx" download>tutorial14_foc.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t15</b> Code generation</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,7.6 10.2,12.6 12.8,10.7 15.3,10.6 17.9,13.2 20.4,8.4 23.0,15.1 25.5,6.7 28.1,15.9 30.6,5.6 33.2,16.8 35.7,5.0 38.3,17.2 40.9,5.1 43.4,17.2 46.0,5.2 48.5,16.8 51.1,5.7 53.6,16.3 56.2,6.4 58.7,15.5 61.3,7.2 63.8,14.7 66.4,8.1 68.9,13.8 71.5,8.8 74.0,13.0 76.6,9.6 79.1,12.1 81.7,10.4 84.3,11.6 86.8,11.0 89.4,11.0 91.9,11.6 94.5,10.5 97.0,11.8 99.6,10.2 102.1,12.2 104.7,9.9 107.2,12.3 109.8,9.9 112.3,12.4 114.9,9.8 117.4,12.4 120.0,9.9" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 0.0288, final 0.0161</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial15_codegen.slx" download>tutorial15_codegen.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t16</b> Lesson t16</td>
+        <td><a href="../simulink/index.html?lang=en#t16">bode</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,15.3 2.6,15.3 5.1,15.1 7.7,14.6 10.2,13.7 12.8,12.4 15.3,9.0 17.9,7.4 20.4,6.1 23.0,5.2 25.5,5.0 28.1,5.5 30.6,6.7 33.2,8.5 35.7,10.8 38.3,13.3 40.9,16.0 43.4,18.5 46.0,22.6 48.5,23.9 51.1,24.7 53.6,25.0 56.2,24.9 58.7,24.3 61.3,23.5 63.8,22.5 66.4,21.3 68.9,20.0 71.5,18.7 74.0,17.3 76.6,14.4 79.1,12.9 81.7,11.4 84.3,10.0 86.8,8.8 89.4,7.7 91.9,6.8 94.5,6.3 97.0,6.1 99.6,6.4 102.1,7.0 104.7,8.1 107.2,11.1 109.8,13.0 112.3,15.0 114.9,17.0 117.4,18.9 120.0,19.2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Plant 4/(s²+0.5s+4): Gm=∞, PM=20.4°</span></div></td>
+        <td>Offline lecture value</td>
+        <td><a href="../simulink/models/tutorial16_freq.slx" download>tutorial16_freq.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t17</b> Lesson t17</td>
+        <td><a href="../simulink/index.html?lang=en#t17">leadlag</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,24.9 15.3,24.5 17.9,23.9 20.4,22.8 23.0,19.1 25.5,16.6 28.1,14.3 30.6,12.1 33.2,10.3 35.7,8.8 38.3,6.6 40.9,5.9 43.4,5.5 46.0,5.2 48.5,5.0 51.1,5.0 53.6,5.1 56.2,5.2 58.7,5.3 61.3,5.4 63.8,5.5 66.4,5.6 68.9,5.7 71.5,5.8 74.0,5.8 76.6,5.8 79.1,5.8 81.7,5.9 84.3,5.9 86.8,5.9 89.4,5.9 91.9,5.9 94.5,5.8 97.0,5.8 99.6,5.8 102.1,5.8 104.7,5.8 107.2,5.8 109.8,5.8 112.3,5.8 114.9,5.8 117.4,5.8 120.0,5.8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>corrected peak 0.5216, final 0.5000; reference peak 0.2000, final 0.2000</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial17_leadlag.slx" download>tutorial17_leadlag.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t18</b> System ID</td>
+        <td><a href="../simulink/index.html?lang=en#t18">sysid</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,23.7 15.3,22.4 17.9,21.2 20.4,20.1 23.0,19.1 25.5,18.1 28.1,17.2 30.6,15.6 33.2,14.8 35.7,14.1 38.3,13.5 40.9,12.9 43.4,12.3 46.0,11.8 48.5,11.3 51.1,10.4 53.6,10.0 56.2,9.6 58.7,9.3 61.3,8.9 63.8,8.6 66.4,8.3 68.9,8.1 71.5,7.6 74.0,7.3 76.6,7.1 79.1,6.9 81.7,6.8 84.3,6.6 86.8,6.4 89.4,6.3 91.9,6.0 94.5,5.9 97.0,5.8 99.6,5.7 102.1,5.6 104.7,5.5 107.2,5.4 109.8,5.3 112.3,5.2 114.9,5.1 117.4,5.0 120.0,5.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>range 0–3.831, final 3.831</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial18_sysid.slx" download>tutorial18_sysid.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t19</b> H-infinity</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,22.5 15.3,17.3 17.9,11.3 20.4,6.9 23.0,5.0 25.5,5.3 28.1,7.1 30.6,10.9 33.2,11.8 35.7,11.9 38.3,11.3 40.9,10.6 43.4,9.9 46.0,9.6 48.5,9.5 51.1,9.9 53.6,10.1 56.2,10.3 58.7,10.3 61.3,10.3 63.8,10.2 66.4,10.1 68.9,10.1 71.5,10.0 74.0,10.1 76.6,10.1 79.1,10.1 81.7,10.1 84.3,10.1 86.8,10.1 89.4,10.1 91.9,10.1 94.5,10.1 97.0,10.1 99.6,10.1 102.1,10.1 104.7,10.1 107.2,10.1 109.8,10.1 112.3,10.1 114.9,10.1 117.4,10.1 120.0,10.1" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>output peak 0.6719, final 0.5000</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial19_robust.slx" download>tutorial19_robust.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t20</b> MPC</td>
+        <td><a href="../simulink/index.html?lang=en#t20">mpc</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,23.6 12.8,19.0 15.3,13.8 17.9,9.8 20.4,7.5 23.0,6.9 25.5,7.7 28.1,8.9 30.6,10.1 33.2,10.8 35.7,11.0 38.3,10.7 40.9,10.2 43.4,9.6 46.0,9.1 48.5,8.7 51.1,8.6 53.6,8.5 56.2,8.4 58.7,8.4 61.3,8.3 63.8,8.2 66.4,8.0 68.9,7.8 71.5,7.7 74.0,7.5 76.6,7.3 79.1,7.2 81.7,7.0 84.3,6.9 86.8,6.8 89.4,6.6 91.9,6.5 94.5,6.3 97.0,6.2 99.6,6.1 102.1,5.9 104.7,5.8 107.2,5.7 109.8,5.5 112.3,5.4 114.9,5.3 117.4,5.1 120.0,5.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>output range 0–0.5618, final 0.5618</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial20_mpc.slx" download>tutorial20_mpc.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t21</b> Sliding mode</td>
+        <td><a href="../simulink/index.html?lang=en#t21">smc</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,24.3 12.8,20.9 15.3,16.4 17.9,11.9 20.4,8.5 23.0,6.1 25.5,5.1 28.1,5.0 30.6,5.6 33.2,6.5 35.7,7.4 38.3,8.2 40.9,8.8 43.4,9.0 46.0,9.1 48.5,9.0 51.1,8.8 53.6,8.6 56.2,8.4 58.7,8.3 61.3,8.2 63.8,8.2 66.4,8.2 68.9,8.3 71.5,8.3 74.0,8.4 76.6,8.4 79.1,8.4 81.7,8.4 84.3,8.4 86.8,8.4 89.4,8.4 91.9,8.4 94.5,8.4 97.0,8.4 99.6,8.4 102.1,8.4 104.7,8.4 107.2,8.4 109.8,8.4 112.3,8.4 114.9,8.4 117.4,8.4 120.0,8.4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>SMC peak 0.724, final 0.600; PID peak 0.636, final 0.636</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial21_smc.slx" download>tutorial21_smc.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t22</b> Root locus</td>
+        <td><a href="../simulink/index.html?lang=en#t22">rootlocus</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,24.9 17.9,24.7 20.4,21.5 23.0,17.4 25.5,12.6 28.1,8.3 30.6,5.7 33.2,5.0 35.7,8.7 38.3,11.7 40.9,14.3 43.4,16.0 46.0,16.5 48.5,14.3 51.1,12.4 53.6,10.7 56.2,9.7 58.7,9.3 61.3,10.7 63.8,11.8 66.4,12.9 68.9,13.6 71.5,13.8 74.0,13.0 76.6,12.3 79.1,11.6 81.7,11.2 84.3,11.0 86.8,11.5 89.4,11.9 91.9,12.3 94.5,12.6 97.0,12.7 99.6,12.7 102.1,12.2 104.7,11.9 107.2,11.7 109.8,11.7 112.3,11.7 114.9,12.0 117.4,12.2 120.0,12.2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>output peak 1.289, final 0.8245</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial22_root_locus.slx" download>tutorial22_root_locus.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t23</b> MRAC</td>
+        <td><a href="../simulink/index.html?lang=en#t23">mrac</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,18.4 15.3,14.0 17.9,11.0 20.4,9.0 23.0,7.7 25.5,6.8 28.1,6.2 30.6,5.5 33.2,5.4 35.7,5.2 38.3,5.2 40.9,5.1 43.4,5.1 46.0,5.0 48.5,5.0 51.1,5.0 53.6,5.0 56.2,5.0 58.7,5.0 61.3,5.0 63.8,5.0 66.4,5.0 68.9,5.0 71.5,5.0 74.0,5.0 76.6,5.0 79.1,5.0 81.7,5.0 84.3,5.0 86.8,5.0 89.4,5.0 91.9,5.0 94.5,5.0 97.0,5.0 99.6,5.0 102.1,5.0 104.7,5.0 107.2,5.0 109.8,5.0 112.3,5.0 114.9,5.0 117.4,5.0 120.0,5.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>reference range 0–2.000, final 2.000; plant peak 2.106, final 2.000; control range 0–3.000, final 3.000</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial23_mrac.slx" download>tutorial23_mrac.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t24</b> Fuzzy logic</td>
+        <td><a href="../simulink/index.html?lang=en#t24">fuzzy</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,25.0 17.9,25.0 20.4,25.0 23.0,25.0 25.5,25.0 28.1,25.0 30.6,25.0 33.2,25.0 35.7,25.0 38.3,25.0 40.9,25.0 43.4,25.0 46.0,25.0 48.5,25.0 51.1,25.0 53.6,24.9 56.2,24.9 58.7,24.6 61.3,24.3 63.8,23.2 66.4,22.0 68.9,19.4 71.5,17.1 74.0,14.3 76.6,12.5 79.1,11.9 81.7,11.1 84.3,10.4 86.8,9.1 89.4,8.4 91.9,7.6 94.5,7.2 97.0,6.7 99.6,6.2 102.1,6.0 104.7,5.7 107.2,5.6 109.8,5.4 112.3,5.3 114.9,5.1 117.4,5.1 120.0,5.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>fuzzy range 0–0.9832, final 0.9832; PID range 0–0.7473, final 0.7473</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial24_fuzzy.slx" download>tutorial24_fuzzy.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t25</b> Simscape</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,24.1 15.3,21.5 17.9,17.9 20.4,13.8 23.0,10.0 25.5,6.9 28.1,5.0 30.6,5.2 33.2,7.0 35.7,9.5 38.3,12.2 40.9,14.8 43.4,16.8 46.0,18.0 48.5,18.3 51.1,16.4 53.6,14.7 56.2,12.9 58.7,11.2 61.3,9.9 63.8,9.1 66.4,9.0 68.9,9.4 71.5,11.4 74.0,12.7 76.6,13.8 79.1,14.7 81.7,15.1 84.3,15.2 86.8,14.9 89.4,14.3 91.9,12.7 94.5,11.9 97.0,11.4 99.6,11.1 102.1,11.0 104.7,11.3 107.2,11.7 109.8,12.2 112.3,13.3 114.9,13.6 117.4,13.8 120.0,13.9" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 2.091, final 1.134</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial25_simscape.slx" download>tutorial25_simscape.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t26</b> Robot kinematics</td>
+        <td><a href="../simulink/index.html?lang=en#t26">arm</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,25.0 15.3,25.0 17.9,25.0 20.4,25.0 23.0,25.0 25.5,25.0 28.1,25.0 30.6,25.0 33.2,25.0 35.7,25.0 38.3,25.0 40.9,25.0 43.4,25.0 46.0,25.0 48.5,25.0 51.1,25.0 53.6,25.0 56.2,25.0 58.7,25.0 61.3,25.0 63.8,25.0 66.4,25.0 68.9,25.0 71.5,25.0 74.0,25.0 76.6,25.0 79.1,25.0 81.7,25.0 84.3,25.0 86.8,25.0 89.4,25.0 91.9,25.0 94.5,25.0 97.0,25.0 99.6,25.0 102.1,25.0 104.7,25.0 107.2,25.0 109.8,25.0 112.3,25.0 114.9,25.0 117.4,25.0 120.0,25.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>end effector (0.452, -0.150, 1.304)</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial26_kinematics.slx" download>tutorial26_kinematics.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t27</b> MSD modeling</td>
+        <td><a href="../simulink/index.html?lang=en#t27">msd</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,22.9 15.3,17.6 17.9,11.4 20.4,6.7 23.0,5.0 25.5,6.7 28.1,10.8 30.6,19.3 33.2,20.6 35.7,19.2 38.3,16.0 40.9,12.2 43.4,9.4 46.0,8.4 48.5,9.5 51.1,15.0 53.6,17.2 56.2,17.9 58.7,17.0 61.3,15.0 63.8,12.8 66.4,11.1 68.9,10.5 71.5,12.8 74.0,14.6 76.6,15.9 79.1,16.3 81.7,15.7 84.3,14.5 86.8,13.1 89.4,12.1 91.9,12.3 94.5,13.2 97.0,14.3 99.6,15.1 102.1,15.3 104.7,14.9 107.2,14.2 109.8,13.3 112.3,12.6 114.9,12.9 117.4,13.5 120.0,13.8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 0.1779, final 0.0998; peak 0.1779, final 0.0998</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial27_msd_models.slx" download>tutorial27_msd_models.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t28</b> DSP basics</td>
+        <td><a href="../simulink/index.html?lang=en#t28">dsp</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,14.8 2.6,9.1 5.1,7.9 7.7,17.1 10.2,16.1 12.8,16.3 15.3,16.7 17.9,14.5 20.4,25.0 23.0,15.7 25.5,17.5 28.1,19.0 30.6,17.9 33.2,13.7 35.7,9.3 38.3,17.2 40.9,23.6 43.4,13.1 46.0,14.9 48.5,11.5 51.1,20.4 53.6,17.3 56.2,11.8 58.7,15.3 61.3,22.3 63.8,14.5 66.4,10.6 68.9,13.4 71.5,10.9 74.0,12.2 76.6,23.6 79.1,11.3 81.7,14.5 84.3,15.3 86.8,22.6 89.4,12.3 91.9,5.0 94.5,14.9 97.0,17.5 99.6,22.0 102.1,10.9 104.7,11.2 107.2,23.4 109.8,19.6 112.3,18.3 114.9,14.3 117.4,8.5 120.0,9.4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 4.533, final 2.178</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial28_dsp.slx" download>tutorial28_dsp.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t29</b> MSD control compare</td>
+        <td><a href="../simulink/index.html?lang=en#t29">msdcompare</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,17.1 2.6,9.0 5.1,24.8 7.7,20.4 10.2,20.1 12.8,14.6 15.3,19.2 17.9,15.0 20.4,25.0 23.0,5.0 25.5,21.2 28.1,17.4 30.6,17.7 33.2,21.7 35.7,20.0 38.3,20.5 40.9,19.6 43.4,17.2 46.0,24.7 48.5,12.8 51.1,19.4 53.6,12.6 56.2,18.4 58.7,18.8 61.3,21.1 63.8,12.4 66.4,22.7 68.9,20.7 71.5,15.7 74.0,20.2 76.6,23.7 79.1,22.1 81.7,17.8 84.3,15.3 86.8,13.5 89.4,20.6 91.9,10.7 94.5,16.7 97.0,16.7 99.6,21.5 102.1,17.2 104.7,8.6 107.2,24.8 109.8,17.2 112.3,19.1 114.9,18.7 117.4,22.7 120.0,12.2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>PID peak 3.965, final 1.814; LQR range 0–1.000, final 1.000</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial29_control_compare.slx" download>tutorial29_control_compare.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t30</b> Active suspension</td>
+        <td><a href="../simulink/index.html?lang=en#t30">suspension</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,24.6 2.6,24.6 5.1,24.5 7.7,24.5 10.2,24.5 12.8,24.5 15.3,24.5 17.9,24.6 20.4,24.6 23.0,24.6 25.5,24.6 28.1,24.6 30.6,24.6 33.2,24.6 35.7,24.6 38.3,24.6 40.9,24.6 43.4,24.5 46.0,24.6 48.5,24.6 51.1,24.6 53.6,24.6 56.2,24.6 58.7,24.6 61.3,24.6 63.8,24.6 66.4,24.6 68.9,24.6 71.5,24.6 74.0,24.6 76.6,24.6 79.1,24.6 81.7,5.0 84.3,25.0 86.8,24.6 89.4,24.6 91.9,24.6 94.5,24.6 97.0,24.6 99.6,24.6 102.1,24.6 104.7,24.6 107.2,24.6 109.8,24.6 112.3,24.5 114.9,24.6 117.4,24.6 120.0,24.6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>bodydisplacement peak 10.06, final 0.0016</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial30_suspension.slx" download>tutorial30_suspension.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t31</b> EKF basics</td>
+        <td><a href="../simulink/index.html?lang=en#t31">ekf</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,10.1 2.6,10.0 5.1,9.3 7.7,9.5 10.2,9.1 12.8,9.3 15.3,9.8 17.9,10.4 20.4,10.4 23.0,12.0 25.5,13.1 28.1,14.3 30.6,15.5 33.2,17.7 35.7,20.3 38.3,22.5 40.9,22.9 43.4,24.1 46.0,23.8 48.5,23.5 51.1,23.1 53.6,21.8 56.2,21.1 58.7,20.5 61.3,20.0 63.8,18.1 66.4,16.5 68.9,14.5 71.5,11.4 74.0,8.0 76.6,6.6 79.1,5.1 81.7,5.0 84.3,5.0 86.8,5.2 89.4,5.9 91.9,6.0 94.5,7.4 97.0,8.6 99.6,9.9 102.1,12.0 104.7,13.2 107.2,16.7 109.8,19.8 112.3,23.1 114.9,24.9 117.4,25.0 120.0,24.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>measurement RMSE 0.053; EKF x₁ RMSE 0.049 (offline lecture)</span></div></td>
+        <td>Offline lecture value</td>
+        <td><a href="../simulink/models/tutorial31_ekf.slx" download>tutorial31_ekf.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t32</b> EKF pendulum</td>
+        <td><a href="../simulink/index.html?lang=en#t32">pendulum</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,5.0 2.6,7.0 5.1,11.4 7.7,15.1 10.2,17.6 12.8,19.5 15.3,20.7 17.9,21.6 20.4,22.4 23.0,23.1 25.5,23.6 28.1,24.0 30.6,24.3 33.2,24.5 35.7,24.7 38.3,24.8 40.9,24.8 43.4,24.9 46.0,24.9 48.5,24.9 51.1,25.0 53.6,25.0 56.2,24.9 58.7,24.6 61.3,24.4 63.8,24.3 66.4,24.1 68.9,24.2 71.5,24.4 74.0,24.6 76.6,24.7 79.1,24.8 81.7,24.9 84.3,24.9 86.8,24.9 89.4,25.0 91.9,25.0 94.5,25.0 97.0,25.0 99.6,25.0 102.1,25.0 104.7,24.8 107.2,24.6 109.8,24.4 112.3,24.2 114.9,24.1 117.4,24.3 120.0,24.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>angle peak 0.5000, final 0.0137</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial32_pendulum.slx" download>tutorial32_pendulum.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t33</b> UKF</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,10.8 2.6,10.3 5.1,10.0 7.7,9.8 10.2,9.8 12.8,10.0 15.3,10.3 17.9,10.8 20.4,11.4 23.0,12.3 25.5,13.5 28.1,15.2 30.6,17.6 33.2,20.8 35.7,23.4 38.3,24.6 40.9,24.9 43.4,24.6 46.0,24.2 48.5,23.7 51.1,23.2 53.6,22.6 56.2,22.0 58.7,21.3 61.3,20.4 63.8,19.4 66.4,18.2 68.9,16.5 71.5,13.9 74.0,10.6 76.6,7.2 79.1,5.4 81.7,5.0 84.3,5.2 86.8,5.6 89.4,6.1 91.9,6.7 94.5,7.2 97.0,7.9 99.6,8.6 102.1,9.5 104.7,10.4 107.2,11.7 109.8,13.4 112.3,15.8 114.9,19.2 117.4,23.0 120.0,25.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 1.875, final -1.810</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial33_ukf.slx" download>tutorial33_ukf.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t34</b> EKF vs UKF</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,10.8 2.6,10.3 5.1,10.0 7.7,9.8 10.2,9.8 12.8,10.0 15.3,10.3 17.9,10.8 20.4,11.4 23.0,12.3 25.5,13.5 28.1,15.2 30.6,17.6 33.2,20.8 35.7,23.4 38.3,24.6 40.9,24.9 43.4,24.6 46.0,24.2 48.5,23.7 51.1,23.2 53.6,22.6 56.2,22.0 58.7,21.3 61.3,20.4 63.8,19.4 66.4,18.2 68.9,16.5 71.5,13.9 74.0,10.6 76.6,7.2 79.1,5.4 81.7,5.0 84.3,5.2 86.8,5.6 89.4,6.1 91.9,6.7 94.5,7.2 97.0,7.9 99.6,8.6 102.1,9.5 104.7,10.4 107.2,11.7 109.8,13.4 112.3,15.8 114.9,19.2 117.4,23.0 120.0,25.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 1.875, final -1.810</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial34_ekfvsukf.slx" download>tutorial34_ekfvsukf.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t35</b> IMU fusion</td>
+        <td><a href="../simulink/index.html?lang=en#t35">imu</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,24.9 10.2,24.8 12.8,24.7 15.3,24.6 17.9,24.4 20.4,24.1 23.0,23.9 25.5,23.6 28.1,23.4 30.6,23.1 33.2,22.8 35.7,22.5 38.3,22.2 40.9,21.8 43.4,21.5 46.0,21.1 48.5,20.7 51.1,20.3 53.6,19.8 56.2,19.4 58.7,18.9 61.3,18.0 63.8,17.5 66.4,17.0 68.9,16.5 71.5,16.0 74.0,15.4 76.6,14.9 79.1,14.4 81.7,13.8 84.3,13.3 86.8,12.7 89.4,12.1 91.9,11.6 94.5,11.0 97.0,10.4 99.6,9.9 102.1,8.8 104.7,8.2 107.2,7.7 109.8,7.1 112.3,6.6 114.9,6.0 117.4,5.5 120.0,5.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>complementary filter range 0.0001–3.479, final 3.479</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial35_imu.slx" download>tutorial35_imu.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t36</b> Stateflow</td>
+        <td><a href="../simulink/index.html?lang=en#t36">stateflow</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,15.0 5.1,15.0 7.7,15.0 10.2,15.0 12.8,15.0 15.3,15.0 17.9,15.0 20.4,15.0 23.0,15.0 25.5,15.0 28.1,15.0 30.6,15.0 33.2,15.0 35.7,15.0 38.3,15.0 40.9,15.0 43.4,15.0 46.0,15.0 48.5,15.0 51.1,15.0 53.6,5.0 56.2,5.0 58.7,5.0 61.3,5.0 63.8,5.0 66.4,5.0 68.9,5.0 71.5,5.0 74.0,5.0 76.6,15.0 79.1,5.0 81.7,15.0 84.3,5.0 86.8,15.0 89.4,25.0 91.9,5.0 94.5,25.0 97.0,5.0 99.6,25.0 102.1,5.0 104.7,25.0 107.2,5.0 109.8,25.0 112.3,5.0 114.9,25.0 117.4,5.0 120.0,25.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 2.000, final 0; peak 227.7, final 84.58</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial36_stateflow.slx" download>tutorial36_stateflow.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t37</b> Triggered / enabled</td>
+        <td><a href="../simulink/index.html?lang=en#t37">triggered</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,15.0 2.6,12.7 5.1,8.5 7.7,6.1 10.2,5.0 12.8,5.5 15.3,8.3 17.9,11.7 20.4,15.6 23.0,20.3 25.5,21.9 28.1,24.2 30.6,25.0 33.2,23.8 35.7,21.3 38.3,17.8 40.9,12.8 43.4,9.2 46.0,6.5 48.5,5.0 51.1,5.6 53.6,7.7 56.2,11.8 58.7,15.8 61.3,19.6 63.8,22.7 66.4,24.8 68.9,24.8 71.5,23.2 74.0,19.5 76.6,15.6 79.1,11.7 81.7,7.6 84.3,5.5 86.8,5.0 89.4,6.1 91.9,9.3 94.5,13.0 97.0,16.9 99.6,21.4 102.1,23.9 104.7,25.0 107.2,24.1 109.8,21.8 112.3,18.4 114.9,14.5 117.4,9.7 120.0,6.8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 0.9801, final 0.7994; peak 0.9801, final -0.6020</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial37_triggered.slx" download>tutorial37_triggered.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t38</b> Bus signals</td>
+        <td><a href="../simulink/index.html?lang=en#t38">bus</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,15.0 2.6,14.0 5.1,13.0 7.7,12.0 10.2,11.1 12.8,10.2 15.3,9.4 17.9,8.6 20.4,7.2 23.0,6.6 25.5,6.1 28.1,5.7 30.6,5.4 33.2,5.1 35.7,5.0 38.3,5.0 40.9,5.1 43.4,5.3 46.0,5.5 48.5,5.9 51.1,6.4 53.6,6.9 56.2,7.5 58.7,8.2 61.3,9.8 63.8,10.7 66.4,11.6 68.9,12.6 71.5,13.6 74.0,14.6 76.6,15.6 79.1,16.6 81.7,17.6 84.3,18.5 86.8,19.4 89.4,20.3 91.9,21.1 94.5,21.9 97.0,22.6 99.6,23.2 102.1,24.2 104.7,24.5 107.2,24.8 109.8,24.9 112.3,25.0 114.9,25.0 117.4,24.8 120.0,24.6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 0.9996, final -0.9589; peak 3.000, final 0.8510; peak 1.581, final -0.9050</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial38_bus.slx" download>tutorial38_bus.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t39</b> Model reference</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,15.7 15.3,10.7 17.9,5.9 20.4,5.3 23.0,5.1 25.5,5.0 28.1,5.0 30.6,5.0 33.2,5.0 35.7,5.0 38.3,5.0 40.9,5.0 43.4,5.0 46.0,5.0 48.5,5.0 51.1,5.0 53.6,5.0 56.2,5.0 58.7,5.0 61.3,5.0 63.8,5.0 66.4,5.0 68.9,5.0 71.5,5.0 74.0,5.0 76.6,5.0 79.1,5.0 81.7,5.0 84.3,5.0 86.8,5.0 89.4,5.0 91.9,5.0 94.5,5.0 97.0,5.0 99.6,5.0 102.1,5.0 104.7,5.0 107.2,5.0 109.8,5.0 112.3,5.0 114.9,5.0 117.4,5.0 120.0,5.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>range 0–0.8571, final 0.8571</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial39_top.slx" download>tutorial39_top.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t40</b> Variant subsystem</td>
+        <td><a href="../simulink/index.html?lang=en#t40">variant</a></td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,24.1 15.3,21.5 17.9,17.9 20.4,13.8 23.0,10.0 25.5,6.9 28.1,5.0 30.6,5.2 33.2,7.0 35.7,9.5 38.3,12.2 40.9,14.8 43.4,16.8 46.0,18.0 48.5,18.3 51.1,16.4 53.6,14.7 56.2,12.9 58.7,11.2 61.3,9.9 63.8,9.1 66.4,9.0 68.9,9.4 71.5,11.4 74.0,12.7 76.6,13.8 79.1,14.7 81.7,15.1 84.3,15.2 86.8,14.9 89.4,14.3 91.9,12.7 94.5,11.9 97.0,11.4 99.6,11.1 102.1,11.0 104.7,11.3 107.2,11.7 109.8,12.2 112.3,13.3 114.9,13.6 117.4,13.8 120.0,13.9" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>variantoutput peak 1.255, final 0.6802</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial40_variant.slx" download>tutorial40_variant.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t41</b> Model callbacks</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,25.0 5.1,25.0 7.7,25.0 10.2,25.0 12.8,24.4 15.3,22.8 17.9,20.4 20.4,17.3 23.0,14.0 25.5,10.9 28.1,8.1 30.6,5.1 33.2,5.0 35.7,5.9 38.3,7.5 40.9,9.8 43.4,12.3 46.0,14.8 48.5,16.9 51.1,19.3 53.6,19.3 56.2,18.5 58.7,16.9 61.3,14.9 63.8,12.6 66.4,10.3 68.9,8.2 71.5,5.6 74.0,5.4 76.6,5.9 79.1,7.0 81.7,8.6 84.3,10.5 86.8,12.5 89.4,14.2 91.9,16.4 94.5,16.7 97.0,16.3 99.6,15.3 102.1,14.0 104.7,12.3 107.2,10.6 109.8,9.0 112.3,6.8 114.9,6.5 117.4,6.7 120.0,7.0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>PI output peak 1.423, final 1.279</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial41_callbacks.slx" download>tutorial41_callbacks.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t42</b> S-Function</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,15.0 2.6,13.0 5.1,11.1 7.7,9.4 10.2,7.8 12.8,6.6 15.3,5.7 17.9,5.1 20.4,5.2 23.0,5.9 25.5,6.9 28.1,8.2 30.6,9.8 33.2,11.7 35.7,13.6 38.3,15.6 40.9,17.6 43.4,19.4 46.0,21.1 48.5,22.6 51.1,23.8 53.6,24.6 56.2,25.0 58.7,25.0 61.3,23.9 63.8,22.8 66.4,21.3 68.9,19.7 71.5,17.8 74.0,15.8 76.6,13.8 79.1,11.9 81.7,10.1 84.3,8.4 86.8,7.1 89.4,6.0 91.9,5.3 94.5,5.0 97.0,5.1 99.6,5.6 102.1,7.6 104.7,9.1 107.2,10.9 109.8,12.8 112.3,14.8 114.9,16.8 117.4,18.7 120.0,20.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 1.999, final -1.088; peak 1.999, final -1.088</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial42_sfunction.slx" download>tutorial42_sfunction.slx</a></td>
+      </tr>
+      <tr>
+        <td><b>t43</b> Model Advisor</td>
+        <td>—</td>
+        <td><div class="metric"><svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="0.0,25.0 2.6,24.8 5.1,24.2 7.7,23.3 10.2,22.0 12.8,20.4 15.3,18.6 17.9,16.7 20.4,12.7 23.0,10.8 25.5,9.1 28.1,7.6 30.6,6.4 33.2,5.6 35.7,5.1 38.3,5.0 40.9,5.3 43.4,6.0 46.0,7.1 48.5,8.5 51.1,10.1 53.6,11.9 56.2,13.9 58.7,15.9 61.3,19.7 63.8,21.3 66.4,22.8 68.9,23.9 71.5,24.6 74.0,25.0 76.6,24.9 79.1,24.5 81.7,23.7 84.3,22.5 86.8,21.1 89.4,19.4 91.9,17.5 94.5,15.5 97.0,13.5 99.6,11.6 102.1,8.2 104.7,6.9 107.2,5.9 109.8,5.2 112.3,5.0 114.9,5.2 117.4,5.7 120.0,6.6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>peak 9.998, final 9.195</span></div></td>
+        <td>Probe</td>
+        <td><a href="../simulink/models/tutorial43_advisor.slx" download>tutorial43_advisor.slx</a></td>
+      </tr>
+        </tbody>
+      </table>
+      <p class="hint">Detailed differences and caveats (t10, t20, t21, t31, modified t32/t35) are documented in the <a href="matlab.html">Chinese provenance table</a>. Numbers are language-independent; the model SHA-256 is in the raw JSON.</p>
+    </main>
+    <footer><a href="en.html">← method</a> · <a href="../">vibe-lab</a></footer>
+  </div>
+  <script>
+    (function () {
+      if (location.protocol !== "https:") return;
+      var s = document.createElement("script");
+      s.async = true; s.src = "https://gc.zgo.at/count.js";
+      s.setAttribute("data-goatcounter", "https://xingdong.goatcounter.com/count");
+      document.head.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
