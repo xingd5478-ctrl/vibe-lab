@@ -13,31 +13,70 @@
 <body>
   <div class="wrap">
     <nav class="topnav" aria-label="全站导航">
-      <a href="./">首页</a>
-      <a href="./imu/">IMU</a>
-      <a href="./control/">Control</a>
-      <a href="./simulink/">Simulink</a>
-      <a href="./about/">方法</a>
-      <a href="./en/" hreflang="en" lang="en">EN</a>
+      <a href="./" data-nav="home">首页</a>
+      <a href="./imu/" data-nav="imu">IMU</a>
+      <a href="./control/" data-nav="control">Control</a>
+      <a href="./simulink/" data-nav="simulink">Simulink</a>
+      <a href="./about/" data-nav="about">方法</a>
+      <a href="./en/" data-nav="lang" hreflang="en" lang="en">EN</a>
     </nav>
     <header>
       <div class="kicker">vibe-lab / 404</div>
-      <h1>这个页面不存在</h1>
-      <p class="sub">链接可能写错了，或者页面已经移动。下面三条路径一定能走通。</p>
+      <h1 id="title">这个页面不存在</h1>
+      <p class="sub" id="subtitle">链接可能写错了，或者页面已经移动。下面三条路径一定能走通。</p>
     </header>
     <main id="main">
       <section class="paths">
-        <h2>从哪开始？</h2>
+        <h2 id="start">从哪开始？</h2>
         <div class="paths-grid">
-          <a href="./imu/"><b>① IMU 数据实验室</b><span>Allan 方差 · R/Q · 卡尔曼</span></a>
-          <a href="./control/"><b>② Control Play</b><span>二阶系统 · PID · 状态反馈</span></a>
-          <a href="./simulink/"><b>③ Simulink 43 课</b><span>交互复现 · 完整讲义</span></a>
+          <a href="./imu/" data-card="imu"><b id="card1">① IMU 数据实验室</b><span id="sub1">Allan 方差 · R/Q · 卡尔曼</span></a>
+          <a href="./control/" data-card="control"><b id="card2">② Control Play</b><span id="sub2">二阶系统 · PID · 状态反馈</span></a>
+          <a href="./simulink/" data-card="simulink"><b id="card3">③ Simulink 43 课</b><span id="sub3">交互复现 · 完整讲义</span></a>
         </div>
       </section>
-      <p class="sub" style="margin-top:18px">English? <a href="./en/">Go to the English homepage →</a></p>
+      <p class="sub" style="margin-top:18px" id="alt">English? <a href="./en/">Go to the English homepage →</a></p>
     </main>
-    <footer>vibe-lab · static site · <a href="./about/">方法说明</a> · <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">源码</a></footer>
+    <footer><span id="footer-text">vibe-lab · static site · </span><a href="./about/" id="footer-method">方法说明</a> · <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer" id="footer-source">源码</a></footer>
   </div>
+  <script>
+  (function () {
+    var isEn = location.pathname.indexOf("/en/") >= 0 || new URLSearchParams(location.search).get("lang") === "en";
+    var root = location.pathname.indexOf("/vibe-lab/") === 0 ? "/vibe-lab/" : "/";
+    if (isEn) {
+      document.documentElement.lang = "en";
+      document.querySelector(".topnav").setAttribute("aria-label", "Site navigation");
+      document.title = "Page not found · vibe-lab";
+      document.querySelectorAll(".topnav a").forEach(function (a) {
+        var key = a.getAttribute("data-nav");
+        a.href = root + (key === "home" ? "" : key === "about" ? "about/" : key === "lang" ? "" : key + "/");
+        a.textContent = { home: "Home", imu: "IMU", control: "Control", simulink: "Simulink", about: "Method", lang: "Chinese" }[key];
+      });
+      document.getElementById("title").textContent = "This page does not exist";
+      document.getElementById("subtitle").textContent = "The link may be wrong, or the page moved. These three paths definitely work.";
+      document.getElementById("start").textContent = "Where to start?";
+      document.getElementById("card1").textContent = "① IMU data lab";
+      document.getElementById("sub1").textContent = "Allan deviation · R/Q · Kalman";
+      document.getElementById("card2").textContent = "② Control Play";
+      document.getElementById("sub2").textContent = "Second order · PID · state feedback";
+      document.getElementById("card3").textContent = "③ Simulink · 43 lessons";
+      document.getElementById("sub3").textContent = "Interactive demos · full guide";
+      document.getElementById("alt").innerHTML = 'Chinese? <a href="' + root + '">Back to the Chinese homepage →</a>';
+      document.getElementById("card1").parentElement.href = root + "imu/?lang=en";
+      document.getElementById("card2").parentElement.href = root + "control/?lang=en";
+      document.getElementById("card3").parentElement.href = root + "simulink/index.html?lang=en";
+      document.getElementById("footer-text").textContent = "vibe-lab · static site · ";
+      document.getElementById("footer-method").textContent = "Method";
+      document.getElementById("footer-method").href = root + "about/en.html";
+      document.getElementById("footer-source").textContent = "Source";
+    } else {
+      document.querySelectorAll(".topnav a").forEach(function (a) {
+        var key = a.getAttribute("data-nav");
+        a.href = root + (key === "home" ? "" : key === "lang" ? "en/" : key === "about" ? "about/" : key + "/");
+      });
+      document.getElementById("footer-method").href = root + "about/";
+    }
+  })();
+  </script>
   <script>
   (function () {
     if (location.protocol !== "https:") return;
@@ -47,6 +86,6 @@
     s.setAttribute("data-goatcounter", "https://xingdong.goatcounter.com/count");
     document.head.appendChild(s);
   })();
-</script>
+  </script>
 </body>
 </html>
