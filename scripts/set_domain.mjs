@@ -12,6 +12,7 @@ if (!raw) {
   process.exit(1);
 }
 const origin = raw.replace(/\/+$/, "");
+const noCname = process.argv.includes("--no-cname");
 if (!/^https:\/\/[^/]+$/.test(origin)) {
   console.error("domain must be exactly https://host (no path)");
   process.exit(1);
@@ -43,7 +44,9 @@ for (const file of files) {
   changed++;
   console.log("updated", path.relative(ROOT, file));
 }
-fs.writeFileSync(path.join(ROOT, "landing", "CNAME"), host + "\n");
-console.log(`CNAME -> ${host}`);
+if (!noCname) {
+  fs.writeFileSync(path.join(ROOT, "landing", "CNAME"), host + "\n");
+  console.log(`CNAME -> ${host}`);
+}
 console.log(`rewrote ${changed} files from ${OLD} to ${origin}`);
-console.log("next: commit, push, then GitHub Settings → Pages → Custom domain, Enforce HTTPS");
+console.log(noCname ? "next: commit/push; Cloudflare Pages or your host will serve this hostname" : "next: commit, push, then GitHub Settings → Pages → Custom domain, Enforce HTTPS");
