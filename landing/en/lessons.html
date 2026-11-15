@@ -29,7 +29,7 @@
       <a href="../control/?lang=en">Control</a>
       <a href="../simulink/index.html?lang=en">Simulink</a>
       <a href="../about/en.html">Method</a>
-      <a href="../simulink/course.html" data-local="../../simulink/course.html">Chinese</a>
+      <a href="../simulink/course.html">Chinese</a>
     </nav>
     <header>
       <div class="kicker">vibe-lab / simulink / 43 lessons</div>
@@ -310,6 +310,15 @@
       document.querySelectorAll("[data-local]").forEach(function (a) { a.href = a.getAttribute("data-local"); });
     })();
   </script>
+  <script>
+  (function () {
+    if (location.protocol !== "https:") return;
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://gc.zgo.at/count.js";
+    s.setAttribute("data-goatcounter", "https://xingdong.goatcounter.com/count");
+    document.head.appendChild(s);
+  })();
+</script>
 </body>
 </html>
-

@@ -80,6 +80,16 @@ ${rows}
       document.querySelectorAll("[data-local]").forEach(function (a) { a.href = a.getAttribute("data-local"); });
     })();
   </script>
+  <script>
+  (function () {
+    if (location.protocol !== "https:") return;
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://gc.zgo.at/count.js";
+    s.setAttribute("data-goatcounter", "https://xingdong.goatcounter.com/count");
+    document.head.appendChild(s);
+  })();
+</script>
 </body>
 </html>
 `;

@@ -359,6 +359,12 @@
     }
   }
 
+  window.vibeTrack = function (name) {
+    try {
+      if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: "event/" + name });
+    } catch (e) {}
+  };
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       walk(document.body);

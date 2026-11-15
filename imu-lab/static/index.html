@@ -242,6 +242,16 @@
   document.querySelectorAll(".topnav a").forEach(function (a, i) { if (hrefs[i]) a.href = hrefs[i]; });
 })();
 </script>
+  <script>
+  (function () {
+    if (location.protocol !== "https:") return;
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://gc.zgo.at/count.js";
+    s.setAttribute("data-goatcounter", "https://xingdong.goatcounter.com/count");
+    document.head.appendChild(s);
+  })();
+</script>
 </body>
 </html>
 

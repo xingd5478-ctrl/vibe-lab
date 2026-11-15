@@ -599,6 +599,7 @@
   }
 
   function exportCSV() {
+    if (window.vibeTrack) window.vibeTrack("imu-export-csv");
     const clean = currentRows();
     if (!clean.length) return;
     const ch = state.channel;
@@ -677,6 +678,7 @@
   }
 
   function exportAllanCSV() {
+    if (window.vibeTrack) window.vibeTrack("imu-export-allan");
     const keys = AXES.map((a) => a.key);
     const series = keys.map((k) => allanFor(k));
     const n = Math.min(...series.map((s) => s.length));

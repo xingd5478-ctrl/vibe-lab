@@ -140,6 +140,16 @@ ${body}
       navigator.serviceWorker.register(root + "sw.js").catch(function () {});
     })();
   </script>
+  <script>
+  (function () {
+    if (location.protocol !== "https:") return;
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://gc.zgo.at/count.js";
+    s.setAttribute("data-goatcounter", "https://xingdong.goatcounter.com/count");
+    document.head.appendChild(s);
+  })();
+</script>
 </body>
 </html>
 `;

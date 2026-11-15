@@ -26,6 +26,14 @@
       <p class="sub">发现错误、讲义讲不清、或者想要一个新实验？直接开一个 GitHub issue，附上复现信息即可。</p>
     </header>
     <main id="main">
+      <section class="paths">
+        <h2>不想注册 GitHub？</h2>
+        <div class="paths-grid">
+          <a href="https://tally.so/r/9N98bY" target="_blank" rel="noreferrer">
+            <b>用 Tally 表单反馈</b><span>无需 GitHub 账号，匿名可用</span>
+          </a>
+        </div>
+      </section>
       <section class="panel" aria-labelledby="feedback-metrics-title" style="margin-bottom:18px">
         <h2 id="feedback-metrics-title">反馈数据</h2>
         <p class="sub" id="feedback-summary">正在读取公开 issue 统计…</p>
@@ -114,5 +122,15 @@
       }).catch(local);
     })();
   </script>
+  <script>
+  (function () {
+    if (location.protocol !== "https:") return;
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://gc.zgo.at/count.js";
+    s.setAttribute("data-goatcounter", "https://xingdong.goatcounter.com/count");
+    document.head.appendChild(s);
+  })();
+</script>
 </body>
 </html>
