@@ -1,4 +1,4 @@
-# Cloudflare Pages 免费部署（推荐，无内容审核）
+# Cloudflare 免费部署（Pages / Worker 两条路）
 
 目标：拿到 `https://vibe-lab.pages.dev`，同时免费使用 Cloudflare Web Analytics。  
 GitHub Pages 可以继续保留作为备份。
@@ -68,3 +68,32 @@ git add -A && git commit -m "chore: point canonical to vibe-lab.pages.dev" && gi
 - 这不是独立域名，是 `pages.dev` 子域；免费、稳定、无内容审核。
 - 如果以后买 `vibe-lab.dev`，在 Cloudflare Pages → Custom domains 绑定，再跑一次 `set_domain` 即可。
 - 不想迁移：继续用 `xingd5478-ctrl.github.io/vibe-lab/`，功能完全一样，只是 URL 长一点。
+
+
+---
+
+# 如果你已经建成了 Worker（截图里的 `npx wrangler deploy`）
+
+仓库已经加了 `wrangler.jsonc`，让 Worker 直接托管 `_site`：
+
+```json
+{
+  "name": "vibe-lab",
+  "compatibility_date": "2025-01-01",
+  "assets": {
+    "directory": "./_site",
+    "not_found_handling": "404-page"
+  }
+}
+```
+
+1. 推送本次提交后，在 Worker 的 **Deployments** 里点 **Retry build**，或等 Git 自动构建；
+2. 打开 **Domains** 标签，把 `workers.dev` 从 Disabled 打开；
+3. 地址是：
+
+```
+https://vibe-lab.xingd5478.workers.dev
+```
+
+如果这个地址能打开首页，发我，我跑 `set_domain --no-cname` 切换 canonical。  
+`workers.dev` 是免费子域；不需要买域名。

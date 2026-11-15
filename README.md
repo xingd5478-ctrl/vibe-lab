@@ -112,7 +112,7 @@ imu-lab/static/
 
 ## 产品化
 
-已加反馈页（`/feedback.html` + GitHub Issue 模板），页面优先读取公开 Issues 并回退到 `data/feedback.json` 快照（`npm run sync:feedback`）；另有 404、WebSite JSON-LD、hreflang/Sitemap、PWA 预缓存。自定义域名与统计需要站外账号/DNS，步骤见 [docs/FREE_STACK.md](docs/FREE_STACK.md) 和 [docs/CLOUDFLARE_PAGES.md](docs/CLOUDFLARE_PAGES.md)；真机/读屏验收也在该文件里列出。
+已加反馈页（`/feedback.html` + GitHub Issue 模板），页面优先读取公开 Issues 并回退到 `data/feedback.json` 快照（`npm run sync:feedback`）；另有 404、WebSite JSON-LD、hreflang/Sitemap、PWA 预缓存。自定义域名与统计需要站外账号/DNS，`wrangler.jsonc` 支持 Cloudflare Worker 静态托管；步骤见 [docs/FREE_STACK.md](docs/FREE_STACK.md) 和 [docs/CLOUDFLARE_PAGES.md](docs/CLOUDFLARE_PAGES.md)；真机/读屏验收也在该文件里列出。
 
 ## 数据层
 
