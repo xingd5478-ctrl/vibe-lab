@@ -290,6 +290,17 @@
   function enGuideHref() {
     return location.protocol === "file:" ? "../landing/en/guide.html" : "../en/guide.html";
   }
+  function setEnglishMeta(text) {
+    const set = (sel, attr) => {
+      const n = document.querySelector(sel);
+      if (n) n.setAttribute(attr, text);
+    };
+    set('meta[name="description"]', "content");
+    set('meta[property="og:description"]', "content");
+    set('meta[name="twitter:description"]', "content");
+    set('meta[property="og:title"]', "content");
+  }
+
   function addNote(text, after) {
     const p = document.createElement("p");
     p.className = "hint en-scope-note";
@@ -322,6 +333,7 @@
       footer.innerHTML = 'vibe-lab · static site · <a href="../">Home</a> · <a href="../about/en.html">Method</a> · <a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">Source</a>';
     }
     if (isImu) {
+      setEnglishMeta("IMU data lab: upload MPU6050 CSV, clean bad frames, compute Allan deviation, fit ARW/RRW and compare Kalman filtering in the browser.");
       const sub = document.querySelector("header .sub");
       if (sub) {
         const badge = sub.querySelector(".badge");
@@ -351,6 +363,7 @@
       addNote("The 10-chapter lab manual is available in English in the Manual tab.");
     }
     if (isCtrl) {
+      setEnglishMeta("Control Play: drag second-order parameters and PID gains, read Bode and step response, and explore state feedback, observers, root locus and discretization.");
       const sub = document.querySelector("header .sub");
       if (sub) sub.textContent = "G(s)=ωn²/(s²+2ζωn·s+ωn²). Drag the sliders to see the Bode plot and step response in real time.";
       const hint = document.querySelector(".controls .hint");
@@ -364,6 +377,7 @@
       addNote("Extended labs are Chinese-only and hidden in English mode; the 14-chapter manual is translated.");
     }
     if (isSim) {
+      setEnglishMeta("43-lesson Simulink control tutorial: interactive demos, a full English lesson guide, MATLAB model provenance and .slx downloads.");
       const sub = document.querySelector("header .sub");
       if (sub) {
         sub.innerHTML = 'A 43-lesson / 8-stage MATLAB + Simulink tutorial. <code>.slx</code> files are binary models the browser cannot run; this page reproduces the same control math interactively. <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">GitHub repo →</a>';
