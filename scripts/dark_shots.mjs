@@ -69,7 +69,7 @@ async function main() {
     await c.send("Page.enable");
     await c.send("Runtime.enable");
     await c.send("Emulation.setDeviceMetricsOverride", { width: 1400, height: 1200, deviceScaleFactor: 1, mobile: false });
-    await c.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "dark" }] });
+    await c.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "dark" }, { name: "prefers-reduced-motion", value: "reduce" }] });
     const ev = async (expr) => {
       const r = await c.send("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true });
       if (r.exceptionDetails) throw new Error(r.exceptionDetails.text);
