@@ -6,7 +6,7 @@ const ROOT = path.resolve(import.meta.dirname, "..");
 const DIRS = ["landing", "shared", "imu-lab/static", "control-play", "simulink", "about"];
 const EXT = new Set([".js", ".css"]);
 const PAGE_BUDGET_KB = {
-  landing: 20,
+  landing: 24,
   shared: 26,
   "imu-lab/static": 110,
   "control-play": 80,

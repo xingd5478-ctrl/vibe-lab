@@ -236,13 +236,13 @@ footer a { color: var(--accent); text-decoration: underline; text-underline-offs
 .scroll-progress { position: fixed; top: 0; left: 0; height: 2px; width: 0; background: var(--accent); z-index: 100; pointer-events: none; }
 @keyframes heroRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes heroFade { from { opacity: 0; } to { opacity: 1; } }
-.hero-copy > * { animation: heroRise .48s cubic-bezier(.2,.7,.3,1) both; }
+.hero-copy > * { animation: heroRise .38s cubic-bezier(.2,.7,.3,1) both; }
 .hero-copy > :nth-child(1) { animation-delay: 0s; }
 .hero-copy > :nth-child(2) { animation-delay: .04s; }
-.hero-copy > :nth-child(3) { animation-delay: .09s; }
-.hero-copy > :nth-child(4) { animation-delay: .14s; }
-.hero-copy > :nth-child(5) { animation-delay: .18s; }
-.hero-visual { animation: heroFade .55s ease both; animation-delay: .08s; }
+.hero-copy > :nth-child(3) { animation-delay: .07s; }
+.hero-copy > :nth-child(4) { animation-delay: .1s; }
+.hero-copy > :nth-child(5) { animation-delay: .13s; }
+.hero-visual { animation: heroFade .45s ease both; animation-delay: .05s; }
 .hero-visual { position: relative; transition: transform .28s ease, box-shadow .28s ease; }
 .hero-visual:hover { transform: rotate(0deg) translateY(-3px); box-shadow: 0 20px 44px rgba(27,29,34,.16); }
 .scope {
@@ -273,3 +273,29 @@ footer a { color: var(--accent); text-decoration: underline; text-underline-offs
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+
+/* Scroll reveal + pointer-reactive cards (desktop only) */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .35s ease, transform .35s cubic-bezier(.2,.7,.3,1); transition-delay: calc(var(--reveal-i, 0) * 40ms); }
+.reveal.in { opacity: 1; transform: none; }
+.card { transform-style: preserve-3d; transition: border-color .2s ease, box-shadow .2s ease, transform .28s ease; }
+.card::before { content: ""; position: absolute; inset: 0; border-radius: 3px; background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(31,78,121,.13), transparent 65%); opacity: 0; transition: opacity .2s ease; pointer-events: none; }
+.card:hover::before { opacity: 1; }
+.card > * { position: relative; z-index: 1; }
+.card:hover { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px); box-shadow: 0 16px 30px rgba(27,29,34,.10); }
+.card picture { position: relative; }
+.card picture::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(255,255,255,.20) 50%, transparent 55%); transform: translateY(-120%); transition: transform .55s ease; pointer-events: none; }
+.card:hover picture::after { transform: translateY(120%); }
+.btn { transform: translate(var(--tx, 0px), var(--ty, 0px)); }
+.btn:hover { transform: translate(var(--tx, 0px), calc(var(--ty, 0px) - 1px)); }
+.topnav a { position: relative; }
+.topnav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .2s ease; }
+.topnav a:hover::after, .topnav a[aria-current="page"]::after { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+}
+
+
+/* Local file previews (used by the screenshot regression harness) stay static. */
+.no-motion *, .no-motion *::before, .no-motion *::after { animation: none !important; transition: none !important; }
+.no-motion .reveal { opacity: 1 !important; transform: none !important; }
