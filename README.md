@@ -165,3 +165,12 @@ imu-lab/static/
 - 三个子项目各自独立；共享 JS 只有 `allan.js / kf.js / fit.js`。
 - 数据不进 Git（`data/sample` 除外）。
 - 每个子项目一个 README：写“现在能做什么 / 下一步 / 怎么跑”。
+
+
+## 工程交接
+
+- 架构与模块边界：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- 部署、回滚、缓存事故、统计/反馈/域名：[docs/RUNBOOK.md](docs/RUNBOOK.md)
+- 提交前检查与生成文件规则：[CONTRIBUTING.md](CONTRIBUTING.md)
+- 部署后线上冒烟：`npm run live`（GitHub Actions 也会在 Pages 部署后自动跑）
+- 代码所有者：`.github/CODEOWNERS`

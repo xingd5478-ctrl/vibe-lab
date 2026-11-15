@@ -16,6 +16,20 @@
     update();
   }
 
+  function track(name) {
+    try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: "event/" + name }); } catch (e) {}
+  }
+
+  document.querySelectorAll(".btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var h = btn.getAttribute("href") || "";
+      track(h.indexOf("imu") >= 0 ? "cta-imu" : "cta-simulink");
+    });
+  });
+  document.querySelectorAll("[data-target]").forEach(function (a) {
+    a.addEventListener("click", function () { track("open-" + a.getAttribute("data-target")); });
+  });
+
   var fine = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   function initReveal() {
@@ -142,7 +156,9 @@
   }
 
   function play() {
-    if (reduced || running) return;
+    if (reduced) return;
+    track("scope-replay");
+    if (running) return;
     running = true;
     var start = 0;
     var duration = 2600;
