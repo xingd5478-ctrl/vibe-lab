@@ -279,13 +279,16 @@
     d.className = "lang-banner";
     d.setAttribute("data-i18n-skip", "");
     d.style.cssText = "margin:10px 0 0;padding:7px 10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12px;border-radius:2px";
-    d.innerHTML = "English UI: tools and charts are translated. Chinese-only manuals and long lesson notes are hidden; switch to <a href=\"?lang=zh\">Chinese</a> for the full content.";
+    d.innerHTML = "English UI: tools, charts and lab manuals are translated; the 43-lesson guide has an English edition. Chinese-only extended labs are hidden; switch to <a href=\"?lang=zh\">Chinese</a> for the original source notes.";
     wrap.insertBefore(d, wrap.querySelector("header"));
   }
 
   let curated = false;
   function enIndexHref() {
     return location.protocol === "file:" ? "../landing/en/lessons.html" : "../en/lessons.html";
+  }
+  function enGuideHref() {
+    return location.protocol === "file:" ? "../landing/en/guide.html" : "../en/guide.html";
   }
   function addNote(text, after) {
     const p = document.createElement("p");
@@ -297,7 +300,7 @@
     else if (main) main.appendChild(p);
   }
   function repointCourseLinks() {
-    const href = enIndexHref();
+    const href = enGuideHref();
     document.querySelectorAll('a[href*="course.html"]').forEach((a) => {
       if (a.closest("[data-i18n-skip]")) return;
       a.href = href;
@@ -306,7 +309,7 @@
   function englishCuration() {
     if (curated) return;
     if (document.getElementById("lesson-body")) {
-      location.replace(enIndexHref());
+      location.replace(enGuideHref());
       return;
     }
     const isImu = !!(document.getElementById("chart-allan") && document.getElementById("chart-time"));
@@ -339,14 +342,26 @@
         file.style.display = "none";
         file.parentNode.insertBefore(b, file);
       }
-      addNote("The 10-chapter lab manual is Chinese-only and hidden in English mode; switch to Chinese for the full manual.");
+      const mh = document.querySelector("#manual h2");
+      if (mh) mh.textContent = "IMU lab manual · 10 chapters";
+      const mhint = document.querySelector("#manual .hint");
+      if (mhint) mhint.textContent = "From what an IMU measures to calibration and lab reports; each chapter anchors to the controls above.";
+      const ms = document.getElementById("manual-search");
+      if (ms) { ms.placeholder = "Search chapters: Allan / calibration / R/Q…"; ms.setAttribute("aria-label", "Search manual chapters"); }
+      addNote("The 10-chapter lab manual is available in English in the Manual tab.");
     }
     if (isCtrl) {
       const sub = document.querySelector("header .sub");
       if (sub) sub.textContent = "G(s)=ωn²/(s²+2ζωn·s+ωn²). Drag the sliders to see the Bode plot and step response in real time.";
       const hint = document.querySelector(".controls .hint");
       if (hint) hint.textContent = "Kp speeds up the response but increases overshoot; Ki removes steady-state error but can oscillate; Kd reduces overshoot and amplifies noise. Drag the sliders to compare open and closed loop.";
-      addNote("Extended labs and the 14-chapter manual are Chinese-only and hidden in English mode; switch to Chinese for them.");
+      const mh = document.querySelector("#manual h2");
+      if (mh) mh.textContent = "Control Play lab manual · 14 chapters";
+      const mhint = document.querySelector("#manual .hint");
+      if (mhint) mhint.textContent = "From first/second order to PID, Bode, state space, observers and engineering detail; each chapter anchors to the controls above.";
+      const ms = document.getElementById("manual-search");
+      if (ms) { ms.placeholder = "Search chapters: Bode / observer / root locus…"; ms.setAttribute("aria-label", "Search manual chapters"); }
+      addNote("Extended labs are Chinese-only and hidden in English mode; the 14-chapter manual is translated.");
     }
     if (isSim) {
       const sub = document.querySelector("header .sub");
@@ -355,7 +370,7 @@
       }
       repointCourseLinks();
       const note = document.getElementById("demo-note");
-      addNote("Interactive reproduction. The Chinese lesson notes are linked from the English lesson index; use the lesson index for .m/.slx downloads.", note);
+      addNote("The full English 43-lesson guide is available in the English guide; use it for .m/.slx downloads and lesson-by-lesson notes.", note);
     }
   }
 

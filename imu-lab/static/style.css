@@ -346,4 +346,3 @@ footer a { color: var(--accent); text-decoration: underline; text-underline-offs
 }
 
 /* English mode: hide Chinese-only long-form sections; English pages stay English. */
-.lang-en #manual, .lang-en .manual, .lang-en .tabs-bar button[data-tab="manual"] { display: none !important; }

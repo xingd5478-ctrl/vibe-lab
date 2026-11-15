@@ -103,12 +103,12 @@ imu-lab/static/
 
 - `tools/probe_all.m` 对 43 个 `.slx` 逐一仿真；t39 的引用子模型放在 `simulink/models/refs/`，t42 的 S-Function 在 `tools/deadzone_sfcn.m`。
 - `artifacts/simulink/probes.json` 是 MATLAB 原始输出（gitignore）；`node scripts/build_matlab_data.mjs` 加上 **SHA-256、MATLAB 版本、solver、停止时间、信号统计**，写出 `data/matlab-probes.json`。
-- `node scripts/build_matlab_table.mjs` 从 JSON 生成 `about/matlab.html`，不再手抄表格；每行带关键信号 mini 曲线；`npm run check:matlab` 校验模型哈希与表格同步。
+- `node scripts/build_en_guide.mjs` 生成英文 43 课讲义；`node scripts/build_matlab_table.mjs` 从 JSON 生成 `about/matlab.html`，不再手抄表格；每行带关键信号 mini 曲线；`npm run check:matlab` 校验模型哈希与表格同步。
 - 43/43 全部可仿真；t24 用讲义原 FIS、t26 补末端输出、t32 加 PD 稳定、t35 修时间通道（见 `tools/patch_models.m`），其余差异在表里写明。
 
 ## 英文 UI（beta）
 
-`?lang=en` 或 `localStorage("vibe-lang")` 启用 `shared/i18n.js`：翻译导航、控件、图表轴/图例、指标与课程标题；英文模式隐藏中文长手册/讲义，并提供 `/en/lessons.html` 英文课程索引。英文首页 `/en/`、英文方法页 `/about/en.html`；`npm run e2e` 会验证英文页无中文残留与 axe。
+`?lang=en` 或 `localStorage("vibe-lang")` 启用 `shared/i18n.js`：翻译导航、控件、图表轴/图例、指标与课程标题；英文模式提供英文版 IMU/Control 手册、`/en/guide.html` 43 课英文讲义和 `/en/lessons.html` 索引。英文首页 `/en/`、英文方法页 `/about/en.html`；`npm run e2e` 会验证英文页无中文残留与 axe。
 
 ## 产品化
 
@@ -148,6 +148,7 @@ imu-lab/static/
 | `/` | 首页（landing） |
 | `/en/` | 英文首页（English overview） |
 | `/en/lessons.html` | 43 课英文索引（模型/MATLAB 源文件） |
+| `/en/guide.html` | 43 课完整英文讲义（目标/概念/步骤/自测） |
 | `/about/matlab.html` | MATLAB 43/43 对照（哈希/求解器/信号） |
 | `/about/en.html` | 英文方法说明 |
 | `/feedback.html` | 反馈入口（GitHub issue 模板） |

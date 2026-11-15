@@ -20,6 +20,7 @@
       "samples": 51,
       "signals_count": 2,
       "metric": "峰值 5.997，末值 -3.264",
+      "metric_source": "probe",
       "note": "信号、增益、示波器；结构课",
       "spark": [
         0,
@@ -201,6 +202,7 @@
       "samples": 51,
       "signals_count": 10,
       "metric": "峰值 7.696，末值 -7.660",
+      "metric_source": "probe",
       "note": "Sum/Product/Mux/Demux；结构课",
       "spark": [
         0,
@@ -837,7 +839,8 @@
       "stop_time": 10,
       "samples": 53,
       "signals_count": 6,
-      "metric": "峰值 1.000，终值 1.000",
+      "metric": "τ=0.5 响应 范围 0–1.0000，末值 1.0000",
+      "metric_source": "probe",
       "note": "与网页 demo 一致",
       "spark": [
         0,
@@ -1246,7 +1249,8 @@
       "stop_time": 10,
       "samples": 56,
       "signals_count": 6,
-      "metric": "ζ=0.2 峰值 1.520，终值 0.996",
+      "metric": "ζ=0.2 响应 峰值 1.520，末值 0.9957",
+      "metric_source": "probe",
       "note": "与网页 demo 一致（ζ=0.2）",
       "spark": [
         0,
@@ -1655,7 +1659,8 @@
       "stop_time": 10,
       "samples": 322,
       "signals_count": 4,
-      "metric": "峰值 0.978，终值 0.978",
+      "metric": "输出 范围 0–0.9775，末值 0.9775",
+      "metric_source": "probe",
       "note": "模型参考/限幅与 demo 不同",
       "spark": [
         0,
@@ -1951,6 +1956,7 @@
       "samples": 244,
       "signals_count": 2,
       "metric": "峰值 20.00，末值 0",
+      "metric_source": "probe",
       "note": "Workspace 导入导出；探针需初始化 u_input",
       "spark": [
         0,
@@ -2132,6 +2138,7 @@
       "samples": 51,
       "signals_count": 6,
       "metric": "峰值 39.98，末值 -21.76",
+      "metric_source": "probe",
       "note": "子系统层级；结构课",
       "spark": [
         0,
@@ -2541,6 +2548,7 @@
       "samples": 52,
       "signals_count": 6,
       "metric": "输出1 峰值 8.101，末值 7.417；输出2 峰值 16.57，末值 13.02",
+      "metric_source": "probe",
       "note": "Mask 参数化；三路输出",
       "spark": [
         0,
@@ -2950,6 +2958,7 @@
       "samples": 53,
       "signals_count": 9,
       "metric": "峰值 0.4182，末值 0.2383；峰值 0.4182，末值 0.2383",
+      "metric_source": "probe",
       "note": "TF/SS/MA 三种实现对比",
       "spark": [
         0,
@@ -3529,7 +3538,8 @@
       "stop_time": 8,
       "samples": 54,
       "signals_count": 8,
-      "metric": "峰值 0.065，终值 0.063（PP）",
+      "metric": "PP 输出 峰值 0.0652，末值 0.0625",
+      "metric_source": "probe",
       "note": "原模型无参考前馈，稳态约 1/16",
       "spark": [
         0,
@@ -4053,6 +4063,7 @@
       "samples": 62,
       "signals_count": 8,
       "metric": "最大误差 0.300，末值 0.000",
+      "metric_source": "probe",
       "note": "估计误差收敛；与 demo 一致",
       "spark": [
         0.3,
@@ -4576,6 +4587,7 @@
       "samples": 96,
       "signals_count": 10,
       "metric": "Kalman RMSE 0.455，测量 1.149",
+      "metric_source": "offline",
       "note": "Kalman 明显优于 Luenberger/测量",
       "spark": [
         0,
@@ -5212,7 +5224,8 @@
       "stop_time": 1.5,
       "samples": 162,
       "signals_count": 4,
-      "metric": "峰值 192.44，终值 137.09",
+      "metric": "转速 峰值 192.4，末值 137.1",
+      "metric_source": "probe",
       "note": "速度 PI 有超调，稳态有差",
       "spark": [
         0,
@@ -5508,6 +5521,7 @@
       "samples": 202,
       "signals_count": 2,
       "metric": "峰值 228.6，末值 145.7；范围 0–410.1，末值 410.1",
+      "metric_source": "probe",
       "note": "FOC 与 DC 对比；末值差异大",
       "spark": [
         0,
@@ -5689,6 +5703,7 @@
       "samples": 2003,
       "signals_count": 2,
       "metric": "峰值 0.0288，末值 0.0161",
+      "metric_source": "probe",
       "note": "代码生成模型；固定步长 1 ms",
       "spark": [
         0,
@@ -5870,6 +5885,7 @@
       "samples": 52,
       "signals_count": 1,
       "metric": "Plant 4/(s²+0.5s+4)：Gm=∞，PM=20.4°",
+      "metric_source": "offline",
       "note": "Plant 4/(s²+0.5s+4)；PM 20.4°",
       "spark": [
         0,
@@ -5994,6 +6010,7 @@
       "samples": 56,
       "signals_count": 2,
       "metric": "校正后 峰值 0.5216，末值 0.5000；参考 峰值 0.2000，末值 0.2000",
+      "metric_source": "probe",
       "note": "Lead/Lag 校正；输入/输出稳态",
       "spark": [
         0,
@@ -6175,6 +6192,7 @@
       "samples": 54,
       "signals_count": 2,
       "metric": "范围 0–3.831，末值 3.831",
+      "metric_source": "probe",
       "note": "阶跃辨识；输出饱和/限幅需注意",
       "spark": [
         0,
@@ -6356,6 +6374,7 @@
       "samples": 54,
       "signals_count": 1,
       "metric": "输出 峰值 0.6719，末值 0.5000",
+      "metric_source": "probe",
       "note": "H∞ 鲁棒控制；输出稳态 0.5",
       "spark": [
         0,
@@ -6479,7 +6498,8 @@
       "stop_time": 10,
       "samples": 1024,
       "signals_count": 1,
-      "metric": "峰值 0.562，10 s 终值 0.562",
+      "metric": "输出 范围 0–0.5618，末值 0.5618",
+      "metric_source": "probe",
       "note": "原 .slx 实为 PID，不是 MPC；10 s 仍在上升",
       "spark": [
         0,
@@ -6604,6 +6624,7 @@
       "samples": 1025,
       "signals_count": 2,
       "metric": "SMC 峰值 0.724，终值 0.600；PID 峰值 0.636，终值 0.636",
+      "metric_source": "probe",
       "note": "原 .slx 是符号继电器：u 仅 0→3，无抖振",
       "spark": [
         0,
@@ -6784,7 +6805,8 @@
       "stop_time": 10,
       "samples": 57,
       "signals_count": 2,
-      "metric": "峰值 1.289，终值 0.825",
+      "metric": "输出 峰值 1.289，末值 0.8245",
+      "metric_source": "probe",
       "note": "对应当前 K 的稳态偏差",
       "spark": [
         0,
@@ -6966,6 +6988,7 @@
       "samples": 54,
       "signals_count": 3,
       "metric": "参考 范围 0–2.000，末值 2.000；对象 峰值 2.106，末值 2.000；控制 范围 0–3.000，末值 3.000",
+      "metric_source": "probe",
       "note": "MRAC 参考/对象跟踪；控制量 3",
       "spark": [
         0,
@@ -7203,7 +7226,8 @@
       "stop_time": 15,
       "samples": 121,
       "signals_count": 5,
-      "metric": "模糊输出 0.983，PID 末值 0.747",
+      "metric": "模糊 范围 0–0.9832，末值 0.9832；PID 范围 0–0.7473，末值 0.7473",
+      "metric_source": "probe",
       "note": "FIS 按讲义重建（Sugeno，25 条规则）；模糊输出 0.983",
       "spark": [
         0,
@@ -7556,6 +7580,7 @@
       "samples": 54,
       "signals_count": 3,
       "metric": "峰值 2.091，末值 1.134",
+      "metric_source": "probe",
       "note": "Simscape 物理模型；位移有超调",
       "spark": [
         0,
@@ -7794,6 +7819,7 @@
       "samples": 51,
       "signals_count": 3,
       "metric": "末端 (0.452, -0.150, 1.304)",
+      "metric_source": "probe",
       "note": "DH 正运动学；探针记录末端 x/y/z",
       "spark": [
         0.4521,
@@ -8032,6 +8058,7 @@
       "samples": 54,
       "signals_count": 5,
       "metric": "峰值 0.1779，末值 0.0998；峰值 0.1779，末值 0.0998",
+      "metric_source": "probe",
       "note": "TF/SS 数值积分对比；两者重合",
       "spark": [
         0,
@@ -8384,6 +8411,7 @@
       "samples": 5673,
       "signals_count": 2,
       "metric": "峰值 4.533，末值 2.178",
+      "metric_source": "probe",
       "note": "DSP 采样/FFT；5.6k 点",
       "spark": [
         0.3565185814814119,
@@ -8565,6 +8593,7 @@
       "samples": 689,
       "signals_count": 2,
       "metric": "PID 峰值 3.965，末值 1.814；LQR 范围 0–1.000，末值 1.000",
+      "metric_source": "probe",
       "note": "PID vs LQR；PID 超调大",
       "spark": [
         0.3565185814814119,
@@ -8746,6 +8775,7 @@
       "samples": 717,
       "signals_count": 3,
       "metric": "车身位移 峰值 10.06，末值 0.0016",
+      "metric_source": "probe",
       "note": "1/4 车主动悬挂；位移峰值 10",
       "spark": [
         0,
@@ -8984,6 +9014,7 @@
       "samples": 1001,
       "signals_count": 4,
       "metric": "测量 RMSE 0.053；EKF x₁ RMSE 0.049（按讲义离线）",
+      "metric_source": "offline",
       "note": "模型只输出真值/含噪测量；EKF 按讲义离线实现",
       "spark": [
         0.8178259290740706,
@@ -9278,7 +9309,8 @@
       "stop_time": 10,
       "samples": 1005,
       "signals_count": 4,
-      "metric": "峰值 0.500，末值 0.014",
+      "metric": "角度 峰值 0.5000，末值 0.0137",
+      "metric_source": "probe",
       "note": "模型已加 PD 状态反馈（K1=20, K2=8），角度 0.5→0.014 rad",
       "spark": [
         0.5,
@@ -9574,6 +9606,7 @@
       "samples": 1001,
       "signals_count": 4,
       "metric": "峰值 1.875，末值 -1.810",
+      "metric_source": "probe",
       "note": "UKF 数据采集；模型无 UKF 模块",
       "spark": [
         0.8,
@@ -9869,6 +9902,7 @@
       "samples": 1001,
       "signals_count": 4,
       "metric": "峰值 1.875，末值 -1.810",
+      "metric_source": "probe",
       "note": "EKF vs UKF 数据；模型无滤波器模块",
       "spark": [
         0.8,
@@ -10163,7 +10197,8 @@
       "stop_time": 10,
       "samples": 51,
       "signals_count": 2,
-      "metric": "互补滤波末值 3.479；t_mdl 0–10 s",
+      "metric": "互补滤波 范围 0.0001–3.479，末值 3.479",
+      "metric_source": "probe",
       "note": "已修复时间通道：t_mdl 由 Clock 记录；互补滤波输出正常",
       "spark": [
         0.00010753342790922001,
@@ -10345,6 +10380,7 @@
       "samples": 71,
       "signals_count": 6,
       "metric": "峰值 2.000，末值 0；峰值 227.7，末值 84.58",
+      "metric_source": "probe",
       "note": "Stateflow 状态机；模式 0/1/2",
       "spark": [
         0,
@@ -10754,6 +10790,7 @@
       "samples": 203,
       "signals_count": 3,
       "metric": "峰值 0.9801，末值 0.7994；峰值 0.9801，末值 -0.6020",
+      "metric_source": "probe",
       "note": "触发/使能子系统；保持/复位",
       "spark": [
         0,
@@ -10992,6 +11029,7 @@
       "samples": 51,
       "signals_count": 3,
       "metric": "峰值 0.9996，末值 -0.9589；峰值 3.000，末值 0.8510；峰值 1.581，末值 -0.9050",
+      "metric_source": "probe",
       "note": "Bus 打包/拆解；三路信号",
       "spark": [
         0,
@@ -11230,6 +11268,7 @@
       "samples": 59,
       "signals_count": 2,
       "metric": "范围 0–0.8571，末值 0.8571",
+      "metric_source": "probe",
       "note": "模型引用；refs/ 下附带两个子模型",
       "spark": [
         0,
@@ -11421,6 +11460,7 @@
       "samples": 54,
       "signals_count": 1,
       "metric": "变体输出 峰值 1.255，末值 0.6802",
+      "metric_source": "probe",
       "note": "变体子系统；ctrl_type=1 选 PID",
       "spark": [
         0,
@@ -11545,6 +11585,7 @@
       "samples": 54,
       "signals_count": 1,
       "metric": "PI 输出 峰值 1.423，末值 1.279",
+      "metric_source": "probe",
       "note": "PreLoad/Init/StopFcn；InitFcn 需 Kp/Ki",
       "spark": [
         0,
@@ -11669,6 +11710,7 @@
       "samples": 51,
       "signals_count": 4,
       "metric": "峰值 1.999，末值 -1.088；峰值 1.999，末值 -1.088",
+      "metric_source": "probe",
       "note": "Level-2 MATLAB S-Function；deadzone_sfcn",
       "spark": [
         0,
@@ -11964,6 +12006,7 @@
       "samples": 51,
       "signals_count": 2,
       "metric": "峰值 9.998，末值 9.195",
+      "metric_source": "probe",
       "note": "Model Advisor/代数环；仿真通过",
       "spark": [
         0,

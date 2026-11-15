@@ -40,7 +40,7 @@ const body = rows.map((r) => {
           <td><a href="../simulink/course.html?id=${esc(r.id)}">${esc(r.id)}</a> ${esc(r.title)}
             <a class="slx" href="../simulink/models/${esc(r.model)}" download title="下载 ${esc(r.model)}">.slx</a></td>
           <td>${demo}</td>
-          <td><div class="metric-cell">${sparkSvg(r.spark)}<span>${esc(r.metric)}</span></div></td>
+          <td><div class="metric-cell">${sparkSvg(r.spark)}<span>${r.metric_source === "offline" ? '<span class="source-offline" title="该数字来自离线讲义，不是本次探针逐点计算">离线</span> ' : ""}${esc(r.metric)}</span></div></td>
           <td>${esc(r.note)}</td>
           <td><code>${esc(r.solver)}</code><br>${esc(fmtTime(r.stop_time))} · <span class="hash" title="SHA-256: ${esc(r.sha256)}">${esc(shortHash(r.sha256))}</span>${refs}<br><span class="status ${status}">${status}</span></td>
         </tr>`;

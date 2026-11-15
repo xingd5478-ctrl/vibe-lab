@@ -1,11 +1,12 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v18";
+const CACHE = "vibe-lab-v21";
 const ASSETS = [
   "./",
   "./index.html",
   "./en/",
   "./en/index.html",
   "./en/lessons.html",
+  "./en/guide.html",
   "./style.css",
   "./feedback.html",
   "./preview-imu.png",
@@ -14,6 +15,12 @@ const ASSETS = [
   "./preview-control-dark.png",
   "./preview-simulink.png",
   "./preview-simulink-dark.png",
+  "./preview-simulink-en-dark.png",
+  "./preview-simulink-en.png",
+  "./preview-control-en-dark.png",
+  "./preview-control-en.png",
+  "./preview-imu-en-dark.png",
+  "./preview-imu-en.png",
   "./robots.txt",
   "./manifest.webmanifest",
   "./icon-192.png",
@@ -30,6 +37,7 @@ const ASSETS = [
   "./imu/index.html",
   "./imu/style.css",
   "./imu/app.js",
+  "./imu/manual-en.js",
   "./imu/manual.js",
   "./imu/data.js",
   "./imu/chart.js",
@@ -45,6 +53,7 @@ const ASSETS = [
   "./control/chart.js",
   "./control/app.js",
   "./control/labs.js",
+  "./control/manual-en.js",
   "./control/manual.js",
   "./simulink/",
   "./simulink/index.html",

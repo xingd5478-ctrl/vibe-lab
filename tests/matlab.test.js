@@ -14,7 +14,9 @@ test("MATLAB probe dataset covers all 43 lessons without blocks", () => {
   assert.equal(data.models.length, 43);
   assert.equal(new Set(data.models.map((m) => m.id)).size, 43);
   assert.ok(data.models.every((m) => m.status === "ok" && m.metric && m.note));
-  assert.ok(data.models.every((m) => m.id === "t26" ? m.spark.length === 0 : m.spark.length >= 2));
+  assert.ok(data.models.every((m) => m.metric_source === "probe" || m.metric_source === "offline"));
+  assert.ok(data.models.filter((m) => m.metric_source === "offline").map((m) => m.id).join(",") === "t12,t16,t31");
+  assert.ok(data.models.every((m) => m.spark.length >= 2));
   assert.match(data.matlab_version, /R2025a/);
 });
 

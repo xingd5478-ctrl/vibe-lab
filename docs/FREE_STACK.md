@@ -69,6 +69,8 @@ goatcounter.count({ path: "event/course-next" });
 
 ## 3. 免费反馈：GitHub Issues + Tally
 
+本站当前已接：GoatCounter site `xingdong`（`https://xingdong.goatcounter.com/count`），Tally 表单 `https://tally.so/r/9N98bY`。
+
 - GitHub Issues 已经可用，标签已建：`bug` / `content` / `idea` / `question` / `wontfix` / `feedback`；
 - `/feedback.html` 已实时读取公开 Issues，0 条时如实显示 0，不需要数据库；
 - 非 GitHub 用户用 [Tally](https://tally.so/pricing) 免费版（无限表单/提交），建一个 4 字段表单：

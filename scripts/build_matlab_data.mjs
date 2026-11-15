@@ -45,25 +45,27 @@ const PRIMARY = {
 };
 
 const METRIC_OVERRIDES = {
-  t03: "峰值 1.000，终值 1.000",
-  t04: "ζ=0.2 峰值 1.520，终值 0.996",
-  t05: "峰值 0.978，终值 0.978",
-  t10: "峰值 0.065，终值 0.063（PP）",
   t11: "最大误差 0.300，末值 0.000",
   t12: "Kalman RMSE 0.455，测量 1.149",
-  t13: "峰值 192.44，终值 137.09",
   t16: "Plant 4/(s²+0.5s+4)：Gm=∞，PM=20.4°",
-  t20: "峰值 0.562，10 s 终值 0.562",
   t21: "SMC 峰值 0.724，终值 0.600；PID 峰值 0.636，终值 0.636",
-  t22: "峰值 1.289，终值 0.825",
-  t24: "模糊输出 0.983，PID 末值 0.747",
   t26: "末端 (0.452, -0.150, 1.304)",
   t31: "测量 RMSE 0.053；EKF x₁ RMSE 0.049（按讲义离线）",
-  t32: "峰值 0.500，末值 0.014",
-  t35: "互补滤波末值 3.479；t_mdl 0–10 s",
 };
 
+const METRIC_SOURCE = { t12: "offline", t16: "offline", t31: "offline" };
+
 const LABELS = {
+  t03: { TF_tau_0p5: "τ=0.5 响应" },
+  t04: { "TF_zeta0.2": "ζ=0.2 响应" },
+  t05: { y_out: "输出" },
+  t10: { y_PP: "PP 输出" },
+  t13: { omega_PI: "转速" },
+  t20: { probe_s1_p1: "输出" },
+  t22: { y_out: "输出" },
+  t24: { y_fuzzy: "模糊", y_pid: "PID" },
+  t32: { x1_true: "角度" },
+  t35: { theta_cf_sim: "互补滤波" },
   t08: { sig_out1: "输出1", sig_out2: "输出2" },
   t26: { fk_x: "末端 x", fk_y: "末端 y", fk_z: "末端 z" },
   t17: { probe_s1_p1: "校正后", probe_s1_p2: "参考" },
@@ -177,6 +179,7 @@ for (const lesson of lessons) {
     samples: m.samples,
     signals_count: signals.length,
     metric: METRIC_OVERRIDES[lesson.id] || autoMetric(lesson.id, signals),
+    metric_source: METRIC_SOURCE[lesson.id] || "probe",
     note: NOTES[lesson.id] || "",
     spark: (signals.find((x) => x.name === (PRIMARY[lesson.id] || [])[0])?.spark || []).map(Number),
     signals: signals.map((s) => ({

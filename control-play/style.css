@@ -279,4 +279,4 @@ footer a { color: var(--accent); text-decoration: underline; text-underline-offs
   select, input[type="number"], input[type="search"] { min-height: 40px; }
 }
 
-.lang-en #labs, .lang-en #manual, .lang-en .tabs-bar button[data-tab="labs"], .lang-en .tabs-bar button[data-tab="manual"] { display: none !important; }
+.lang-en #labs, .lang-en .tabs-bar button[data-tab="labs"] { display: none !important; }

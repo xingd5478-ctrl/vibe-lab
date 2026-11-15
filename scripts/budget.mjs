@@ -10,7 +10,7 @@ const PAGE_BUDGET_KB = {
   shared: 24,
   "imu-lab/static": 110,
   "control-play": 80,
-  simulink: 220,
+  simulink: 280,
   about: 30,
 };
 
@@ -41,7 +41,7 @@ console.log(`perf budget: ${rows.length} files, total ${(total / 1024).toFixed(1
 rows.slice(0, 6).forEach(([f, s]) => console.log(`  ${(s / 1024).toFixed(1)} KB  ${f}`));
 for (const [dir, size] of perDir) console.log(`  page ${dir.padEnd(16)} ${(size / 1024).toFixed(1)} KB / ${PAGE_BUDGET_KB[dir]} KB`);
 
-const MAX_TOTAL = 420 * 1024;
+const MAX_TOTAL = 480 * 1024;
 const MAX_FILE = 160 * 1024;
 let failed = false;
 if (total > MAX_TOTAL) {

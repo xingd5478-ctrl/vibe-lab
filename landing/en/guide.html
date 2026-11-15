@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>43-lesson Simulink guide · vibe-lab</title>
+  <meta name="description" content="English guide to all 43 Simulink control lessons: goals, concepts, steps, pitfalls and self-checks, with .slx and .m downloads." />
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/en/guide.html" />
+  <link rel="alternate" hreflang="zh-CN" href="https://xingd5478-ctrl.github.io/vibe-lab/simulink/course.html" />
+  <link rel="alternate" hreflang="en" href="https://xingd5478-ctrl.github.io/vibe-lab/en/guide.html" />
+  <style>
+    .wrap { max-width: 980px; }
+    .lesson { background: var(--panel); border: 1px solid var(--line); border-radius: 3px; margin: 10px 0; padding: 0 14px; }
+    .lesson > summary { cursor: pointer; padding: 12px 0; font-weight: 600; list-style: none; }
+    .lesson > summary::-webkit-details-marker { display: none; }
+    .lesson > summary::before { content: "+"; display: inline-block; width: 18px; color: var(--muted); }
+    .lesson[open] > summary::before { content: "−"; }
+    .lesson .num { font-family: "Cascadia Mono", Consolas, monospace; color: var(--muted); margin-right: 6px; }
+    .lesson-body { padding: 0 0 14px 18px; border-top: 1px solid var(--line); }
+    .lesson-body h4 { margin: 14px 0 4px; font-size: 13px; }
+    .lesson-body ul, .lesson-body ol { margin: 4px 0 8px; padding-left: 20px; font-size: 13px; line-height: 1.65; }
+    .hook { font-size: 14px; color: var(--ink); }
+    .math { font-family: "Cascadia Mono", Consolas, monospace; background: var(--bg); border-left: 2px solid var(--accent); padding: 6px 9px; margin: 8px 0; font-size: 12.5px; overflow-x: auto; }
+    .pitfall { border-left: 2px solid #b58a3a; padding-left: 9px; color: var(--muted); }
+    .quiz span { color: var(--muted); }
+    .dl { font-size: 12px; color: var(--muted); margin-top: 12px; }
+    h2 { margin-top: 28px; font-size: 16px; }
+    h2 .range { color: var(--muted); font-weight: 400; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="topnav" aria-label="Site navigation">
+      <a href="./">Home</a>
+      <a href="../imu/?lang=en">IMU</a>
+      <a href="../control/?lang=en">Control</a>
+      <a href="../simulink/index.html?lang=en">Simulink</a>
+      <a href="../about/en.html">Method</a>
+      <a href="../simulink/course.html">Chinese</a>
+    </nav>
+    <header>
+      <div class="kicker">vibe-lab / simulink / 43-lesson guide</div>
+      <h1>The 43-lesson English guide</h1>
+      <p class="sub">Every lesson in English: goal, concepts, formula, steps, what to watch, pitfalls and a self-check. Download the <code>.slx</code> model or the original <code>.m</code>; the Chinese source notes remain available for comparison.</p>
+      <p class="hint">This is the readable English companion to the interactive demos. The original Chinese lesson prose is not hidden here as a requirement; it is linked per lesson.</p>
+    </header>
+    <main id="main">
+      <p class="hint"><a href="lessons.html">← compact lesson index</a> · <a href="../simulink/index.html?lang=en">interactive labs</a></p>
+    <h2>Phase 1 · Simulink &amp; dynamics <span class="range">t01–t08</span></h2>
+      <details class="lesson" id="t01" open>
+        <summary><span class="num">t01</span> Signals</summary>
+        <div class="lesson-body">
+          <p class="hook">Think of Simulink as a water pipe: the signal is the water, Gain is a valve, Scope is the flow meter.</p>
+          <p><b>Goal.</b> Build a sine → gain → scope model on your own and explain what each block does.</p>
+          <h4>Concepts</h4><ul><li><b>Signal</b> — A number that changes with time; in Simulink it is just a line.</li><li><b>Gain</b> — Multiplies the input by a constant: K=2 means twice as large.</li><li><b>Scope</b> — An oscilloscope; double-click it to see the waveform.</li></ul>
+          <div class="math">y(t) = K · u(t)</div>
+          <h4>Steps</h4><ol><li>Drag Sine Wave from Sources</li><li>Drag Gain from Math Operations and change it to 2</li><li>Drag Scope from Sinks</li><li>Connect the lines in order and click Run</li><li>Double-click Scope to see the waveform</li></ol>
+          <p><b>Watch for.</b> The sine amplitude in Scope becomes twice the input; set K to 0.5 and the amplitude halves at once.</p>
+          <p class="pitfall"><b>Pitfall.</b> Scope does not pop up by itself, you must double-click it; Sine defaults to 1 rad/s, not 1 Hz.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What is the output amplitude when K=0.5?</b><br><span>Half of the input.</span></li><li><b>If Scope shows no waveform, what do you check first?</b><br><span>The wiring, whether Run was clicked, and whether Scope was opened.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial01_signals.slx" download>tutorial01_signals.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t01_signal_basics.m" target="_blank" rel="noreferrer">t01_signal_basics.m</a> · <a href="../simulink/course.html?id=t01">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t02">
+        <summary><span class="num">t02</span> Math blocks</summary>
+        <div class="lesson-body">
+          <p class="hook">Wiring in Simulink is like parcel sorting: Sum merges, Product multiplies, Mux packs.</p>
+          <p><b>Goal.</b> Use Sum/Product/Mux to add, subtract and multiply several signals and display them together.</p>
+          <h4>Concepts</h4><ul><li><b>Sum</b> — Adds or subtracts several inputs; the +/− port signs can be changed.</li><li><b>Product</b> — Multiplies several inputs.</li><li><b>Mux</b> — Packs several signals into one bus so a single Scope can show multiple curves.</li></ul>
+          <div class="math">y = (u1 + u2) · K</div>
+          <h4>Steps</h4><ol><li>Drag two Sine blocks as u1 and u2</li><li>Drag Sum and change the signs to + +</li><li>Drag Gain and set K</li><li>Drag Mux to bundle both inputs and the result</li><li>Connect Scope and run</li></ol>
+          <p><b>Watch for.</b> Scope shows u1, u2 and their sum; change K and the sum curve scales as a whole.</p>
+          <p class="pitfall"><b>Pitfall.</b> Sum input ports default to + +, double-click to subtract; Mux only packs, it performs no math.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Does Mux add the signals together?</b><br><span>No, it only packs them for display.</span></li><li><b>How do you make Sum compute u1−u2?</b><br><span>Double-click Sum and change the second port sign to −.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial02_math.slx" download>tutorial02_math.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t02_math_blocks.m" target="_blank" rel="noreferrer">t02_math_blocks.m</a> · <a href="../simulink/course.html?id=t02">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t03">
+        <summary><span class="num">t03</span> First order</summary>
+        <div class="lesson-body">
+          <p class="hook">A first-order system is like a water tank: the inlet is open, but the level creeps toward the top instead of jumping.</p>
+          <p><b>Goal.</b> Understand the time constant τ: larger τ is slower; read response speed with the 63.2% and 2% rules.</p>
+          <h4>Concepts</h4><ul><li><b>Time constant τ</b> — Time needed for the level to reach 63.2% of its final value.</li><li><b>Steady-state gain K</b> — How many times the input the final level is.</li><li><b>Settling time</b> — About 4τ until the response enters the ±2% band.</li></ul>
+          <div class="math">G(s) = K / (τs + 1); step response y(t) = K(1 − e^(−t/τ))</div>
+          <h4>Steps</h4><ol><li>Drag Step as the input</li><li>Drag Transfer Fcn with numerator [K] and denominator [τ 1]</li><li>Connect Scope and Run</li><li>Change τ to see the speed, change K to see the final height</li></ol>
+          <p><b>Watch for.</b> With τ=1 the response reaches 63.2% at 1 s; with τ=3 it reaches the same height but needs 3 s. K changes only the final height, not the speed.</p>
+          <p class="pitfall"><b>Pitfall.</b> Transfer Fcn denominator is [τ 1], not [1 τ]; Step jumps at 1 s by default, not at 0 s.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>With τ=2 s, when is 63.2% reached?</b><br><span>At about 2 s (counted from the step instant).</span></li><li><b>Does a larger K make the response faster?</b><br><span>No, it changes only the final amplitude.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial03_first_order.slx" download>tutorial03_first_order.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t03_first_order_sys.m" target="_blank" rel="noreferrer">t03_first_order_sys.m</a> · <a href="../simulink/course.html?id=t03">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t04">
+        <summary><span class="num">t04</span> Second order</summary>
+        <div class="lesson-body">
+          <p class="hook">A second-order system is like a car on springs: it has inertia and damping, so it overshoots and then rebounds.</p>
+          <p><b>Goal.</b> Explain what ωn and ζ each control; read overshoot and oscillation from the waveform.</p>
+          <h4>Concepts</h4><ul><li><b>ωn natural frequency</b> — How fast the system wants to oscillate; larger is faster.</li><li><b>ζ damping ratio</b> — How hard the brakes are; ζ&lt;1 overshoots, ζ=1 is critical, ζ&gt;1 is overdamped.</li><li><b>Overshoot</b> — The largest percentage by which the first peak exceeds the target.</li></ul>
+          <div class="math">G(s)=ωn²/(s²+2ζωn s+ωn²); overshoot ≈ exp(−πζ/√(1−ζ²))</div>
+          <h4>Steps</h4><ol><li>Step input</li><li>Transfer Fcn with denominator [1 2ζωn ωn²] and numerator [ωn²]</li><li>Connect Scope and run</li><li>Change ωn and ζ separately and compare</li></ol>
+          <p><b>Watch for.</b> Raising ζ from 0.2 to 0.7 clearly reduces the overshoot; a larger ωn speeds up the whole curve, but ζ sets the shape.</p>
+          <p class="pitfall"><b>Pitfall.</b> More damping is not always better: too large a ζ slows the response; look at ωn and ζ together.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Does ζ=1 overshoot?</b><br><span>No, that is critical damping.</span></li><li><b>To go faster without overshoot, what do you tune?</b><br><span>Keep ζ≈0.7 first, then increase ωn.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial04_second_order.slx" download>tutorial04_second_order.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t04_second_order_sys.m" target="_blank" rel="noreferrer">t04_second_order_sys.m</a> · <a href="../simulink/course.html?id=t04">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t05">
+        <summary><span class="num">t05</span> PID control</summary>
+        <div class="lesson-body">
+          <p class="hook">PID is like driving: P steps on the gas for the current error, I remembers the lasting error, D lifts off early based on the rate of change.</p>
+          <p><b>Goal.</b> Understand which problem P/I/D each solve; read overshoot, settling time and steady-state error.</p>
+          <h4>Concepts</h4><ul><li><b>P</b> — The larger the error, the harder the control; P alone usually leaves steady-state error.</li><li><b>I</b> — Accumulates the error and removes steady-state error; too much causes overshoot or windup.</li><li><b>D</b> — Reacts to the error rate and suppresses overshoot; it amplifies noise.</li></ul>
+          <div class="math">u = Kp·e + Ki·∫e dt + Kd·de/dt</div>
+          <h4>Steps</h4><ol><li>Step → Sum (reference − output)</li><li>Feed the Sum into PID Controller</li><li>Connect the PID output to the plant (e.g. 1/(s²+2ζωn s+ωn²))</li><li>Feedback the output to the Sum and connect Scope</li></ol>
+          <p><b>Watch for.</b> P only: steady-state error remains; add I: the error disappears but overshoot may appear; add D: less overshoot but more noise.</p>
+          <p class="pitfall"><b>Pitfall.</b> I can wind up; D is noise-sensitive, so filter it in practice. Tune P first, then I, then D.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Which term removes steady-state error?</b><br><span>I.</span></li><li><b>With large overshoot and noise, what do you adjust first?</b><br><span>Reduce Kd or filter D, then retune Kp.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial05_pid.slx" download>tutorial05_pid.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t05_pid_control.m" target="_blank" rel="noreferrer">t05_pid_control.m</a> · <a href="../simulink/course.html?id=t05">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t06">
+        <summary><span class="num">t06</span> Sources &amp; sinks</summary>
+        <div class="lesson-body">
+          <p class="hook">Simulink is not an island: data can come in from the MATLAB workspace and results can be saved back.</p>
+          <p><b>Goal.</b> Import data with From Workspace and export simulation results with To Workspace.</p>
+          <h4>Concepts</h4><ul><li><b>From Workspace</b> — Reads a time series from a MATLAB variable.</li><li><b>To Workspace</b> — Saves the simulation output as a variable for analysis at the command line afterwards.</li><li><b>Sample time</b> — The time column of the data must match the model sample time.</li></ul>
+          <div class="math">Variable format: t = (0:0.01:10)'; u = sin(t);</div>
+          <h4>Steps</h4><ol><li>Prepare t and u at the command line</li><li>Drag From Workspace and enter [t u]</li><li>Connect Scope or Gain</li><li>Drag To Workspace to save y</li><li>After Run, plot(tout, y) at the command line</li></ol>
+          <p><b>Watch for.</b> The Scope waveform should match plot(t,u); the To Workspace variable appears after Run.</p>
+          <p class="pitfall"><b>Pitfall.</b> A misspelled variable name, a non-monotonic time column and a missing sample time all raise errors or give a bad waveform.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>How does data enter Simulink?</b><br><span>Through From Workspace.</span></li><li><b>How do results get back to MATLAB?</b><br><span>Through To Workspace.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial06_sources_sinks.slx" download>tutorial06_sources_sinks.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t06_sources_and_sinks.m" target="_blank" rel="noreferrer">t06_sources_and_sinks.m</a> · <a href="../simulink/course.html?id=t06">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t07">
+        <summary><span class="num">t07</span> Subsystems</summary>
+        <div class="lesson-body">
+          <p class="hook">A subsystem puts a tangle of wires in a box: outside you see only inputs and outputs, inside you tidy up as you like.</p>
+          <p><b>Goal.</b> Wrap several blocks into a subsystem and understand hierarchical modeling.</p>
+          <h4>Concepts</h4><ul><li><b>Subsystem</b> — A container for a group of blocks that exposes only input/output ports.</li><li><b>Port order</b> — The subsystem input/output order decides the external wiring.</li><li><b>Reuse</b> — The same subsystem can be called in many places.</li></ul>
+          <div class="math">Outside: u → [subsystem] → y; inside it is still the original block wiring.</div>
+          <h4>Steps</h4><ol><li>Select the blocks to wrap</li><li>Right-click Create Subsystem from Selection</li><li>Double-click to enter the subsystem and check the ports</li><li>Name the subsystem, wire it outside and run</li></ol>
+          <p><b>Watch for.</b> The waveform is identical before and after wrapping; you can still double-click inside to change parameters.</p>
+          <p class="pitfall"><b>Pitfall.</b> Port order may change after wrapping; changes to internal parameters are not visible from outside.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Does a subsystem change the system dynamics?</b><br><span>No, it is only an organizational structure.</span></li><li><b>How do you enter a subsystem?</b><br><span>Double-click the subsystem block.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial07_subsystem.slx" download>tutorial07_subsystem.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t07_subsystem.m" target="_blank" rel="noreferrer">t07_subsystem.m</a> · <a href="../simulink/course.html?id=t07">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t08">
+        <summary><span class="num">t08</span> Masks</summary>
+        <div class="lesson-body">
+          <p class="hook">A Mask is a dashboard for a subsystem: internal parameters become a dialog so others do not have to go inside.</p>
+          <p><b>Goal.</b> Add a Mask to a subsystem and build a reusable, configurable block.</p>
+          <h4>Concepts</h4><ul><li><b>Mask</b> — A custom parameter panel for a subsystem.</li><li><b>Parameters</b> — K, τ and so on in the panel, mapped to internal blocks.</li><li><b>Initialization</b> — A Mask can run initialization code to compute initial values from the parameters.</li></ul>
+          <div class="math">Panel parameter K → internal Gain value = K.</div>
+          <h4>Steps</h4><ol><li>Right-click the subsystem → Mask → Create Mask</li><li>Add a parameter named K under Parameters</li><li>Enter K as the gain of the internal Gain block</li><li>Confirm, then double-click the subsystem to see the panel</li></ol>
+          <p><b>Watch for.</b> Double-clicking the subsystem shows only the parameter panel; after changing K the internal Gain follows and the waveform changes.</p>
+          <p class="pitfall"><b>Pitfall.</b> The parameter name must match the internal reference; click Apply or the change has no effect.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What does a Mask do?</b><br><span>Exposes internal parameters as a dialog for easy reuse.</span></li><li><b>If a panel parameter has no effect, what do you check first?</b><br><span>Whether the parameter name matches the internal reference.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial08_masking.slx" download>tutorial08_masking.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t08_masking.m" target="_blank" rel="noreferrer">t08_masking.m</a> · <a href="../simulink/course.html?id=t08">Chinese source notes</a></p>
+        </div>
+      </details>
+
+    <h2>Phase 2 · Classical control <span class="range">t16, t17, t22</span></h2>
+      <details class="lesson" id="t16">
+        <summary><span class="num">t16</span> Lesson 16</summary>
+        <div class="lesson-body">
+          <p class="hook">A Bode plot is a taste test for the system: it follows low frequencies, lags at high frequencies, and may resonate in between.</p>
+          <p><b>Goal.</b> Read the magnitude/phase plots, the −3 dB bandwidth, the resonant peak and the phase margin.</p>
+          <h4>Concepts</h4><ul><li><b>Magnitude</b> — How much each input frequency is amplified or attenuated, in dB.</li><li><b>Phase</b> — How many degrees the output lags the input.</li><li><b>Margin</b> — How much room is left before instability; phase margin is usually 45°–60°.</li></ul>
+          <div class="math">|G(jω)|dB = 20·log10|G(jω)|; a second-order system resonates near ω≈ωn√(1−2ζ²)</div>
+          <h4>Steps</h4><ol><li>Build a second-order transfer function</li><li>Connect a Bode block or call bode(sys)</li><li>Read the low-frequency gain, the −3 dB point and the resonant peak</li><li>Change ζ and watch the peak and the phase</li></ol>
+          <p><b>Watch for.</b> Small ζ → tall resonant peak and steep phase change; large ζ → the peak disappears, bandwidth widens but the response slows.</p>
+          <p class="pitfall"><b>Pitfall.</b> dB is 20log10, not 10log10; the horizontal axis is logarithmic, so equal spacing is not equal frequency.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>The −3 dB point corresponds to about what magnitude?</b><br><span>0.707 times.</span></li><li><b>What happens if the phase margin is too small?</b><br><span>Easy oscillation/instability.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial16_freq.slx" download>tutorial16_freq.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t16_freq_domain.m" target="_blank" rel="noreferrer">t16_freq_domain.m</a> · <a href="../simulink/course.html?id=t16">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t17">
+        <summary><span class="num">t17</span> Lesson 17</summary>
+        <div class="lesson-body">
+          <p class="hook">Lead compensation is steering early; lag compensation is waiting a little and wearing the error down slowly.</p>
+          <p><b>Goal.</b> Understand how zeros and poles change phase and gain; know that Lead raises phase margin and Lag raises low-frequency gain.</p>
+          <h4>Concepts</h4><ul><li><b>Lead</b> — The zero is left of the pole, adding phase in the mid band and improving speed/margin.</li><li><b>Lag</b> — The pole sits near the origin, raising low-frequency gain and reducing steady-state error.</li><li><b>Frequency shaping</b> — You do not add zeros and poles at random, you shape the target band.</li></ul>
+          <div class="math">Lead: Gc=(1+αTs)/(1+Ts), α&gt;1; Lag: α&lt;1</div>
+          <h4>Steps</h4><ol><li>Look at the uncompensated Bode plot, find the crossover frequency and phase margin</li><li>Add a Lead zero/pole and watch the phase lift</li><li>Add Lag when steady-state accuracy is needed</li><li>Verify overshoot and settling time with a closed-loop step</li></ol>
+          <p><b>Watch for.</b> Lead increases the phase margin and reduces overshoot; Lag raises low-frequency gain and cuts steady-state error, but slows the response.</p>
+          <p class="pitfall"><b>Pitfall.</b> Lead amplifies high-frequency noise; Lag reduces bandwidth. Zeros and poles cannot be placed blindly, always look at the band.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Which one raises the phase margin?</b><br><span>Lead.</span></li><li><b>Which one reduces steady-state error?</b><br><span>Lag.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial17_leadlag.slx" download>tutorial17_leadlag.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t17_lead_lag.m" target="_blank" rel="noreferrer">t17_lead_lag.m</a> · <a href="../simulink/course.html?id=t17">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t22">
+        <summary><span class="num">t22</span> Root locus</summary>
+        <div class="lesson-body">
+          <p class="hook">The root locus is the route the closed-loop poles take across the map as K grows from 0.</p>
+          <p><b>Goal.</b> Read a root locus: when the system is stable, when it oscillates, and roughly what the critical K is.</p>
+          <h4>Concepts</h4><ul><li><b>Open-loop gain K</b> — Changing K moves the closed-loop poles along the locus.</li><li><b>Branches</b> — One route starting from each open-loop pole.</li><li><b>Imaginary axis</b> — The locus crossing it means stability changes.</li></ul>
+          <div class="math">Closed-loop characteristic equation 1 + K·G(s) = 0</div>
+          <h4>Steps</h4><ol><li>Write the open-loop G(s)</li><li>Plot with rlocus(G) (X=poles, O=zeros)</li><li>Find the imaginary-axis crossing (critical K)</li><li>Pick the K on the locus that gives the desired damping</li></ol>
+          <p><b>Watch for.</b> Small K keeps the poles near the open-loop poles; as K grows some poles move into the right half-plane and the system goes from stable to oscillatory/unstable.</p>
+          <p class="pitfall"><b>Pitfall.</b> The root locus shows pole positions only, it does not prove enough margin; too large a K is unstable; zeros matter too.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What does a locus crossing the imaginary axis mean?</b><br><span>Critical stability.</span></li><li><b>Does a larger K always mean faster?</b><br><span>No, it may oscillate or even destabilize.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial22_root_locus.slx" download>tutorial22_root_locus.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t22_root_locus.m" target="_blank" rel="noreferrer">t22_root_locus.m</a> · <a href="../simulink/course.html?id=t22">Chinese source notes</a></p>
+        </div>
+      </details>
+
+    <h2>Phase 3 · Modern control <span class="range">t09–t12</span></h2>
+      <details class="lesson" id="t09">
+        <summary><span class="num">t09</span> State space</summary>
+        <div class="lesson-body">
+          <p class="hook">State is the minimum information needed to remember where the system is now: to drive you only need position + velocity, not the whole history.</p>
+          <p><b>Goal.</b> Write a second-order system as ẋ=Ax+Bu, y=Cx+Du and explain what A/B/C/D each do.</p>
+          <h4>Concepts</h4><ul><li><b>State vector</b> — A set of variables that determines the future evolution, such as [position, velocity].</li><li><b>A / B</b> — A describes how the system evolves by itself, B describes how the input enters.</li><li><b>C / D</b> — C picks which combination of states you measure, D is input feedthrough (usually 0).</li></ul>
+          <div class="math">Double integrator: ẋ1=x2, ẋ2=u; A=[0 1;0 0], B=[0;1], C=[1 0], D=0</div>
+          <h4>Steps</h4><ol><li>Drag a State-Space block</li><li>Fill the A, B, C, D matrices (semicolons separate rows)</li><li>Step → State-Space → Scope</li><li>Run; then change C to [0 1] and look again</li></ol>
+          <p><b>Watch for.</b> C=[1 0] outputs position; C=[0 1] outputs only velocity, which becomes a constant — you are only 'measuring' velocity.</p>
+          <p class="pitfall"><b>Pitfall.</b> MATLAB matrices use semicolons for rows and spaces/commas for columns; leaving D out raises a dimension error; initial values live in the block's Initial condition.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What does C do?</b><br><span>Decides which combination of states is the output.</span></li><li><b>What are the states of a double-integrator system?</b><br><span>Position and velocity.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial09_state_space.slx" download>tutorial09_state_space.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t09_state_space.m" target="_blank" rel="noreferrer">t09_state_space.m</a> · <a href="../simulink/course.html?id=t09">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t10">
+        <summary><span class="num">t10</span> State feedback / LQR</summary>
+        <div class="lesson-body">
+          <p class="hook">Pole placement is choosing the system's personality: fast, stable or overshoot-free all show up as pole locations.</p>
+          <p><b>Goal.</b> Understand how u=−Kx moves the closed-loop poles to chosen positions; know what LQR's Q/R trade off.</p>
+          <h4>Concepts</h4><ul><li><b>State feedback K</b> — Multiply each state by a gain and sum them to form the control input.</li><li><b>Closed-loop poles</b> — Set the response speed and oscillation; the further left, the faster.</li><li><b>LQR Q/R</b> — Large Q cares more about state error (more aggressive), large R cares more about saving control effort (more conservative).</li></ul>
+          <div class="math">Double integrator: K=[ωn², 2ζωn], u=k1(r−x1)−k2x2, closed-loop poles −ζωn ± jωn√(1−ζ²)</div>
+          <h4>Steps</h4><ol><li>Step → Sum (+ −)</li><li>Feed the Sum into a Gain as the control u</li><li>Feed u into 1/s² (two Integrators in series)</li><li>Multiply x1, x2 by K and feed them back to Sum</li><li>Connect Scope to see position</li></ol>
+          <p><b>Watch for.</b> Raising ζ from 0.3 to 1 removes the overshoot; a larger ωn speeds up the response but also raises the control peak.</p>
+          <p class="pitfall"><b>Pitfall.</b> K is only feedback gain, the reference needs separate feedforward (otherwise the steady state never reaches 1); the control saturates, so limit it in practice.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What do poles further left mean?</b><br><span>Faster convergence.</span></li><li><b>Does a larger R in LQR make control more aggressive or more conservative?</b><br><span>More conservative.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial10_state_feedback.slx" download>tutorial10_state_feedback.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t10_state_feedback.m" target="_blank" rel="noreferrer">t10_state_feedback.m</a> · <a href="../simulink/course.html?id=t10">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t11">
+        <summary><span class="num">t11</span> Observer</summary>
+        <div class="lesson-body">
+          <p class="hook">An observer is like an experienced driver: without opening the engine, engine speed can be guessed from the sound and the road speed.</p>
+          <p><b>Goal.</b> Understand how a Luenberger observer corrects its state estimate with the output error, and that L sets the convergence speed.</p>
+          <h4>Concepts</h4><ul><li><b>Estimate x̂</b> — Predict with the model, correct with the measurement y.</li><li><b>Observer gain L</b> — Larger L trusts the measurement more and converges faster, but amplifies noise.</li><li><b>Separation principle</b> — Controller and observer can be designed separately without interfering.</li></ul>
+          <div class="math">x̂' = Ax̂ + Bu + L(y − Cx̂); error e=x−x̂ converges as (A−LC)</div>
+          <h4>Steps</h4><ol><li>Copy the plant model as the observer</li><li>Feed u into both the plant and the observer</li><li>Subtract ŷ from y, multiply by L and add it back to the observer</li><li>Use the observer states for feedback; Scope compares true vs estimated</li></ol>
+          <p><b>Watch for.</b> Deliberately start with a wrong estimate: the error decays at a rate set by L; too large an L makes noise shake the estimate.</p>
+          <p class="pitfall"><b>Pitfall.</b> Observer poles are usually 2–5 times faster than the controller's; when only position is measured, velocity is computed and its noise is amplified.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What corrects the observer estimate?</b><br><span>The output error y−Cx̂.</span></li><li><b>Is a larger L always better?</b><br><span>No, it amplifies noise and may destabilize.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial11_observer.slx" download>tutorial11_observer.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t11_observer.m" target="_blank" rel="noreferrer">t11_observer.m</a> · <a href="../simulink/course.html?id=t11">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t12">
+        <summary><span class="num">t12</span> Kalman filter</summary>
+        <div class="lesson-body">
+          <p class="hook">A Kalman filter is a weighted average in noise: trust the model more if it is reliable, trust the measurement more if it is reliable.</p>
+          <p><b>Goal.</b> Understand the predict/update steps and what larger Q and R each mean.</p>
+          <h4>Concepts</h4><ul><li><b>Q process noise</b> — How unreliable the model is; large Q → trust the measurement more.</li><li><b>R measurement noise</b> — How noisy the sensor is; large R → trust the model more.</li><li><b>Kalman gain K</b> — The measurement weight computed automatically at each step.</li></ul>
+          <div class="math">Predict P←P+Q; update K=P/(P+R), x̂←x̂+K(z−x̂), P←(1−K)P</div>
+          <h4>Steps</h4><ol><li>Generate a noisy measurement z</li><li>Initialize x̂ and P</li><li>Predict, then add Q, at each step</li><li>Compute K, correct with z, update P</li><li>Plot z against x̂</li></ol>
+          <p><b>Watch for.</b> Larger R gives a smoother estimate that lags real changes; larger Q follows the measurement more closely but is noisier.</p>
+          <p class="pitfall"><b>Pitfall.</b> Swapping Q/R is the most common mistake: R is sensor noise, not a 'trust level'; keep the units consistent.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>With larger R, what does the filter trust more?</b><br><span>The model.</span></li><li><b>What does a large K mean?</b><br><span>This step trusts the measurement more.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial12_kalman.slx" download>tutorial12_kalman.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t12_kalman_filter.m" target="_blank" rel="noreferrer">t12_kalman_filter.m</a> · <a href="../simulink/course.html?id=t12">Chinese source notes</a></p>
+        </div>
+      </details>
+
+    <h2>Phase 4 · Advanced control <span class="range">t18–t21, t23, t24</span></h2>
+      <details class="lesson" id="t18">
+        <summary><span class="num">t18</span> System ID</summary>
+        <div class="lesson-body">
+          <p class="hook">System identification is tasting the soup to guess the recipe: apply a known input and infer the model parameters from the output.</p>
+          <p><b>Goal.</b> Estimate first-order K and τ from a step response; know least squares and model validation.</p>
+          <h4>Concepts</h4><ul><li><b>Step-response method</b> — Read K and τ directly from the final value and the 63.2% time.</li><li><b>Least squares</b> — Fit parameters to data so the sum of squared prediction errors is minimal.</li><li><b>Model validation</b> — Hold back a data segment and check whether predictions still hold.</li></ul>
+          <div class="math">First order: y(t)=K(1−e^(−t/τ)); K=y(∞), τ=t₆₃</div>
+          <h4>Steps</h4><ol><li>Apply a step input to the plant and log the output</li><li>Read the final value K and the 63.2% time τ</li><li>Refine with least squares</li><li>Validate on another data segment</li></ol>
+          <p><b>Watch for.</b> The fitted curve should hug the measurements; a large deviation on new data means the model structure is wrong.</p>
+          <p class="pitfall"><b>Pitfall.</b> Too small an excitation gives poor SNR; remove offset/delay first; never validate on the fitting data itself.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>How do you read τ for a first-order system?</b><br><span>The time to reach 63.2% of the response.</span></li><li><b>Why keep a validation set?</b><br><span>To prevent overfitting and test generalization.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial18_sysid.slx" download>tutorial18_sysid.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t18_system_id.m" target="_blank" rel="noreferrer">t18_system_id.m</a> · <a href="../simulink/course.html?id=t18">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t19">
+        <summary><span class="num">t19</span> H-infinity</summary>
+        <div class="lesson-body">
+          <p class="hook">H∞ is insurance for the system: keep stability margin where the model is uncertain.</p>
+          <p><b>Goal.</b> Understand the sensitivity function S, the complementary sensitivity T, and what the weighting functions suppress.</p>
+          <h4>Concepts</h4><ul><li><b>S sensitivity</b> — Effect of disturbance/model error on the output; it should be small at low frequency.</li><li><b>T complementary sensitivity</b> — Effect of noise/high-frequency uncertainty; it should be small at high frequency.</li><li><b>Weights</b> — W1/W2/W3 tell the optimizer which frequency band matters more.</li></ul>
+          <div class="math">min ‖[W1S; W2KS; W3T]‖∞ &lt; 1</div>
+          <h4>Steps</h4><ol><li>Build the nominal model and the uncertainty</li><li>Choose the sensitivity weight W1 and the control weight W2</li><li>Solve for the controller with hinfsyn</li><li>μ analysis / time-domain validation</li></ol>
+          <p><b>Watch for.</b> With weights, S is pushed down at low frequency and T at high frequency; the robust stability margin grows.</p>
+          <p class="pitfall"><b>Pitfall.</b> Harsher weights are not better: they may be infeasible or blow up the controller order; the nominal model must stay realistic.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What does a large S mean?</b><br><span>Disturbance/error strongly affects the output.</span></li><li><b>What does H∞ optimize?</b><br><span>The worst-case gain (∞ norm).</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial19_robust.slx" download>tutorial19_robust.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t19_robust_control.m" target="_blank" rel="noreferrer">t19_robust_control.m</a> · <a href="../simulink/course.html?id=t19">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t20">
+        <summary><span class="num">t20</span> MPC</summary>
+        <div class="lesson-body">
+          <p class="hook">MPC is like chess: look N moves ahead each time, play one move, then recompute N moves.</p>
+          <p><b>Goal.</b> Understand the prediction model, receding-horizon optimization and constraints, and what Q/R trade off.</p>
+          <h4>Concepts</h4><ul><li><b>Prediction model</b> — Use the model to roll N steps forward and predict future states.</li><li><b>Receding horizon</b> — Apply only the first move, then re-optimize at the next step.</li><li><b>Constraints</b> — Input/state limits go straight into the optimization — MPC's killer feature.</li></ul>
+          <div class="math">min Σ [Q(x−r)² + R u²], s.t. |u|≤umax</div>
+          <h4>Steps</h4><ol><li>Discretize the plant model</li><li>Set the prediction horizon N and the weights Q/R</li><li>Add input/state constraints</li><li>Solve the QP each step and apply the first u</li></ol>
+          <p><b>Watch for.</b> With a small uMax the input sits on the limit and the response slows; too small an N is shortsighted, a large N costs computation.</p>
+          <p class="pitfall"><b>Pitfall.</b> An inaccurate prediction model walks confidently in the wrong direction; conflicting constraints make the QP infeasible; check QP timing for real-time use.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>How many control moves does MPC apply per step?</b><br><span>Only the first one.</span></li><li><b>Is a larger N always better?</b><br><span>Not necessarily, computation and model error both grow.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial20_mpc.slx" download>tutorial20_mpc.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t20_mpc.m" target="_blank" rel="noreferrer">t20_mpc.m</a> · <a href="../simulink/course.html?id=t20">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t21">
+        <summary><span class="num">t21</span> Sliding mode</summary>
+        <div class="lesson-body">
+          <p class="hook">Sliding mode control presses the state onto a track: first reach the track, then slide along it to the target.</p>
+          <p><b>Goal.</b> Understand the sliding surface s=ė+λe, the switching control u=−k·sat(s/φ), and chattering vs boundary layer.</p>
+          <h4>Concepts</h4><ul><li><b>Sliding surface</b> — s=0 is the constraint you want the state to obey.</li><li><b>Reaching condition</b> — The control must guarantee that s converges to 0.</li><li><b>Boundary layer φ</b> — Use sat instead of sign to reduce chattering at some accuracy cost.</li></ul>
+          <div class="math">s=ė+λe; u=−k·sat(s/φ)</div>
+          <h4>Steps</h4><ol><li>Define the error e and the sliding surface s</li><li>Design the switching control so that s→0</li><li>Suppress chattering with a boundary layer/super-twisting</li><li>Look at the control signal and the error</li></ol>
+          <p><b>Watch for.</b> Small φ: small error but chattering control; large φ: smooth control but larger steady-state error; λ sets the convergence speed on the surface.</p>
+          <p class="pitfall"><b>Pitfall.</b> Chattering wears out actuators; too large a λ is noise-sensitive; k must exceed the disturbance bound.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What happens when φ shrinks?</b><br><span>More chattering, higher accuracy.</span></li><li><b>How does the error converge on the surface?</b><br><span>Exponentially, as ė=−λe.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial21_smc.slx" download>tutorial21_smc.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t21_sliding_mode.m" target="_blank" rel="noreferrer">t21_sliding_mode.m</a> · <a href="../simulink/course.html?id=t21">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t23">
+        <summary><span class="num">t23</span> MRAC</summary>
+        <div class="lesson-body">
+          <p class="hook">MRAC adjusts the steering while driving: the reference model says how it should behave and the adaptation law changes its own parameters.</p>
+          <p><b>Goal.</b> Understand the roles of the reference model, the tracking error and the adaptation law.</p>
+          <h4>Concepts</h4><ul><li><b>Reference model</b> — The ideal closed-loop response used as the learning target.</li><li><b>Tracking error</b> — Difference between the real output and the reference-model output.</li><li><b>Adaptation law</b> — Adjusts controller parameters online from the error (e.g. the MIT rule).</li></ul>
+          <div class="math">θ̇ = −γ·e·x (MIT rule, γ is the adaptation gain)</div>
+          <h4>Steps</h4><ol><li>Choose a reference model</li><li>Define the tracking error</li><li>Design an adaptation law to update the parameters</li><li>Verify recovery after a parameter jump</li></ol>
+          <p><b>Watch for.</b> Wrong initial parameters give a large error that then shrinks as the parameters converge; too large a γ causes high-frequency oscillation.</p>
+          <p class="pitfall"><b>Pitfall.</b> Excessive adaptation gain destabilizes; insufficient excitation lets the parameters drift; add parameter limits.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What is the reference model for?</b><br><span>It defines the ideal response.</span></li><li><b>Does a larger γ converge faster?</b><br><span>Not necessarily, too large oscillates.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial23_mrac.slx" download>tutorial23_mrac.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t23_mrac.m" target="_blank" rel="noreferrer">t23_mrac.m</a> · <a href="../simulink/course.html?id=t23">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t24">
+        <summary><span class="num">t24</span> Fuzzy logic</summary>
+        <div class="lesson-body">
+          <p class="hook">Fuzzy control writes the veteran's rule 'big error, push harder' as a rule table.</p>
+          <p><b>Goal.</b> Understand membership, rules and defuzzification; know that it does not need an accurate model.</p>
+          <h4>Concepts</h4><ul><li><b>Membership</b> — The degree 0–1 to which a value belongs to big/medium/small.</li><li><b>Rule table</b> — E.g. 'error positive big &amp; error rate positive big → output positive big'.</li><li><b>Defuzzification</b> — Weighted-averages the rule outputs into a single concrete control value.</li></ul>
+          <div class="math">u = Σ wᵢ·uᵢ / Σ wᵢ (Sugeno weighted average)</div>
+          <h4>Steps</h4><ol><li>Define the input membership functions</li><li>Write the rule table</li><li>Choose the defuzzification method</li><li>Tune the scaling factors in closed loop</li></ol>
+          <p><b>Watch for.</b> Reasonable rules/scaling give a smooth response; too large overshoots, too small is sluggish; conflicting rules chatter.</p>
+          <p class="pitfall"><b>Pitfall.</b> More rules are not always better; unnormalized input scaling is hard to tune; fuzzy control has no stability guarantee.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Does fuzzy control need an accurate model?</b><br><span>No, it relies on rules/experience.</span></li><li><b>What does defuzzification do?</b><br><span>Combines the rule outputs into one concrete control value.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial24_fuzzy.slx" download>tutorial24_fuzzy.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t24_fuzzy_control.m" target="_blank" rel="noreferrer">t24_fuzzy_control.m</a> · <a href="../simulink/course.html?id=t24">Chinese source notes</a></p>
+        </div>
+      </details>
+
+    <h2>Phase 5 · Mechatronics &amp; deployment <span class="range">t13–t15, t25</span></h2>
+      <details class="lesson" id="t13">
+        <summary><span class="num">t13</span> DC motor</summary>
+        <div class="lesson-body">
+          <p class="hook">A motor has two layers of inertia: current takes time to build and speed takes time to build — hence the usual current inner loop + speed outer loop.</p>
+          <p><b>Goal.</b> Understand back-EMF, the electrical and mechanical time constants, and why PI loops are cascaded.</p>
+          <h4>Concepts</h4><ul><li><b>Back-EMF</b> — The faster it spins, the larger the voltage the motor pushes back, which limits current.</li><li><b>Electrical τe=L/R</b> — Current-loop response speed, usually milliseconds.</li><li><b>Mechanical τm=J/B</b> — Speed-loop response speed, usually tens to hundreds of milliseconds.</li></ul>
+          <div class="math">Electrical: L di/dt = u − R i − Keω; mechanical: J dω/dt = Kt i − Bω</div>
+          <h4>Steps</h4><ol><li>First close only the current PI loop with a current step reference</li><li>Then add the speed loop, whose output is the current reference</li><li>Set the speed-loop bandwidth to 1/5–1/10 of the current loop</li><li>Look at the speed and current waveforms</li></ol>
+          <p><b>Watch for.</b> The inner loop is fast and the outer loop is slower; a load-torque step drops the speed, which the outer loop pulls back.</p>
+          <p class="pitfall"><b>Pitfall.</b> Loops with too similar bandwidths oscillate; limiting and anti-windup are mandatory.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Which loop should be faster?</b><br><span>The current inner loop.</span></li><li><b>What does back-EMF grow with?</b><br><span>Speed.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial13_dc_motor.slx" download>tutorial13_dc_motor.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t13_dc_motor.m" target="_blank" rel="noreferrer">t13_dc_motor.m</a> · <a href="../simulink/course.html?id=t13">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t14">
+        <summary><span class="num">t14</span> PMSM + FOC</summary>
+        <div class="lesson-body">
+          <p class="hook">FOC rotates the three-phase AC into a frame that turns with the rotor, so AC quantities become DC and control feels like a DC motor.</p>
+          <p><b>Goal.</b> Understand the Clarke/Park transforms, the d-q axes, and why id is usually commanded to 0.</p>
+          <h4>Concepts</h4><ul><li><b>Clarke</b> — Three-phase abc → two-phase αβ.</li><li><b>Park</b> — αβ → dq rotating with the rotor.</li><li><b>d/q</b> — The d axis is the flux axis and the q axis produces torque; surface PM motors usually set id=0.</li></ul>
+          <div class="math">id and iq are DC quantities; torque Te ∝ iq (with id=0)</div>
+          <h4>Steps</h4><ol><li>Sample the three phase currents</li><li>Clarke → Park (rotor angle θ required)</li><li>d/q current PI</li><li>Inverse Park → SVPWM driving the inverter</li></ol>
+          <p><b>Watch for.</b> In steady state id≈0 and iq follows the reference; under load iq grows while the outer loop holds the speed.</p>
+          <p class="pitfall"><b>Pitfall.</b> θ must be accurate (encoder/observer); a wrong pole-pair count or phase sequence reverses the torque direction.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What key information does the Park transform need?</b><br><span>The rotor angle θ.</span></li><li><b>What id value is usual for a surface PMSM?</b><br><span>0.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial14_foc.slx" download>tutorial14_foc.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t14_foc_pmsm.m" target="_blank" rel="noreferrer">t14_foc_pmsm.m</a> · <a href="../simulink/course.html?id=t14">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t25">
+        <summary><span class="num">t25</span> Simscape</summary>
+        <div class="lesson-body">
+          <p class="hook">Simscape is like building blocks: no differential equations needed, just connect mass, spring and damper.</p>
+          <p><b>Goal.</b> Understand physical vs signal modeling and build the simplest mass-spring-damper.</p>
+          <h4>Concepts</h4><ul><li><b>Physical domain</b> — Mechanical, electrical and hydraulic parts connect to each other, with effort/flow variables.</li><li><b>Physical elements</b> — Mass, spring, damper and force source, each with real parameters.</li><li><b>Solver</b> — Simscape generates the equations automatically, but you still pick a suitable solver.</li></ul>
+          <div class="math">m·ẍ = F − c·ẋ − k·x</div>
+          <h4>Steps</h4><ol><li>Place Mass, Spring, Damper and Force elements</li><li>Connect them by physical (not signal) lines</li><li>Set m, k, c and the initial conditions</li><li>Connect Scope to see displacement/velocity</li></ol>
+          <p><b>Watch for.</b> Larger k oscillates faster; larger c damps faster; a larger mass responds more sluggishly.</p>
+          <p class="pitfall"><b>Pitfall.</b> Physical lines are not signal arrows; keep units consistent (N, kg, m); algebraic loops or conflicting initial conditions raise errors.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>How do Simscape connections differ from Simulink signal lines?</b><br><span>Physical connections carry power, not one-way signals.</span></li><li><b>How does the response change as damping c grows?</b><br><span>The oscillation decays faster.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial25_simscape.slx" download>tutorial25_simscape.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t25_simscape.m" target="_blank" rel="noreferrer">t25_simscape.m</a> · <a href="../simulink/course.html?id=t25">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t15">
+        <summary><span class="num">t15</span> Code generation</summary>
+        <div class="lesson-body">
+          <p class="hook">Code generation turns the diagram you built in Simulink into C code that the board can run.</p>
+          <p><b>Goal.</b> Understand continuous→discrete (c2d), sample time, and what to check before generating code.</p>
+          <h4>Concepts</h4><ul><li><b>Discretization c2d</b> — Convert continuous A/B into discrete Ad/Bd stepped at the sample period.</li><li><b>Sample time</b> — Every block's sample time must match the hardware interrupt.</li><li><b>Fixed/floating point</b> — Whether the MCU has an FPU decides float or fixed point.</li></ul>
+          <div class="math">x[k+1] = Ad x[k] + Bd u[k]; Ad=e^{ATs}</div>
+          <h4>Steps</h4><ol><li>Fix the hardware sample period Ts</li><li>Discretize with c2d and design K with dlqr</li><li>Set the model fixed step to Ts</li><li>Generate code and check interfaces and limits</li></ol>
+          <p><b>Watch for.</b> The discrete simulation should stay close to the continuous one; too large a Ts clearly degrades performance and can even destabilize.</p>
+          <p class="pitfall"><b>Pitfall.</b> Inconsistent sample times make the code behave differently from the simulation; forgetting limits/anti-windup blows up the integrator.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What does c2d do?</b><br><span>Converts a continuous model into a discrete one.</span></li><li><b>Is a larger Ts better?</b><br><span>No, too large loses performance and can even destabilize.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial15_codegen.slx" download>tutorial15_codegen.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t15_code_generation.m" target="_blank" rel="noreferrer">t15_code_generation.m</a> · <a href="../simulink/course.html?id=t15">Chinese source notes</a></p>
+        </div>
+      </details>
+
+    <h2>Phase 6 · Case studies <span class="range">t26–t30</span></h2>
+      <details class="lesson" id="t26">
+        <summary><span class="num">t26</span> Robot kinematics</summary>
+        <div class="lesson-body">
+          <p class="hook">A robot arm is like your own arm: joint angles give the hand position (forward kinematics), and a target point can be converted back to joint angles (inverse kinematics).</p>
+          <p><b>Goal.</b> Understand DH parameters, forward/inverse kinematics, multiple solutions and the reachable workspace.</p>
+          <h4>Concepts</h4><ul><li><b>Forward kinematics FK</b> — θ1, θ2 → end-effector position, by direct substitution.</li><li><b>Inverse kinematics IK</b> — End-effector position → θ1, θ2, possibly with several solutions.</li><li><b>Singular/unreachable</b> — A target too far away cannot be reached; some poses make joint speeds blow up.</li></ul>
+          <div class="math">x=l1cosθ1+l2cos(θ1+θ2); y=l1sinθ1+l2sin(θ1+θ2)</div>
+          <h4>Steps</h4><ol><li>Measure the link lengths l1, l2</li><li>Write the forward kinematics equations</li><li>Solve IK geometrically/analytically</li><li>Check multiple solutions and reachability</li></ol>
+          <p><b>Watch for.</b> Joint angles change sharply near the boundary; one end point often has two elbow-up/elbow-down solutions.</p>
+          <p class="pitfall"><b>Pitfall.</b> Forgetting to pick among multiple solutions; targets beyond l1+l2 have no solution; unify the angle units and zero positions.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What are the FK input and output?</b><br><span>Joint angles → end-effector position.</span></li><li><b>What happens if the target is too far?</b><br><span>It is unreachable, no solution.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial26_kinematics.slx" download>tutorial26_kinematics.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t26_robot_kinematics.m" target="_blank" rel="noreferrer">t26_robot_kinematics.m</a> · <a href="../simulink/course.html?id=t26">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t27">
+        <summary><span class="num">t27</span> MSD modeling</summary>
+        <div class="lesson-body">
+          <p class="hook">Mass-spring-damper is the classic wobbly system: give it a push and watch how it wobbles and when it stops.</p>
+          <p><b>Goal.</b> Understand ωn and ζ, and that the TF/state-space/discrete/numerical-integration models are equivalent.</p>
+          <h4>Concepts</h4><ul><li><b>ωn=√(k/m)</b> — Natural vibration frequency without damping.</li><li><b>ζ=c/(2√(km))</b> — Damping ratio: &lt;1 oscillates, =1 critical, &gt;1 overdamped.</li><li><b>Four model forms</b> — Transfer function, state space, discretization and numerical integration describe the same system.</li></ul>
+          <div class="math">m ẍ + c ẋ + k x = F(t); ωn=√(k/m), ζ=c/(2√(km))</div>
+          <h4>Steps</h4><ol><li>Set m, k, c</li><li>Write the transfer function or state space</li><li>Apply a step/impulse input</li><li>Look at displacement, velocity and overshoot</li></ol>
+          <p><b>Watch for.</b> Larger k → higher frequency; larger c → less overshoot and faster settling; larger m → slower.</p>
+          <p class="pitfall"><b>Pitfall.</b> Inconsistent units (mm vs m); missing initial conditions; too large a discretization step causes numerical instability.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Does ζ=0.2 oscillate?</b><br><span>Yes, it is underdamped.</span></li><li><b>How does ωn change as k grows?</b><br><span>It grows.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial27_msd_models.slx" download>tutorial27_msd_models.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t27_msd_modeling.m" target="_blank" rel="noreferrer">t27_msd_modeling.m</a> · <a href="../simulink/course.html?id=t27">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t28">
+        <summary><span class="num">t28</span> DSP basics</summary>
+        <div class="lesson-body">
+          <p class="hook">Sampling is like the frame rate of a movie: too few frames and the wheels seem to spin backwards — that is aliasing.</p>
+          <p><b>Goal.</b> Understand the sampling theorem, aliasing, and the basic use of FFT/windows.</p>
+          <h4>Concepts</h4><ul><li><b>Sampling theorem</b> — fs &gt; 2·fmax is required for distortion-free reconstruction.</li><li><b>Aliasing</b> — Frequencies above fs/2 fold down into fake low frequencies.</li><li><b>FFT/window</b> — Converts time to frequency; truncation leaks, so apply a window.</li></ul>
+          <div class="math">Nyquist frequency fs/2; aliased frequency = |f − round(f/fs)·fs|</div>
+          <h4>Steps</h4><ol><li>Feed in a sine</li><li>Sample it at different fs</li><li>Plot the samples/reconstructed waveform</li><li>Run an FFT and check the spectral lines</li></ol>
+          <p><b>Watch for.</b> With enough fs the samples reconstruct the sine; with too little fs a fake low-frequency wave appears whose frequency is completely different from the original.</p>
+          <p class="pitfall"><b>Pitfall.</b> Time-domain 'looks fine' does not prove there is no aliasing; use an anti-alias filter before sampling; FFT resolution = fs/N.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What is the highest frequency measurable with fs=40 Hz?</b><br><span>20 Hz.</span></li><li><b>What does a 30 Hz signal become when sampled at 40 Hz?</b><br><span>A fake 10 Hz signal.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial28_dsp.slx" download>tutorial28_dsp.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t28_dsp_basics.m" target="_blank" rel="noreferrer">t28_dsp_basics.m</a> · <a href="../simulink/course.html?id=t28">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t29">
+        <summary><span class="num">t29</span> MSD control compare</summary>
+        <div class="lesson-body">
+          <p class="hook">The same spring door can be closed by PID or by LQR, but one is tuned by trial and the other by model and cost.</p>
+          <p><b>Goal.</b> Understand the difference between PID and LQR: one tunes on the error, the other optimizes over states.</p>
+          <h4>Concepts</h4><ul><li><b>PID</b> — No model needed, tune Kp/Ki/Kd; sensitive to noise/saturation.</li><li><b>LQR</b> — Needs a state-space model, tune Q/R; better multivariable coordination.</li><li><b>Comparison axes</b> — Overshoot, settling time, control energy, noise robustness.</li></ul>
+          <div class="math">PID: u=Kp e+Ki∫e+Kd de; LQR: u=−Kx, K from the Riccati equation with Q/R</div>
+          <h4>Steps</h4><ol><li>First tune PID to an acceptable response</li><li>Build the state-space model and design LQR</li><li>Add sensor noise/actuator limits</li><li>Compare on the same plot</li></ol>
+          <p><b>Watch for.</b> A well-tuned LQR is usually smoother and uses less control energy; PID chatters more under noise.</p>
+          <p class="pitfall"><b>Pitfall.</b> Compare with the same limits and noise; a different LQR weight is a different controller, do not report only the best set.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What does LQR need?</b><br><span>A state-space model and Q/R.</span></li><li><b>What is PID's advantage?</b><br><span>No accurate model needed, easy to start with.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial29_control_compare.slx" download>tutorial29_control_compare.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t29_msd_control.m" target="_blank" rel="noreferrer">t29_msd_control.m</a> · <a href="../simulink/course.html?id=t29">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t30">
+        <summary><span class="num">t30</span> Active suspension</summary>
+        <div class="lesson-body">
+          <p class="hook">Over a speed bump the body should stay comfortable while the tires stay on the road — active suspension trades one against the other.</p>
+          <p><b>Goal.</b> Understand the quarter-car two-mass model, road excitation, and the comfort vs grip conflict.</p>
+          <h4>Concepts</h4><ul><li><b>Sprung/unsprung mass</b> — Body and wheel masses, joined by the spring/damper and the tire.</li><li><b>Road excitation</b> — A speed bump is a displacement/velocity input.</li><li><b>Active control</b> — An actuator applies force to cancel body vibration.</li></ul>
+          <div class="math">Coupled two-mass equations; the usual goals are low body acceleration and low tire dynamic load</div>
+          <h4>Steps</h4><ol><li>Build the quarter-car model</li><li>Apply a road step/sine</li><li>Start passive, then add PID/skyhook control</li><li>Look at the body acceleration and the tire dynamic load</li></ol>
+          <p><b>Watch for.</b> Too soft is comfortable but rolls and grips poorly; too stiff grips well but is harsh; active control can compromise but costs energy.</p>
+          <p class="pitfall"><b>Pitfall.</b> Watching body displacement but not acceleration; ignoring actuator bandwidth/limits; an overly ideal road model.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What is the core conflict in active suspension?</b><br><span>Comfort vs grip.</span></li><li><b>Why look at the tire dynamic load?</b><br><span>It reflects the grip/road contact.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial30_suspension.slx" download>tutorial30_suspension.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t30_active_suspension.m" target="_blank" rel="noreferrer">t30_active_suspension.m</a> · <a href="../simulink/course.html?id=t30">Chinese source notes</a></p>
+        </div>
+      </details>
+
+    <h2>Phase 7 · Nonlinear filtering <span class="range">t31–t35</span></h2>
+      <details class="lesson" id="t31">
+        <summary><span class="num">t31</span> EKF basics</summary>
+        <div class="lesson-body">
+          <p class="hook">The EKF walks a curve blindfolded: guess with the model at each step, correct with the sensor, but the model is nonlinear.</p>
+          <p><b>Goal.</b> Understand the EKF predict/update and that the Jacobian performs local linearization.</p>
+          <h4>Concepts</h4><ul><li><b>Nonlinear model</b> — f(x) and h(x) are no longer matrix multiplications.</li><li><b>Jacobian</b> — Differentiate f/h around the current state to get a local linear model.</li><li><b>Predict/update</b> — Same as the KF, except the matrices are recomputed every step.</li></ul>
+          <div class="math">F=∂f/∂x, H=∂h/∂x; P⁻=F P Fᵀ+Q, K=P⁻Hᵀ(H P⁻Hᵀ+R)⁻¹</div>
+          <h4>Steps</h4><ol><li>Write the nonlinear state/measurement equations</li><li>Derive the Jacobians F and H</li><li>Initialize x̂ and P</li><li>Predict/update at each step</li></ol>
+          <p><b>Watch for.</b> With a poor initial value it converges first and then tracks; under strong nonlinearity the linearization error makes the covariance over-optimistic.</p>
+          <p class="pitfall"><b>Pitfall.</b> A wildly wrong initial value or a wrong Jacobian diverges; Q/R swapped; angles must handle ±π wrapping.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What is the main difference between EKF and KF?</b><br><span>A Jacobian-based local linearization at every step.</span></li><li><b>Does the EKF always converge?</b><br><span>No, strong nonlinearity or bad initial values can diverge.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial31_ekf.slx" download>tutorial31_ekf.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t31_ekf_basics.m" target="_blank" rel="noreferrer">t31_ekf_basics.m</a> · <a href="../simulink/course.html?id=t31">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t32">
+        <summary><span class="num">t32</span> EKF pendulum</summary>
+        <div class="lesson-body">
+          <p class="hook">The inverted pendulum is the bicycle of control: sinθ is strongly nonlinear and a slightly wrong initial state tips it over.</p>
+          <p><b>Goal.</b> Understand the pendulum state equations, EKF estimation of angle/rate, and convergence from an initial offset.</p>
+          <h4>Concepts</h4><ul><li><b>States</b> — θ, θ̇ (sometimes cart position/velocity too).</li><li><b>Strong nonlinearity</b> — sinθ and cosθ cannot be treated linearly.</li><li><b>Estimation</b> — When only the angle is measured, the rate comes from the model/filter.</li></ul>
+          <div class="math">θ̈ = (g sinθ − u cosθ)/(l) (simplified); measurement h=θ</div>
+          <h4>Steps</h4><ol><li>Write the nonlinear pendulum equation</li><li>Linearize or use an EKF</li><li>Design the controller (LQR/energy)</li><li>Start from an offset angle and watch convergence</li></ol>
+          <p><b>Watch for.</b> With a large initial offset it swings back first and then stabilizes; with heavy noise the rate estimate chatters.</p>
+          <p class="pitfall"><b>Pitfall.</b> Angle wrapping (±π); over-confident initial values/covariance prevent convergence; insufficient control limits.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Why is the inverted pendulum hard?</b><br><span>Strong nonlinearity + an unstable equilibrium.</span></li><li><b>Where does the rate come from when only the angle is measured?</b><br><span>From the model/observer estimate.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial32_pendulum.slx" download>tutorial32_pendulum.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t32_ekf_pendulum.m" target="_blank" rel="noreferrer">t32_ekf_pendulum.m</a> · <a href="../simulink/course.html?id=t32">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t33">
+        <summary><span class="num">t33</span> UKF</summary>
+        <div class="lesson-body">
+          <p class="hook">The UKF derives no derivatives; it scatters a few sigma points through the nonlinear function and refits the mean and covariance.</p>
+          <p><b>Goal.</b> Understand the unscented transform: why you can filter nonlinear systems without Jacobians.</p>
+          <h4>Concepts</h4><ul><li><b>Sigma points</b> — 2n+1 representative points chosen from the covariance.</li><li><b>Unscented transform</b> — Push the points through the nonlinearity, then weight them back into mean/covariance.</li><li><b>Weights</b> — Center and symmetric points get different weights and can carry higher-order information.</li></ul>
+          <div class="math">xᵢ = x̂ ± √((n+λ)P); y = Σ wᵢ f(xᵢ)</div>
+          <h4>Steps</h4><ol><li>Choose the sigma points and weights</li><li>Push each point through the nonlinear model</li><li>Weight them into the predicted mean/covariance</li><li>Update with the measurement</li></ol>
+          <p><b>Watch for.</b> Under strong nonlinearity the UKF is usually more accurate than the EKF; the cost grows with the dimension.</p>
+          <p class="pitfall"><b>Pitfall.</b> A non-positive-definite covariance or a bad weight choice diverges; the UKF is not magic — a wrong model breaks both.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Does the UKF need Jacobians?</b><br><span>No.</span></li><li><b>How many sigma points are there?</b><br><span>2n+1 (n is the state dimension).</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial33_ukf.slx" download>tutorial33_ukf.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t33_ukf_basics.m" target="_blank" rel="noreferrer">t33_ukf_basics.m</a> · <a href="../simulink/course.html?id=t33">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t34">
+        <summary><span class="num">t34</span> EKF vs UKF</summary>
+        <div class="lesson-body">
+          <p class="hook">EKF and UKF are two ways to guess a nonlinear distribution: one by tangent approximation, one by sampling.</p>
+          <p><b>Goal.</b> Choose EKF or UKF based on nonlinearity strength, dimension and computation.</p>
+          <h4>Concepts</h4><ul><li><b>EKF</b> — First-order linearization, fast; large error under strong nonlinearity.</li><li><b>UKF</b> — Sampling approximation, usually more accurate; cost about 2n+1 times.</li><li><b>Selection</b> — Depends on nonlinearity, dimension and real-time requirements.</li></ul>
+          <div class="math">EKF: F=∂f/∂x; UKF: sigma-point propagation</div>
+          <h4>Steps</h4><ol><li>Implement EKF/UKF on the same model</li><li>Run Monte Carlo over many initial values/noise seeds</li><li>Compare RMSE, runtime and divergence rate</li><li>Choose per scenario</li></ol>
+          <p><b>Watch for.</b> Under strong nonlinearity/large initial error the UKF has smaller error; on linear systems the two nearly coincide.</p>
+          <p class="pitfall"><b>Pitfall.</b> Concluding from a single run; ignoring computation; parameters not aligned (different Q/R).</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Does the UKF help much on linear systems?</b><br><span>Not much, it is close to the KF.</span></li><li><b>What is the UKF's cost?</b><br><span>Higher computation.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial34_ekfvsukf.slx" download>tutorial34_ekfvsukf.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t34_ekf_vs_ukf.m" target="_blank" rel="noreferrer">t34_ekf_vs_ukf.m</a> · <a href="../simulink/course.html?id=t34">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t35">
+        <summary><span class="num">t35</span> IMU fusion</summary>
+        <div class="lesson-body">
+          <p class="hook">A gyro is good short-term and an accelerometer is good long-term: a complementary filter trusts the gyro short-term and the accelerometer long-term.</p>
+          <p><b>Goal.</b> Understand the complementary filter's α and its relation to the Kalman filter.</p>
+          <h4>Concepts</h4><ul><li><b>Gyro integration</b> — Smooth short-term, but it drifts.</li><li><b>Accelerometer</b> — No long-term drift, but vibration/motion acceleration disturbs it.</li><li><b>Complementary α</b> — Larger α trusts the gyro, smaller α trusts the accelerometer.</li></ul>
+          <div class="math">θ̂ ← α(θ̂ + ω·dt) + (1−α)·θacc</div>
+          <h4>Steps</h4><ol><li>Read the gyro rate and integrate it</li><li>Read the accelerometer and compute the tilt</li><li>Fuse them with weight α</li><li>Tune α and watch drift/jitter</li></ol>
+          <p><b>Watch for.</b> Large α: smooth but slowly drifting; small α: responsive but jittery. A Kalman filter can be seen as an adaptive α.</p>
+          <p class="pitfall"><b>Pitfall.</b> During vigorous motion the accelerometer does not see pure gravity and biases the estimate; calibrate the gyro bias first.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Larger α trusts which sensor more?</b><br><span>The gyro.</span></li><li><b>When is the accelerometer unreliable?</b><br><span>When there is motion acceleration/vibration.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial35_imu.slx" download>tutorial35_imu.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t35_imu_fusion.m" target="_blank" rel="noreferrer">t35_imu_fusion.m</a> · <a href="../simulink/course.html?id=t35">Chinese source notes</a></p>
+        </div>
+      </details>
+
+    <h2>Phase 8 · Advanced Simulink <span class="range">t36–t43</span></h2>
+      <details class="lesson" id="t36">
+        <summary><span class="num">t36</span> Stateflow</summary>
+        <div class="lesson-body">
+          <p class="hook">Stateflow is like a vending machine: insert a coin, pick an item, dispense — each state transitions only when its condition holds.</p>
+          <p><b>Goal.</b> Understand states, transitions, conditions/actions and the execution order of a state machine.</p>
+          <h4>Concepts</h4><ul><li><b>State</b> — The mode the system is in, e.g. Idle/Run/Fault.</li><li><b>Transition</b> — Jump from one state to another when a condition holds.</li><li><b>Action</b> — Operations performed on entry/exit/transition.</li></ul>
+          <div class="math">No formula; the core is 'state × event → new state'</div>
+          <h4>Steps</h4><ol><li>Draw the states and transitions</li><li>Write the transition conditions (events/guards)</li><li>Add entry/during/exit actions</li><li>Trigger tests with a signal source</li></ol>
+          <p><b>Watch for.</b> States change only on a condition edge/event; priority decides which of several simultaneous transitions wins.</p>
+          <p class="pitfall"><b>Pitfall.</b> Conflicting/deadlocked transitions; missing initialization; action side effects executed repeatedly.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What is Stateflow good for?</b><br><span>Logic/mode switching.</span></li><li><b>What happens when transition conditions conflict?</b><br><span>Priority decides, which may not match expectations.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial36_stateflow.slx" download>tutorial36_stateflow.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t36_stateflow_basics.m" target="_blank" rel="noreferrer">t36_stateflow_basics.m</a> · <a href="../simulink/course.html?id=t36">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t37">
+        <summary><span class="num">t37</span> Triggered / enabled</summary>
+        <div class="lesson-body">
+          <p class="hook">A triggered subsystem is like a camera shutter: it takes one picture when the trigger edge arrives and holds it the rest of the time.</p>
+          <p><b>Goal.</b> Understand when Enabled/Triggered/Reset subsystems execute.</p>
+          <h4>Concepts</h4><ul><li><b>Enabled</b> — Executes while the enable is active.</li><li><b>Triggered</b> — Executes once on a rising/falling edge.</li><li><b>Reset</b> — Resets the internal state.</li></ul>
+          <div class="math">y(k)=f(u(k)) updates only at trigger instants</div>
+          <h4>Steps</h4><ol><li>Create a Triggered Subsystem</li><li>Choose the trigger type (rising/falling/either)</li><li>Add hold/count logic inside</li><li>Observe the staircase output</li></ol>
+          <p><b>Watch for.</b> The output jumps on the trigger edge and holds in between; triggering too fast misses events.</p>
+          <p class="pitfall"><b>Pitfall.</b> Wrong trigger edge; sample-time conflicts; forgetting reset lets the state accumulate.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>When does a Triggered subsystem execute?</b><br><span>When the trigger event arrives.</span></li><li><b>Why is the output a staircase?</b><br><span>It updates only at trigger instants.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial37_triggered.slx" download>tutorial37_triggered.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t37_triggered_subsystem.m" target="_blank" rel="noreferrer">t37_triggered_subsystem.m</a> · <a href="../simulink/course.html?id=t37">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t38">
+        <summary><span class="num">t38</span> Bus signals</summary>
+        <div class="lesson-body">
+          <p class="hook">A Bus is like a shipping box: several signals go in, and they come out by name or index.</p>
+          <p><b>Goal.</b> Understand Bus Creator/Selector, element naming and types.</p>
+          <h4>Concepts</h4><ul><li><b>Bus Creator</b> — Packs several signals into one bus.</li><li><b>Bus Selector</b> — Extracts some of them by name or index.</li><li><b>Elements</b> — Each signal has a name/type; the interfaces must match.</li></ul>
+          <div class="math">No formula; essentially structured signal packing</div>
+          <h4>Steps</h4><ol><li>Feed several signals into Bus Creator</li><li>Name each signal</li><li>Extract signals by name with Bus Selector</li><li>Connect Scope to check</li></ol>
+          <p><b>Watch for.</b> One line carries several signals after packing; a wrong selector name errors or grabs the wrong signal.</p>
+          <p class="pitfall"><b>Pitfall.</b> Name spelling/type mismatch; packing order changed while the Selector uses indices; cannot see inside while debugging.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>Does a Bus change the signal values?</b><br><span>No, it only packs them.</span></li><li><b>How does the Selector pick signals?</b><br><span>By name or index.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial38_bus.slx" download>tutorial38_bus.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t38_bus_signals.m" target="_blank" rel="noreferrer">t38_bus_signals.m</a> · <a href="../simulink/course.html?id=t38">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t39">
+        <summary><span class="num">t39</span> Model reference</summary>
+        <div class="lesson-body">
+          <p class="hook">Model referencing is like using standard parts: the submodel is developed and tested alone, then installed in the big model.</p>
+          <p><b>Goal.</b> Understand the Model block, interface definition and the benefit of independent builds.</p>
+          <h4>Concepts</h4><ul><li><b>Model block</b> — References another .slx as a block.</li><li><b>Interface</b> — Input/output ports must match.</li><li><b>Independent testing</b> — A submodel can be simulated alone, which helps parallel work.</li></ul>
+          <div class="math">No formula; a project organization technique</div>
+          <h4>Steps</h4><ol><li>Create the submodel and define its ports</li><li>Place a Model block in the top model and reference it</li><li>Align the interface</li><li>Test/integrate separately</li></ol>
+          <p><b>Watch for.</b> The top model cannot see inside the submodel; a mismatched interface errors immediately.</p>
+          <p class="pitfall"><b>Pitfall.</b> Interface version mismatch; lost submodel path; global variable conflicts.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What is the benefit of a Model block?</b><br><span>Reuse, parallel work, independent testing.</span></li><li><b>What happens on an interface mismatch?</b><br><span>The build fails.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial39_top.slx" download>tutorial39_top.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t39_model_referencing.m" target="_blank" rel="noreferrer">t39_model_referencing.m</a> · <a href="../simulink/course.html?id=t39">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t40">
+        <summary><span class="num">t40</span> Variant subsystem</summary>
+        <div class="lesson-body">
+          <p class="hook">A variant subsystem is like one car with several configurations: the same model switches implementation by variable.</p>
+          <p><b>Goal.</b> Understand the Variant Subsystem, activation conditions and multi-variant management.</p>
+          <h4>Concepts</h4><ul><li><b>Variant</b> — Several candidate subsystems, one active by condition.</li><li><b>Activation condition</b> — A variable/expression decides which is chosen.</li><li><b>Build</b> — You can compile only the active variant or check all of them.</li></ul>
+          <div class="math">No formula; configuration management</div>
+          <h4>Steps</h4><ol><li>Create a Variant Subsystem</li><li>Add several candidate implementations</li><li>Set the activation variable</li><li>Switch the variable and verify</li></ol>
+          <p><b>Watch for.</b> Switching variants changes the output for the same input; inactive variants may not be compiled.</p>
+          <p class="pitfall"><b>Pitfall.</b> Undefined variable; testing only the active variant; inconsistent interfaces.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What is a variant for?</b><br><span>One model, several implementations.</span></li><li><b>How do you switch?</b><br><span>Through the activation condition/variable.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial40_variant.slx" download>tutorial40_variant.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t40_variant_subsystem.m" target="_blank" rel="noreferrer">t40_variant_subsystem.m</a> · <a href="../simulink/course.html?id=t40">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t41">
+        <summary><span class="num">t41</span> Model callbacks</summary>
+        <div class="lesson-body">
+          <p class="hook">Callbacks are like power-on self-test and shutdown save: they run automatically at specific points of the model lifecycle.</p>
+          <p><b>Goal.</b> Understand when PreLoad/Init/StopFcn callbacks execute and their side effects.</p>
+          <h4>Concepts</h4><ul><li><b>PreLoad</b> — Runs before the model loads.</li><li><b>InitFcn</b> — Initializes variables before the simulation starts.</li><li><b>StopFcn</b> — Saves/cleans up after the simulation ends.</li></ul>
+          <div class="math">No formula; lifecycle hooks</div>
+          <h4>Steps</h4><ol><li>Write callbacks in the model properties</li><li>Verify the timing with disp/assignin</li><li>Avoid slow work/side effects</li><li>Agree on variable initialization as a team</li></ol>
+          <p><b>Watch for.</b> Callbacks run automatically at their moments; wrong ordering leaves variables undefined.</p>
+          <p class="pitfall"><b>Pitfall.</b> Heavy work/popups in callbacks; depending on uninitialized workspace variables; implicit behavior in team projects.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>When does InitFcn run?</b><br><span>Before the simulation starts.</span></li><li><b>What belongs in callbacks?</b><br><span>Light initialization/cleanup.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial41_callbacks.slx" download>tutorial41_callbacks.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t41_callbacks.m" target="_blank" rel="noreferrer">t41_callbacks.m</a> · <a href="../simulink/course.html?id=t41">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t42">
+        <summary><span class="num">t42</span> S-Function</summary>
+        <div class="lesson-body">
+          <p class="hook">An S-Function is a block you write yourself: Simulink handles scheduling, you handle the algorithm.</p>
+          <p><b>Goal.</b> Understand the Setup/Outputs/Update structure of a Level-2 MATLAB S-Function.</p>
+          <h4>Concepts</h4><ul><li><b>S-Function</b> — A custom block that registers ports/states/sample times.</li><li><b>Callback methods</b> — setup, Outputs, Update, Derivatives.</li><li><b>When to use</b> — Algorithms Simulink lacks or external integration.</li></ul>
+          <div class="math">Discrete/continuous state updates implemented by you</div>
+          <h4>Steps</h4><ol><li>Write setup to register the ports</li><li>Implement Outputs/Update</li><li>Place it in a MATLAB Function/S-Function block</li><li>Test the edge cases</li></ol>
+          <p><b>Watch for.</b> A custom block takes part in the solve like a built-in one; the method order decides the state updates.</p>
+          <p class="pitfall"><b>Pitfall.</b> Wrong port/dimension registration; mixing continuous/discrete states; slower than built-in blocks.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What are S-Functions for?</b><br><span>Custom blocks/algorithms.</span></li><li><b>Which method computes the output?</b><br><span>Outputs.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial42_sfunction.slx" download>tutorial42_sfunction.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t42_sfunction_basics.m" target="_blank" rel="noreferrer">t42_sfunction_basics.m</a> · <a href="../simulink/course.html?id=t42">Chinese source notes</a></p>
+        </div>
+      </details>
+      <details class="lesson" id="t43">
+        <summary><span class="num">t43</span> Model Advisor</summary>
+        <div class="lesson-body">
+          <p class="hook">Model Advisor is factory quality control: it automatically checks algebraic loops, unconnected ports, sample-time conflicts and more.</p>
+          <p><b>Goal.</b> Use Model Advisor for modeling-standard checks and understand the limits of its checks.</p>
+          <h4>Concepts</h4><ul><li><b>Checks</b> — Grouped by standard/safety/performance.</li><li><b>Auto-fix</b> — Some issues can be fixed with one click.</li><li><b>Limits</b> — The tool does not know your intent; a warning is not necessarily an error.</li></ul>
+          <div class="math">No formula; static checks</div>
+          <h4>Steps</h4><ol><li>Open Model Advisor</li><li>Choose a check set (e.g. ISO 26262)</li><li>Read the report item by item</li><li>Fix/waive and record</li></ol>
+          <p><b>Watch for.</b> Algebraic loops, unconnected ports and sample-time conflicts are flagged; some are design trade-offs.</p>
+          <p class="pitfall"><b>Pitfall.</b> Believing every report or ignoring all of it; not recording waiver reasons; check sets that do not match project standards.</p>
+          <h4>Check yourself</h4><ol class="quiz"><li><b>What does Model Advisor check?</b><br><span>Modeling standards/static issues.</span></li><li><b>Is a warning always a bug?</b><br><span>No, it may be a design trade-off.</span></li></ol>
+          <p class="dl"><a href="../simulink/models/tutorial43_advisor.slx" download>tutorial43_advisor.slx</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/t43_model_advisor.m" target="_blank" rel="noreferrer">t43_model_advisor.m</a> · <a href="../simulink/course.html?id=t43">Chinese source notes</a></p>
+        </div>
+      </details>
+    </main>
+    <footer><a href="./">← vibe-lab</a> · <a href="lessons.html">43-lesson index</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial" target="_blank" rel="noreferrer">Tutorial source</a></footer>
+  </div>
+  <script>
+    (function () {
+      if (location.protocol !== "https:") return;
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://gc.zgo.at/count.js";
+      s.setAttribute("data-goatcounter", "https://xingdong.goatcounter.com/count");
+      document.head.appendChild(s);
+    })();
+  </script>
+</body>
+</html>

@@ -118,7 +118,8 @@ window.CONTROL_MANUAL = {
 
 (function () {
   "use strict";
-  const D = window.CONTROL_MANUAL;
+  const isEn = !!(window.VibeI18n && window.VibeI18n.lang === "en");
+  const D = isEn && window.CONTROL_MANUAL_EN ? window.CONTROL_MANUAL_EN : window.CONTROL_MANUAL;
   const grid = document.getElementById("manual-grid");
   if (!D || !grid) return;
   const el = (tag, cls, text) => {
@@ -144,9 +145,9 @@ window.CONTROL_MANUAL = {
     const ol = el("ol", "manual-steps");
     c.steps.forEach((s) => ol.appendChild(el("li", "", s)));
     body.appendChild(ol);
-    body.appendChild(el("p", "manual-pitfall", "坑：" + c.pitfall));
+    body.appendChild(el("p", "manual-pitfall", (isEn ? "Pitfall: " : "坑：") + c.pitfall));
     if (c.anchor) {
-      const a = el("a", "manual-anchor", "→ 到对应实验");
+      const a = el("a", "manual-anchor", isEn ? "→ Go to experiment" : "→ 到对应实验");
       a.href = "#" + c.anchor;
       body.appendChild(a);
     }

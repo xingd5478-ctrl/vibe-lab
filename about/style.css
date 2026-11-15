@@ -119,6 +119,7 @@ body.wide .wrap { max-width: 1120px; }
 .matlab-table td { line-height: 1.55; }
 .matlab-table .metric-cell { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
 .matlab-table .spark { width: 120px; height: 28px; color: var(--accent); }
+.matlab-table .source-offline { display: inline-block; padding: 0 4px; margin-right: 4px; border: 1px solid #b58a3a; border-radius: 2px; color: #8a641f; font-size: 10px; vertical-align: 1px; }
 .matlab-table .slx { margin-left: 4px; font-size: 10.5px; color: var(--muted); }
 .matlab-table .hash { font-family: Consolas, monospace; color: var(--muted); font-size: 10.5px; }
 .matlab-table .status { font-size: 10.5px; color: #2f6b4f; }
@@ -141,6 +142,7 @@ body.wide .wrap { max-width: 1120px; }
   .matlab-table .status { color: #7fc9a3; }
   .matlab-table .status.blocked { color: #e08a8a; }
   .matlab-table .spark { color: #7fb3e0; }
+  .matlab-table .source-offline { border-color: #b58a3a; color: #d8b46a; }
   .matlab-toolbar input { border-color: #666b75; }
 }
 
