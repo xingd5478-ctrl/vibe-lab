@@ -396,6 +396,11 @@
     } catch (e) {}
   };
 
+  var i18nErrorSent = false;
+  function reportI18nError() { if (i18nErrorSent) return; i18nErrorSent = true; if (window.vibeTrack) window.vibeTrack("js-error"); }
+  window.addEventListener("error", reportI18nError);
+  window.addEventListener("unhandledrejection", reportI18nError);
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       walk(document.body);

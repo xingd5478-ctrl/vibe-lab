@@ -30,6 +30,11 @@
     a.addEventListener("click", function () { track("open-" + a.getAttribute("data-target")); });
   });
 
+  var errorSent = false;
+  function reportError() { if (errorSent) return; errorSent = true; track("js-error"); }
+  window.addEventListener("error", reportError);
+  window.addEventListener("unhandledrejection", reportError);
+
   var fine = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   function initReveal() {
