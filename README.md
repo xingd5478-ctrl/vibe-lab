@@ -97,13 +97,13 @@ imu-lab/static/
 - **Control Play**（`/control/`）：二阶 Bode/阶跃/PID + **状态反馈、观测器、根轨迹、离散化 4 个扩展实验**，附 **14 章实验手册**；页面用「实验台 / 扩展实验 / 手册」标签切换；
 - **Simulink 教程**（`/simulink/`）：43 课讲义 + 19 个交互实验 + 43 个 `.slx` 下载；课程按 **精读 / 合格 / 概念** 分级。
 
-首页提供「从哪开始」三条路径 + 全站顶栏；`/en/` 是英文概览页（工具与讲义仍为中文），带 hreflang 与语言切换；9 门「概念」课带可计算的小例子；`npm run check:chart` 在 CI 中保证三份 `chart.js` 不漂移。
+首页提供「从哪开始」三条路径 + 全站顶栏；首页工具卡使用真实界面截图（浅/深两套 `preview-*.png`），`/en/` 是英文概览页（工具与讲义仍为中文），带 hreflang 与语言切换；9 门「概念」课带可计算的小例子；`npm run check:chart` 在 CI 中保证三份 `chart.js` 不漂移。
 
 ## MATLAB 43/43 对照
 
 - `tools/probe_all.m` 对 43 个 `.slx` 逐一仿真；t39 的引用子模型放在 `simulink/models/refs/`，t42 的 S-Function 在 `tools/deadzone_sfcn.m`。
 - `artifacts/simulink/probes.json` 是 MATLAB 原始输出（gitignore）；`node scripts/build_matlab_data.mjs` 加上 **SHA-256、MATLAB 版本、solver、停止时间、信号统计**，写出 `data/matlab-probes.json`。
-- `node scripts/build_matlab_table.mjs` 从 JSON 生成 `about/matlab.html`，不再手抄表格；`npm run check:matlab` 校验模型哈希与表格同步。
+- `node scripts/build_matlab_table.mjs` 从 JSON 生成 `about/matlab.html`，不再手抄表格；每行带关键信号 mini 曲线；`npm run check:matlab` 校验模型哈希与表格同步。
 - 43/43 全部可仿真；t24 的 FIS 是探针占位、t35 的输出疑似连线问题、t32 的倒立摆未闭环稳定等差异都在表里写明。
 
 ## 英文 UI（beta）

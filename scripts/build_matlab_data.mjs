@@ -173,12 +173,14 @@ for (const lesson of lessons) {
     signals_count: signals.length,
     metric: METRIC_OVERRIDES[lesson.id] || autoMetric(lesson.id, signals),
     note: NOTES[lesson.id] || "",
+    spark: (signals.find((x) => x.name === (PRIMARY[lesson.id] || [])[0])?.spark || []).map(Number),
     signals: signals.map((s) => ({
       name: s.name,
       n: s.n,
       min: Number(s.min.toFixed(6)),
       max: Number(s.max.toFixed(6)),
       final: Number(s.final.toFixed(6)),
+      spark: (s.spark || []).map(Number),
     })),
   };
   if (lesson.id === "t39") {

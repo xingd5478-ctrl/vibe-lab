@@ -57,13 +57,10 @@
         <div class="no">INSTRUMENT 01</div>
         <h2>IMU 数据实验室</h2>
         <p>上传 CSV → CRC 清洗 → 三轴 Allan → 拟合 ARW/RRW → 调 R/Q 看卡尔曼滤波。附 10 章实验手册、PNG/CSV 导出与参数链接。</p>
-        <svg viewBox="0 0 320 92" role="img" aria-label="Allan 曲线示意">
-          <path class="fig-accent" d="M12,22 C70,32 120,58 175,66 C225,73 270,62 308,50" fill="none" stroke="#1f4e79" stroke-width="2"/>
-          <path class="fig-green" d="M12,28 C70,38 120,62 175,70 C225,77 270,68 308,58" fill="none" stroke="#2f6b4f" stroke-width="1.4" opacity="0.7"/>
-          <path class="fig-orange" d="M12,30 L308,86" fill="none" stroke="#b5651d" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
-          <line class="fig-axis" x1="12" y1="86" x2="308" y2="86" stroke="#d8d3c7"/>
-          <line class="fig-axis" x1="12" y1="12" x2="12" y2="86" stroke="#d8d3c7"/>
-        </svg>
+        <picture>
+          <source srcset="preview-imu-dark.png" media="(prefers-color-scheme: dark)" />
+          <img class="shot" src="preview-imu.png" alt="IMU 数据实验室界面" width="640" height="360" loading="lazy" />
+        </picture>
         <span class="go">打开 →</span>
       </a>
 
@@ -71,12 +68,10 @@
         <div class="no">INSTRUMENT 02</div>
         <h2>Control Play</h2>
         <p>二阶系统的 Bode、阶跃与 PID 闭环，外加状态反馈、观测器、根轨迹、离散化 4 个扩展实验；附 14 章实验手册。</p>
-        <svg viewBox="0 0 320 92" role="img" aria-label="阶跃响应示意">
-          <path class="fig-green" d="M12,86 L60,40 C72,22 86,20 98,34 C112,50 120,56 140,54 L308,52" fill="none" stroke="#2f6b4f" stroke-width="2"/>
-          <line class="fig-ref" x1="12" y1="52" x2="308" y2="52" stroke="#b9b3a5" stroke-width="1" stroke-dasharray="4 4"/>
-          <line class="fig-axis" x1="12" y1="86" x2="308" y2="86" stroke="#d8d3c7"/>
-          <line class="fig-axis" x1="12" y1="12" x2="12" y2="86" stroke="#d8d3c7"/>
-        </svg>
+        <picture>
+          <source srcset="preview-control-dark.png" media="(prefers-color-scheme: dark)" />
+          <img class="shot" src="preview-control.png" alt="Control Play 界面" width="640" height="360" loading="lazy" />
+        </picture>
         <span class="go">打开 →</span>
       </a>
 
@@ -84,18 +79,10 @@
         <div class="no">TUTORIAL 03</div>
         <h2>Simulink 教程 · 交互复现</h2>
         <p>43 课 / 8 阶段的 Simulink 控制教程：43 篇新手讲义 + 19 个交互复现（信号、PID、Kalman、Bode、MPC、滑模、根轨迹、模糊、IMU、Stateflow…），附 .m/.slx 源文件。</p>
-        <svg viewBox="0 0 320 92" role="img" aria-label="Simulink 框图示意">
-          <rect class="fig-box" x="12" y="30" width="62" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
-          <text class="fig-ink" x="43" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Step</text>
-          <rect class="fig-sum" x="112" y="30" width="80" height="32" rx="2" fill="#eef1f4" stroke="#7a9cc6"/>
-          <text class="fig-ink" x="152" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">Σ / K</text>
-          <rect class="fig-box" x="230" y="30" width="78" height="32" rx="2" fill="#f7f4ec" stroke="#b9b3a5"/>
-          <text class="fig-ink" x="269" y="50" text-anchor="middle" font-size="9" font-family="Consolas" fill="#1b1d22">1/s²</text>
-          <line class="fig-arrow" x1="74" y1="46" x2="110" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
-          <line class="fig-arrow" x1="192" y1="46" x2="228" y2="46" stroke="#1b1d22" stroke-width="1.2"/>
-          <path class="fig-green" d="M269,62 V80 H43 V64" fill="none" stroke="#2f6b4f" stroke-width="1.1" stroke-dasharray="4 4"/>
-          <circle class="fig-ink" cx="74" cy="46" r="2" fill="#1b1d22"/>
-        </svg>
+        <picture>
+          <source srcset="preview-simulink-dark.png" media="(prefers-color-scheme: dark)" />
+          <img class="shot" src="preview-simulink.png" alt="Simulink 交互复现界面" width="640" height="360" loading="lazy" />
+        </picture>
         <span class="go">打开 →</span>
       </a>
     </main>

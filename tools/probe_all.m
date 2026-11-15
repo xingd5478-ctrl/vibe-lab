@@ -155,7 +155,7 @@ end
 function [samples, signals] = collect_signals(out)
 samples = 0;
 signals = repmat(struct("name", "", "n", 0, "t0", NaN, "t1", NaN, ...
-    "min", NaN, "max", NaN, "final", NaN, "rms", NaN), 1, 0);
+    "min", NaN, "max", NaN, "final", NaN, "rms", NaN, "spark", []), 1, 0);
 if ~isa(out, "Simulink.SimulationOutput"), return; end
 names = string(out.who);
 for i = 1:numel(names)
@@ -190,7 +190,7 @@ end
 
 function [sig, ok] = signal_stats(name, value)
 sig = struct("name", string(name), "n", 0, "t0", NaN, "t1", NaN, ...
-    "min", NaN, "max", NaN, "final", NaN, "rms", NaN);
+    "min", NaN, "max", NaN, "final", NaN, "rms", NaN, "spark", []);
 ok = false;
 try
     if isa(value, "timeseries")
@@ -204,6 +204,8 @@ try
         sig.max = max(d);
         sig.final = d(end);
         sig.rms = sqrt(mean(d .^ 2));
+        idx = round(linspace(1, numel(d), min(48, numel(d))));
+        sig.spark = d(idx);
         ok = true;
     end
 catch

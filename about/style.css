@@ -117,6 +117,8 @@ body.wide .wrap { max-width: 1120px; }
 .matlab-table { font-size: 12.5px; }
 .matlab-table th { position: sticky; top: 0; background: var(--paper); z-index: 1; }
 .matlab-table td { line-height: 1.55; }
+.matlab-table .metric-cell { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+.matlab-table .spark { width: 120px; height: 28px; color: var(--accent); }
 .matlab-table .slx { margin-left: 4px; font-size: 10.5px; color: var(--muted); }
 .matlab-table .hash { font-family: Consolas, monospace; color: var(--muted); font-size: 10.5px; }
 .matlab-table .status { font-size: 10.5px; color: #2f6b4f; }
@@ -138,6 +140,7 @@ body.wide .wrap { max-width: 1120px; }
   th { color: var(--muted); }
   .matlab-table .status { color: #7fc9a3; }
   .matlab-table .status.blocked { color: #e08a8a; }
+  .matlab-table .spark { color: #7fb3e0; }
   .matlab-toolbar input { border-color: #666b75; }
 }
 

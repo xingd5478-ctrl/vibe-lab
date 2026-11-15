@@ -100,6 +100,8 @@ h1 { margin: 10px 0 8px; font-size: 34px; font-weight: 650; letter-spacing: -0.0
 .card h2 { margin: 8px 0 6px; font-size: 19px; font-weight: 650; }
 .card p { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
 .card svg { width: 100%; height: 92px; display: block; margin: 4px 0 14px; }
+.card picture { display: block; margin: 4px 0 14px; }
+.card .shot { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 2px; background: var(--panel); }
 .fig-accent { stroke: var(--accent); }
 .fig-green { stroke: var(--green); }
 .fig-orange { stroke: var(--orange); }

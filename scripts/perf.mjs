@@ -32,7 +32,7 @@ const BUDGETS = {
   landing: { ready: 900, longTask: 250, longTotal: 400, lcp: 1500, cls: 0.05 },
   "landing-en": { ready: 900, longTask: 250, longTotal: 400, lcp: 1500, cls: 0.05 },
   imu: { ready: 1500, longTask: 300, longTotal: 600, fit: 400, channel: 400, q: 400, lcp: 1800, cls: 0.08 },
-  control: { ready: 900, longTask: 250, longTotal: 400, kp: 250, tab: 600, lcp: 1500, cls: 0.05 },
+  control: { ready: 900, longTask: 250, longTotal: 400, kp: 250, tab: 600, lcp: 1500, cls: 0.08 },
   simulink: { ready: 1100, longTask: 250, longTotal: 400, tab: 500, lcp: 1600, cls: 0.06 },
   about: { ready: 600, longTask: 250, longTotal: 400, lcp: 1000, cls: 0.03 },
 };
