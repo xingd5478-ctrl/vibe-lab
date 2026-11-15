@@ -53,9 +53,9 @@ const html = `<!DOCTYPE html>
   <title>MATLAB comparison: 43/43 · vibe-lab</title>
   <meta name="description" content="English provenance table for 43 MATLAB/Simulink models: SHA-256, solver, stop time, signal statistics and model downloads." />
   <link rel="stylesheet" href="../style.css" />
-  <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/about/matlab-en.html" />
-  <link rel="alternate" hreflang="zh-CN" href="https://xingd5478-ctrl.github.io/vibe-lab/about/matlab.html" />
-  <link rel="alternate" hreflang="en" href="https://xingd5478-ctrl.github.io/vibe-lab/about/matlab-en.html" />
+  <link rel="canonical" href="https://vibe-lab.xingd5478.workers.dev/about/matlab-en.html" />
+  <link rel="alternate" hreflang="zh-CN" href="https://vibe-lab.xingd5478.workers.dev/about/matlab.html" />
+  <link rel="alternate" hreflang="en" href="https://vibe-lab.xingd5478.workers.dev/about/matlab-en.html" />
   <style>
     .wrap { max-width: 1120px; }
     table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
