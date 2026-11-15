@@ -5,16 +5,18 @@ import fs from "node:fs";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const OLD = "https://xingd5478-ctrl.github.io/vibe-lab";
+const DEFAULT_OLD = "https://xingd5478-ctrl.github.io/vibe-lab";
+const fromArg = process.argv.find((a) => a.startsWith("--from="));
+const OLD = (fromArg ? fromArg.slice("--from=".length) : DEFAULT_OLD).replace(/\/+$/, "");
 const raw = process.argv[2];
 if (!raw) {
-  console.error("usage: node scripts/set_domain.mjs https://your-domain.example");
+  console.error("usage: node scripts/set_domain.mjs https://your-domain.example [--from=https://old.example] [--no-cname]");
   process.exit(1);
 }
 const origin = raw.replace(/\/+$/, "");
 const noCname = process.argv.includes("--no-cname");
-if (!/^https:\/\/[^/]+$/.test(origin)) {
-  console.error("domain must be exactly https://host (no path)");
+if (!/^https:\/\/[^/?#]+(?:\/[^?#]*)?$/.test(origin)) {
+  console.error("target must be https://host or https://host/path (no query/hash)");
   process.exit(1);
 }
 const host = new URL(origin).host;

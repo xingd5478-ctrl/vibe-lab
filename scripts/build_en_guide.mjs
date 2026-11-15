@@ -15,7 +15,7 @@ const i18n = fs.readFileSync(path.join(ROOT, "shared", "i18n.js"), "utf8");
 const block = i18n.match(/const TITLES = \{([\s\S]*?)\n  \};/);
 if (!block) throw new Error("TITLES block not found");
 const TITLES = Function(`return ({${block[1]}});`)();
-const ROOT_URL = "https://vibe-lab.xingd5478.workers.dev";
+const ROOT_URL = "https://xingd5478-ctrl.github.io/vibe-lab";
 const PHASES = {
   "Phase 1 · Simulink 基础与动力学": "Phase 1 · Simulink & dynamics",
   "Phase 2 · 经典控制设计": "Phase 2 · Classical control",

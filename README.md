@@ -2,7 +2,7 @@
 
 传感器与控制的可视化实验室：三个零依赖的浏览器工具 + 方法页 + 英文首页 + 43/43 MATLAB 对照。
 
-**线上：** https://vibe-lab.xingd5478.workers.dev/
+**线上：** https://xingd5478-ctrl.github.io/vibe-lab/
 
 ## 目录
 

@@ -1,5 +1,8 @@
 # Cloudflare 免费部署（Pages / Worker 两条路）
 
+> 当前主站已切回 **GitHub Pages**：`https://xingd5478-ctrl.github.io/vibe-lab/`，因为手机实测可访问。
+> `https://vibe-lab.xingd5478.workers.dev/` 保留为桌面备份；不要把两个地址同时当 canonical。
+
 目标：拿到 `https://vibe-lab.pages.dev`，同时免费使用 Cloudflare Web Analytics。  
 GitHub Pages 可以继续保留作为备份。
 
@@ -67,7 +70,7 @@ git add -A && git commit -m "chore: point canonical to vibe-lab.pages.dev" && gi
 
 - 这不是独立域名，是 `pages.dev` 子域；免费、稳定、无内容审核。
 - 如果以后买 `vibe-lab.dev`，在 Cloudflare Pages → Custom domains 绑定，再跑一次 `set_domain` 即可。
-- 不想迁移：继续用 `xingd5478-ctrl.github.io/vibe-lab/`，功能完全一样，只是 URL 长一点。
+- 不想迁移：继续用 `https://xingd5478-ctrl.github.io/vibe-lab/`，手机实测可访问。
 
 
 ---
