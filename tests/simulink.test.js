@@ -9,7 +9,8 @@ function valueAt(t, y, sec) {
 }
 
 test("first order reaches 63.2% at tau and settles at K", () => {
-  const tau = 0.8, K = 1.5;
+  const tau = 0.8,
+    K = 1.5;
   const r = S.firstOrder(tau, K, 6);
   const y63 = valueAt(r.t, r.y, 0.5 + tau);
   assert.ok(Math.abs(y63 - 0.632 * K) < 0.02 * K, `y63=${y63}`);
@@ -17,7 +18,8 @@ test("first order reaches 63.2% at tau and settles at K", () => {
 });
 
 test("second order overshoot matches the analytical estimate", () => {
-  const wn = 5, zeta = 0.3;
+  const wn = 5,
+    zeta = 0.3;
   const r = S.secondOrder(wn, zeta, 8);
   const m = S.metrics(r.t, r.y, 1);
   const expect = Math.exp((-Math.PI * zeta) / Math.sqrt(1 - zeta * zeta)) * 100;
@@ -26,7 +28,8 @@ test("second order overshoot matches the analytical estimate", () => {
 });
 
 test("state feedback places poles and tracks reference", () => {
-  const wn = 4, zeta = 0.7;
+  const wn = 4,
+    zeta = 0.7;
   const r = S.stateFeedback(wn, zeta, 8);
   assert.ok(Math.abs(r.k[0] - wn * wn) < 1e-9);
   assert.ok(Math.abs(r.k[1] - 2 * zeta * wn) < 1e-9);
@@ -100,7 +103,8 @@ test("root locus: low gain stable, high gain unstable", () => {
 });
 
 test("fuzzy P has steady error that shrinks with scale", () => {
-  const a = S.fuzzyDemo(4), b = S.fuzzyDemo(10);
+  const a = S.fuzzyDemo(4),
+    b = S.fuzzyDemo(10);
   const ea = Math.abs(1 - a.y[a.y.length - 1]);
   const eb = Math.abs(1 - b.y[b.y.length - 1]);
   assert.ok(ea < 0.25, `ea=${ea}`);
@@ -151,7 +155,9 @@ test("state machine latches fault and resets", () => {
 });
 
 test("variant mode selects different controllers", () => {
-  const open = S.variantDemo(0), pid = S.variantDemo(1), pd = S.variantDemo(2);
+  const open = S.variantDemo(0),
+    pid = S.variantDemo(1),
+    pd = S.variantDemo(2);
   assert.equal(open.label, "开环");
   assert.equal(pid.label, "PID");
   assert.equal(pd.label, "状态反馈 (PD)");
@@ -197,7 +203,11 @@ test("root locus exposes K=20..50 segment", () => {
   const r = S.rootLocusDemo(1);
   assert.ok(r.highlight.some((br) => br.length > 1));
   let maxIm = 0;
-  r.highlight.forEach((br) => br.forEach(([, im]) => { if (Math.abs(im) > maxIm) maxIm = Math.abs(im); }));
+  r.highlight.forEach((br) =>
+    br.forEach(([, im]) => {
+      if (Math.abs(im) > maxIm) maxIm = Math.abs(im);
+    })
+  );
   assert.ok(maxIm > 2, `maxIm=${maxIm}`);
 });
 
@@ -240,7 +250,10 @@ test("MRAC adapts after plant gain change", () => {
 
 test("MSD LQR tracks reference with finite gains", () => {
   const r = S.msdCompareDemo(100, 1);
-  assert.ok(r.K.every((v) => isFinite(v) && v > 0), `K=${r.K}`);
+  assert.ok(
+    r.K.every((v) => isFinite(v) && v > 0),
+    `K=${r.K}`
+  );
   assert.ok(Math.abs(r.lqr.y[r.lqr.y.length - 1] - 1) < 0.02);
 });
 
@@ -249,7 +262,9 @@ test("suspension produces finite acceleration and tire load", () => {
   assert.ok(r.acc.every((v) => isFinite(v)));
   assert.ok(r.load.every((v) => isFinite(v)));
   let pa = 0;
-  r.acc.forEach((v) => { pa = Math.max(pa, Math.abs(v)); });
+  r.acc.forEach((v) => {
+    pa = Math.max(pa, Math.abs(v));
+  });
   assert.ok(pa > 0 && pa < 50, `peak=${pa}`);
 });
 

@@ -14,10 +14,16 @@ vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "simulink", "lessons.js"), "utf8"), sandbox);
 const DATA = sandbox.window.SIMULINK_LESSONS;
 const models = [];
-DATA.phases.forEach((ph) => ph.items.forEach((l) => { if (!models.includes(l.model)) models.push(l.model); }));
+DATA.phases.forEach((ph) =>
+  ph.items.forEach((l) => {
+    if (!models.includes(l.model)) models.push(l.model);
+  })
+);
 
 fs.mkdirSync(OUT, { recursive: true });
-let ok = 0, skipped = 0, failed = [];
+let ok = 0,
+  skipped = 0,
+  failed = [];
 
 function isZip(buf) {
   return buf && buf.length > 100 && buf[0] === 0x50 && buf[1] === 0x4b;
@@ -25,7 +31,10 @@ function isZip(buf) {
 
 for (const name of models) {
   const dest = path.join(OUT, name);
-  if (fs.existsSync(dest) && isZip(fs.readFileSync(dest))) { skipped++; continue; }
+  if (fs.existsSync(dest) && isZip(fs.readFileSync(dest))) {
+    skipped++;
+    continue;
+  }
   let saved = false;
   for (const base of [CDN, RAW]) {
     try {
@@ -36,13 +45,24 @@ for (const name of models) {
       fs.writeFileSync(dest, buf);
       saved = true;
       break;
-    } catch (e) { /* try fallback */ }
+    } catch (e) {
+      /* try fallback */
+    }
   }
-  if (saved) { ok++; console.log("ok", name); }
-  else failed.push(name);
+  if (saved) {
+    ok++;
+    console.log("ok", name);
+  } else failed.push(name);
 }
 
-const total = fs.readdirSync(OUT).filter((f) => f.endsWith(".slx"))
+const total = fs
+  .readdirSync(OUT)
+  .filter((f) => f.endsWith(".slx"))
   .reduce((s, f) => s + fs.statSync(path.join(OUT, f)).size, 0);
-console.log(`models: ${models.length}, downloaded ${ok}, skipped ${skipped}, failed ${failed.length}, total ${(total / 1024).toFixed(0)} KB`);
-if (failed.length) { console.error("failed:", failed.join(", ")); process.exit(1); }
+console.log(
+  `models: ${models.length}, downloaded ${ok}, skipped ${skipped}, failed ${failed.length}, total ${(total / 1024).toFixed(0)} KB`
+);
+if (failed.length) {
+  console.error("failed:", failed.join(", "));
+  process.exit(1);
+}

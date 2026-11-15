@@ -12,6 +12,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Install dev dependencies
+        run: npm ci
+      - name: Check layout/nav source
+        run: npm run check:layout
+      - name: Lint
+        run: npm run lint
+      - name: Format check
+        run: npm run format:check
       - name: Run unit tests
         run: npm test
       - name: chart.js copies in sync

@@ -10,7 +10,9 @@ function runWorkerFile(file, deps) {
   let captured = null;
   const self = {
     ...deps,
-    postMessage: (msg) => { captured = msg; },
+    postMessage: (msg) => {
+      captured = msg;
+    },
   };
   const sandbox = { self, importScripts: () => {}, console };
   vm.createContext(sandbox);

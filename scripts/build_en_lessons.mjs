@@ -1,12 +1,19 @@
 /* Generate the English lesson index (landing/en/lessons.html) from lessons.js. */
 import fs from "node:fs";
 import path from "node:path";
+import { PAGES, navFor } from "./site_layout.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const lessonsSrc = fs.readFileSync(path.join(ROOT, "simulink", "lessons.js"), "utf8");
-const re = /\{ id: "(t\d+)", n: (\d+), title: "([^"]+)", desc: "([^"]+)", file: "([^"]+)", model: "([^"]+)"(?:, demo: "([^"]+)")? \}/g;
+const re =
+  /\{ id: "(t\d+)", n: (\d+), title: "([^"]+)", desc: "([^"]+)", file: "([^"]+)", model: "([^"]+)"(?:, demo: "([^"]+)")? \}/g;
 const lessons = [...lessonsSrc.matchAll(re)].map((m) => ({
-  id: m[1], n: Number(m[2]), zh: m[3], file: m[5], model: m[6], demo: m[7] || null,
+  id: m[1],
+  n: Number(m[2]),
+  zh: m[3],
+  file: m[5],
+  model: m[6],
+  demo: m[7] || null,
 }));
 const i18n = fs.readFileSync(path.join(ROOT, "shared", "i18n.js"), "utf8");
 const block = i18n.match(/const TITLES = \{([\s\S]*?)\n  \};/);
@@ -14,18 +21,20 @@ if (!block) throw new Error("TITLES block not found");
 const TITLES = Function(`return ({${block[1]}});`)();
 if (lessons.length !== 43) throw new Error(`expected 43 lessons, got ${lessons.length}`);
 
-const rows = lessons.map((l) => {
-  const title = TITLES[l.zh] || `Lesson ${l.n}`;
-  const demo = l.demo ? ` · <a href="../simulink/index.html?lang=en#${l.id}">interactive</a>` : "";
-  return `      <tr>
+const rows = lessons
+  .map((l) => {
+    const title = TITLES[l.zh] || `Lesson ${l.n}`;
+    const demo = l.demo ? ` · <a href="../simulink/index.html?lang=en#${l.id}">interactive</a>` : "";
+    return `      <tr>
         <td><span class="n">${l.id}</span> ${title}${demo}</td>
         <td><a href="../simulink/course.html?id=${l.id}" data-local="../../simulink/course.html?id=${l.id}">Chinese notes</a></td>
         <td><a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/${l.file}" target="_blank" rel="noreferrer">${l.file}</a></td>
         <td><a href="../simulink/models/${l.model}" data-local="../../simulink/models/${l.model}" download>${l.model}</a></td>
       </tr>`;
-}).join("\n");
+  })
+  .join("\n");
 
-const html = `<!DOCTYPE html>
+let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -93,5 +102,6 @@ ${rows}
 </body>
 </html>
 `;
+html = html.replace(/<nav class="topnav"[\s\S]*?<\/nav>/, navFor(PAGES["landing/en/lessons.html"]));
 fs.writeFileSync(path.join(ROOT, "landing", "en", "lessons.html"), html);
 console.log(`wrote landing/en/lessons.html (${lessons.length} lessons)`);

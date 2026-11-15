@@ -36,9 +36,11 @@ test("every lesson has a beginner guide with required sections", () => {
 test("every lesson has either an interactive demo or a worked example", () => {
   const { data, examples } = load();
   const missing = [];
-  data.phases.forEach((p) => p.items.forEach((l) => {
-    if (!l.demo && !(examples[l.id] && examples[l.id].length > 40)) missing.push(l.id);
-  }));
+  data.phases.forEach((p) =>
+    p.items.forEach((l) => {
+      if (!l.demo && !(examples[l.id] && examples[l.id].length > 40)) missing.push(l.id);
+    })
+  );
   assert.deepEqual(missing, [], `no demo/example: ${missing.join(", ")}`);
 });
 
@@ -50,7 +52,11 @@ test("English guide covers 43 lessons and contains no Chinese", () => {
   const guide = sandbox.window.SIMULINK_GUIDE_EN;
   assert.equal(Object.keys(guide).length, 43);
   for (const id of ["t01", "t12", "t24", "t32", "t43"]) assert.ok(guide[id], id);
-  assert.equal((fs.readFileSync(path.resolve(__dirname, "..", "simulink/guide-en.js"), "utf8").match(/[\u4e00-\u9fff]/g) || []).length, 0);
+  assert.equal(
+    (fs.readFileSync(path.resolve(__dirname, "..", "simulink/guide-en.js"), "utf8").match(/[\u4e00-\u9fff]/g) || [])
+      .length,
+    0
+  );
 });
 
 test("English guide page contains 43 lessons and no Chinese", () => {

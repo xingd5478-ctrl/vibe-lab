@@ -37,7 +37,10 @@ test("csv export has expected header and rows", () => {
   const cols = data.fromRows(rows);
   const mask = data.cleanMask(cols);
   const text = data.csv(cols, mask, "gz", 100, 1e-4, 1e-8);
-  const lines = text.replace(/^\ufeff/, "").trim().split("\n");
+  const lines = text
+    .replace(/^\ufeff/, "")
+    .trim()
+    .split("\n");
   assert.equal(lines[0], "t,gx_dps,gy_dps,gz_dps,angle_deg,kf_deg");
   assert.equal(lines.length, 101);
 });

@@ -1,6 +1,7 @@
 /* Build the full English 43-lesson guide from lessons.js + guide-en.js. */
 import fs from "node:fs";
 import path from "node:path";
+import { PAGES, navFor } from "./site_layout.mjs";
 import vm from "node:vm";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -27,16 +28,18 @@ const PHASES = {
   "Phase 8 · Simulink 进阶": "Phase 8 · Advanced Simulink",
 };
 
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const phases = L.phases.map((ph) => {
-  const items = ph.items.map((l) => {
-    const g = G[l.id];
-    if (!g) throw new Error(`missing guide for ${l.id}`);
-    const title = TITLES[l.title] || `Lesson ${l.n}`;
-    const concepts = g.concepts.map(([t, d]) => `<li><b>${esc(t)}</b> — ${esc(d)}</li>`).join("");
-    const steps = g.steps.map((s) => `<li>${esc(s)}</li>`).join("");
-    const quiz = (g.quiz || []).map(([q, a]) => `<li><b>${esc(q)}</b><br><span>${esc(a)}</span></li>`).join("");
-    return `      <details class="lesson" id="${l.id}"${l.id === "t01" ? " open" : ""}>
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const phases = L.phases
+  .map((ph) => {
+    const items = ph.items
+      .map((l) => {
+        const g = G[l.id];
+        if (!g) throw new Error(`missing guide for ${l.id}`);
+        const title = TITLES[l.title] || `Lesson ${l.n}`;
+        const concepts = g.concepts.map(([t, d]) => `<li><b>${esc(t)}</b> — ${esc(d)}</li>`).join("");
+        const steps = g.steps.map((s) => `<li>${esc(s)}</li>`).join("");
+        const quiz = (g.quiz || []).map(([q, a]) => `<li><b>${esc(q)}</b><br><span>${esc(a)}</span></li>`).join("");
+        return `      <details class="lesson" id="${l.id}"${l.id === "t01" ? " open" : ""}>
         <summary><span class="num">${l.id}</span> ${esc(title)}</summary>
         <div class="lesson-body">
           <p class="hook">${esc(g.hook)}</p>
@@ -50,12 +53,14 @@ const phases = L.phases.map((ph) => {
           <p class="dl"><a href="../simulink/models/${esc(l.model)}" download>${esc(l.model)}</a> · <a href="https://github.com/xingd5478-ctrl/simulink-control-tutorial/blob/main/${esc(l.file)}" target="_blank" rel="noreferrer">${esc(l.file)}</a> · <a href="../simulink/course.html?id=${l.id}">Chinese source notes</a></p>
         </div>
       </details>`;
-  }).join("\n");
-  const label = PHASES[ph.title] || ph.title;
-  return `    <h2>${esc(label)} <span class="range">${esc(ph.range)}</span></h2>\n${items}`;
-}).join("\n\n");
+      })
+      .join("\n");
+    const label = PHASES[ph.title] || ph.title;
+    return `    <h2>${esc(label)} <span class="range">${esc(ph.range)}</span></h2>\n${items}`;
+  })
+  .join("\n\n");
 
-const html = `<!DOCTYPE html>
+let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -159,5 +164,6 @@ ${phases}
 </body>
 </html>
 `;
+html = html.replace(/<nav class="topnav"[\s\S]*?<\/nav>/, navFor(PAGES["landing/en/guide.html"]));
 fs.writeFileSync(path.join(ROOT, "landing", "en", "guide.html"), html);
 console.log(`wrote landing/en/guide.html (${phases.split("<details").length - 1} lessons)`);

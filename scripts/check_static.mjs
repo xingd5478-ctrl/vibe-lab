@@ -17,7 +17,17 @@ function walk(dir, out = []) {
 }
 
 const files = [];
-for (const d of ["landing", "shared", "imu-lab/static", "control-play", "simulink", "about", "scripts", "tests", "tools"]) {
+for (const d of [
+  "landing",
+  "shared",
+  "imu-lab/static",
+  "control-play",
+  "simulink",
+  "about",
+  "scripts",
+  "tests",
+  "tools",
+]) {
   const p = path.join(ROOT, d);
   if (fs.existsSync(p)) walk(p, files);
 }
@@ -33,15 +43,28 @@ for (const file of files.filter((f) => /\.m?js$/.test(f))) {
 console.log(`JS syntax checked: ${files.filter((f) => /\.m?js$/.test(f)).length}`);
 
 const pages = [
-  "landing/index.html", "landing/en/index.html", "landing/404.html", "landing/feedback.html",
-  "landing/en/lessons.html", "landing/en/guide.html",
-  "imu-lab/static/index.html", "control-play/index.html",
-  "simulink/index.html", "simulink/course.html",
-  "about/index.html", "about/en.html", "about/matlab.html", "about/matlab-en.html",
+  "landing/index.html",
+  "landing/en/index.html",
+  "landing/404.html",
+  "landing/feedback.html",
+  "landing/en/lessons.html",
+  "landing/en/guide.html",
+  "imu-lab/static/index.html",
+  "control-play/index.html",
+  "simulink/index.html",
+  "simulink/course.html",
+  "about/index.html",
+  "about/en.html",
+  "about/matlab.html",
+  "about/matlab-en.html",
 ];
 for (const rel of pages) {
   const file = path.join(ROOT, rel);
-  if (!fs.existsSync(file)) { console.error(`page missing ${rel}`); failed++; continue; }
+  if (!fs.existsSync(file)) {
+    console.error(`page missing ${rel}`);
+    failed++;
+    continue;
+  }
   const html = fs.readFileSync(file, "utf8");
   const errs = [];
   if (!/^<!doctype html>/i.test(html.trim())) errs.push("doctype");
@@ -53,8 +76,13 @@ for (const rel of pages) {
   const ids = [...html.matchAll(/<[^>]+\bid="([^"]+)"/g)].map((m) => m[1]);
   const dup = [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
   if (dup.length) errs.push("duplicate id: " + dup.join(","));
-  if (errs.length) { console.error(`HTML FAIL ${rel}: ${errs.join("; ")}`); failed++; }
-  else console.log(`ok   ${rel}`);
+  if (errs.length) {
+    console.error(`HTML FAIL ${rel}: ${errs.join("; ")}`);
+    failed++;
+  } else console.log(`ok   ${rel}`);
 }
-if (failed) { console.error(`static checks failed: ${failed}`); process.exit(1); }
+if (failed) {
+  console.error(`static checks failed: ${failed}`);
+  process.exit(1);
+}
 console.log("STATIC CHECKS OK");

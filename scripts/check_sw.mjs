@@ -24,7 +24,10 @@ const map = (a) => {
 let bad = 0;
 for (const a of assets) {
   const p = map(a);
-  if (!fs.existsSync(p)) { console.error("missing SW asset", a, "->", path.relative(ROOT, p)); bad++; }
+  if (!fs.existsSync(p)) {
+    console.error("missing SW asset", a, "->", path.relative(ROOT, p));
+    bad++;
+  }
 }
 console.log(`SW assets checked: ${assets.length}, missing ${bad}`);
 process.exit(bad ? 1 : 0);

@@ -5,16 +5,15 @@ const path = require("node:path");
 const vm = require("node:vm");
 const allan = require("../imu-lab/static/allan.js");
 
-const workerCode = fs.readFileSync(
-  path.resolve(__dirname, "../imu-lab/static/allan-worker.js"),
-  "utf8"
-);
+const workerCode = fs.readFileSync(path.resolve(__dirname, "../imu-lab/static/allan-worker.js"), "utf8");
 
 function runWorker(payload) {
   let captured = null;
   const self = {
     IMUAllan: allan,
-    postMessage: (msg) => { captured = msg; },
+    postMessage: (msg) => {
+      captured = msg;
+    },
   };
   const sandbox = { self, importScripts: () => {}, console };
   vm.createContext(sandbox);
@@ -48,8 +47,13 @@ test("allan worker returns raw result when clean=false", () => {
   const n = 3000;
   const arr = new Float32Array(n).fill(0.1);
   const out = runWorker({
-    id: 1, gx: arr, gy: arr, gz: arr, crc: new Uint8Array(n).fill(1),
-    fs: 100, clean: false,
+    id: 1,
+    gx: arr,
+    gy: arr,
+    gz: arr,
+    crc: new Uint8Array(n).fill(1),
+    fs: 100,
+    clean: false,
   });
   assert.ok(out.results.gx.length > 0);
   assert.equal(out.id, 1);

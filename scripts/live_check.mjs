@@ -7,7 +7,7 @@ const checks = [
   ["/feedback.html", "Tally"],
   ["/shared/i18n.js", "VibeI18n"],
   ["/motion.js", "scope-canvas"],
-  ["/data/feedback.json", "\"total\""],
+  ["/data/feedback.json", '"total"'],
   ["/imu/manual-en.js", "IMU_MANUAL_EN"],
 ];
 

@@ -23,14 +23,16 @@ async function publicApi(pathname) {
   return res.json();
 }
 
-const raw = gh(["repos/" + REPO + "/issues?state=all&per_page=100"]) ?? await publicApi("/issues?state=all&per_page=100");
+const raw =
+  gh(["repos/" + REPO + "/issues?state=all&per_page=100"]) ?? (await publicApi("/issues?state=all&per_page=100"));
 const issues = raw.filter((i) => !i.pull_request);
 const details = [];
 for (const it of issues.slice(0, 50)) {
   let first = null;
   if (it.comments > 0) {
-    const comments = gh([`repos/${REPO}/issues/${it.number}/comments?per_page=1`])
-      ?? await publicApi(`/issues/${it.number}/comments?per_page=1`).catch(() => []);
+    const comments =
+      gh([`repos/${REPO}/issues/${it.number}/comments?per_page=1`]) ??
+      (await publicApi(`/issues/${it.number}/comments?per_page=1`).catch(() => []));
     if (comments.length) first = comments[0].created_at;
   }
   details.push({

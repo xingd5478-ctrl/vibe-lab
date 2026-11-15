@@ -1,6 +1,7 @@
 /* English provenance table: 43 rows, numeric metrics only; detailed caveats stay on the Chinese table. */
 import fs from "node:fs";
 import path from "node:path";
+import { PAGES, navFor } from "./site_layout.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const data = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "matlab-probes.json"), "utf8"));
@@ -10,42 +11,78 @@ if (!block) throw new Error("TITLES block not found");
 const TITLES = Function(`return ({${block[1]}});`)();
 
 const REPL = [
-  ["峰值", "peak"], ["末值", "final"], ["范围", "range"], ["输出", "output"], ["模糊", "fuzzy"],
-  ["转速", "speed"], ["角度", "angle"], ["互补滤波", "complementary filter"], ["校正后", "corrected"],
-  ["参考", "reference"], ["对象", "plant"], ["控制", "control"], ["末端", "end effector"],
-  ["测量", "measurement"], ["误差", "error"], ["响应", "response"], ["位移", "displacement"],
-  ["车身", "body"], ["变体", "variant"], ["输入", "input"], ["转速", "speed"], ["输出1", "output 1"],
-  ["输出2", "output 2"], ["输出3", "output 3"], ["精度", "accuracy"], ["模式", "mode"], ["最大", "maximum"], ["终值", "final"], ["离线", "offline"], ["按讲义离线", "offline lecture"], ["讲义", "lecture"],
+  ["峰值", "peak"],
+  ["末值", "final"],
+  ["范围", "range"],
+  ["输出", "output"],
+  ["模糊", "fuzzy"],
+  ["转速", "speed"],
+  ["角度", "angle"],
+  ["互补滤波", "complementary filter"],
+  ["校正后", "corrected"],
+  ["参考", "reference"],
+  ["对象", "plant"],
+  ["控制", "control"],
+  ["末端", "end effector"],
+  ["测量", "measurement"],
+  ["误差", "error"],
+  ["响应", "response"],
+  ["位移", "displacement"],
+  ["车身", "body"],
+  ["变体", "variant"],
+  ["输入", "input"],
+  ["转速", "speed"],
+  ["输出1", "output 1"],
+  ["输出2", "output 2"],
+  ["输出3", "output 3"],
+  ["精度", "accuracy"],
+  ["模式", "mode"],
+  ["最大", "maximum"],
+  ["终值", "final"],
+  ["离线", "offline"],
+  ["按讲义离线", "offline lecture"],
+  ["讲义", "lecture"],
 ];
-const enMetric = (s) => REPL.reduce((x, [a, b]) => x.split(a).join(b), s)
-  .replace(/，/g, ", ").replace(/；/g, "; ").replace(/：/g, ": ")
-  .replace(/（/g, " (").replace(/）/g, ")").replace(/按lectureoffline/g, "offline lecture");
+const enMetric = (s) =>
+  REPL.reduce((x, [a, b]) => x.split(a).join(b), s)
+    .replace(/，/g, ", ")
+    .replace(/；/g, "; ")
+    .replace(/：/g, ": ")
+    .replace(/（/g, " (")
+    .replace(/）/g, ")")
+    .replace(/按lectureoffline/g, "offline lecture");
 
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const spark = (values) => {
   const v = (values || []).map(Number).filter(Number.isFinite);
   if (v.length < 2) return "";
-  const min = Math.min(...v), max = Math.max(...v), span = max - min || 1;
-  const pts = v.map((x, i) => `${(i / (v.length - 1) * 120).toFixed(1)},${(25 - (x - min) / span * 20).toFixed(1)}`).join(" ");
+  const min = Math.min(...v),
+    max = Math.max(...v),
+    span = max - min || 1;
+  const pts = v
+    .map((x, i) => `${((i / (v.length - 1)) * 120).toFixed(1)},${(25 - ((x - min) / span) * 20).toFixed(1)}`)
+    .join(" ");
   return `<svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>`;
 };
 
 let cjk = 0;
-const rows = data.models.map((m) => {
-  const title = TITLES[m.title] || `Lesson ${m.id}`;
-  const metric = enMetric(m.metric);
-  cjk += (metric.match(/[\u4e00-\u9fff]/g) || []).length;
-  return `      <tr>
+const rows = data.models
+  .map((m) => {
+    const title = TITLES[m.title] || `Lesson ${m.id}`;
+    const metric = enMetric(m.metric);
+    cjk += (metric.match(/[\u4e00-\u9fff]/g) || []).length;
+    return `      <tr>
         <td><b>${esc(m.id)}</b> ${esc(title)}</td>
         <td>${m.demo ? `<a href="../simulink/index.html?lang=en#${m.id}">${esc(m.demo)}</a>` : "—"}</td>
         <td><div class="metric">${spark(m.spark)}<span>${esc(metric)}</span></div></td>
         <td>${m.metric_source === "offline" ? "Offline lecture value" : "Probe"}</td>
         <td><a href="../simulink/models/${esc(m.model)}" download>${esc(m.model)}</a></td>
       </tr>`;
-}).join("\n");
+  })
+  .join("\n");
 if (cjk) console.warn(`warning: ${cjk} CJK characters left in metrics`);
 
-const html = `<!DOCTYPE html>
+let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -119,5 +156,6 @@ ${rows}
 </body>
 </html>
 `;
+html = html.replace(/<nav class="topnav"[\s\S]*?<\/nav>/, navFor(PAGES["about/matlab-en.html"]));
 fs.writeFileSync(path.join(ROOT, "about", "matlab-en.html"), html);
 console.log(`wrote about/matlab-en.html (${data.models.length} rows, ${cjk} CJK left)`);

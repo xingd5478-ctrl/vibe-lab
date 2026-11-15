@@ -12,20 +12,38 @@ const EDGE = [
   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
   "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
 ].find((p) => fs.existsSync(p));
-if (!EDGE) { console.log("DARK VISUAL SKIP: Edge not found"); process.exit(0); }
+if (!EDGE) {
+  console.log("DARK VISUAL SKIP: Edge not found");
+  process.exit(0);
+}
 const UPDATE = process.argv.includes("--update");
 const OUT = path.join(ROOT, "artifacts", "visual-dark");
 const BASE = path.join(ROOT, "tests", "baselines-dark");
-const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".png": "image/png", ".csv": "text/csv", ".webmanifest": "application/manifest+json" };
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".png": "image/png",
+  ".csv": "text/csv",
+  ".webmanifest": "application/manifest+json",
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function serve() {
   const server = http.createServer((req, res) => {
     const url = decodeURIComponent((req.url || "/").split("?")[0]);
     const file = path.join(ROOT, url);
-    if (!file.startsWith(ROOT)) { res.statusCode = 403; res.end(); return; }
+    if (!file.startsWith(ROOT)) {
+      res.statusCode = 403;
+      res.end();
+      return;
+    }
     fs.readFile(file, (err, data) => {
-      if (err) { res.statusCode = 404; res.end("nf"); return; }
+      if (err) {
+        res.statusCode = 404;
+        res.end("nf");
+        return;
+      }
       res.setHeader("Content-Type", MIME[path.extname(file)] || "application/octet-stream");
       res.end(data);
     });
@@ -38,20 +56,34 @@ function cdp(wsUrl) {
   const pending = new Map();
   ws.onmessage = (ev) => {
     const m = JSON.parse(ev.data);
-    if (m.id && pending.has(m.id)) { const p = pending.get(m.id); pending.delete(m.id); m.error ? p.reject(new Error(JSON.stringify(m.error))) : p.resolve(m.result); }
+    if (m.id && pending.has(m.id)) {
+      const p = pending.get(m.id);
+      pending.delete(m.id);
+      m.error ? p.reject(new Error(JSON.stringify(m.error))) : p.resolve(m.result);
+    }
   };
   return {
-    open: new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; }),
-    send: (method, params = {}) => new Promise((resolve, reject) => {
-      const id = ++seq; pending.set(id, { resolve, reject });
-      ws.send(JSON.stringify({ id, method, params }));
+    open: new Promise((res, rej) => {
+      ws.onopen = res;
+      ws.onerror = rej;
     }),
+    send: (method, params = {}) =>
+      new Promise((resolve, reject) => {
+        const id = ++seq;
+        pending.set(id, { resolve, reject });
+        ws.send(JSON.stringify({ id, method, params }));
+      }),
     close: () => ws.close(),
   };
 }
 async function waitFor(fn, timeout = 20000) {
   const t = Date.now();
-  while (Date.now() - t < timeout) { try { if (await fn()) return; } catch {} await sleep(100); }
+  while (Date.now() - t < timeout) {
+    try {
+      if (await fn()) return;
+    } catch {}
+    await sleep(100);
+  }
   throw new Error("timeout");
 }
 
@@ -60,7 +92,20 @@ async function main() {
   const server = await serve();
   const base = `http://127.0.0.1:${server.address().port}`;
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-dark-"));
-  const edge = spawn(EDGE, ["--headless=new", "--disable-gpu", "--no-first-run", "--hide-scrollbars", "--disable-features=ServiceWorker", "--remote-debugging-port=9343", `--user-data-dir=${profile}`, "about:blank"], { stdio: "ignore" });
+  const edge = spawn(
+    EDGE,
+    [
+      "--headless=new",
+      "--disable-gpu",
+      "--no-first-run",
+      "--hide-scrollbars",
+      "--disable-features=ServiceWorker",
+      "--remote-debugging-port=9343",
+      `--user-data-dir=${profile}`,
+      "about:blank",
+    ],
+    { stdio: "ignore" }
+  );
   try {
     await waitFor(async () => (await fetch("http://127.0.0.1:9343/json/version")).ok, 20000);
     const target = await (await fetch("http://127.0.0.1:9343/json/new?about:blank", { method: "PUT" })).json();
@@ -68,8 +113,18 @@ async function main() {
     await c.open;
     await c.send("Page.enable");
     await c.send("Runtime.enable");
-    await c.send("Emulation.setDeviceMetricsOverride", { width: 1400, height: 1200, deviceScaleFactor: 1, mobile: false });
-    await c.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "dark" }, { name: "prefers-reduced-motion", value: "reduce" }] });
+    await c.send("Emulation.setDeviceMetricsOverride", {
+      width: 1400,
+      height: 1200,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    await c.send("Emulation.setEmulatedMedia", {
+      features: [
+        { name: "prefers-color-scheme", value: "dark" },
+        { name: "prefers-reduced-motion", value: "reduce" },
+      ],
+    });
     const ev = async (expr) => {
       const r = await c.send("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true });
       if (r.exceptionDetails) throw new Error(r.exceptionDetails.text);
@@ -78,7 +133,8 @@ async function main() {
     const pages = [
       ["landing", "landing/index.html", "!!document.querySelector('.card')"],
       ["landing-en", "landing/en/index.html", "!!document.querySelector('.card')"],
-      ["imu", "imu-lab/static/index.html", "!!document.querySelector('#chart-time svg')"],      ["control", "control-play/index.html", "!!document.querySelector('#bode svg')"],
+      ["imu", "imu-lab/static/index.html", "!!document.querySelector('#chart-time svg')"],
+      ["control", "control-play/index.html", "!!document.querySelector('#bode svg')"],
       ["simulink", "simulink/index.html", "!!document.querySelector('#chart-a svg')"],
       ["about", "about/index.html", "!!document.querySelector('h1')"],
       ["matlab", "about/matlab.html", "document.querySelectorAll('#matlab-rows tr').length === 43"],
@@ -96,9 +152,14 @@ async function main() {
     c.close();
   } finally {
     edge.kill();
-    await new Promise((r) => { edge.once("exit", r); setTimeout(r, 1200); });
+    await new Promise((r) => {
+      edge.once("exit", r);
+      setTimeout(r, 1200);
+    });
     server.close();
-    try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 }); } catch {}
+    try {
+      fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
+    } catch {}
   }
   if (UPDATE) {
     fs.mkdirSync(BASE, { recursive: true });
@@ -107,8 +168,14 @@ async function main() {
     return;
   }
   const py = spawnSync("python", ["scripts/compare_png.py", BASE, OUT, "0.03"], { cwd: ROOT, stdio: "inherit" });
-  if (py.error) { console.error("python not found; cannot compare dark baselines"); process.exit(1); }
+  if (py.error) {
+    console.error("python not found; cannot compare dark baselines");
+    process.exit(1);
+  }
   if (py.status !== 0) process.exit(1);
   console.log("DARK VISUAL OK");
 }
-main().catch((e) => { console.error("DARK VISUAL FAIL:", e.message); process.exit(1); });
+main().catch((e) => {
+  console.error("DARK VISUAL FAIL:", e.message);
+  process.exit(1);
+});

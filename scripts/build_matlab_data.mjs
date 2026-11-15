@@ -16,9 +16,14 @@ if (!fs.existsSync(RAW)) {
 
 const raw = JSON.parse(fs.readFileSync(RAW, "utf8"));
 const lessonSource = fs.readFileSync(path.join(ROOT, "simulink", "lessons.js"), "utf8");
-const lessonRe = /\{ id: "(t\d+)", n: (\d+), title: "([^"]+)", desc: "([^"]+)", file: "([^"]+)", model: "([^"]+)"(?:, demo: "([^"]+)")? \}/g;
+const lessonRe =
+  /\{ id: "(t\d+)", n: (\d+), title: "([^"]+)", desc: "([^"]+)", file: "([^"]+)", model: "([^"]+)"(?:, demo: "([^"]+)")? \}/g;
 const lessons = [...lessonSource.matchAll(lessonRe)].map((m) => ({
-  id: m[1], n: Number(m[2]), title: m[3], demo: m[7] || null, model: m[6],
+  id: m[1],
+  n: Number(m[2]),
+  title: m[3],
+  demo: m[7] || null,
+  model: m[6],
 }));
 if (lessons.length !== 43) throw new Error(`expected 43 lessons, parsed ${lessons.length}`);
 lessons.sort((a, b) => a.n - b.n);
@@ -26,22 +31,49 @@ lessons.sort((a, b) => a.n - b.n);
 const sha256 = (file) => crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
 
 const PRIMARY = {
-  t01: ["gain_out"], t02: ["Demux3"], t03: ["TF_tau_0p5"], t04: ["TF_zeta0.2"],
-  t05: ["y_out"], t06: ["saved_data"], t07: ["NestedOut"], t08: ["sig_out1", "sig_out2"],
-  t09: ["y_ss", "y_tf"], t10: ["y_PP"], t11: ["x1_true", "x1_hat"],
-  t12: ["y_Kalman", "y_noisy_data"], t13: ["omega_PI"], t14: ["w_FOC", "w_DC"],
-  t15: ["probe_s1_p1"], t16: ["probe_s1_p1"], t17: ["probe_s1_p1", "probe_s1_p2"],
-  t18: ["y_plant"], t19: ["probe_s1_p1"], t20: ["probe_s1_p1"],
-  t21: ["probe_s1_p1", "probe_s1_p2"], t22: ["y_out"],
+  t01: ["gain_out"],
+  t02: ["Demux3"],
+  t03: ["TF_tau_0p5"],
+  t04: ["TF_zeta0.2"],
+  t05: ["y_out"],
+  t06: ["saved_data"],
+  t07: ["NestedOut"],
+  t08: ["sig_out1", "sig_out2"],
+  t09: ["y_ss", "y_tf"],
+  t10: ["y_PP"],
+  t11: ["x1_true", "x1_hat"],
+  t12: ["y_Kalman", "y_noisy_data"],
+  t13: ["omega_PI"],
+  t14: ["w_FOC", "w_DC"],
+  t15: ["probe_s1_p1"],
+  t16: ["probe_s1_p1"],
+  t17: ["probe_s1_p1", "probe_s1_p2"],
+  t18: ["y_plant"],
+  t19: ["probe_s1_p1"],
+  t20: ["probe_s1_p1"],
+  t21: ["probe_s1_p1", "probe_s1_p2"],
+  t22: ["y_out"],
   t23: ["probe_s1_p1", "probe_s1_p2", "probe_s1_p3"],
-  t24: ["y_fuzzy", "y_pid"], t25: ["y_phys"], t26: ["fk_x", "fk_y", "fk_z"],
-  t27: ["y_ss_sim", "y_tf_sim"], t28: ["probe_s1_p1"],
-  t29: ["probe_s1_p1", "probe_s1_p2"], t30: ["probe_s1_p1"],
-  t31: ["y_noisy", "x1_true"], t32: ["x1_true"], t33: ["x1_true"],
-  t34: ["demo_x1true"], t35: ["theta_cf_sim"], t36: ["mode_data", "speed_data"],
-  t37: ["cont_out", "en_out"], t38: ["pos_out", "spd_out", "torque_out"],
-  t39: ["plant_y_sub"], t40: ["y_data"], t41: ["probe_s1_p1"],
-  t42: ["sfcn_in", "sfcn_out"], t43: ["advisor_out"],
+  t24: ["y_fuzzy", "y_pid"],
+  t25: ["y_phys"],
+  t26: ["fk_x", "fk_y", "fk_z"],
+  t27: ["y_ss_sim", "y_tf_sim"],
+  t28: ["probe_s1_p1"],
+  t29: ["probe_s1_p1", "probe_s1_p2"],
+  t30: ["probe_s1_p1"],
+  t31: ["y_noisy", "x1_true"],
+  t32: ["x1_true"],
+  t33: ["x1_true"],
+  t34: ["demo_x1true"],
+  t35: ["theta_cf_sim"],
+  t36: ["mode_data", "speed_data"],
+  t37: ["cont_out", "en_out"],
+  t38: ["pos_out", "spd_out", "torque_out"],
+  t39: ["plant_y_sub"],
+  t40: ["y_data"],
+  t41: ["probe_s1_p1"],
+  t42: ["sfcn_in", "sfcn_out"],
+  t43: ["advisor_out"],
 };
 
 const METRIC_OVERRIDES = {
@@ -137,7 +169,8 @@ const fmt = (v) => {
 
 function signalMetric(sig) {
   if (!sig) return null;
-  const peak = sig.max, final = sig.final;
+  const peak = sig.max,
+    final = sig.final;
   if (Math.abs(peak - final) > 1e-6) return `峰值 ${fmt(peak)}，末值 ${fmt(final)}`;
   return `范围 ${fmt(sig.min)}–${fmt(peak)}，末值 ${fmt(final)}`;
 }
@@ -161,11 +194,17 @@ const rows = [];
 const problems = [];
 for (const lesson of lessons) {
   const m = rawById.get(lesson.id);
-  if (!m) { problems.push(`${lesson.id}: missing raw probe`); continue; }
+  if (!m) {
+    problems.push(`${lesson.id}: missing raw probe`);
+    continue;
+  }
   if (m.model !== lesson.model) problems.push(`${lesson.id}: model mismatch ${m.model} != ${lesson.model}`);
   const modelPath = path.join(ROOT, "simulink", "models", lesson.model);
-  if (!fs.existsSync(modelPath)) { problems.push(`${lesson.id}: missing ${modelPath}`); continue; }
-  const signals = Array.isArray(m.signals) ? m.signals : (m.signals ? [m.signals] : []);
+  if (!fs.existsSync(modelPath)) {
+    problems.push(`${lesson.id}: missing ${modelPath}`);
+    continue;
+  }
+  const signals = Array.isArray(m.signals) ? m.signals : m.signals ? [m.signals] : [];
   const row = {
     id: lesson.id,
     n: lesson.n,

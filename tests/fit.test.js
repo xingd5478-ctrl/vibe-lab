@@ -10,7 +10,9 @@ const taus = [];
 for (let i = 0; i < 40; i++) taus.push(0.1 * Math.pow(1000 / 0.1, i / 39));
 
 test("recovers ARW/RRW from a two-term Allan curve", () => {
-  const N = 0.035, K = 0.0012, dt = 0.01;
+  const N = 0.035,
+    K = 0.0012,
+    dt = 0.01;
   const fit = fitAllan(synthAllan(N, K, taus), dt);
   assert.ok(fit);
   assert.ok(Math.abs(fit.arw - N * 60) / (N * 60) < 0.02);
@@ -24,7 +26,9 @@ test("returns null for too few points", () => {
 });
 
 test("IRLS fit is robust to outlier tau bins", () => {
-  const N = 0.035, K = 0.0012, dt = 0.01;
+  const N = 0.035,
+    K = 0.0012,
+    dt = 0.01;
   const pts = synthAllan(N, K, taus);
   pts[5].adev *= 6;
   pts[30].adev *= 5;

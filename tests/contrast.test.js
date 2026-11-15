@@ -8,7 +8,8 @@ const FILES = ["imu-lab/static/style.css", "control-play/style.css", "simulink/s
 
 function luminance(hex) {
   const h = hex.replace("#", "");
-  const c = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+  const c = [0, 2, 4]
+    .map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
     .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
   return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
 }
@@ -28,7 +29,16 @@ test("dark chart series and axes meet 3:1 non-text contrast", () => {
   for (const file of FILES) {
     const v = darkVars(file);
     const panel = v.panel || "#1b1e24";
-    for (const key of ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-raw", "chart-raw2", "chart-axis"]) {
+    for (const key of [
+      "chart-1",
+      "chart-2",
+      "chart-3",
+      "chart-4",
+      "chart-5",
+      "chart-raw",
+      "chart-raw2",
+      "chart-axis",
+    ]) {
       assert.ok(v[key], `${file}: missing --${key}`);
       assert.ok(contrast(v[key], panel) >= 3, `${file}: --${key} ${v[key]} < 3:1 on ${panel}`);
     }

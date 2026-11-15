@@ -35,7 +35,8 @@ for (const [from, to] of [
   ["control-play", "control"],
   ["simulink", "simulink"],
   ["about", "about"],
-]) copyDir(path.join(ROOT, from), path.join(OUT, to));
+])
+  copyDir(path.join(ROOT, from), path.join(OUT, to));
 
 fs.mkdirSync(path.join(OUT, "data"), { recursive: true });
 for (const f of ["matlab-probes.json", "feedback.json"]) {
@@ -44,5 +45,8 @@ for (const f of ["matlab-probes.json", "feedback.json"]) {
 fs.mkdirSync(path.join(OUT, "shared"), { recursive: true });
 fs.copyFileSync(path.join(ROOT, "shared", "i18n.js"), path.join(OUT, "shared", "i18n.js"));
 
-const count = (dir) => fs.readdirSync(dir, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? count(path.join(dir, e.name)) : 1), 0);
+const count = (dir) =>
+  fs
+    .readdirSync(dir, { withFileTypes: true })
+    .reduce((n, e) => n + (e.isDirectory() ? count(path.join(dir, e.name)) : 1), 0);
 console.log(`_site built: ${count(OUT)} files at ${OUT}`);

@@ -10,7 +10,9 @@ const fromArg = process.argv.find((a) => a.startsWith("--from="));
 const OLD = (fromArg ? fromArg.slice("--from=".length) : DEFAULT_OLD).replace(/\/+$/, "");
 const raw = process.argv[2];
 if (!raw) {
-  console.error("usage: node scripts/set_domain.mjs https://your-domain.example [--from=https://old.example] [--no-cname]");
+  console.error(
+    "usage: node scripts/set_domain.mjs https://your-domain.example [--from=https://old.example] [--no-cname]"
+  );
   process.exit(1);
 }
 const origin = raw.replace(/\/+$/, "");
@@ -51,4 +53,8 @@ if (!noCname) {
   console.log(`CNAME -> ${host}`);
 }
 console.log(`rewrote ${changed} files from ${OLD} to ${origin}`);
-console.log(noCname ? "next: commit/push; Cloudflare Pages or your host will serve this hostname" : "next: commit, push, then GitHub Settings → Pages → Custom domain, Enforce HTTPS");
+console.log(
+  noCname
+    ? "next: commit/push; Cloudflare Pages or your host will serve this hostname"
+    : "next: commit, push, then GitHub Settings → Pages → Custom domain, Enforce HTTPS"
+);

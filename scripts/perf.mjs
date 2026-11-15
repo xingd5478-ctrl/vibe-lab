@@ -33,7 +33,7 @@ const BUDGETS = {
   "landing-en": { ready: 900, longTask: 250, longTotal: 400, lcp: 1500, cls: 0.05 },
   imu: { ready: 1500, longTask: 300, longTotal: 600, fit: 400, channel: 400, q: 400, lcp: 1800, cls: 0.08 },
   control: { ready: 900, longTask: 250, longTotal: 400, kp: 250, tab: 600, lcp: 1500, cls: 0.08 },
-  simulink: { ready: 1100, longTask: 250, longTotal: 400, tab: 500, lcp: 1600, cls: 0.10 },
+  simulink: { ready: 1100, longTask: 250, longTotal: 400, tab: 500, lcp: 1600, cls: 0.1 },
   about: { ready: 600, longTask: 250, longTotal: 400, lcp: 1000, cls: 0.03 },
 };
 
@@ -41,9 +41,17 @@ function serve() {
   const server = http.createServer((req, res) => {
     const url = decodeURIComponent((req.url || "/").split("?")[0]);
     const file = path.join(ROOT, url);
-    if (!file.startsWith(ROOT)) { res.statusCode = 403; res.end(); return; }
+    if (!file.startsWith(ROOT)) {
+      res.statusCode = 403;
+      res.end();
+      return;
+    }
     fs.readFile(file, (err, data) => {
-      if (err) { res.statusCode = 404; res.end("not found"); return; }
+      if (err) {
+        res.statusCode = 404;
+        res.end("not found");
+        return;
+      }
       res.setHeader("Content-Type", MIME[path.extname(file)] || "application/octet-stream");
       res.end(data);
     });
@@ -65,7 +73,10 @@ function cdp(wsUrl) {
     }
   };
   return {
-    open: new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = reject; }),
+    open: new Promise((resolve, reject) => {
+      ws.onopen = resolve;
+      ws.onerror = reject;
+    }),
     send(method, params = {}) {
       return new Promise((resolve, reject) => {
         const id = ++seq;
@@ -80,7 +91,9 @@ function cdp(wsUrl) {
 async function waitFor(fn, timeout = 20000) {
   const start = Date.now();
   while (Date.now() - start < timeout) {
-    try { if (await fn()) return true; } catch {}
+    try {
+      if (await fn()) return true;
+    } catch {}
     await sleep(100);
   }
   throw new Error("timeout waiting for page condition");
@@ -90,11 +103,20 @@ async function main() {
   const server = await serve();
   const base = `http://127.0.0.1:${server.address().port}`;
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-perf-"));
-  const edge = spawn(EDGE, [
-    "--headless=new", "--disable-gpu", "--no-first-run", "--disable-features=ServiceWorker",
-    "--remote-debugging-port=9337", `--user-data-dir=${profile}`,
-    "--window-size=1400,1000", "about:blank",
-  ], { stdio: "ignore" });
+  const edge = spawn(
+    EDGE,
+    [
+      "--headless=new",
+      "--disable-gpu",
+      "--no-first-run",
+      "--disable-features=ServiceWorker",
+      "--remote-debugging-port=9337",
+      `--user-data-dir=${profile}`,
+      "--window-size=1400,1000",
+      "about:blank",
+    ],
+    { stdio: "ignore" }
+  );
 
   const results = [];
   const failures = [];
@@ -171,12 +193,24 @@ async function main() {
       const m = await baseMetrics();
       const b = BUDGETS[name];
       const ready = Math.max(m.load, m.dcl, readySelector ? m.now : 0);
-      const row = { page: name, ready, dcl: m.dcl, load: m.load, fcp: m.fcp, lcp: m.lcp, cls: m.cls, longTask: m.longTask, longTotal: m.longTotal };
+      const row = {
+        page: name,
+        ready,
+        dcl: m.dcl,
+        load: m.load,
+        fcp: m.fcp,
+        lcp: m.lcp,
+        cls: m.cls,
+        longTask: m.longTask,
+        longTotal: m.longTotal,
+      };
       if (ready > b.ready * SCALE) failures.push(`${name}: ready ${ready}ms > ${Math.round(b.ready * SCALE)}ms`);
       if (m.lcp > b.lcp * SCALE) failures.push(`${name}: LCP ${m.lcp}ms > ${Math.round(b.lcp * SCALE)}ms`);
       if (m.cls > b.cls * SCALE) failures.push(`${name}: CLS ${m.cls} > ${+(b.cls * SCALE).toFixed(3)}`);
-      if (m.longTask > b.longTask * SCALE) failures.push(`${name}: long task ${m.longTask}ms > ${Math.round(b.longTask * SCALE)}ms`);
-      if (m.longTotal > b.longTotal * SCALE) failures.push(`${name}: long tasks total ${m.longTotal}ms > ${Math.round(b.longTotal * SCALE)}ms`);
+      if (m.longTask > b.longTask * SCALE)
+        failures.push(`${name}: long task ${m.longTask}ms > ${Math.round(b.longTask * SCALE)}ms`);
+      if (m.longTotal > b.longTotal * SCALE)
+        failures.push(`${name}: long tasks total ${m.longTotal}ms > ${Math.round(b.longTotal * SCALE)}ms`);
       results.push(row);
       return row;
     }
@@ -187,55 +221,91 @@ async function main() {
 
     const imu = await measurePage("imu", "imu-lab/static/index.html", "!!document.querySelector('#chart-time svg')");
     imu.interactions = [];
-    imu.interactions.push(await interact("document.querySelector('#fit').click()", "document.querySelector('#r-val').textContent.includes('e-')", "fit"));
-    imu.interactions.push(await interact(
-      "(() => { const s = document.querySelector('#channel'); s.value = 'gz'; s.dispatchEvent(new Event('change', { bubbles: true })); })()",
-      "document.querySelector('#chart-kf svg')", "channel"));
-    imu.interactions.push(await interact(
-      "(() => { const i = document.querySelector('#logQ'); i.value = '-7'; i.dispatchEvent(new Event('input', { bubbles: true })); })()",
-      "document.querySelector('#q-val').textContent.includes('e-')", "q-slider"));
+    imu.interactions.push(
+      await interact(
+        "document.querySelector('#fit').click()",
+        "document.querySelector('#r-val').textContent.includes('e-')",
+        "fit"
+      )
+    );
+    imu.interactions.push(
+      await interact(
+        "(() => { const s = document.querySelector('#channel'); s.value = 'gz'; s.dispatchEvent(new Event('change', { bubbles: true })); })()",
+        "document.querySelector('#chart-kf svg')",
+        "channel"
+      )
+    );
+    imu.interactions.push(
+      await interact(
+        "(() => { const i = document.querySelector('#logQ'); i.value = '-7'; i.dispatchEvent(new Event('input', { bubbles: true })); })()",
+        "document.querySelector('#q-val').textContent.includes('e-')",
+        "q-slider"
+      )
+    );
     imu.interactions.forEach((i) => {
       if (i.ms > BUDGETS.imu[i.label === "q-slider" ? "q" : i.label] * SCALE) {
-        failures.push(`imu ${i.label}: ${i.ms}ms > ${Math.round(BUDGETS.imu[i.label === "q-slider" ? "q" : i.label] * SCALE)}ms`);
+        failures.push(
+          `imu ${i.label}: ${i.ms}ms > ${Math.round(BUDGETS.imu[i.label === "q-slider" ? "q" : i.label] * SCALE)}ms`
+        );
       }
     });
 
     const control = await measurePage("control", "control-play/index.html", "!!document.querySelector('#bode svg')");
     control.interactions = [];
-    control.interactions.push(await interact(
-      "(() => { const i = document.querySelector('#kp'); i.value = '5'; i.dispatchEvent(new Event('input', { bubbles: true })); })()",
-      "document.querySelector('#meta-step').textContent.includes('Kp=5')", "kp-slider"));
-    control.interactions.push(await interact(
-      "document.querySelector('[data-tab=\"labs\"]').click()",
-      "document.getElementById('labs').hidden === false", "labs-tab"));
+    control.interactions.push(
+      await interact(
+        "(() => { const i = document.querySelector('#kp'); i.value = '5'; i.dispatchEvent(new Event('input', { bubbles: true })); })()",
+        "document.querySelector('#meta-step').textContent.includes('Kp=5')",
+        "kp-slider"
+      )
+    );
+    control.interactions.push(
+      await interact(
+        "document.querySelector('[data-tab=\"labs\"]').click()",
+        "document.getElementById('labs').hidden === false",
+        "labs-tab"
+      )
+    );
     control.interactions.forEach((i) => {
       const key = i.label === "kp-slider" ? "kp" : "tab";
-      if (i.ms > BUDGETS.control[key] * SCALE) failures.push(`control ${i.label}: ${i.ms}ms > ${Math.round(BUDGETS.control[key] * SCALE)}ms`);
+      if (i.ms > BUDGETS.control[key] * SCALE)
+        failures.push(`control ${i.label}: ${i.ms}ms > ${Math.round(BUDGETS.control[key] * SCALE)}ms`);
     });
 
     const sim = await measurePage("simulink", "simulink/index.html", "!!document.querySelector('#chart-a svg')");
     sim.interactions = [];
-    sim.interactions.push(await interact(
-      "document.querySelector('#tabs button[data-demo=\"smc\"]').click()",
-      "document.querySelector('#metrics').textContent.includes('抖振')", "smc-tab"));
+    sim.interactions.push(
+      await interact(
+        "document.querySelector('#tabs button[data-demo=\"smc\"]').click()",
+        "document.querySelector('#metrics').textContent.includes('抖振')",
+        "smc-tab"
+      )
+    );
     sim.interactions.forEach((i) => {
-      if (i.ms > BUDGETS.simulink.tab * SCALE) failures.push(`simulink ${i.label}: ${i.ms}ms > ${Math.round(BUDGETS.simulink.tab * SCALE)}ms`);
+      if (i.ms > BUDGETS.simulink.tab * SCALE)
+        failures.push(`simulink ${i.label}: ${i.ms}ms > ${Math.round(BUDGETS.simulink.tab * SCALE)}ms`);
     });
 
     await measurePage("about", "about/index.html", null);
 
     const pm = await client.send("Performance.getMetrics");
-    const heap = Object.fromEntries(pm.metrics
-      .filter((m) => ["JSHeapUsedSize", "Nodes", "Documents"].includes(m.name))
-      .map((m) => [m.name, Math.round(m.value)]));
+    const heap = Object.fromEntries(
+      pm.metrics
+        .filter((m) => ["JSHeapUsedSize", "Nodes", "Documents"].includes(m.name))
+        .map((m) => [m.name, Math.round(m.value)])
+    );
 
     console.log(`runtime perf budget (scale x${SCALE})`);
     console.log("page      ready   dcl    load   fcp     lcp     cls     long(max/total)");
     for (const r of results) {
-      console.log(`${r.page.padEnd(9)} ${String(r.ready).padStart(5)}ms ${String(r.dcl).padStart(5)}ms ${String(r.load).padStart(5)}ms ${String(r.fcp ?? "-").padStart(5)}ms ${String(r.lcp).padStart(5)}ms ${String(r.cls).padStart(6)} ${String(r.longTask + "/" + r.longTotal).padStart(12)}`);
+      console.log(
+        `${r.page.padEnd(9)} ${String(r.ready).padStart(5)}ms ${String(r.dcl).padStart(5)}ms ${String(r.load).padStart(5)}ms ${String(r.fcp ?? "-").padStart(5)}ms ${String(r.lcp).padStart(5)}ms ${String(r.cls).padStart(6)} ${String(r.longTask + "/" + r.longTotal).padStart(12)}`
+      );
       for (const i of r.interactions || []) console.log(`  ${i.label.padEnd(12)} ${String(i.ms).padStart(5)}ms`);
     }
-    console.log(`JS heap ${(heap.JSHeapUsedSize / 1048576).toFixed(1)}MB, ${heap.Nodes} nodes, ${heap.Documents} documents`);
+    console.log(
+      `JS heap ${(heap.JSHeapUsedSize / 1048576).toFixed(1)}MB, ${heap.Nodes} nodes, ${heap.Documents} documents`
+    );
     if (failures.length) {
       console.error("RUNTIME PERF FAIL:");
       failures.forEach((f) => console.error("  " + f));
@@ -246,10 +316,18 @@ async function main() {
     client.close();
   } finally {
     edge.kill();
-    await new Promise((r) => { edge.once("exit", r); setTimeout(r, 1500); });
+    await new Promise((r) => {
+      edge.once("exit", r);
+      setTimeout(r, 1500);
+    });
     server.close();
-    try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 }); } catch {}
+    try {
+      fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
+    } catch {}
   }
 }
 
-main().catch((e) => { console.error("RUNTIME PERF FAIL:", e.message); process.exit(1); });
+main().catch((e) => {
+  console.error("RUNTIME PERF FAIL:", e.message);
+  process.exit(1);
+});

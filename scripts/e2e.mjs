@@ -18,16 +18,31 @@ if (!EDGE) {
   process.exit(0);
 }
 
-const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".csv": "text/csv", ".png": "image/png", ".gz": "application/gzip" };
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".csv": "text/csv",
+  ".png": "image/png",
+  ".gz": "application/gzip",
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function serve() {
   const server = http.createServer((req, res) => {
     const url = decodeURIComponent((req.url || "/").split("?")[0]);
     const file = path.join(ROOT, url);
-    if (!file.startsWith(ROOT)) { res.statusCode = 403; res.end(); return; }
+    if (!file.startsWith(ROOT)) {
+      res.statusCode = 403;
+      res.end();
+      return;
+    }
     fs.readFile(file, (err, data) => {
-      if (err) { res.statusCode = 404; res.end("not found"); return; }
+      if (err) {
+        res.statusCode = 404;
+        res.end("not found");
+        return;
+      }
       res.setHeader("Content-Type", MIME[path.extname(file)] || "application/octet-stream");
       res.end(data);
     });
@@ -38,7 +53,9 @@ function serve() {
 async function waitFor(fn, timeout = 15000) {
   const start = Date.now();
   while (Date.now() - start < timeout) {
-    try { if (await fn()) return true; } catch {}
+    try {
+      if (await fn()) return true;
+    } catch {}
     await sleep(150);
   }
   throw new Error("timeout waiting for condition");
@@ -80,15 +97,25 @@ async function main() {
   const base = `http://127.0.0.1:${port}`;
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-e2e-"));
   const download = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-dl-"));
-  const edge = spawn(EDGE, [
-    "--headless=new", "--disable-gpu", "--no-first-run",
-    "--remote-debugging-port=9333", `--user-data-dir=${profile}`, "about:blank",
-  ], { stdio: "ignore" });
+  const edge = spawn(
+    EDGE,
+    [
+      "--headless=new",
+      "--disable-gpu",
+      "--no-first-run",
+      "--remote-debugging-port=9333",
+      `--user-data-dir=${profile}`,
+      "about:blank",
+    ],
+    { stdio: "ignore" }
+  );
 
   try {
     await waitFor(async () => (await fetch("http://127.0.0.1:9333/json/version")).ok, 20000);
     const pageUrl = `${base}/imu-lab/static/index.html`;
-    const target = await (await fetch(`http://127.0.0.1:9333/json/new?${encodeURIComponent(pageUrl)}`, { method: "PUT" })).json();
+    const target = await (
+      await fetch(`http://127.0.0.1:9333/json/new?${encodeURIComponent(pageUrl)}`, { method: "PUT" })
+    ).json();
     const client = cdp(target.webSocketDebuggerUrl);
     await client.open;
     await client.send("Page.enable");
@@ -101,7 +128,8 @@ async function main() {
       return r.result.value;
     };
 
-    const audit = async (label, dark = false) => {      if (!AXE) return;
+    const audit = async (label, dark = false) => {
+      if (!AXE) return;
       await client.send("Emulation.setEmulatedMedia", {
         features: [{ name: "prefers-color-scheme", value: dark ? "dark" : "light" }],
       });
@@ -109,7 +137,7 @@ async function main() {
       await evalJs(AXE);
       const res = await evalJs(
         'axe.run(document,{runOnly:{type:"tag",values:["wcag2a","wcag2aa"]}})' +
-        '.then(r=>r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.slice(0,3).map(n=>n.target)})))'
+          ".then(r=>r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.slice(0,3).map(n=>n.target)})))"
       );
       const bad = res.filter((v) => v.impact === "serious" || v.impact === "critical");
       const tag = dark ? `${label}-dark` : label;
@@ -124,10 +152,13 @@ async function main() {
     await client.send("Page.navigate", { url: `${base}/imu-lab/static/index.html?lang=en` });
     await waitFor(() => evalJs("!!document.querySelector('#chart-time svg')"));
     if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("imu-en: lang");
-    if (!(await evalJs("document.querySelector('h1').textContent")).includes("IMU data lab")) throw new Error("imu-en: h1");
+    if (!(await evalJs("document.querySelector('h1').textContent")).includes("IMU data lab"))
+      throw new Error("imu-en: h1");
     if (!(await evalJs("!!document.querySelector('.lang-banner')"))) throw new Error("imu-en: banner");
-    if ((await evalJs("document.querySelector('.lang-switch').textContent")) !== "Chinese") throw new Error("imu-en: switch");
-    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("imu-en: Chinese text remains");
+    if ((await evalJs("document.querySelector('.lang-switch').textContent")) !== "Chinese")
+      throw new Error("imu-en: switch");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0)
+      throw new Error("imu-en: Chinese text remains");
     await audit("imu-en");
     await audit("imu-en", true);
     await evalJs("localStorage.setItem('vibe-lang', 'zh')");
@@ -141,17 +172,27 @@ async function main() {
 
     await evalJs("document.querySelector('#export-report').click()");
     await waitFor(() => fs.readdirSync(download).some((f) => f.endsWith(".html")), 8000);
-    const html = fs.readFileSync(path.join(download, fs.readdirSync(download).find((f) => f.endsWith(".html"))), "utf8");
+    const html = fs.readFileSync(
+      path.join(
+        download,
+        fs.readdirSync(download).find((f) => f.endsWith(".html"))
+      ),
+      "utf8"
+    );
     if (!html.includes("IMU 数据实验室")) throw new Error("report content missing");
 
     await client.send("Page.navigate", { url: `${base}/imu-lab/static/index.html?r=-7&q=-9&ch=gy` });
     await sleep(1200);
-    if (!(await evalJs("document.querySelector('#r-val').textContent")).includes("1.00e-7")) throw new Error("URL R not restored");
-    if ((await evalJs("document.querySelector('#channel').value")) !== "gy") throw new Error("URL channel not restored");
+    if (!(await evalJs("document.querySelector('#r-val').textContent")).includes("1.00e-7"))
+      throw new Error("URL R not restored");
+    if ((await evalJs("document.querySelector('#channel').value")) !== "gy")
+      throw new Error("URL channel not restored");
 
     await client.send("Page.navigate", { url: `${base}/control-play/index.html` });
     await waitFor(() => evalJs("!!document.querySelector('#bode svg')"));
-    await evalJs("(() => { const el = document.querySelector('#kp'); el.value = '3'; el.dispatchEvent(new Event('input', { bubbles: true })); })()");
+    await evalJs(
+      "(() => { const el = document.querySelector('#kp'); el.value = '3'; el.dispatchEvent(new Event('input', { bubbles: true })); })()"
+    );
     await sleep(250);
     const meta = await evalJs("document.querySelector('#meta-step').textContent");
     if (!/Kp=3\.00/.test(meta)) throw new Error("PID slider not wired");
@@ -161,14 +202,18 @@ async function main() {
     await client.send("Page.navigate", { url: `${base}/control-play/index.html?lang=en` });
     await waitFor(() => evalJs("!!document.querySelector('#bode svg')"));
     await sleep(800);
-    if ((await evalJs("document.querySelectorAll('.tabs-bar button').length")) !== 3) throw new Error("control-en: tabs");
+    if ((await evalJs("document.querySelectorAll('.tabs-bar button').length")) !== 3)
+      throw new Error("control-en: tabs");
     await evalJs("document.querySelector('.tabs-bar button[data-tab=\"labs\"]').click()");
     await sleep(300);
-    if (!(await evalJs("document.querySelector('#labs').textContent")).includes("State feedback")) throw new Error("control-en: labs not English");
-    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("control-en: Chinese text remains");
+    if (!(await evalJs("document.querySelector('#labs').textContent")).includes("State feedback"))
+      throw new Error("control-en: labs not English");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0)
+      throw new Error("control-en: Chinese text remains");
     await evalJs("document.querySelector('.tabs-bar button[data-tab=\"manual\"]').click()");
     await sleep(300);
-    if (!(await evalJs("document.querySelector('#manual-grid').textContent")).includes("First and second order")) throw new Error("control-en: manual not English");
+    if (!(await evalJs("document.querySelector('#manual-grid').textContent")).includes("First and second order"))
+      throw new Error("control-en: manual not English");
     await audit("control-en");
     await evalJs("localStorage.setItem('vibe-lang', 'zh')");
 
@@ -180,10 +225,12 @@ async function main() {
     await client.send("Page.navigate", { url: `${base}/landing/en/index.html` });
     await sleep(700);
     if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("landing-en: lang");
-    if ((await evalJs("document.querySelectorAll('.topnav a').length")) !== 6) throw new Error("landing-en: global nav");
+    if ((await evalJs("document.querySelectorAll('.topnav a').length")) !== 6)
+      throw new Error("landing-en: global nav");
     if ((await evalJs("document.querySelectorAll('.card').length")) !== 3) throw new Error("landing-en: cards");
     if (!(await evalJs("document.title")).includes("sensors")) throw new Error("landing-en: title");
-    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("English text check failed");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0)
+      throw new Error("English text check failed");
     await audit("landing-en");
     await audit("landing-en", true);
 
@@ -194,17 +241,24 @@ async function main() {
 
     await client.send("Page.navigate", { url: `${base}/about/matlab.html` });
     await waitFor(async () => (await evalJs("document.querySelectorAll('#matlab-rows tr').length")) === 43, 12000);
-    if ((await evalJs("document.querySelector('#matlab-count').textContent")).trim() !== "43 / 43") throw new Error("matlab: count");
-    await evalJs("(() => { const q = document.querySelector('#matlab-search'); q.value = 't31'; q.dispatchEvent(new Event('input', { bubbles: true })); })()");
-    await waitFor(async () => (await evalJs("document.querySelector('#matlab-count').textContent")).trim() === "1 / 43");
+    if ((await evalJs("document.querySelector('#matlab-count').textContent")).trim() !== "43 / 43")
+      throw new Error("matlab: count");
+    await evalJs(
+      "(() => { const q = document.querySelector('#matlab-search'); q.value = 't31'; q.dispatchEvent(new Event('input', { bubbles: true })); })()"
+    );
+    await waitFor(
+      async () => (await evalJs("document.querySelector('#matlab-count').textContent")).trim() === "1 / 43"
+    );
     await audit("matlab");
     await audit("matlab", true);
 
     await client.send("Page.navigate", { url: `${base}/about/en.html` });
     await sleep(400);
     if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("about-en: lang");
-    if (!(await evalJs("document.body.textContent")).includes("Methods & limitations")) throw new Error("about-en: content");
-    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("English text check failed");
+    if (!(await evalJs("document.body.textContent")).includes("Methods & limitations"))
+      throw new Error("about-en: content");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0)
+      throw new Error("English text check failed");
     await audit("about-en");
     await audit("about-en", true);
     await evalJs("localStorage.setItem('vibe-lang', 'zh')");
@@ -221,12 +275,18 @@ async function main() {
 
     await client.send("Page.navigate", { url: `${base}/simulink/course.html?id=t03` });
     await sleep(900);
-    if (!(await evalJs("document.querySelector('#lesson-title').textContent")).includes("t03")) throw new Error("course: title");
-    if ((await evalJs("document.querySelectorAll('#lesson-list .lesson').length")) !== 43) throw new Error("course: lessons");
-    if ((await evalJs("document.querySelectorAll('#lesson-body .guide-card').length")) < 3) throw new Error("course: guide");
+    if (!(await evalJs("document.querySelector('#lesson-title').textContent")).includes("t03"))
+      throw new Error("course: title");
+    if ((await evalJs("document.querySelectorAll('#lesson-list .lesson').length")) !== 43)
+      throw new Error("course: lessons");
+    if ((await evalJs("document.querySelectorAll('#lesson-body .guide-card').length")) < 3)
+      throw new Error("course: guide");
     await evalJs("document.querySelector('#lesson-body a[download]').click()");
     await waitFor(() => fs.readdirSync(download).some((f) => f.endsWith(".slx")), 10000);
-    const slx = path.join(download, fs.readdirSync(download).find((f) => f.endsWith(".slx")));
+    const slx = path.join(
+      download,
+      fs.readdirSync(download).find((f) => f.endsWith(".slx"))
+    );
     const head = fs.readFileSync(slx).subarray(0, 2);
     if (head[0] !== 0x50 || head[1] !== 0x4b) throw new Error("course: downloaded .slx is not a zip");
     await audit("course");
@@ -236,9 +296,11 @@ async function main() {
     await waitFor(async () => (await evalJs("document.querySelectorAll('#phases .phase-link').length")) === 8, 12000);
     await waitFor(() => evalJs("!!document.querySelector('#chart-a svg')"));
     await sleep(350);
-    if (!/Signals|Signal/.test(await evalJs("document.querySelector('#demo-title').textContent"))) throw new Error("simulink-en: demo title");
+    if (!/Signals|Signal/.test(await evalJs("document.querySelector('#demo-title').textContent")))
+      throw new Error("simulink-en: demo title");
     if (!(await evalJs("!!document.querySelector('.lang-banner')"))) throw new Error("simulink-en: banner");
-    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("English text check failed");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0)
+      throw new Error("English text check failed");
     await audit("simulink-en");
     await audit("simulink-en", true);
 
@@ -253,9 +315,14 @@ async function main() {
     server.close();
     try {
       fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
-    } catch (e) { /* Edge may still hold crashpad files; ignore */ }
+    } catch (e) {
+      /* Edge may still hold crashpad files; ignore */
+    }
     fs.rmSync(download, { recursive: true, force: true });
   }
 }
 
-main().catch((e) => { console.error("E2E FAIL:", e.message); process.exit(1); });
+main().catch((e) => {
+  console.error("E2E FAIL:", e.message);
+  process.exit(1);
+});

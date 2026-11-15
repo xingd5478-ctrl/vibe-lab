@@ -2,6 +2,7 @@
    Usage: node scripts/build_matlab_table.mjs [--check] */
 import fs from "node:fs";
 import path from "node:path";
+import { PAGES, navFor } from "./site_layout.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const DATA = path.join(ROOT, "data", "matlab-probes.json");
@@ -16,27 +17,39 @@ const data = JSON.parse(fs.readFileSync(DATA, "utf8"));
 const rows = [...data.models].sort((a, b) => a.n - b.n);
 if (rows.length !== 43) throw new Error(`expected 43 rows, got ${rows.length}`);
 
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-}[c]));
+const esc = (s) =>
+  String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[c]
+  );
 const shortHash = (h) => String(h || "").slice(0, 10);
-const fmtTime = (t) => Number.isFinite(Number(t)) ? `${Number(t)} s` : "—";
+const fmtTime = (t) => (Number.isFinite(Number(t)) ? `${Number(t)} s` : "—");
 
 function sparkSvg(values) {
   const v = (values || []).map(Number).filter((x) => Number.isFinite(x));
   if (v.length < 2) return "";
-  const min = Math.min(...v), max = Math.max(...v), span = max - min || 1;
-  const pts = v.map((x, i) => `${(i / (v.length - 1) * 120).toFixed(1)},${(25 - (x - min) / span * 20).toFixed(1)}`).join(" ");
+  const min = Math.min(...v),
+    max = Math.max(...v),
+    span = max - min || 1;
+  const pts = v
+    .map((x, i) => `${((i / (v.length - 1)) * 120).toFixed(1)},${(25 - ((x - min) / span) * 20).toFixed(1)}`)
+    .join(" ");
   return `<svg class="spark" viewBox="0 0 120 28" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>`;
 }
 
-const body = rows.map((r) => {
-  const demo = r.demo
-    ? `<a href="../simulink/#${esc(r.demo)}">${esc(r.demo)}</a>`
-    : "—";
-  const refs = r.refs && r.refs.length ? ` +${r.refs.length} refs` : "";
-  const status = r.status === "ok" ? "ok" : "blocked";
-  return `        <tr data-search="${esc([r.id, r.title, r.demo, r.metric, r.note, r.solver].join(" "))}">
+const body = rows
+  .map((r) => {
+    const demo = r.demo ? `<a href="../simulink/#${esc(r.demo)}">${esc(r.demo)}</a>` : "—";
+    const refs = r.refs && r.refs.length ? ` +${r.refs.length} refs` : "";
+    const status = r.status === "ok" ? "ok" : "blocked";
+    return `        <tr data-search="${esc([r.id, r.title, r.demo, r.metric, r.note, r.solver].join(" "))}">
           <td><a href="../simulink/course.html?id=${esc(r.id)}">${esc(r.id)}</a> ${esc(r.title)}
             <a class="slx" href="../simulink/models/${esc(r.model)}" download title="下载 ${esc(r.model)}">.slx</a></td>
           <td>${demo}</td>
@@ -44,9 +57,10 @@ const body = rows.map((r) => {
           <td>${esc(r.note)}</td>
           <td><code>${esc(r.solver)}</code><br>${esc(fmtTime(r.stop_time))} · <span class="hash" title="SHA-256: ${esc(r.sha256)}">${esc(shortHash(r.sha256))}</span>${refs}<br><span class="status ${status}">${status}</span></td>
         </tr>`;
-}).join("\n");
+  })
+  .join("\n");
 
-const html = `<!DOCTYPE html>
+let html = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
@@ -154,6 +168,7 @@ ${body}
 </html>
 `;
 
+html = html.replace(/<nav class="topnav"[\s\S]*?<\/nav>/, navFor(PAGES["about/matlab.html"]));
 if (CHECK) {
   const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, "utf8") : "";
   if (current !== html) {

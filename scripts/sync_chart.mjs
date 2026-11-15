@@ -4,11 +4,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const files = [
-  "imu-lab/static/chart.js",
-  "control-play/chart.js",
-  "simulink/chart.js",
-].map((f) => path.join(ROOT, f));
+const files = ["imu-lab/static/chart.js", "control-play/chart.js", "simulink/chart.js"].map((f) => path.join(ROOT, f));
 
 const hash = (buf) => crypto.createHash("sha256").update(buf).digest("hex");
 const check = process.argv.includes("--check");
