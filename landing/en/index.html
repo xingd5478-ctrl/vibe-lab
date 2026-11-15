@@ -35,21 +35,22 @@
       <a href="../about/en.html" data-local="../../about/en.html">Method</a>
       <a href="../" hreflang="zh-CN" lang="zh-CN" data-local="../index.html">Chinese</a>
     </nav>
-    <header>
-      <div class="kicker">vibe-lab / index</div>
-      <h1>Sensors and control, visualized</h1>
-      <p class="sub">
-        Three zero-dependency browser tools: break MEMS gyro data into Allan deviation and R/Q; drag second-order
-        and PID curves; and revisit the core math of a 43-lesson Simulink course. Everything runs locally — no data
-        leaves your browser.
-      </p>
-      <p class="lang-note">English mode translates the interactive UI, both lab manuals and the 43-lesson guide. Chinese-only extended labs are hidden; switch to Chinese for the original source notes.</p>
-      <ul class="proof" aria-label="Project facts">
-        <li><b>43/43</b> MATLAB models</li>
-        <li><b>19</b> interactive demos</li>
-        <li><b>0</b> runtime dependencies</li>
-        <li><b>MIT</b> source</li>
-      </ul>
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="kicker">vibe-lab / sensors &amp; control</div>
+        <h1>Sensor noise, control curves and <span class="accent">43 Simulink lessons</span> — drag them.</h1>
+        <p class="sub">Three zero-dependency browser tools: break MEMS gyro data into Allan deviation and R/Q; drag second-order and PID curves;
+        and revisit the core math of a 43-lesson Simulink course. Everything runs locally — no data leaves your browser.</p>
+        <div class="hero-actions"><a class="btn primary" href="../imu/">Open IMU lab</a><a class="btn" href="../simulink/">Browse 43 lessons</a></div>
+        <ul class="proof" aria-label="Project facts"><li><b>43/43</b> MATLAB models</li><li><b>19</b> interactive demos</li><li><b>0</b> runtime dependencies</li><li><b>MIT</b> source</li></ul>
+      </div>
+      <figure class="hero-visual">
+        <picture>
+          <source srcset="../preview-imu-en-dark.png" media="(prefers-color-scheme: dark)" />
+          <img src="../preview-imu-en.png" alt="IMU data lab screenshot" width="640" height="360" />
+        </picture>
+        <figcaption>IMU data lab · everything local</figcaption>
+      </figure>
     </header>
 
     <section class="paths" aria-label="Choose a starting point">
@@ -62,37 +63,38 @@
     </section>
 
     <main id="main">
+    <div class="section-head"><h2>Three tools</h2><span>Open and use — no account</span></div>
     <section class="cards">
       <a class="card" data-target="imu" href="../imu/">
         <div class="no">INSTRUMENT 01</div>
         <h2>IMU data lab</h2>
-        <p>Upload CSV → CRC cleaning → three-axis Allan → fit ARW/RRW → tune R/Q and watch a Kalman filter. Includes a 10-chapter lab manual, PNG/CSV export and shareable parameter links.</p>
         <picture>
           <source srcset="../preview-imu-en-dark.png" media="(prefers-color-scheme: dark)" />
           <img class="shot" src="../preview-imu-en.png" alt="IMU data lab screenshot" width="640" height="360" loading="lazy" />
         </picture>
+        <p>Upload CSV → CRC cleaning → three-axis Allan → fit ARW/RRW → tune R/Q and watch a Kalman filter. Includes a 10-chapter lab manual, PNG/CSV export and shareable parameter links.</p>
         <span class="go">Open →</span>
       </a>
 
       <a class="card" data-target="control" href="../control/">
         <div class="no">INSTRUMENT 02</div>
         <h2>Control Play</h2>
-        <p>Bode, step and PID loops for a second-order plant, plus four extra labs: state feedback, observer, root locus and discretization. Includes a 14-chapter manual.</p>
         <picture>
           <source srcset="../preview-control-en-dark.png" media="(prefers-color-scheme: dark)" />
           <img class="shot" src="../preview-control-en.png" alt="Control Play screenshot" width="640" height="360" loading="lazy" />
         </picture>
+        <p>Bode, step and PID loops for a second-order plant, plus four extra labs: state feedback, observer, root locus and discretization. Includes a 14-chapter manual.</p>
         <span class="go">Open →</span>
       </a>
 
       <a class="card" data-target="simulink" href="../simulink/">
         <div class="no">TUTORIAL 03</div>
         <h2>Simulink tutorial · interactive</h2>
-        <p>43 lessons across 8 stages: 43 beginner guides and 19 interactive reproductions (signals, PID, Kalman, Bode, MPC, sliding mode, root locus, fuzzy, IMU, Stateflow…), with .m/.slx sources.</p>
         <picture>
           <source srcset="../preview-simulink-en-dark.png" media="(prefers-color-scheme: dark)" />
           <img class="shot" src="../preview-simulink-en.png" alt="Simulink interactive demo screenshot" width="640" height="360" loading="lazy" />
         </picture>
+        <p>43 lessons across 8 stages: 43 beginner guides and 19 interactive reproductions (signals, PID, Kalman, Bode, MPC, sliding mode, root locus, fuzzy, IMU, Stateflow…), with .m/.slx sources.</p>
         <span class="go">Open →</span>
       </a>
     </section>
