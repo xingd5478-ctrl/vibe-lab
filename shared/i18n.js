@@ -132,7 +132,7 @@
     "超调量": "Overshoot", "末值误差": "Final error", "贴限幅比例": "Saturation ratio",
     "测量 RMSE": "Meas. RMSE", "滤波 RMSE": "Filter RMSE", "EKF RMSE": "EKF RMSE",
     "抖振指标 mean|Δu|": "Chattering mean|Δu|", "t>1s 最大误差": "Max error after 1 s",
-    "输入幅度": "Input amplitude", "输出幅度": "Output amplitude", "输入幅值": "Input amplitude", "输出幅值": "Output amplitude", "噪声": "Noise",
+    "数据图": "Chart", "输入幅度": "Input amplitude", "输出幅度": "Output amplitude", "输入幅值": "Input amplitude", "输出幅值": "Output amplitude", "噪声": "Noise",
     "无": "none", "有": "yes", "开环": "Open", "闭环": "Closed loop", "闭环 PID": "PID",
     "连续 PID": "Cont. PID", "离散 PID": "Disc. PID", "真实": "True", "估计值": "Estimate",
     "采样点连线": "S&H", "真实正弦": "True sine", "重建": "Reconstructed",
@@ -279,7 +279,7 @@
     d.className = "lang-banner";
     d.setAttribute("data-i18n-skip", "");
     d.style.cssText = "margin:10px 0 0;padding:7px 10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12px;border-radius:2px";
-    d.innerHTML = "English UI: tools, charts and lab manuals are translated; the 43-lesson guide has an English edition. Chinese-only extended labs are hidden; switch to <a href=\"?lang=zh\">Chinese</a> for the original source notes.";
+    d.innerHTML = "English UI: tools, charts, lab manuals, the four extended labs and the 43-lesson guide are translated. Switch to <a href=\"?lang=zh\">Chinese</a> for the original source notes.";
     wrap.insertBefore(d, wrap.querySelector("header"));
   }
 
@@ -374,7 +374,9 @@
       if (mhint) mhint.textContent = "From first/second order to PID, Bode, state space, observers and engineering detail; each chapter anchors to the controls above.";
       const ms = document.getElementById("manual-search");
       if (ms) { ms.placeholder = "Search chapters: Bode / observer / root locus…"; ms.setAttribute("aria-label", "Search manual chapters"); }
-      addNote("Extended labs are Chinese-only and hidden in English mode; the 14-chapter manual is translated.");
+      const lh = document.querySelector("#labs h2");
+      if (lh) lh.textContent = "More control labs · 4";
+      addNote("All four extended labs and the 14-chapter manual are available in English.");
     }
     if (isSim) {
       setEnglishMeta("43-lesson Simulink control tutorial: interactive demos, a full English lesson guide, MATLAB model provenance and .slx downloads.");

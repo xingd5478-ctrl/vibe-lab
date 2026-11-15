@@ -278,5 +278,3 @@ footer a { color: var(--accent); text-decoration: underline; text-underline-offs
   input[type="range"] { min-height: 40px; }
   select, input[type="number"], input[type="search"] { min-height: 40px; }
 }
-
-.lang-en #labs, .lang-en .tabs-bar button[data-tab="labs"] { display: none !important; }

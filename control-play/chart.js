@@ -373,7 +373,7 @@
     const xt = logX ? logTicks(xmin, xmax) : linTicks(xmin, xmax, 5);
     const yt = logY ? logTicks(ymin, ymax) : linTicks(ymin, ymax, 4);
 
-    let svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${cfg.aria || "数据图"}">`;
+    let svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${tr(cfg.aria || "数据图")}">`;
     const clipId = "clip" + ((el._cid = (el._cid || 0) + 1));
     svg += `<defs><clipPath id="${clipId}"><rect x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}"/></clipPath></defs>`;
 

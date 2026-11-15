@@ -158,6 +158,20 @@ async function main() {
     await audit("control");
     await audit("control", true);
 
+    await client.send("Page.navigate", { url: `${base}/control-play/index.html?lang=en` });
+    await waitFor(() => evalJs("!!document.querySelector('#bode svg')"));
+    await sleep(800);
+    if ((await evalJs("document.querySelectorAll('.tabs-bar button').length")) !== 3) throw new Error("control-en: tabs");
+    await evalJs("document.querySelector('.tabs-bar button[data-tab=\"labs\"]').click()");
+    await sleep(300);
+    if (!(await evalJs("document.querySelector('#labs').textContent")).includes("State feedback")) throw new Error("control-en: labs not English");
+    if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0) throw new Error("control-en: Chinese text remains");
+    await evalJs("document.querySelector('.tabs-bar button[data-tab=\"manual\"]').click()");
+    await sleep(300);
+    if (!(await evalJs("document.querySelector('#manual-grid').textContent")).includes("First and second order")) throw new Error("control-en: manual not English");
+    await audit("control-en");
+    await evalJs("localStorage.setItem('vibe-lang', 'zh')");
+
     await client.send("Page.navigate", { url: `${base}/landing/index.html` });
     await sleep(1000);
     await audit("landing");
