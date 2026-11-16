@@ -57,7 +57,7 @@ Canonical URL is currently `https://xingd5478-ctrl.github.io/vibe-lab/`. The Wor
 
 ## Known debt
 
-- `simulink/app.js` (≈56 KB), `guide.js` (≈56 KB) are monoliths.
+- `simulink/app.js` is split into `app-core.js` / `app-demos.js` / `app-ui.js` (classic scripts, not ESM yet). `guide.js` (≈56 KB) is still a data monolith.
 - Top navigation and footer are generated from `scripts/site_layout.mjs` / `scripts/site_footer.mjs` (`npm run layout`); 404 stays dynamic.
 - `chart.js` is copied into `imu-lab`, `control-play`, `simulink`; `npm run check:chart` keeps them in sync.
 - i18n uses Chinese source strings as dictionary keys and a MutationObserver; static metadata is improved at runtime. ESLint/Prettier cover `scripts/`, `tests/`, `landing/`, `shared/`, `imu-lab/static/`, `control-play/` and `simulink/` JavaScript.
