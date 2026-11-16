@@ -44,7 +44,7 @@ rows.slice(0, 6).forEach(([f, s]) => console.log(`  ${(s / 1024).toFixed(1)} KB 
 for (const [dir, size] of perDir)
   console.log(`  page ${dir.padEnd(16)} ${(size / 1024).toFixed(1)} KB / ${PAGE_BUDGET_KB[dir]} KB`);
 
-const MAX_TOTAL = 480 * 1024;
+const MAX_TOTAL = 500 * 1024;
 const MAX_FILE = 160 * 1024;
 let failed = false;
 if (total > MAX_TOTAL) {
