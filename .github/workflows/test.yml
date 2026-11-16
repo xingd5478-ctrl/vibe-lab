@@ -47,7 +47,7 @@ jobs:
         run: node scripts/e2e.mjs
       - name: Runtime performance budget
         env:
-          PERF_SCALE: "2"
+          PERF_SCALE: "3"
         run: node scripts/perf.mjs
       - name: Big-file pipeline (Edge, 200k rows)
         run: node scripts/bigtest.mjs
