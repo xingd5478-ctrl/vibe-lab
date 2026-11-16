@@ -13,7 +13,8 @@
   }
 
   function gauss(r) {
-    let u = 0, v = 0;
+    let u = 0,
+      v = 0;
     while (!u) u = r();
     while (!v) v = r();
     return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
@@ -21,21 +22,30 @@
 
   function metrics(t, y, ref) {
     const target = ref === undefined ? 1 : ref;
-    let peak = -Infinity, tPeak = 0;
-    for (let i = 0; i < y.length; i++) if (y[i] > peak) { peak = y[i]; tPeak = t[i]; }
+    let peak = -Infinity,
+      tPeak = 0;
+    for (let i = 0; i < y.length; i++)
+      if (y[i] > peak) {
+        peak = y[i];
+        tPeak = t[i];
+      }
     const overshoot = peak > target ? ((peak - target) / target) * 100 : 0;
     let settle = t[t.length - 1];
     for (let i = y.length - 1; i >= 0; i--) {
       if (Math.abs(y[i] - target) > 0.02 * Math.abs(target)) {
-        settle = t[Math.min(i + 1, y.length - 1)]; break;
+        settle = t[Math.min(i + 1, y.length - 1)];
+        break;
       }
     }
     return { overshoot, tPeak, settle, ess: Math.abs(target - y[y.length - 1]) };
   }
 
   function firstOrder(tau, K, T) {
-    const dt = 0.002, n = Math.round((T || 6) / dt);
-    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
+    const dt = 0.002,
+      n = Math.round((T || 6) / dt);
+    const t = new Float64Array(n),
+      y = new Float64Array(n),
+      u = new Float64Array(n);
     let x = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
@@ -47,9 +57,13 @@
   }
 
   function secondOrder(wn, zeta, T) {
-    const dt = 0.002, n = Math.round((T || 6) / dt);
-    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
-    let x = 0, v = 0;
+    const dt = 0.002,
+      n = Math.round((T || 6) / dt);
+    const t = new Float64Array(n),
+      y = new Float64Array(n),
+      u = new Float64Array(n);
+    let x = 0,
+      v = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       u[i] = t[i] >= 0.5 ? 1 : 0;
@@ -62,10 +76,15 @@
   }
 
   function stateFeedback(wn, zeta, T) {
-    const dt = 0.002, n = Math.round((T || 6) / dt);
-    const k1 = wn * wn, k2 = 2 * zeta * wn;
-    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
-    let x1 = 0, x2 = 0;
+    const dt = 0.002,
+      n = Math.round((T || 6) / dt);
+    const k1 = wn * wn,
+      k2 = 2 * zeta * wn;
+    const t = new Float64Array(n),
+      y = new Float64Array(n),
+      u = new Float64Array(n);
+    let x1 = 0,
+      x2 = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       const r = t[i] >= 0.5 ? 1 : 0;
@@ -78,13 +97,23 @@
   }
 
   function observer(wn, zeta, wo, zetao, noise) {
-    const dt = 0.002, T = 6, n = Math.round(T / dt);
-    const k1 = wn * wn, k2 = 2 * zeta * wn;
-    const l1 = 2 * zetao * wo, l2 = wo * wo;
-    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
-    const est = new Float64Array(n), err = new Float64Array(n);
+    const dt = 0.002,
+      T = 6,
+      n = Math.round(T / dt);
+    const k1 = wn * wn,
+      k2 = 2 * zeta * wn;
+    const l1 = 2 * zetao * wo,
+      l2 = wo * wo;
+    const t = new Float64Array(n),
+      y = new Float64Array(n),
+      u = new Float64Array(n);
+    const est = new Float64Array(n),
+      err = new Float64Array(n);
     const r = rng(7);
-    let x1 = 0, x2 = 0, h1 = 0, h2 = 0;
+    let x1 = 0,
+      x2 = 0,
+      h1 = 0,
+      h2 = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       const ref = t[i] >= 0.5 ? 1 : 0;
@@ -102,10 +131,15 @@
   }
 
   function smc(lambda, k, phi) {
-    const dt = 0.001, T = 6, n = Math.round(T / dt);
-    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
+    const dt = 0.001,
+      T = 6,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      y = new Float64Array(n),
+      u = new Float64Array(n);
     const s = new Float64Array(n);
-    let x1 = 0, x2 = 0;
+    let x1 = 0,
+      x2 = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       const r = t[i] >= 0.5 ? 1 : 0;
@@ -117,10 +151,13 @@
       x1 += x2 * dt;
       y[i] = x1;
     }
-    let chat = 0, cnt = 0, last = 0;
+    let chat = 0,
+      cnt = 0,
+      last = 0;
     for (let i = n - Math.round(1 / dt); i < n; i++) {
       if (cnt > 0) chat += Math.abs(u[i] - last);
-      last = u[i]; cnt++;
+      last = u[i];
+      cnt++;
     }
     return { t, y, u, s, chattering: cnt ? chat / cnt : 0 };
   }
@@ -131,8 +168,12 @@
   }
 
   function signalDemo(K, freq, noise) {
-    const dt = 0.001, T = 4, n = Math.round(T / dt);
-    const t = new Float64Array(n), u = new Float64Array(n), y = new Float64Array(n);
+    const dt = 0.001,
+      T = 4,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      u = new Float64Array(n),
+      y = new Float64Array(n);
     const r = rng(11);
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
@@ -143,9 +184,18 @@
   }
 
   function pidDemo(kp, ki, kd, openLoop) {
-    const wn = 4, zeta = 0.4, dt = 0.002, T = 8, n = Math.round(T / dt);
-    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
-    let x = 0, v = 0, I = 0, pe = 0;
+    const wn = 4,
+      zeta = 0.4,
+      dt = 0.002,
+      T = 8,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      y = new Float64Array(n),
+      u = new Float64Array(n);
+    let x = 0,
+      v = 0,
+      I = 0,
+      pe = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       const ref = t[i] >= 0.5 ? 1 : 0;
@@ -163,11 +213,17 @@
   }
 
   function kalmanDemo(R, Q) {
-    const dt = 0.05, T = 10, n = Math.round(T / dt);
-    const t = new Float64Array(n), z = new Float64Array(n), x = new Float64Array(n);
+    const dt = 0.05,
+      T = 10,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      z = new Float64Array(n),
+      x = new Float64Array(n);
     const r = rng(23);
-    let est = 0, P = 1;
-    let sm = 0, sk = 0;
+    let est = 0,
+      P = 1;
+    let sm = 0,
+      sk = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       const truth = 1;
@@ -184,7 +240,9 @@
   }
 
   function bodeDemo(wn, zeta) {
-    const w = [], mag = [], phase = [];
+    const w = [],
+      mag = [],
+      phase = [];
     for (let e = -1; e <= 2.001; e += 0.02) {
       const wi = Math.pow(10, e);
       const re = wn * wn - wi * wi;
@@ -197,7 +255,10 @@
     for (const m of mag) if (m > peak) peak = m;
     let bw = w[w.length - 1];
     for (let i = 0; i < mag.length; i++) {
-      if (mag[i] <= -3) { bw = w[i]; break; }
+      if (mag[i] <= -3) {
+        bw = w[i];
+        break;
+      }
     }
     const iw = w.findIndex((v) => v >= wn);
     return { w, mag, phase, peak, bw, phaseAtWn: phase[iw < 0 ? phase.length - 1 : iw] };
@@ -205,15 +266,21 @@
 
   /* ---------- MPC：一阶对象，滚动优化 + 输入约束 ---------- */
   function mpcDemo(N, Q, R, uMax) {
-    const Ts = 0.1, T = 8, n = Math.round(T / Ts);
-    const a = 0.9, b = 0.5;
-    const t = new Float64Array(n), xa = new Float64Array(n), ua = new Float64Array(n);
+    const Ts = 0.1,
+      T = 8,
+      n = Math.round(T / Ts);
+    const a = 0.9,
+      b = 0.5;
+    const t = new Float64Array(n),
+      xa = new Float64Array(n),
+      ua = new Float64Array(n);
     let x = 0;
     let us = new Array(N).fill(0);
     const refAt = (step) => (step * Ts >= 1 ? 1 : 0);
 
     function predictCost(x0, u, ref, start) {
-      let xx = x0, cost = 0;
+      let xx = x0,
+        cost = 0;
       for (let j = 0; j < N; j++) {
         xx = a * xx + b * u[j];
         const r = refAt(start + j + 1);
@@ -266,7 +333,8 @@
       return { re: (p.re * q.re + p.im * q.im) / d, im: (p.im * q.re - p.re * q.im) / d };
     };
     const poly = (s) => {
-      const s2 = cmul(s, s), s3 = cmul(s2, s);
+      const s2 = cmul(s, s),
+        s3 = cmul(s2, s);
       return {
         re: s3.re + 3 * s2.re + 2 * s.re + K,
         im: s3.im + 3 * s2.im + 2 * s.im,
@@ -332,15 +400,24 @@
 
   /* ---------- 一维模糊控制：N/Z/P 隶属度 + 加权平均 ---------- */
   function fuzzyDemo(scale) {
-    const wn = 4, zeta = 0.5, dt = 0.002, T = 8, n = Math.round(T / dt);
-    const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
+    const wn = 4,
+      zeta = 0.5,
+      dt = 0.002,
+      T = 8,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      y = new Float64Array(n),
+      u = new Float64Array(n);
     const tri = (x, a, b, c) => Math.max(0, Math.min((x - a) / (b - a), (c - x) / (c - b)));
-    let x = 0, v = 0;
+    let x = 0,
+      v = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       const ref = t[i] >= 0.5 ? 1 : 0;
       const e = Math.max(-1.5, Math.min(1.5, ref - x));
-      const wN = tri(e, -1.5, -1, 0), wZ = tri(e, -1, 0, 1), wP = tri(e, 0, 1, 1.5);
+      const wN = tri(e, -1.5, -1, 0),
+        wZ = tri(e, -1, 0, 1),
+        wP = tri(e, 0, 1, 1.5);
       const sum = wN + wZ + wP || 1;
       const out = (wP - wN) / sum;
       u[i] = Math.max(-10, Math.min(10, scale * out));
@@ -354,9 +431,14 @@
 
   /* ---------- 质量-弹簧-阻尼（m=1） ---------- */
   function msdDemo(k, c) {
-    const dt = 0.002, T = 8, n = Math.round(T / dt);
-    const t = new Float64Array(n), x = new Float64Array(n), f = new Float64Array(n);
-    let pos = 0, vel = 0;
+    const dt = 0.002,
+      T = 8,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      x = new Float64Array(n),
+      f = new Float64Array(n);
+    let pos = 0,
+      vel = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       f[i] = t[i] >= 0.5 ? 1 : 0;
@@ -366,7 +448,9 @@
       x[i] = pos;
     }
     return {
-      t, x, f,
+      t,
+      x,
+      f,
       wn: Math.sqrt(k),
       zeta: c / (2 * Math.sqrt(k)),
     };
@@ -374,10 +458,12 @@
 
   /* ---------- 2 连杆正/逆运动学 ---------- */
   function armDemo(tx, ty) {
-    const l1 = 1, l2 = 0.8;
+    const l1 = 1,
+      l2 = 0.8;
     const d = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
     const reachable = d >= -1 && d <= 1;
-    let th1 = Math.atan2(ty, tx), th2 = 0;
+    let th1 = Math.atan2(ty, tx),
+      th2 = 0;
     if (reachable) {
       th2 = Math.acos(Math.max(-1, Math.min(1, d)));
       th1 = Math.atan2(ty, tx) - Math.atan2(l2 * Math.sin(th2), l1 + l2 * Math.cos(th2));
@@ -389,14 +475,18 @@
 
   /* ---------- 采样定理 / 混叠 ---------- */
   function dspDemo(f, fs) {
-    const dtc = 0.001, T = 1, n = Math.round(T / dtc);
-    const t = new Float64Array(n), y = new Float64Array(n);
+    const dtc = 0.001,
+      T = 1,
+      n = Math.round(T / dtc);
+    const t = new Float64Array(n),
+      y = new Float64Array(n);
     for (let i = 0; i < n; i++) {
       t[i] = i * dtc;
       y[i] = Math.sin(2 * Math.PI * f * t[i]);
     }
     const m = Math.max(2, Math.floor(T * fs) + 1);
-    const ts = new Float64Array(m), z = new Float64Array(m);
+    const ts = new Float64Array(m),
+      z = new Float64Array(m);
     for (let i = 0; i < m; i++) {
       ts[i] = i / fs;
       z[i] = Math.sin(2 * Math.PI * f * ts[i]);
@@ -408,11 +498,17 @@
 
   /* ---------- IMU 融合：互补滤波 vs 加速度计 ---------- */
   function imuFusionDemo(alpha, noiseOn) {
-    const dt = 0.01, T = 20, n = Math.round(T / dt);
-    const t = new Float64Array(n), truth = new Float64Array(n);
-    const acc = new Float64Array(n), comp = new Float64Array(n);
+    const dt = 0.01,
+      T = 20,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      truth = new Float64Array(n);
+    const acc = new Float64Array(n),
+      comp = new Float64Array(n);
     const r = rng(31);
-    let est = 0, sa = 0, sc = 0;
+    let est = 0,
+      sa = 0,
+      sc = 0;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       truth[i] = 0.6 * Math.sin(0.35 * t[i]);
@@ -425,7 +521,10 @@
       sc += Math.pow(comp[i] - truth[i], 2);
     }
     return {
-      t, truth, acc, comp,
+      t,
+      truth,
+      acc,
+      comp,
       rmseAcc: Math.sqrt(sa / n),
       rmseComp: Math.sqrt(sc / n),
     };
@@ -433,7 +532,9 @@
 
   /* ---------- Bus：多路信号打包后按索引选择 ---------- */
   function busDemo(sel) {
-    const dt = 0.002, T = 4, n = Math.round(T / dt);
+    const dt = 0.002,
+      T = 4,
+      n = Math.round(T / dt);
     const t = new Float64Array(n);
     const sigs = [new Float64Array(n), new Float64Array(n), new Float64Array(n), new Float64Array(n)];
     for (let i = 0; i < n; i++) {
@@ -465,12 +566,25 @@
 
   /* ---------- 离散化：数字 PID 采样保持 vs 连续 PID ---------- */
   function discreteDemo(Ts) {
-    const wn = 4, zeta = 0.4, kp = 1.5, ki = 1.2, kd = 0.05;
-    const dt = 0.001, T = 8, n = Math.round(T / dt);
-    const t = new Float64Array(n), yc = new Float64Array(n), yd = new Float64Array(n);
+    const wn = 4,
+      zeta = 0.4,
+      kp = 1.5,
+      ki = 1.2,
+      kd = 0.05;
+    const dt = 0.001,
+      T = 8,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      yc = new Float64Array(n),
+      yd = new Float64Array(n);
 
     function run(sampleTs) {
-      let x = 0, v = 0, I = 0, pe = 0, uHold = 0, last = -1;
+      let x = 0,
+        v = 0,
+        I = 0,
+        pe = 0,
+        uHold = 0,
+        last = -1;
       const out = new Float64Array(n);
       for (let i = 0; i < n; i++) {
         t[i] = i * dt;
@@ -493,16 +607,30 @@
 
     const cont = run(dt);
     const disc = run(Ts);
-    for (let i = 0; i < n; i++) { yc[i] = cont[i]; yd[i] = disc[i]; }
+    for (let i = 0; i < n; i++) {
+      yc[i] = cont[i];
+      yd[i] = disc[i];
+    }
     return { t, yc, yd, samples: Math.max(1, Math.round(T / Ts)) };
   }
 
   /* DC 电机：速度 PI + 电气/机械动态 */
   function motorDemo(kp, ki, load) {
-    const R = 1, L = 0.5, J = 0.01, b = 0.1, Kt = 0.1, Ke = 0.1;
-    const dt = 0.001, T = 4, n = Math.round(T / dt);
-    const t = new Float64Array(n), w = new Float64Array(n), cur = new Float64Array(n);
-    let i = 0, omega = 0, I = 0;
+    const R = 1,
+      L = 0.5,
+      J = 0.01,
+      b = 0.1,
+      Kt = 0.1,
+      Ke = 0.1;
+    const dt = 0.001,
+      T = 4,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      w = new Float64Array(n),
+      cur = new Float64Array(n);
+    let i = 0,
+      omega = 0,
+      I = 0;
     for (let k = 0; k < n; k++) {
       t[k] = k * dt;
       const ref = t[k] >= 0.2 ? 50 : 0;
@@ -519,10 +647,15 @@
 
   /* 触发子系统：采样保持 */
   function triggeredDemo(fs) {
-    const dt = 0.001, T = 3, n = Math.round(T / dt);
-    const t = new Float64Array(n), y = new Float64Array(n);
-    const ts = [], z = [];
-    let hold = 0, next = 0;
+    const dt = 0.001,
+      T = 3,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      y = new Float64Array(n);
+    const ts = [],
+      z = [];
+    let hold = 0,
+      next = 0;
     for (let k = 0; k < n; k++) {
       t[k] = k * dt;
       y[k] = Math.sin(2 * Math.PI * t[k]);
@@ -538,23 +671,35 @@
 
   /* 超前-滞后：C=(s+z)/(s+p)，对象 1/(s(s+1))，算 PM 与闭环阶跃 */
   function leadlagDemo(z, p) {
-    const a2 = p + 1, a1 = p + z, a0 = z;
-    const dt = 0.002, T = 8, n = Math.round(T / dt);
-    const t = new Float64Array(n), y = new Float64Array(n);
-    let x1 = 0, x2 = 0, x3 = 0;
+    const a2 = p + 1,
+      a1 = p + z,
+      a0 = z;
+    const dt = 0.002,
+      T = 8,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      y = new Float64Array(n);
+    let x1 = 0,
+      x2 = 0,
+      x3 = 0;
     for (let k = 0; k < n; k++) {
       t[k] = k * dt;
       const u = t[k] >= 0.5 ? 1 : 0;
-      const dx1 = x2, dx2 = x3;
+      const dx1 = x2,
+        dx2 = x3;
       const dx3 = -a0 * x1 - a1 * x2 - a2 * x3 + u;
-      x1 += dx1 * dt; x2 += dx2 * dt; x3 += dx3 * dt;
+      x1 += dx1 * dt;
+      x2 += dx2 * dt;
+      x3 += dx3 * dt;
       y[k] = z * x1 + x2;
     }
-    const w = [], mag = [], ph = [];
+    const w = [],
+      mag = [],
+      ph = [];
     let pm = NaN;
     for (let e = -2; e <= 2.001; e += 0.02) {
       const wi = Math.pow(10, e);
-      const Lmag = (Math.hypot(wi, z) / Math.hypot(wi, p)) / (wi * Math.hypot(wi, 1));
+      const Lmag = Math.hypot(wi, z) / Math.hypot(wi, p) / (wi * Math.hypot(wi, 1));
       const phase = Math.atan2(wi, z) - Math.atan2(wi, p) - Math.PI / 2 - Math.atan(wi);
       w.push(wi);
       mag.push(20 * Math.log10(Lmag));
@@ -573,8 +718,12 @@
 
   /* 系统辨识：对带噪阶跃响应估 K、τ（终值 + 63.2% 时间） */
   function sysidDemo(noise, tauTrue) {
-    const K = 2, dt = 0.01, T = 4, n = Math.round(T / dt);
-    const t = new Float64Array(n), data = new Float64Array(n);
+    const K = 2,
+      dt = 0.01,
+      T = 4,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      data = new Float64Array(n);
     const r = rng(41);
     for (let k = 0; k < n; k++) {
       t[k] = k * dt;
@@ -583,7 +732,10 @@
     const Kfit = data[n - 1];
     let tauFit = tauTrue;
     for (let k = 0; k < n; k++) {
-      if (data[k] >= 0.632 * Kfit) { tauFit = t[k]; break; }
+      if (data[k] >= 0.632 * Kfit) {
+        tauFit = t[k];
+        break;
+      }
     }
     const fit = new Float64Array(n);
     let se = 0;
@@ -596,9 +748,16 @@
 
   /* MRAC：MIT 规则，对象增益阶跃变化 */
   function mracDemo(gamma) {
-    const dt = 0.002, T = 8, n = Math.round(T / dt);
-    const t = new Float64Array(n), y = new Float64Array(n), ym = new Float64Array(n), th = new Float64Array(n);
-    let p = 0, m = 0, theta = 1;
+    const dt = 0.002,
+      T = 8,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      y = new Float64Array(n),
+      ym = new Float64Array(n),
+      th = new Float64Array(n);
+    let p = 0,
+      m = 0,
+      theta = 1;
     for (let i = 0; i < n; i++) {
       t[i] = i * dt;
       const r = t[i] >= 0.5 ? 1 : 0;
@@ -607,19 +766,36 @@
       theta = Math.max(0.1, Math.min(5, theta - gamma * e * r * dt));
       p += (-2 * p + b * theta * r) * dt;
       m += (-2 * m + 2 * r) * dt;
-      y[i] = p; ym[i] = m; th[i] = theta;
+      y[i] = p;
+      ym[i] = m;
+      th[i] = theta;
     }
     return { t, y, ym, theta: th };
   }
 
   /* MSD：PID vs 离散 LQR（Q/R 调参） */
   function msdCompareDemo(Q, R) {
-    const k = 4, c = 0.5, dt = 0.002, T = 8, n = Math.round(T / dt);
+    const k = 4,
+      c = 0.5,
+      dt = 0.002,
+      T = 8,
+      n = Math.round(T / dt);
     // 离散 LQR（Euler 离散 + Riccati 迭代）
     const Ts = 0.01;
-    const A = [[0, 1], [-k, -c]], B = [0, 1];
-    const Ad = [[1, Ts], [-k * Ts, 1 - c * Ts]], Bd = [0, Ts];
-    let P = [[Q, 0], [0, 1]];
+    const A = [
+        [0, 1],
+        [-k, -c],
+      ],
+      B = [0, 1];
+    const Ad = [
+        [1, Ts],
+        [-k * Ts, 1 - c * Ts],
+      ],
+      Bd = [0, Ts];
+    let P = [
+      [Q, 0],
+      [0, 1],
+    ];
     let K = [0, 0];
     for (let it = 0; it < 300; it++) {
       const pb0 = P[0][0] * Bd[0] + P[0][1] * Bd[1];
@@ -642,11 +818,19 @@
       const r01 = (Bd[0] * P[0][0] + Bd[1] * P[1][0]) * K[1];
       const r10 = (Bd[0] * P[0][1] + Bd[1] * P[1][1]) * K[0];
       const r11 = (Bd[0] * P[0][1] + Bd[1] * P[1][1]) * K[1];
-      P = [[q00 - r00, q01 - r01], [q10 - r10, q11 - r11]];
+      P = [
+        [q00 - r00, q01 - r01],
+        [q10 - r10, q11 - r11],
+      ];
     }
     function run(kind) {
-      const t = new Float64Array(n), y = new Float64Array(n), u = new Float64Array(n);
-      let x = 0, v = 0, I = 0, pe = 0;
+      const t = new Float64Array(n),
+        y = new Float64Array(n),
+        u = new Float64Array(n);
+      let x = 0,
+        v = 0,
+        I = 0,
+        pe = 0;
       for (let i = 0; i < n; i++) {
         t[i] = i * dt;
         const ref = t[i] >= 0.5 ? 1 : 0;
@@ -663,7 +847,8 @@
         const acc = uu - c * v - k * x;
         v += acc * dt;
         x += v * dt;
-        y[i] = x; u[i] = uu;
+        y[i] = x;
+        u[i] = uu;
       }
       return { t, y, u };
     }
@@ -672,10 +857,21 @@
 
   /* 1/4 车主动悬挂：天棚阻尼 */
   function suspensionDemo(csky) {
-    const ms = 300, mu = 40, ks = 20000, cs = 1500, kt = 200000;
-    const dt = 0.001, T = 4, n = Math.round(T / dt);
-    const t = new Float64Array(n), acc = new Float64Array(n), load = new Float64Array(n);
-    let xs = 0, vs = 0, xu = 0, vu = 0;
+    const ms = 300,
+      mu = 40,
+      ks = 20000,
+      cs = 1500,
+      kt = 200000;
+    const dt = 0.001,
+      T = 4,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      acc = new Float64Array(n),
+      load = new Float64Array(n);
+    let xs = 0,
+      vs = 0,
+      xu = 0,
+      vu = 0;
     for (let k = 0; k < n; k++) {
       t[k] = k * dt;
       const zr = t[k] >= 0.5 ? 0.05 : 0;
@@ -683,8 +879,10 @@
       const u = csky > 0 ? Math.max(-2000, Math.min(2000, -csky * vs)) : 0;
       const aS = (fs + u) / ms;
       const aU = (-fs - kt * (xu - zr)) / mu;
-      vs += aS * dt; xs += vs * dt;
-      vu += aU * dt; xu += vu * dt;
+      vs += aS * dt;
+      xs += vs * dt;
+      vu += aU * dt;
+      xu += vu * dt;
       acc[k] = aS;
       load[k] = kt * (zr - xu);
     }
@@ -693,11 +891,23 @@
 
   /* EKF：Van der Pol，只测 x1 */
   function ekfDemo(R) {
-    const mu = 1, dt = 0.01, T = 10, n = Math.round(T / dt);
-    const t = new Float64Array(n), truth = new Float64Array(n), meas = new Float64Array(n), est = new Float64Array(n);
+    const mu = 1,
+      dt = 0.01,
+      T = 10,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      truth = new Float64Array(n),
+      meas = new Float64Array(n),
+      est = new Float64Array(n);
     const r = rng(51);
-    let x1 = 1, x2 = 0, e1 = 1.5, e2 = 0;
-    let P00 = 1, P01 = 0, P10 = 0, P11 = 1;
+    let x1 = 1,
+      x2 = 0,
+      e1 = 1.5,
+      e2 = 0;
+    let P00 = 1,
+      P01 = 0,
+      P10 = 0,
+      P11 = 1;
     const Q = 1e-3;
     for (let k = 0; k < n; k++) {
       t[k] = k * dt;
@@ -705,29 +915,36 @@
       x2 += (mu * (1 - x1 * x1) * x2 - x1) * dt;
       truth[k] = x1;
       meas[k] = x1 + gauss(r) * 0.1;
-      const F00 = 1, F01 = dt;
-      const F10 = (-1 - 2 * mu * e1 * e2) * dt, F11 = 1 + mu * (1 - e1 * e1) * dt;
+      const F00 = 1,
+        F01 = dt;
+      const F10 = (-1 - 2 * mu * e1 * e2) * dt,
+        F11 = 1 + mu * (1 - e1 * e1) * dt;
       e1 += e2 * dt;
       e2 += (mu * (1 - e1 * e1) * e2 - e1) * dt;
-      const n00 = F00 * P00 + F01 * P10, n01 = F00 * P01 + F01 * P11;
-      const n10 = F10 * P00 + F11 * P10, n11 = F10 * P01 + F11 * P11;
+      const n00 = F00 * P00 + F01 * P10,
+        n01 = F00 * P01 + F01 * P11;
+      const n10 = F10 * P00 + F11 * P10,
+        n11 = F10 * P01 + F11 * P11;
       P00 = n00 * F00 + n01 * F01 + Q;
       P01 = n00 * F10 + n01 * F11;
       P10 = n10 * F00 + n11 * F01;
       P11 = n10 * F10 + n11 * F11 + Q;
       const S = P00 + R;
-      const K0 = P00 / S, K1 = P10 / S;
+      const K0 = P00 / S,
+        K1 = P10 / S;
       const innov = meas[k] - e1;
       e1 += K0 * innov;
       e2 += K1 * innov;
-      const old00 = P00, old01 = P01;
+      const old00 = P00,
+        old01 = P01;
       P00 = (1 - K0) * old00;
       P01 = (1 - K0) * old01;
       P10 = P10 - K1 * old00;
       P11 = P11 - K1 * old01;
       est[k] = e1;
     }
-    let sm = 0, se = 0;
+    let sm = 0,
+      se = 0;
     for (let k = 0; k < n; k++) {
       sm += Math.pow(meas[k] - truth[k], 2);
       se += Math.pow(est[k] - truth[k], 2);
@@ -737,42 +954,64 @@
 
   /* 倒立摆 EKF：只测角度，估角速度 */
   function pendulumEkfDemo(R) {
-    const g = 9.8, l = 1, dt = 0.002, T = 5, n = Math.round(T / dt);
-    const t = new Float64Array(n), truth = new Float64Array(n), meas = new Float64Array(n), est = new Float64Array(n);
+    const g = 9.8,
+      l = 1,
+      dt = 0.002,
+      T = 5,
+      n = Math.round(T / dt);
+    const t = new Float64Array(n),
+      truth = new Float64Array(n),
+      meas = new Float64Array(n),
+      est = new Float64Array(n);
     const r = rng(61);
-    let th = 0.3, om = 0, e1 = 0.5, e2 = 0;
-    let P00 = 1, P01 = 0, P10 = 0, P11 = 1;
+    let th = 0.3,
+      om = 0,
+      e1 = 0.5,
+      e2 = 0;
+    let P00 = 1,
+      P01 = 0,
+      P10 = 0,
+      P11 = 1;
     const Q = 1e-2;
     for (let k = 0; k < n; k++) {
       t[k] = k * dt;
       const u = Math.max(-20, Math.min(20, -25 * th - 8 * om));
       const acc = (g / l) * Math.sin(th) + u;
-      om += acc * dt; th += om * dt;
+      om += acc * dt;
+      th += om * dt;
       truth[k] = th;
       meas[k] = th + gauss(r) * 0.05;
       const f1 = (g / l) * Math.cos(e1);
       e1 += e2 * dt;
       e2 += (f1 + u) * dt;
-      const F00 = 1, F01 = dt, F10 = f1 * dt, F11 = 1;
-      const n00 = F00 * P00 + F01 * P10, n01 = F00 * P01 + F01 * P11;
-      const n10 = F10 * P00 + F11 * P10, n11 = F10 * P01 + F11 * P11;
+      const F00 = 1,
+        F01 = dt,
+        F10 = f1 * dt,
+        F11 = 1;
+      const n00 = F00 * P00 + F01 * P10,
+        n01 = F00 * P01 + F01 * P11;
+      const n10 = F10 * P00 + F11 * P10,
+        n11 = F10 * P01 + F11 * P11;
       P00 = n00 * F00 + n01 * F01 + Q;
       P01 = n00 * F10 + n01 * F11;
       P10 = n10 * F00 + n11 * F01;
       P11 = n10 * F10 + n11 * F11 + Q;
       const S = P00 + R;
-      const K0 = P00 / S, K1 = P10 / S;
+      const K0 = P00 / S,
+        K1 = P10 / S;
       const inn = meas[k] - e1;
       e1 += K0 * inn;
       e2 += K1 * inn;
-      const o00 = P00, o01 = P01;
+      const o00 = P00,
+        o01 = P01;
       P00 = (1 - K0) * o00;
       P01 = (1 - K0) * o01;
       P10 -= K1 * o00;
       P11 -= K1 * o01;
       est[k] = e1;
     }
-    let sm = 0, se = 0;
+    let sm = 0,
+      se = 0;
     for (let k = 0; k < n; k++) {
       sm += Math.pow(meas[k] - truth[k], 2);
       se += Math.pow(est[k] - truth[k], 2);
@@ -789,7 +1028,10 @@
     const ia = al;
     const ib = -0.5 * al + (Math.sqrt(3) / 2) * be;
     const ic = -0.5 * al - (Math.sqrt(3) / 2) * be;
-    const ang = [], A = [], B = [], C = [];
+    const ang = [],
+      A = [],
+      B = [],
+      C = [];
     for (let d = 0; d <= 360; d += 5) {
       const p = (d * Math.PI) / 180;
       ang.push(d);
@@ -800,12 +1042,40 @@
     return { ia, ib, ic, id, iq, ang, A, B, C };
   }
 
-  const api = { firstOrder, secondOrder, stateFeedback, observer, smc, signalDemo, pidDemo, kalmanDemo, bodeDemo, mpcDemo, rootLocusDemo, fuzzyDemo, msdDemo, armDemo, dspDemo, imuFusionDemo, busDemo, nextState, variantDemo, discreteDemo, motorDemo, triggeredDemo, leadlagDemo, sysidDemo, mracDemo, msdCompareDemo, suspensionDemo, ekfDemo, pendulumEkfDemo, focDemo, metrics, poles };
+  const api = {
+    firstOrder,
+    secondOrder,
+    stateFeedback,
+    observer,
+    smc,
+    signalDemo,
+    pidDemo,
+    kalmanDemo,
+    bodeDemo,
+    mpcDemo,
+    rootLocusDemo,
+    fuzzyDemo,
+    msdDemo,
+    armDemo,
+    dspDemo,
+    imuFusionDemo,
+    busDemo,
+    nextState,
+    variantDemo,
+    discreteDemo,
+    motorDemo,
+    triggeredDemo,
+    leadlagDemo,
+    sysidDemo,
+    mracDemo,
+    msdCompareDemo,
+    suspensionDemo,
+    ekfDemo,
+    pendulumEkfDemo,
+    focDemo,
+    metrics,
+    poles,
+  };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.SimControl = api;
 })(typeof window !== "undefined" ? window : globalThis);
-
-
-
-
-

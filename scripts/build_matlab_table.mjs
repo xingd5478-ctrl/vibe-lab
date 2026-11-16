@@ -3,6 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { PAGES, navFor } from "./site_layout.mjs";
+import { footerFor } from "./site_footer.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const DATA = path.join(ROOT, "data", "matlab-probes.json");
@@ -169,6 +170,7 @@ ${body}
 `;
 
 html = html.replace(/<nav class="topnav"[\s\S]*?<\/nav>/, navFor(PAGES["about/matlab.html"]));
+html = html.replace(/<footer[^>]*>[\s\S]*?<\/footer>/, footerFor("about/matlab.html"));
 if (CHECK) {
   const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, "utf8") : "";
   if (current !== html) {

@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { PAGES, navFor } from "./site_layout.mjs";
+import { footerFor } from "./site_footer.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const lessonsSrc = fs.readFileSync(path.join(ROOT, "simulink", "lessons.js"), "utf8");
@@ -103,5 +104,6 @@ ${rows}
 </html>
 `;
 html = html.replace(/<nav class="topnav"[\s\S]*?<\/nav>/, navFor(PAGES["landing/en/lessons.html"]));
+html = html.replace(/<footer[^>]*>[\s\S]*?<\/footer>/, footerFor("landing/en/lessons.html"));
 fs.writeFileSync(path.join(ROOT, "landing", "en", "lessons.html"), html);
 console.log(`wrote landing/en/lessons.html (${lessons.length} lessons)`);

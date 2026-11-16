@@ -58,9 +58,9 @@ Canonical URL is currently `https://xingd5478-ctrl.github.io/vibe-lab/`. The Wor
 ## Known debt
 
 - `simulink/app.js` (≈56 KB), `guide.js` (≈56 KB) are monoliths.
-- Top navigation is generated from `scripts/site_layout.mjs` (`npm run layout`); the footer remains page-specific and is still duplicated.
+- Top navigation and footer are generated from `scripts/site_layout.mjs` / `scripts/site_footer.mjs` (`npm run layout`); 404 stays dynamic.
 - `chart.js` is copied into `imu-lab`, `control-play`, `simulink`; `npm run check:chart` keeps them in sync.
-- i18n uses Chinese source strings as dictionary keys and a MutationObserver; static metadata is improved at runtime. ESLint/Prettier currently cover `scripts/`, `tests/`, `shared/i18n.js` and `landing/motion.js`, not every browser module.
+- i18n uses Chinese source strings as dictionary keys and a MutationObserver; static metadata is improved at runtime. ESLint/Prettier cover `scripts/`, `tests/`, `landing/`, `shared/`, `imu-lab/static/`, `control-play/` and `simulink/` JavaScript.
 - Service worker cache version and asset list are maintained by hand.
 - Browser tests run on Edge/Chromium only; no real iOS/Safari/Firefox device lab.
 - No client error monitor; GoatCounter is page/event analytics only.

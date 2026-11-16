@@ -9,7 +9,11 @@
   const REPO = DATA.repo;
 
   const lessonById = {};
-  DATA.phases.forEach((ph) => ph.items.forEach((l) => { lessonById[l.id] = l; }));
+  DATA.phases.forEach((ph) =>
+    ph.items.forEach((l) => {
+      lessonById[l.id] = l;
+    })
+  );
 
   const toPts = (t, y) => {
     const out = new Array(t.length);
@@ -22,14 +26,15 @@
 
   function metrics(list) {
     if (window.LabKit) return window.LabKit.metrics($("metrics"), list);
-    $("metrics").innerHTML = list
-      .map(([k, v]) => `<div class="metric"><span>${k}</span><b>${v}</b></div>`)
-      .join("");
+    $("metrics").innerHTML = list.map(([k, v]) => `<div class="metric"><span>${k}</span><b>${v}</b></div>`).join("");
   }
 
   function links(id) {
     const l = lessonById[id];
-    if (!l) { $("links").innerHTML = ""; return; }
+    if (!l) {
+      $("links").innerHTML = "";
+      return;
+    }
     $("links").innerHTML =
       `<a href="course.html?id=${l.id}">本课讲义 →</a>` +
       `<a href="${REPO}/blob/main/${l.file}" target="_blank" rel="noreferrer">第 ${l.n} 课 · ${l.file}</a>` +
@@ -43,7 +48,9 @@
     const w = Math.max(el.clientWidth || 640, 420);
     const h = spec.feedback ? 170 : 120;
     const bw = Math.max(84, Math.min(150, (w - 40 - (n - 1) * 34) / n));
-    const gap = 34, y = 26, bh = 52;
+    const gap = 34,
+      y = 26,
+      bh = 52;
     let svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${spec.aria || "Simulink 框图"}">
       <defs>
         <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="arrow-head" d="M0,0 L8,4 L0,8 z" fill="#1b1d22"/></marker>
@@ -62,7 +69,8 @@
     if (spec.feedback) {
       const lastX = 20 + (n - 1) * (bw + gap) + bw / 2;
       const firstX = 20 + spec.sumIndex * (bw + gap) + bw / 2;
-      const yb = y + bh, yf = h - 16;
+      const yb = y + bh,
+        yf = h - 16;
       svg += `<path class="fb" d="M${lastX},${yb} V${yf} H${firstX} V${yb + 2}" marker-end="url(#ah2)"/>`;
       svg += `<text class="fb-label" x="${(lastX + firstX) / 2}" y="${yf - 6}" text-anchor="middle">${spec.feedback}</text>`;
     }
@@ -71,16 +79,18 @@
   }
 
   function renderArm(el, a) {
-    const W = Math.max(el.clientWidth || 640, 320), H = 300;
+    const W = Math.max(el.clientWidth || 640, 320),
+      H = 300;
     const scale = Math.min((W * 0.55) / a.maxReach, (H * 0.72) / a.maxReach);
-    const ox = W * 0.2, oy = H * 0.8;
+    const ox = W * 0.2,
+      oy = H * 0.8;
     const x1 = ox + a.l1 * Math.cos(a.th1) * scale;
     const y1 = oy - a.l1 * Math.sin(a.th1) * scale;
     const x2 = x1 + a.l2 * Math.cos(a.th1 + a.th2) * scale;
     const y2 = y1 - a.l2 * Math.sin(a.th1 + a.th2) * scale;
-    const tx = ox + a.ex * scale, ty = oy - a.ey * scale;
-    el.innerHTML =
-      `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="两连杆机械臂，末端 ${a.ex.toFixed(2)},${a.ey.toFixed(2)}">
+    const tx = ox + a.ex * scale,
+      ty = oy - a.ey * scale;
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="两连杆机械臂，末端 ${a.ex.toFixed(2)},${a.ey.toFixed(2)}">
         <line class="arm-grid" x1="0" y1="${oy}" x2="${W}" y2="${oy}" stroke="#e7e3d8"/>
         <line class="arm-grid" x1="${ox}" y1="0" x2="${ox}" y2="${H}" stroke="#e7e3d8"/>
         <circle class="arm-base" cx="${ox}" cy="${oy}" r="7" fill="#1b1d22"/>
@@ -105,10 +115,20 @@
         aria: "状态机：事件进入 Stateflow，输出状态",
         blocks: [{ label: "事件" }, { label: "Stateflow", sub: "Idle/Run/Fault" }, { label: "状态输出" }],
       },
-      params: [{
-        id: "cmd", label: "事件", type: "buttons", value: 0,
-        options: [{ label: "启动", value: 1 }, { label: "停止", value: 0 }, { label: "故障", value: 2 }, { label: "复位", value: 3 }],
-      }],
+      params: [
+        {
+          id: "cmd",
+          label: "事件",
+          type: "buttons",
+          value: 0,
+          options: [
+            { label: "启动", value: 1 },
+            { label: "停止", value: 0 },
+            { label: "故障", value: 2 },
+            { label: "复位", value: 3 },
+          ],
+        },
+      ],
       render(p) {
         if (p.cmd !== sfState.lastCmd) {
           const ns = S.nextState(sfState.state, p.cmd);
@@ -117,10 +137,16 @@
           sfState.lastCmd = p.cmd;
         }
         const pts = [];
-        sfState.log.forEach(([i, s]) => { pts.push([i, s]); pts.push([i + 0.9, s]); });
+        sfState.log.forEach(([i, s]) => {
+          pts.push([i, s]);
+          pts.push([i + 0.9, s]);
+        });
         plot($("chart-a"), {
-          height: 250, xLabel: "事件序号", yLabel: "状态 (0=Idle, 1=Run, 2=Fault)",
-          yMin: -0.3, yMax: 2.4,
+          height: 250,
+          xLabel: "事件序号",
+          yLabel: "状态 (0=Idle, 1=Run, 2=Fault)",
+          yMin: -0.3,
+          yMax: 2.4,
           aria: "状态机状态随事件变化",
           series: [{ name: "state", color: "#1f4e79", width: 2.0, points: pts }],
         });
@@ -142,21 +168,35 @@
         aria: "变体子系统：三个控制器实现切换",
         blocks: [{ label: "参考" }, { label: "Variant", sub: "开环/PID/PD" }, { label: "Plant" }, { label: "Scope" }],
       },
-      params: [{
-        id: "mode", label: "变体", type: "buttons", value: 1,
-        options: [{ label: "开环", value: 0 }, { label: "PID", value: 1 }, { label: "状态反馈", value: 2 }],
-      }],
+      params: [
+        {
+          id: "mode",
+          label: "变体",
+          type: "buttons",
+          value: 1,
+          options: [
+            { label: "开环", value: 0 },
+            { label: "PID", value: 1 },
+            { label: "状态反馈", value: 2 },
+          ],
+        },
+      ],
       render(p) {
         const r = S.variantDemo(p.mode);
         const m = S.metrics(r.t, r.y, 1);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "输出 y",
-          yMin: 0, yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "输出 y",
+          yMin: 0,
+          yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
           aria: `变体 ${r.label} 的阶跃响应`,
           series: [{ name: r.label, color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "控制 u",
           aria: "变体控制量",
           series: [{ name: "u", color: "#2f6b4f", width: 1.2, points: toPts(r.t, r.u) }],
         });
@@ -185,8 +225,11 @@
       render(p) {
         const r = S.signalDemo(p.K, p.freq, p.noise);
         plot($("chart-a"), {
-          height: 260, xLabel: "时间 (s)", yLabel: "u(t) / y(t)",
-          yMin: -3.6, yMax: 3.6,
+          height: 260,
+          xLabel: "时间 (s)",
+          yLabel: "u(t) / y(t)",
+          yMin: -3.6,
+          yMax: 3.6,
           aria: `正弦输入经增益 K=${p.K} 的输出`,
           series: [
             { name: "输入 u", color: "#b9b3a5", width: 1.6, points: toPts(r.t, r.u) },
@@ -209,8 +252,15 @@
       note: "u = Kp·e + Ki·∫e + Kd·de。先把 Ki、Kd 调 0 只看 P，再加 I 消稳态误差，最后加 D 压超调。",
       diagram: {
         aria: "PID 闭环框图：参考与输出相减进入 PID，控制二阶对象",
-        blocks: [{ label: "Step" }, { label: "Σ", sub: "+ −" }, { label: "PID" }, { label: "Plant", sub: "二阶对象" }, { label: "Scope" }],
-        sumIndex: 1, feedback: "输出 y",
+        blocks: [
+          { label: "Step" },
+          { label: "Σ", sub: "+ −" },
+          { label: "PID" },
+          { label: "Plant", sub: "二阶对象" },
+          { label: "Scope" },
+        ],
+        sumIndex: 1,
+        feedback: "输出 y",
       },
       params: [
         { id: "kp", label: "Kp", min: 0, max: 6, step: 0.1, value: 1.5 },
@@ -221,13 +271,18 @@
         const r = S.pidDemo(p.kp, p.ki, p.kd);
         const m = S.metrics(r.t, r.y, 1);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "输出 y",
-          yMin: 0, yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "输出 y",
+          yMin: 0,
+          yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
           aria: `PID 阶跃响应，Kp=${p.kp}，Ki=${p.ki}，Kd=${p.kd}`,
           series: [{ name: "y", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "控制 u",
           aria: "PID 控制量",
           series: [{ name: "u", color: "#2f6b4f", width: 1.2, points: toPts(r.t, r.u) }],
         });
@@ -246,7 +301,12 @@
       note: "预测 P←P+Q，更新 K=P/(P+R)。R 是传感器噪声，Q 是模型噪声；调大 R 更信模型，调大 Q 更信测量。",
       diagram: {
         aria: "卡尔曼滤波：测量 z 与模型预测融合",
-        blocks: [{ label: "真值 1" }, { label: "测量 z", sub: "+噪声" }, { label: "Kalman", sub: "K=P/(P+R)" }, { label: "Scope" }],
+        blocks: [
+          { label: "真值 1" },
+          { label: "测量 z", sub: "+噪声" },
+          { label: "Kalman", sub: "K=P/(P+R)" },
+          { label: "Scope" },
+        ],
       },
       params: [
         { id: "R", label: "测量噪声 R", min: 0.01, max: 1, step: 0.01, value: 0.1 },
@@ -255,18 +315,27 @@
       render(p) {
         const r = S.kalmanDemo(p.R, p.Q);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "真值 / 测量 / 估计",
-          yMin: 0.4, yMax: 1.6,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "真值 / 测量 / 估计",
+          yMin: 0.4,
+          yMax: 1.6,
           aria: `卡尔曼估计，R=${p.R}，Q=${p.Q}`,
           series: [
             { name: "测量 z", color: "#d3ccba", width: 1.0, points: toPts(r.t, r.z) },
             { name: "估计 x̂", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.x) },
           ],
         });
-        const e1 = new Float64Array(r.t.length), e2 = new Float64Array(r.t.length);
-        for (let i = 0; i < r.t.length; i++) { e1[i] = r.z[i] - 1; e2[i] = r.x[i] - 1; }
+        const e1 = new Float64Array(r.t.length),
+          e2 = new Float64Array(r.t.length);
+        for (let i = 0; i < r.t.length; i++) {
+          e1[i] = r.z[i] - 1;
+          e2[i] = r.x[i] - 1;
+        }
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "误差",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "误差",
           aria: "测量误差与滤波误差",
           series: [
             { name: "测量误差", color: "#b9b3a5", width: 1.0, points: toPts(r.t, e1) },
@@ -296,13 +365,20 @@
       render(p) {
         const b = S.bodeDemo(p.wn, p.zeta);
         plot($("chart-a"), {
-          height: 250, logX: true, xLabel: "ω (rad/s)", yLabel: "幅值 (dB)",
+          height: 250,
+          logX: true,
+          xLabel: "ω (rad/s)",
+          yLabel: "幅值 (dB)",
           aria: `二阶系统 Bode 幅频，ωn=${p.wn}，ζ=${p.zeta}`,
           series: [{ name: "|G|", color: "#1f4e79", width: 1.8, points: b.w.map((w, i) => [w, b.mag[i]]) }],
         });
         plot($("chart-b"), {
-          height: 250, logX: true, xLabel: "ω (rad/s)", yLabel: "相位 (°)",
-          yMin: -190, yMax: 5,
+          height: 250,
+          logX: true,
+          xLabel: "ω (rad/s)",
+          yLabel: "相位 (°)",
+          yMin: -190,
+          yMax: 5,
           aria: "二阶系统 Bode 相频",
           series: [{ name: "∠G", color: "#8a4a12", width: 1.6, points: b.w.map((w, i) => [w, b.phase[i]]) }],
         });
@@ -322,7 +398,8 @@
       diagram: {
         aria: "MPC 框图：参考进入预测优化器，控制对象并反馈",
         blocks: [{ label: "参考" }, { label: "MPC", sub: "min Σ Q e²+R u²" }, { label: "Plant" }, { label: "Scope" }],
-        sumIndex: 0, feedback: "状态反馈",
+        sumIndex: 0,
+        feedback: "状态反馈",
       },
       params: [
         { id: "N", label: "预测步数 N", min: 3, max: 15, step: 1, value: 8 },
@@ -336,16 +413,32 @@
         let sat = 0;
         for (const u of r.u) if (Math.abs(u) >= p.uMax * 0.999) sat++;
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "输出 x",
-          yMin: 0, yMax: Math.max(1.2, maxOf(r.x)) * 1.1,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "输出 x",
+          yMin: 0,
+          yMax: Math.max(1.2, maxOf(r.x)) * 1.1,
           aria: `MPC 跟踪，N=${p.N}，uMax=${p.uMax}`,
           series: [
             { name: "x", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.x) },
-            { name: "参考", color: "#b9b3a5", width: 1.2, dash: "5 4", points: [[0, 0], [1, 0], [1, 1], [8, 1]] },
+            {
+              name: "参考",
+              color: "#b9b3a5",
+              width: 1.2,
+              dash: "5 4",
+              points: [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [8, 1],
+              ],
+            },
           ],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "控制 u",
           aria: "MPC 控制量",
           series: [{ name: "u", color: "#2f6b4f", width: 1.4, points: toPts(r.t, r.u) }],
         });
@@ -370,30 +463,78 @@
       render(p) {
         const b = S.rootLocusDemo(p.K);
         let maxIm = 0.1;
-        b.branches.forEach((br) => br.forEach(([, im]) => { if (Math.abs(im) > maxIm) maxIm = Math.abs(im); }));
+        b.branches.forEach((br) =>
+          br.forEach(([, im]) => {
+            if (Math.abs(im) > maxIm) maxIm = Math.abs(im);
+          })
+        );
         const series = b.branches.map((br, i) => ({
-          name: `分支 ${i + 1}`, color: i === 0 ? "#1f4e79" : i === 1 ? "#2f6b4f" : "#8a4a12",
-          width: 1.4, legend: false, points: br,
+          name: `分支 ${i + 1}`,
+          color: i === 0 ? "#1f4e79" : i === 1 ? "#2f6b4f" : "#8a4a12",
+          width: 1.4,
+          legend: false,
+          points: br,
         }));
         b.highlight.forEach((br, i) => {
           if (br.length > 1) {
             series.push({ name: "K∈[20,50]", color: "#b5651d", width: 3.0, legend: i === 0, points: br });
           }
         });
-        series.push({ name: "y 轴 (x=0)", color: "#1b1d22", width: 1.3, legend: true, points: [[0, -4.5], [0, 4.5]] });
+        series.push({
+          name: "y 轴 (x=0)",
+          color: "#1b1d22",
+          width: 1.3,
+          legend: true,
+          points: [
+            [0, -4.5],
+            [0, 4.5],
+          ],
+        });
         [60, 180, 300].forEach((deg) => {
           const rad = (deg * Math.PI) / 180;
-          series.push({ name: "渐近线", color: "#7a9cc6", width: 1, dash: "6 5", legend: false,
-            points: [[-1, 0], [-1 + 8 * Math.cos(rad), 8 * Math.sin(rad)]] });
+          series.push({
+            name: "渐近线",
+            color: "#7a9cc6",
+            width: 1,
+            dash: "6 5",
+            legend: false,
+            points: [
+              [-1, 0],
+              [-1 + 8 * Math.cos(rad), 8 * Math.sin(rad)],
+            ],
+          });
         });
-        series.push({ name: "开环极点 X", color: "#5b564c", marker: "x", line: false, points: b.openPoles.map((p) => [p, 0]) });
-        series.push({ name: "当前闭环极点", color: "#1f4e79", marker: "dot", line: false, points: b.current.map((p) => [p.re, p.im]) });
+        series.push({
+          name: "开环极点 X",
+          color: "#5b564c",
+          marker: "x",
+          line: false,
+          points: b.openPoles.map((p) => [p, 0]),
+        });
+        series.push({
+          name: "当前闭环极点",
+          color: "#1f4e79",
+          marker: "dot",
+          line: false,
+          points: b.current.map((p) => [p.re, p.im]),
+        });
         if (b.zeros.length) {
-          series.push({ name: "零点 O", color: "#2f6b4f", marker: "o", line: false, points: b.zeros.map((p) => [p, 0]) });
+          series.push({
+            name: "零点 O",
+            color: "#2f6b4f",
+            marker: "o",
+            line: false,
+            points: b.zeros.map((p) => [p, 0]),
+          });
         }
         plot($("chart-a"), {
-          height: 270, xLabel: "Re", yLabel: "Im",
-          xMin: -5.5, xMax: 1.5, yMin: -4.5, yMax: 4.5,
+          height: 270,
+          xLabel: "Re",
+          yLabel: "Im",
+          xMin: -5.5,
+          xMax: 1.5,
+          yMin: -4.5,
+          yMax: 4.5,
           aria: `根轨迹，K=${p.K}`,
           series,
         });
@@ -421,13 +562,18 @@
         const r = S.fuzzyDemo(p.scale);
         const m = S.metrics(r.t, r.y, 1);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "输出 y",
-          yMin: 0, yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "输出 y",
+          yMin: 0,
+          yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
           aria: `模糊控制响应，尺度=${p.scale}`,
           series: [{ name: "y", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "控制 u",
           aria: "模糊控制量",
           series: [{ name: "u", color: "#2f6b4f", width: 1.2, points: toPts(r.t, r.u) }],
         });
@@ -447,7 +593,12 @@
       note: "m ẍ + c ẋ + k x = F。ωn=√(k/m)、ζ=c/(2√(km))：k 决定晃多快，c 决定多久停。",
       diagram: {
         aria: "质量弹簧阻尼系统：力作用于质量，经弹簧阻尼到示波器",
-        blocks: [{ label: "Force" }, { label: "m", sub: "质量" }, { label: "k / c", sub: "弹簧/阻尼" }, { label: "Scope" }],
+        blocks: [
+          { label: "Force" },
+          { label: "m", sub: "质量" },
+          { label: "k / c", sub: "弹簧/阻尼" },
+          { label: "Scope" },
+        ],
       },
       params: [
         { id: "k", label: "刚度 k (N/m)", min: 1, max: 20, step: 0.5, value: 5 },
@@ -457,8 +608,11 @@
         const r = S.msdDemo(p.k, p.c);
         const m = S.metrics(r.t, r.x, 1 / p.k);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "位移 x",
-          yMin: 0, yMax: Math.max(1 / p.k, maxOf(r.x)) * 1.2,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "位移 x",
+          yMin: 0,
+          yMax: Math.max(1 / p.k, maxOf(r.x)) * 1.2,
           aria: `质量弹簧阻尼位移，k=${p.k}，c=${p.c}`,
           series: [{ name: "x", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.x) }],
         });
@@ -512,8 +666,11 @@
       render(p) {
         const r = S.dspDemo(p.f, p.fs);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "幅值",
-          yMin: -1.3, yMax: 1.3,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "幅值",
+          yMin: -1.3,
+          yMax: 1.3,
           aria: `采样演示，f=${p.f}，fs=${p.fs}`,
           series: [
             { name: "真实正弦", color: "#b9b3a5", width: 1.4, points: toPts(r.t, r.y) },
@@ -523,8 +680,11 @@
         const ya = new Float64Array(r.t.length);
         for (let i = 0; i < r.t.length; i++) ya[i] = Math.sin(2 * Math.PI * r.alias * r.t[i]);
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "真实 / 混叠重建",
-          yMin: -1.3, yMax: 1.3,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "真实 / 混叠重建",
+          yMin: -1.3,
+          yMax: 1.3,
           aria: "真实频率与混叠频率对比",
           series: [
             { name: "真实", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.y) },
@@ -546,7 +706,12 @@
       note: "互补滤波：θ̂←α(θ̂+ωdt)+(1−α)θacc。α 大更信陀螺（平滑但漂），α 小更信加速度计（跟得快但抖）。",
       diagram: {
         aria: "IMU 融合：陀螺积分与加速度计倾角互补",
-        blocks: [{ label: "Gyro", sub: "积分" }, { label: "互补滤波", sub: "α" }, { label: "Accel", sub: "倾角" }, { label: "Scope" }],
+        blocks: [
+          { label: "Gyro", sub: "积分" },
+          { label: "互补滤波", sub: "α" },
+          { label: "Accel", sub: "倾角" },
+          { label: "Scope" },
+        ],
       },
       params: [
         { id: "alpha", label: "互补系数 α", min: 0.8, max: 0.99, step: 0.01, value: 0.95 },
@@ -555,7 +720,9 @@
       render(p) {
         const r = S.imuFusionDemo(p.alpha, p.noise);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "倾角 (°)",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "倾角 (°)",
           aria: `IMU 融合，α=${p.alpha}`,
           series: [
             { name: "真值", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.truth) },
@@ -563,10 +730,16 @@
             { name: "互补输出", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.comp) },
           ],
         });
-        const e1 = new Float64Array(r.t.length), e2 = new Float64Array(r.t.length);
-        for (let i = 0; i < r.t.length; i++) { e1[i] = r.acc[i] - r.truth[i]; e2[i] = r.comp[i] - r.truth[i]; }
+        const e1 = new Float64Array(r.t.length),
+          e2 = new Float64Array(r.t.length);
+        for (let i = 0; i < r.t.length; i++) {
+          e1[i] = r.acc[i] - r.truth[i];
+          e2[i] = r.comp[i] - r.truth[i];
+        }
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "误差 (°)",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "误差 (°)",
           aria: "加速度计与互补滤波误差",
           series: [
             { name: "加速度计误差", color: "#b9b3a5", width: 0.9, points: toPts(r.t, e1) },
@@ -595,12 +768,16 @@
         const names = ["sin", "cos", "ramp", "square"];
         const colors = ["#1f4e79", "#2f6b4f", "#8a4a12", "#7a9cc6"];
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "四路信号",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "四路信号",
           aria: "Bus 中的四路信号",
           series: names.map((n, i) => ({ name: n, color: colors[i], width: 1.2, points: toPts(r.t, r.sigs[i]) })),
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: names[r.sel],
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: names[r.sel],
           aria: `Bus 选择 ${names[r.sel]}`,
           series: [{ name: names[r.sel], color: "#1f4e79", width: 2.0, points: toPts(r.t, r.sigs[r.sel]) }],
         });
@@ -618,7 +795,12 @@
       note: "电压→电流→转矩→转速：电气时间常数 ~0.5s、机械 ~0.1s。速度 PI 调 Kp/Ki；负载加大后靠积分拉回。",
       diagram: {
         aria: "直流电机：电压经电气与机械动态到转速",
-        blocks: [{ label: "电压 u" }, { label: "电气 L/R", sub: "电流环" }, { label: "机械 J/b", sub: "转速" }, { label: "Scope" }],
+        blocks: [
+          { label: "电压 u" },
+          { label: "电气 L/R", sub: "电流环" },
+          { label: "机械 J/b", sub: "转速" },
+          { label: "Scope" },
+        ],
       },
       params: [
         { id: "kp", label: "速度环 Kp", min: 0.05, max: 2, step: 0.05, value: 0.5 },
@@ -629,12 +811,18 @@
         const r = S.motorDemo(p.kp, p.ki, p.load);
         const m = S.metrics(r.t, r.w, 50);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "转速 (rad/s)", yMin: 0, yMax: 60,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "转速 (rad/s)",
+          yMin: 0,
+          yMax: 60,
           aria: "直流电机转速",
           series: [{ name: "转速", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.w) }],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "电流 (A)",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "电流 (A)",
           aria: "直流电机电流",
           series: [{ name: "电流", color: "#8a4a12", width: 1.2, points: toPts(r.t, r.cur) }],
         });
@@ -659,7 +847,11 @@
       render(p) {
         const r = S.triggeredDemo(p.fs);
         plot($("chart-a"), {
-          height: 260, xLabel: "时间 (s)", yLabel: "幅值", yMin: -1.3, yMax: 1.3,
+          height: 260,
+          xLabel: "时间 (s)",
+          yLabel: "幅值",
+          yMin: -1.3,
+          yMax: 1.3,
           aria: "触发采样保持",
           series: [
             { name: "连续输入", color: "#b9b3a5", width: 1.4, points: toPts(r.t, r.y) },
@@ -691,12 +883,17 @@
         const r = S.leadlagDemo(p.z, p.p);
         const m = S.metrics(r.t, r.y, 1);
         plot($("chart-a"), {
-          height: 250, logX: true, xLabel: "ω (rad/s)", yLabel: "开环幅值 (dB)",
+          height: 250,
+          logX: true,
+          xLabel: "ω (rad/s)",
+          yLabel: "开环幅值 (dB)",
           aria: "校正后开环 Bode 幅频",
           series: [{ name: "|L|", color: "#1f4e79", width: 1.6, points: r.w.map((w, i) => [w, r.mag[i]]) }],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "闭环输出",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "闭环输出",
           aria: "校正后闭环阶跃",
           series: [{ name: "y", color: "#2f6b4f", width: 1.8, points: toPts(r.t, r.y) }],
         });
@@ -724,7 +921,11 @@
       render(p) {
         const r = S.sysidDemo(p.noise, p.tau);
         plot($("chart-a"), {
-          height: 260, xLabel: "时间 (s)", yLabel: "输出 y", yMin: 0, yMax: 2.4,
+          height: 260,
+          xLabel: "时间 (s)",
+          yLabel: "输出 y",
+          yMin: 0,
+          yMax: 2.4,
           aria: "阶跃响应与拟合",
           series: [
             { name: "实测", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.data) },
@@ -747,13 +948,20 @@
       note: "参考模型给出理想响应；对象增益在 2s 从 1 变 2，MIT 规则按误差调 θ，约几秒恢复跟踪。γ 太大会振荡。",
       diagram: {
         aria: "MRAC：参考模型与对象误差驱动自适应律",
-        blocks: [{ label: "参考模型" }, { label: "自适应律", sub: "γ" }, { label: "Controller", sub: "θ" }, { label: "Plant" }],
+        blocks: [
+          { label: "参考模型" },
+          { label: "自适应律", sub: "γ" },
+          { label: "Controller", sub: "θ" },
+          { label: "Plant" },
+        ],
       },
       params: [{ id: "gamma", label: "自适应增益 γ", min: 0.05, max: 2, step: 0.05, value: 0.5 }],
       render(p) {
         const r = S.mracDemo(p.gamma);
         plot($("chart-a"), {
-          height: 260, xLabel: "时间 (s)", yLabel: "输出",
+          height: 260,
+          xLabel: "时间 (s)",
+          yLabel: "输出",
           aria: "参考模型与对象输出",
           series: [
             { name: "参考模型", color: "#b9b3a5", width: 2.2, points: toPts(r.t, r.ym) },
@@ -787,7 +995,11 @@
         const mp = S.metrics(r.pid.t, r.pid.y, 1);
         const ml = S.metrics(r.lqr.t, r.lqr.y, 1);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "位置 x", yMin: 0, yMax: 1.6,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "位置 x",
+          yMin: 0,
+          yMax: 1.6,
           aria: "PID 与 LQR 位置对比",
           series: [
             { name: "PID", color: "#b9b3a5", width: 2.2, points: toPts(r.pid.t, r.pid.y) },
@@ -795,7 +1007,9 @@
           ],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "控制 u",
           aria: "PID 与 LQR 控制量",
           series: [
             { name: "PID u", color: "#b9b3a5", width: 1.4, points: toPts(r.pid.t, r.pid.u) },
@@ -822,18 +1036,23 @@
       params: [{ id: "csky", label: "天棚阻尼 csky", min: 0, max: 5000, step: 100, value: 0 }],
       render(p) {
         const r = S.suspensionDemo(p.csky);
-        let pa = 0, pl = 0;
+        let pa = 0,
+          pl = 0;
         for (let i = 0; i < r.t.length; i++) {
           pa = Math.max(pa, Math.abs(r.acc[i]));
           pl = Math.max(pl, Math.abs(r.load[i]));
         }
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "车身加速度 (m/s²)",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "车身加速度 (m/s²)",
           aria: "车身加速度",
           series: [{ name: "a_s", color: "#1f4e79", width: 1.4, points: toPts(r.t, r.acc) }],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "轮胎动载 (N)",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "轮胎动载 (N)",
           aria: "轮胎动载",
           series: [{ name: "F_z", color: "#8a4a12", width: 1.4, points: toPts(r.t, r.load) }],
         });
@@ -852,13 +1071,20 @@
       note: "Van der Pol 振子只测 x1，EKF 用 Jacobian 局部线性化；R 越大越信模型、估计更平滑但跟踪变慢。",
       diagram: {
         aria: "EKF：非线性对象与带噪观测",
-        blocks: [{ label: "Van der Pol" }, { label: "测量 y=x1" }, { label: "EKF", sub: "Jacobian" }, { label: "Scope" }],
+        blocks: [
+          { label: "Van der Pol" },
+          { label: "测量 y=x1" },
+          { label: "EKF", sub: "Jacobian" },
+          { label: "Scope" },
+        ],
       },
       params: [{ id: "R", label: "测量噪声 R", min: 0.001, max: 0.5, step: 0.001, value: 0.05 }],
       render(p) {
         const r = S.ekfDemo(p.R);
         plot($("chart-a"), {
-          height: 260, xLabel: "时间 (s)", yLabel: "x1",
+          height: 260,
+          xLabel: "时间 (s)",
+          yLabel: "x1",
           aria: "EKF 估计与真值",
           series: [
             { name: "真值", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.truth) },
@@ -887,7 +1113,9 @@
       render(p) {
         const r = S.pendulumEkfDemo(p.R);
         plot($("chart-a"), {
-          height: 260, xLabel: "时间 (s)", yLabel: "角度 θ (rad)",
+          height: 260,
+          xLabel: "时间 (s)",
+          yLabel: "角度 θ (rad)",
           aria: "倒立摆角度估计",
           series: [
             { name: "真值", color: "#b9b3a5", width: 1.2, points: toPts(r.t, r.truth) },
@@ -919,7 +1147,11 @@
       render(p) {
         const r = S.focDemo(p.iq, p.deg);
         plot($("chart-a"), {
-          height: 250, xLabel: "θ (°)", yLabel: "三相电流 (A)", yMin: -6, yMax: 6,
+          height: 250,
+          xLabel: "θ (°)",
+          yLabel: "三相电流 (A)",
+          yMin: -6,
+          yMax: 6,
           aria: "三相电流随角度",
           series: [
             { name: "ia", color: "#1f4e79", width: 1.4, points: r.ang.map((d, i) => [d, r.A[i]]) },
@@ -951,8 +1183,11 @@
       render(p) {
         const r = S.firstOrder(p.tau, p.K, 6);
         plot($("chart-a"), {
-          height: 260, xLabel: "时间 (s)", yLabel: "y(t)",
-          yMin: 0, yMax: Math.max(1.1, p.K) * 1.15,
+          height: 260,
+          xLabel: "时间 (s)",
+          yLabel: "y(t)",
+          yMin: 0,
+          yMax: Math.max(1.1, p.K) * 1.15,
           aria: `一阶系统阶跃响应，τ=${p.tau}s，K=${p.K}`,
           series: [{ name: "输出 y", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
         });
@@ -983,8 +1218,11 @@
         const m = S.metrics(r.t, r.y, 1);
         const pl = S.poles(p.wn, p.zeta);
         plot($("chart-a"), {
-          height: 260, xLabel: "时间 (s)", yLabel: "y(t)",
-          yMin: 0, yMax: Math.max(1.1, maxOf(r.y)) * 1.12,
+          height: 260,
+          xLabel: "时间 (s)",
+          yLabel: "y(t)",
+          yMin: 0,
+          yMax: Math.max(1.1, maxOf(r.y)) * 1.12,
           aria: `二阶系统阶跃响应，ωn=${p.wn}，ζ=${p.zeta}`,
           series: [{ name: "输出 y", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
         });
@@ -1005,7 +1243,8 @@
       diagram: {
         aria: "状态反馈框图：参考经求和进入双积分对象，状态经 K 反馈",
         blocks: [{ label: "Step" }, { label: "Σ", sub: "+ −" }, { label: "1/s²", sub: "Plant" }, { label: "Scope" }],
-        sumIndex: 1, feedback: "K = [ωn², 2ζωn]",
+        sumIndex: 1,
+        feedback: "K = [ωn², 2ζωn]",
       },
       params: [
         { id: "wn", label: "闭环 ωn (rad/s)", min: 1, max: 12, step: 0.5, value: 4 },
@@ -1015,13 +1254,18 @@
         const r = S.stateFeedback(p.wn, p.zeta, 6);
         const m = S.metrics(r.t, r.y, 1);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "位置 x1",
-          yMin: 0, yMax: Math.max(1.1, maxOf(r.y)) * 1.12,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "位置 x1",
+          yMin: 0,
+          yMax: Math.max(1.1, maxOf(r.y)) * 1.12,
           aria: `状态反馈位置响应，ωn=${p.wn}，ζ=${p.zeta}`,
           series: [{ name: "x1", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) }],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "控制 u",
           aria: "状态反馈控制量",
           series: [{ name: "u", color: "#2f6b4f", width: 1.4, points: toPts(r.t, r.u) }],
         });
@@ -1041,7 +1285,8 @@
       diagram: {
         aria: "观测器框图：对象输出 y 进入观测器，估计状态用于反馈",
         blocks: [{ label: "Step" }, { label: "Σ", sub: "+ −" }, { label: "1/s²", sub: "Plant" }, { label: "Scope" }],
-        sumIndex: 1, feedback: "x̂ (Luenberger Observer)",
+        sumIndex: 1,
+        feedback: "x̂ (Luenberger Observer)",
       },
       params: [
         { id: "wn", label: "控制器 ωn", min: 1, max: 10, step: 0.5, value: 4 },
@@ -1055,8 +1300,11 @@
         let maxErr = 0;
         for (let i = 0; i < r.t.length; i++) if (r.t[i] > 1 && r.err[i] > maxErr) maxErr = r.err[i];
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "位置 x1 / x̂1",
-          yMin: 0, yMax: Math.max(1.1, maxOf(r.y)) * 1.12,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "位置 x1 / x̂1",
+          yMin: 0,
+          yMax: Math.max(1.1, maxOf(r.y)) * 1.12,
           aria: "真实状态与观测器估计对比",
           series: [
             { name: "真实 x1", color: "#b9b3a5", width: 2.8, points: toPts(r.t, r.y) },
@@ -1064,7 +1312,9 @@
           ],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "|x1 − x̂1|",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "|x1 − x̂1|",
           aria: "观测误差",
           series: [{ name: "误差", color: "#8a4a12", width: 1.2, points: toPts(r.t, r.err) }],
         });
@@ -1083,8 +1333,15 @@
       note: "滑模面 s = ė + λe，u = −k·sat(s/φ)。φ 越小越接近 sign → 抖振更大；φ 越大越平滑但稳态误差变大。",
       diagram: {
         aria: "滑模控制框图：误差进入 SMC，控制双积分对象，状态反馈",
-        blocks: [{ label: "Step" }, { label: "Σ", sub: "e" }, { label: "SMC", sub: "sat(s/φ)" }, { label: "1/s²", sub: "Plant" }, { label: "Scope" }],
-        sumIndex: 1, feedback: "x",
+        blocks: [
+          { label: "Step" },
+          { label: "Σ", sub: "e" },
+          { label: "SMC", sub: "sat(s/φ)" },
+          { label: "1/s²", sub: "Plant" },
+          { label: "Scope" },
+        ],
+        sumIndex: 1,
+        feedback: "x",
       },
       params: [
         { id: "lambda", label: "滑模面 λ", min: 1, max: 12, step: 0.5, value: 4 },
@@ -1094,18 +1351,33 @@
       render(p) {
         const r = S.smc(p.lambda, p.k, p.phi);
         let maxErr = 0;
-        for (let i = 0; i < r.t.length; i++) if (r.t[i] > 1 && Math.abs(r.y[i] - 1) > maxErr) maxErr = Math.abs(r.y[i] - 1);
+        for (let i = 0; i < r.t.length; i++)
+          if (r.t[i] > 1 && Math.abs(r.y[i] - 1) > maxErr) maxErr = Math.abs(r.y[i] - 1);
         plot($("chart-a"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "位置 x1",
-          yMin: 0, yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "位置 x1",
+          yMin: 0,
+          yMax: Math.max(1.2, maxOf(r.y)) * 1.1,
           aria: "滑模控制位置跟踪",
           series: [
             { name: "x1", color: "#1f4e79", width: 1.8, points: toPts(r.t, r.y) },
-            { name: "参考", color: "#b9b3a5", width: 1.2, dash: "5 4", points: [[0, 1], [6, 1]] },
+            {
+              name: "参考",
+              color: "#b9b3a5",
+              width: 1.2,
+              dash: "5 4",
+              points: [
+                [0, 1],
+                [6, 1],
+              ],
+            },
           ],
         });
         plot($("chart-b"), {
-          height: 250, xLabel: "时间 (s)", yLabel: "控制 u",
+          height: 250,
+          xLabel: "时间 (s)",
+          yLabel: "控制 u",
           aria: "滑模控制量（抖振）",
           series: [{ name: "u", color: "#2f6b4f", width: 1.2, points: toPts(r.t, r.u) }],
         });
@@ -1146,7 +1418,12 @@
       }
       if (d.type === "buttons") {
         if (window.LabKit && window.LabKit.buttons) {
-          box.appendChild(window.LabKit.buttons(d.label, d.options, d.value, (v) => { d.value = v; onChange(); }));
+          box.appendChild(
+            window.LabKit.buttons(d.label, d.options, d.value, (v) => {
+              d.value = v;
+              onChange();
+            })
+          );
           return;
         }
         const div = document.createElement("div");
@@ -1177,8 +1454,12 @@
         return;
       }
       if (window.LabKit && window.LabKit.slider) {
-        box.appendChild(window.LabKit.slider(d.label, d.min, d.max, d.step, d.value, onChange,
-          { id: "p-" + d.id, valueId: "v-" + d.id }));
+        box.appendChild(
+          window.LabKit.slider(d.label, d.min, d.max, d.step, d.value, onChange, {
+            id: "p-" + d.id,
+            valueId: "v-" + d.id,
+          })
+        );
         return;
       }
       const div = document.createElement("div");
@@ -1194,7 +1475,10 @@
   function readParams(params) {
     const p = {};
     params.forEach((d) => {
-      if (d.type === "buttons") { p[d.id] = d.value; return; }
+      if (d.type === "buttons") {
+        p[d.id] = d.value;
+        return;
+      }
       const el = $("p-" + d.id);
       p[d.id] = d.type === "toggle" ? el.checked : parseFloat(el.value);
     });
@@ -1227,8 +1511,9 @@
 
   function buildTabs() {
     const box = $("tabs");
-    const order = Object.keys(DEMOS).sort((a, b) =>
-      parseInt(DEMOS[a].lesson.slice(1), 10) - parseInt(DEMOS[b].lesson.slice(1), 10));
+    const order = Object.keys(DEMOS).sort(
+      (a, b) => parseInt(DEMOS[a].lesson.slice(1), 10) - parseInt(DEMOS[b].lesson.slice(1), 10)
+    );
     order.forEach((id) => {
       const b = document.createElement("button");
       b.type = "button";
@@ -1264,6 +1549,9 @@
   }
   window.addEventListener("resize", () => {
     clearTimeout(window.__simT);
-    window.__simT = setTimeout(() => { diagram(DEMOS[current].diagram); refresh(); }, 120);
+    window.__simT = setTimeout(() => {
+      diagram(DEMOS[current].diagram);
+      refresh();
+    }, 120);
   });
 })();

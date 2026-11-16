@@ -14,7 +14,8 @@
 
   function bode(wn, zeta) {
     const w = logspace(0.1, 100, 320);
-    const mag = [], phase = [];
+    const mag = [],
+      phase = [];
     for (const wi of w) {
       const re = wn * wn - wi * wi;
       const im = 2 * zeta * wn * wi;
@@ -25,9 +26,14 @@
   }
 
   function sim(wn, zeta, closed, kp, ki, kd) {
-    const dt = 0.002, T = 8, n = Math.floor(T / dt);
-    let x1 = 0, x2 = 0, xi = 0;
-    const t = new Float64Array(n), y = new Float64Array(n);
+    const dt = 0.002,
+      T = 8,
+      n = Math.floor(T / dt);
+    let x1 = 0,
+      x2 = 0,
+      xi = 0;
+    const t = new Float64Array(n),
+      y = new Float64Array(n);
     for (let i = 0; i < n; i++) {
       let u = 1;
       if (closed) {
@@ -47,14 +53,22 @@
   }
 
   function metrics(t, y) {
-    let peak = -Infinity, tPeak = 0;
-    for (let i = 0; i < y.length; i++) if (y[i] > peak) { peak = y[i]; tPeak = t[i]; }
+    let peak = -Infinity,
+      tPeak = 0;
+    for (let i = 0; i < y.length; i++)
+      if (y[i] > peak) {
+        peak = y[i];
+        tPeak = t[i];
+      }
     const overshoot = peak > 1 ? (peak - 1) * 100 : 0;
-    let settle = 0, settled = true;
+    let settle = 0,
+      settled = true;
     for (let i = y.length - 1; i >= 0; i--) {
       if (Math.abs(y[i] - 1) > 0.02) {
-        if (i === y.length - 1) { settle = null; settled = false; }
-        else settle = t[Math.min(i + 1, y.length - 1)];
+        if (i === y.length - 1) {
+          settle = null;
+          settled = false;
+        } else settle = t[Math.min(i + 1, y.length - 1)];
         break;
       }
     }
@@ -65,13 +79,22 @@
   const tr = (s) => (window.VibeI18n ? window.VibeI18n.translate(s) : s);
 
   function plotBode(el, b) {
-    const w = Math.max(el.clientWidth || 640, 320), h = 300;
-    const iw = w - PAD.l - PAD.r, ih = h - PAD.t - PAD.b;
-    const x0 = Math.log10(b.w[0]), x1 = Math.log10(b.w[b.w.length - 1]);
-    let magMin = Math.min(...b.mag), magMax = Math.max(...b.mag);
-    let phMin = Math.min(...b.phase), phMax = Math.max(...b.phase);
-    const mp = (magMax - magMin) * 0.08 || 1, pp = (phMax - phMin) * 0.08 || 1;
-    magMin -= mp; magMax += mp; phMin -= pp; phMax += pp;
+    const w = Math.max(el.clientWidth || 640, 320),
+      h = 300;
+    const iw = w - PAD.l - PAD.r,
+      ih = h - PAD.t - PAD.b;
+    const x0 = Math.log10(b.w[0]),
+      x1 = Math.log10(b.w[b.w.length - 1]);
+    let magMin = Math.min(...b.mag),
+      magMax = Math.max(...b.mag);
+    let phMin = Math.min(...b.phase),
+      phMax = Math.max(...b.phase);
+    const mp = (magMax - magMin) * 0.08 || 1,
+      pp = (phMax - phMin) * 0.08 || 1;
+    magMin -= mp;
+    magMax += mp;
+    phMin -= pp;
+    phMax += pp;
 
     const X = (v) => PAD.l + ((Math.log10(v) - x0) / (x1 - x0)) * iw;
     const Ym = (v) => PAD.t + (1 - (v - magMin) / (magMax - magMin)) * ih;
@@ -101,8 +124,16 @@
     svg += `<text class="axis-label" x="${w - PAD.r}" y="${PAD.t - 10}" text-anchor="end">${tr("相位 (°)")}</text>`;
     svg += `<text class="axis-label" x="${w - PAD.r}" y="${h - 4}" text-anchor="end">ω (rad/s)</text>`;
 
-    svg += path(b.w.map((v, i) => [X(v), Ym(b.mag[i])]), "#1f4e79", 1.8);
-    svg += path(b.w.map((v, i) => [X(v), Yp(b.phase[i])]), "#b5651d", 1.8);
+    svg += path(
+      b.w.map((v, i) => [X(v), Ym(b.mag[i])]),
+      "#1f4e79",
+      1.8
+    );
+    svg += path(
+      b.w.map((v, i) => [X(v), Yp(b.phase[i])]),
+      "#b5651d",
+      1.8
+    );
 
     svg += `<line x1="${PAD.l + 118}" y1="${PAD.t - 18}" x2="${PAD.l + 132}" y2="${PAD.t - 18}" stroke="#1f4e79" stroke-width="2"/>`;
     svg += `<text class="legend-label" x="${PAD.l + 137}" y="${PAD.t - 14}">${tr("幅值")}</text>`;
@@ -112,7 +143,12 @@
     el.innerHTML = svg;
 
     attachHover(el, {
-      w, h, pad: PAD, X, xInv, xLabel: "ω",
+      w,
+      h,
+      pad: PAD,
+      X,
+      xInv,
+      xLabel: "ω",
       series: [
         { name: tr("幅值"), points: b.w.map((v, i) => [v, b.mag[i]]) },
         { name: tr("相位"), points: b.w.map((v, i) => [v, b.phase[i]]) },
@@ -122,8 +158,10 @@
   }
 
   function plotStep(el, open, closed) {
-    const w = Math.max(el.clientWidth || 640, 320), h = 260;
-    const iw = w - PAD.l - PAD.r, ih = h - PAD.t - PAD.b;
+    const w = Math.max(el.clientWidth || 640, 320),
+      h = 260;
+    const iw = w - PAD.l - PAD.r,
+      ih = h - PAD.t - PAD.b;
     const tmax = open.t[open.t.length - 1];
     const ymax = Math.max(1.05, ...open.y, ...closed.y) * 1.08;
     const X = (v) => PAD.l + (v / tmax) * iw;
@@ -147,8 +185,17 @@
     svg += `<text class="axis-label" x="${w - PAD.r}" y="${h - 4}" text-anchor="end">t (s)</text>`;
 
     svg += `<line x1="${PAD.l}" y1="${Y(1)}" x2="${w - PAD.r}" y2="${Y(1)}" stroke="#b9b3a5" stroke-width="1.2" stroke-dasharray="5 4"/>`;
-    svg += path(Array.from(open.t, (v, i) => [X(v), Y(open.y[i])]), "#b9b3a5", 1.2, "5 4");
-    svg += path(Array.from(closed.t, (v, i) => [X(v), Y(closed.y[i])]), "#2f6b4f", 1.8);
+    svg += path(
+      Array.from(open.t, (v, i) => [X(v), Y(open.y[i])]),
+      "#b9b3a5",
+      1.2,
+      "5 4"
+    );
+    svg += path(
+      Array.from(closed.t, (v, i) => [X(v), Y(closed.y[i])]),
+      "#2f6b4f",
+      1.8
+    );
 
     svg += `<line x1="${PAD.l + 78}" y1="${PAD.t - 18}" x2="${PAD.l + 92}" y2="${PAD.t - 18}" stroke="#b9b3a5" stroke-width="1.2" stroke-dasharray="5 4"/>`;
     svg += `<text class="legend-label" x="${PAD.l + 97}" y="${PAD.t - 14}">${tr("开环")}</text>`;
@@ -158,7 +205,12 @@
     el.innerHTML = svg;
 
     attachHover(el, {
-      w, h, pad: PAD, X, xInv, xLabel: "t",
+      w,
+      h,
+      pad: PAD,
+      X,
+      xInv,
+      xLabel: "t",
       series: [
         { name: tr("开环"), points: Array.from(open.t, (v, i) => [v, open.y[i]]) },
         { name: tr("闭环"), points: Array.from(closed.t, (v, i) => [v, closed.y[i]]) },
@@ -180,8 +232,13 @@
     $("kp-val").textContent = kp.toFixed(2);
     $("ki-val").textContent = ki.toFixed(2);
     $("kd-val").textContent = kd.toFixed(3);
-    [["wn", wn.toFixed(1)], ["zeta", zeta.toFixed(2)], ["kp", kp.toFixed(2)],
-     ["ki", ki.toFixed(2)], ["kd", kd.toFixed(3)]].forEach(([id, v]) => {
+    [
+      ["wn", wn.toFixed(1)],
+      ["zeta", zeta.toFixed(2)],
+      ["kp", kp.toFixed(2)],
+      ["ki", ki.toFixed(2)],
+      ["kd", kd.toFixed(3)],
+    ].forEach(([id, v]) => {
       $(id).setAttribute("aria-valuetext", v);
     });
 
@@ -211,7 +268,11 @@
     p.set("kp", state.kp.toFixed(2));
     p.set("ki", state.ki.toFixed(2));
     p.set("kd", state.kd.toFixed(3));
-    try { history.replaceState(null, "", location.pathname + "?" + p.toString() + (location.hash || "")); } catch (e) { /* file:// */ }
+    try {
+      history.replaceState(null, "", location.pathname + "?" + p.toString() + (location.hash || ""));
+    } catch (e) {
+      /* file:// */
+    }
   }
 
   function loadURL() {

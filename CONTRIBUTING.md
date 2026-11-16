@@ -46,14 +46,14 @@ Edit the generator or source data and regenerate.
 
 ## Navigation
 
-The static top navigation is generated from `scripts/site_layout.mjs` (single source of labels, hrefs, language switch and active state). After editing it:
+The static top navigation is generated from `scripts/site_layout.mjs`, and the static footer from `scripts/site_footer.mjs` (single sources for labels, hrefs, language switch and active state). After editing either:
 
 ```bash
 npm run layout
 npm run check:layout
 ```
 
-The generated pages are committed; CI fails if a page nav and the shared source drift. The footer remains page-specific.
+The generated pages are committed; CI fails if a page nav/footer and the shared source drift. 404 keeps a dynamic footer and is intentionally excluded.
 
 ## Conventions
 

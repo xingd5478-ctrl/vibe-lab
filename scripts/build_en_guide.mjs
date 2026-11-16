@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { PAGES, navFor } from "./site_layout.mjs";
+import { footerFor } from "./site_footer.mjs";
 import vm from "node:vm";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -165,5 +166,6 @@ ${phases}
 </html>
 `;
 html = html.replace(/<nav class="topnav"[\s\S]*?<\/nav>/, navFor(PAGES["landing/en/guide.html"]));
+html = html.replace(/<footer[^>]*>[\s\S]*?<\/footer>/, footerFor("landing/en/guide.html"));
 fs.writeFileSync(path.join(ROOT, "landing", "en", "guide.html"), html);
 console.log(`wrote landing/en/guide.html (${phases.split("<details").length - 1} lessons)`);

@@ -18,10 +18,16 @@
     for (const tau of taus) {
       const m = Math.max(1, Math.round(tau / dt));
       if (m * 2 >= n) break;
-      let sum = 0, prev = null, k = 0;
+      let sum = 0,
+        prev = null,
+        k = 0;
       for (let i = 0; i + m <= n; i += m) {
         const mean = (cs[i + m] - cs[i]) / m;
-        if (prev !== null) { const d = mean - prev; sum += d * d; k++; }
+        if (prev !== null) {
+          const d = mean - prev;
+          sum += d * d;
+          k++;
+        }
         prev = mean;
       }
       if (k > 0) out.push({ tau, adev: Math.sqrt((0.5 * sum) / k) });

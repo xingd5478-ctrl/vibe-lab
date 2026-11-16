@@ -49,7 +49,8 @@
   /* ---------- 数据 ---------- */
   function mulberry32(a) {
     return function () {
-      a |= 0; a = (a + 0x6d2b79f5) | 0;
+      a |= 0;
+      a = (a + 0x6d2b79f5) | 0;
       let t = Math.imul(a ^ (a >>> 15), 1 | a);
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
@@ -57,14 +58,18 @@
   }
 
   function gauss(rnd) {
-    let u = 0, v = 0;
+    let u = 0,
+      v = 0;
     while (!u) u = rnd();
     while (!v) v = rnd();
     return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
   }
 
   function synth() {
-    const fs = 100, n = fs * 60, rnd = mulberry32(42), rows = [];
+    const fs = 100,
+      n = fs * 60,
+      rnd = mulberry32(42),
+      rows = [];
     let bias = 0;
     for (let i = 0; i < n; i++) {
       bias += gauss(rnd) * 0.0005;
@@ -89,7 +94,11 @@
   }
 
   function parseHeader(line) {
-    const norm = (s) => s.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    const norm = (s) =>
+      s
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "");
     const head = line.split(",").map(norm);
     const pick = (names) => {
       for (const n of names) {
@@ -125,7 +134,9 @@
     const rows = [];
     for (let i = start; i < lines.length; i++) {
       const c = lines[i].split(",");
-      const gx = Number(c[idx.gx]), gy = Number(c[idx.gy]), gz = Number(c[idx.gz]);
+      const gx = Number(c[idx.gx]),
+        gy = Number(c[idx.gy]),
+        gz = Number(c[idx.gz]);
       if (!isFinite(gx) || !isFinite(gy) || !isFinite(gz)) continue;
       const t = idx.t >= 0 ? Number(c[idx.t]) : NaN;
       const crc = idx.crc >= 0 ? Number(c[idx.crc]) : 1;
@@ -143,7 +154,9 @@
     const rows = [];
     for (let i = start; i < lines.length; i++) {
       const c = lines[i].split(",");
-      const gx = Number(c[idx.gx]), gy = Number(c[idx.gy]), gz = Number(c[idx.gz]);
+      const gx = Number(c[idx.gx]),
+        gy = Number(c[idx.gy]),
+        gz = Number(c[idx.gz]);
       if (isFinite(gx) && isFinite(gy) && isFinite(gz)) {
         const t = idx.t >= 0 ? Number(c[idx.t]) : NaN;
         const crc = idx.crc >= 0 ? Number(c[idx.crc]) : 1;
@@ -175,7 +188,9 @@
       return;
     }
     const opts = head.map((h, i) => `<option value="${i}">${h || "列" + (i + 1)}</option>`).join("");
-    ["gx", "gy", "gz"].forEach((k) => { $("map-" + k).innerHTML = opts; });
+    ["gx", "gy", "gz"].forEach((k) => {
+      $("map-" + k).innerHTML = opts;
+    });
     const pick = (re) => head.findIndex((h) => re.test(h.toLowerCase()));
     $("map-gx").value = String(Math.max(0, pick(/gx|x/)));
     $("map-gy").value = String(Math.max(0, pick(/gy|y/)));
@@ -191,7 +206,9 @@
     const rows = [];
     for (let i = 1; i < lines.length; i++) {
       const c = lines[i].split(",");
-      const gx = Number(c[map.gx]), gy = Number(c[map.gy]), gz = Number(c[map.gz]);
+      const gx = Number(c[map.gx]),
+        gy = Number(c[map.gy]),
+        gz = Number(c[map.gz]);
       if (!isFinite(gx) || !isFinite(gy) || !isFinite(gz)) continue;
       rows.push({ t: NaN, gx, gy, gz, crc: 1 });
     }
@@ -200,7 +217,10 @@
 
   function buildRowsChunked(cols, f, text) {
     const n = cols.n;
-    if (!n) { finishLoad([], f, text); return; }
+    if (!n) {
+      finishLoad([], f, text);
+      return;
+    }
     const rows = new Array(n);
     let i = 0;
     const step = () => {
@@ -261,7 +281,9 @@
           };
           parseWorker.postMessage({ id, text });
         } else {
-          parseCSVChunked(text, (p) => { $("source-name").textContent = `解析中 ${p}%`; })
+          parseCSVChunked(text, (p) => {
+            $("source-name").textContent = `解析中 ${p}%`;
+          })
             .then((rows) => finishLoad(rows, f, text))
             .catch(() => {
               flash("解析失败，请检查文件格式");
@@ -277,10 +299,14 @@
   }
 
   function fixTime(rows, fs) {
-    let ok = true, prev = -Infinity;
+    let ok = true,
+      prev = -Infinity;
     for (let i = 0; i < rows.length; i++) {
       const t = rows[i].t;
-      if (!isFinite(t) || t <= prev) { ok = false; break; }
+      if (!isFinite(t) || t <= prev) {
+        ok = false;
+        break;
+      }
       prev = t;
     }
     if (!ok) {
@@ -311,7 +337,13 @@
         allanCache.set(key, IMUData.allan(state.cols, axis, state.fs, state.mask));
       } else {
         const rows = currentRows();
-        allanCache.set(key, allanDeviation(rows.map((r) => r[axis]), 1 / state.fs));
+        allanCache.set(
+          key,
+          allanDeviation(
+            rows.map((r) => r[axis]),
+            1 / state.fs
+          )
+        );
       }
     }
     return allanCache.get(key);
@@ -359,26 +391,33 @@
     if (state.warnedVersion !== dataVersion) {
       state.warnedVersion = dataVersion;
       if (window.IMUData) {
-        IMUData.validate(state.rows, state.fs).slice(0, 2).forEach((w) => flash(w));
+        IMUData.validate(state.rows, state.fs)
+          .slice(0, 2)
+          .forEach((w) => flash(w));
       }
     }
     if (allanWorker && raw.length > 150000) {
       const n = raw.length;
-      const gx = new Float32Array(n), gy = new Float32Array(n), gz = new Float32Array(n);
+      const gx = new Float32Array(n),
+        gy = new Float32Array(n),
+        gz = new Float32Array(n);
       const crc = new Uint8Array(n);
       for (let i = 0; i < n; i++) {
         const r = raw[i];
-        gx[i] = r.gx; gy[i] = r.gy; gz[i] = r.gz;
+        gx[i] = r.gx;
+        gy[i] = r.gy;
+        gz[i] = r.gz;
         crc[i] = r.crc === 1 ? 1 : 0;
       }
       workerReq += 1;
-      allanWorker.postMessage(
-        { id: workerReq, gx, gy, gz, crc, fs: state.fs, clean: state.clean },
-        [gx.buffer, gy.buffer, gz.buffer, crc.buffer]
-      );
+      allanWorker.postMessage({ id: workerReq, gx, gy, gz, crc, fs: state.fs, clean: state.clean }, [
+        gx.buffer,
+        gy.buffer,
+        gz.buffer,
+        crc.buffer,
+      ]);
     }
   }
-
 
   function updateSRSummary() {
     const el = $("sr-summary");
@@ -448,16 +487,25 @@
     const fitSeries = [];
     if (fit) {
       fitSeries.push({
-        name: "ARW 拟合", color: "#7a9cc6", width: 1.1, dash: "5 4", legend: false,
+        name: "ARW 拟合",
+        color: "#7a9cc6",
+        width: 1.1,
+        dash: "5 4",
+        legend: false,
         points: pts.filter((p) => p.tau <= fit.shortMax).map((p) => [p.tau, fit.N / Math.sqrt(p.tau)]),
       });
       fitSeries.push({
-        name: "RRW 拟合", color: "#c9a27a", width: 1.1, dash: "5 4", legend: false,
+        name: "RRW 拟合",
+        color: "#c9a27a",
+        width: 1.1,
+        dash: "5 4",
+        legend: false,
         points: pts.filter((p) => p.tau >= fit.longMin).map((p) => [p.tau, fit.K * Math.sqrt(p.tau / 3)]),
       });
     }
     if (pending) {
-      $("chart-allan").innerHTML = `<div class="hint" style="padding:24px">Allan 计算中…（${(raw.length / 1000).toFixed(0)}k 帧，Worker）</div>`;
+      $("chart-allan").innerHTML =
+        `<div class="hint" style="padding:24px">Allan 计算中…（${(raw.length / 1000).toFixed(0)}k 帧，Worker）</div>`;
     } else {
       plot($("chart-allan"), {
         height: 250,
@@ -480,8 +528,10 @@
       if (pending) {
         fi.textContent = "Allan 计算中…";
       } else if (fit) {
-        const nLo = (fit.nCI[0] * 60).toFixed(2), nHi = (fit.nCI[1] * 60).toFixed(2);
-        const kLo = (fit.kCI[0] * 60).toFixed(2), kHi = (fit.kCI[1] * 60).toFixed(2);
+        const nLo = (fit.nCI[0] * 60).toFixed(2),
+          nHi = (fit.nCI[1] * 60).toFixed(2);
+        const kLo = (fit.kCI[0] * 60).toFixed(2),
+          kHi = (fit.kCI[1] * 60).toFixed(2);
         fi.innerHTML =
           `ARW=${fit.arw.toFixed(3)} °/√h（95% ${nLo}–${nHi}）<br>` +
           `RRW=${fit.rrw.toFixed(3)} (°/s)/√h（95% ${kLo}–${kHi}）<br>` +
@@ -491,8 +541,9 @@
       }
     }
 
-    $("meta-time").textContent = `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
-    $("meta-allan").textContent = pending ? "计算中…" : (fit ? `R²=${fit.r2.toFixed(3)}` : "log-log");
+    $("meta-time").textContent =
+      `${clean.length.toLocaleString()} 帧 · ${raw.length - clean.length} 坏帧（尖峰已截断）`;
+    $("meta-allan").textContent = pending ? "计算中…" : fit ? `R²=${fit.r2.toFixed(3)}` : "log-log";
     updateAllanTable(pending ? [] : pts);
     updateSRSummary();
     drawKF();
@@ -508,7 +559,9 @@
     if (state.compare && m.comp && m.comp.length) {
       series.push({
         name: `对比 A (R/Q=${(state.compare.r / state.compare.q).toFixed(1)})`,
-        color: "#b5651d", width: 1.1, dash: "6 4",
+        color: "#b5651d",
+        width: 1.1,
+        dash: "6 4",
         points: m.comp,
       });
     }
@@ -546,7 +599,10 @@
 
     let angle = angleCache.get(key);
     if (!angle) {
-      angle = integrate(clean.map((r) => r[ch]), state.fs);
+      angle = integrate(
+        clean.map((r) => r[ch]),
+        state.fs
+      );
       angleCache.set(key, angle);
     }
     const filtered = kf1d(angle, state.r, state.q, angle[0], 1);
@@ -558,7 +614,9 @@
       const comp = kf1d(angle, state.compare.r, state.compare.q, angle[0], 1);
       series.push({
         name: `对比 A (R/Q=${(state.compare.r / state.compare.q).toFixed(1)})`,
-        color: "#b5651d", width: 1.1, dash: "6 4",
+        color: "#b5651d",
+        width: 1.1,
+        dash: "6 4",
         points: clean.map((r, i) => [r.t, comp[i] - comp[0]]),
       });
     }
@@ -576,7 +634,10 @@
 
   function scheduleKF() {
     if (rafId) return;
-    rafId = requestAnimationFrame(() => { rafId = 0; drawKF(); });
+    rafId = requestAnimationFrame(() => {
+      rafId = 0;
+      drawKF();
+    });
   }
 
   /* ---------- 导出 / 分享 ---------- */
@@ -595,7 +656,9 @@
     if (!el) return;
     el.textContent = msg;
     clearTimeout(flash._t);
-    flash._t = setTimeout(() => { el.textContent = "—"; }, 2500);
+    flash._t = setTimeout(() => {
+      el.textContent = "—";
+    }, 2500);
   }
 
   function exportCSV() {
@@ -605,24 +668,35 @@
     const ch = state.channel;
     if (state.cols && window.IMUData) {
       const text = IMUData.csv(state.cols, state.mask, ch, state.fs, state.r, state.q);
-      downloadBlob(new Blob([text], { type: "text/csv;charset=utf-8" }),
-        `imu_lab_${ch}_R${state.r.toExponential(1)}_Q${state.q.toExponential(1)}.csv`.replace(/[^A-Za-z0-9_.+-]/g, ""));
+      downloadBlob(
+        new Blob([text], { type: "text/csv;charset=utf-8" }),
+        `imu_lab_${ch}_R${state.r.toExponential(1)}_Q${state.q.toExponential(1)}.csv`.replace(/[^A-Za-z0-9_.+-]/g, "")
+      );
       flash("CSV 已导出");
       return;
     }
-    const angle = integrate(clean.map((r) => r[ch]), state.fs);
+    const angle = integrate(
+      clean.map((r) => r[ch]),
+      state.fs
+    );
     const filtered = kf1d(angle, state.r, state.q, angle[0], 1);
     const lines = ["t,gx_dps,gy_dps,gz_dps,angle_deg,kf_deg"];
     clean.forEach((r, i) => {
-      lines.push([
-        r.t.toFixed(4),
-        r.gx.toFixed(6), r.gy.toFixed(6), r.gz.toFixed(6),
-        (angle[i] - angle[0]).toFixed(6),
-        (filtered[i] - filtered[0]).toFixed(6),
-      ].join(","));
+      lines.push(
+        [
+          r.t.toFixed(4),
+          r.gx.toFixed(6),
+          r.gy.toFixed(6),
+          r.gz.toFixed(6),
+          (angle[i] - angle[0]).toFixed(6),
+          (filtered[i] - filtered[0]).toFixed(6),
+        ].join(",")
+      );
     });
-    downloadBlob(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }),
-      `imu_lab_${ch}_R${state.r.toExponential(1)}_Q${state.q.toExponential(1)}.csv`.replace(/[^A-Za-z0-9_.+-]/g, ""));
+    downloadBlob(
+      new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }),
+      `imu_lab_${ch}_R${state.r.toExponential(1)}_Q${state.q.toExponential(1)}.csv`.replace(/[^A-Za-z0-9_.+-]/g, "")
+    );
     flash("CSV 已导出");
   }
 
@@ -673,7 +747,10 @@
       canvas.toBlob((b) => downloadBlob(b, name + ".png"), "image/png");
       flash("PNG 已导出");
     };
-    img.onerror = () => { URL.revokeObjectURL(url); flash("PNG 导出失败"); };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      flash("PNG 导出失败");
+    };
     img.src = url;
   }
 
@@ -682,7 +759,10 @@
     const keys = AXES.map((a) => a.key);
     const series = keys.map((k) => allanFor(k));
     const n = Math.min(...series.map((s) => s.length));
-    if (!n) { flash("Allan 尚未就绪"); return; }
+    if (!n) {
+      flash("Allan 尚未就绪");
+      return;
+    }
     const lines = ["tau_s," + keys.map((k) => "adev_" + k).join(",")];
     for (let i = 0; i < n; i++) {
       lines.push([series[0][i].tau.toFixed(6)].concat(series.map((s) => s[i].adev.toFixed(9))).join(","));
@@ -694,8 +774,7 @@
     lines.push("# fit_arw=" + (state.fit ? state.fit.arw.toFixed(4) : "n/a"));
     lines.push("# fit_rrw=" + (state.fit ? state.fit.rrw.toFixed(4) : "n/a"));
     const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-    downloadBlob(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }),
-      `imu_allan_${stamp}.csv`);
+    downloadBlob(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }), `imu_allan_${stamp}.csv`);
     flash("Allan CSV 已导出");
   }
 
@@ -704,7 +783,11 @@
     if (!clean.length) return;
     const fit = state.fit;
     const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-    const blocks = [["时域", "chart-time"], ["Allan 方差", "chart-allan"], ["滤波对比", "chart-kf"]]
+    const blocks = [
+      ["时域", "chart-time"],
+      ["Allan 方差", "chart-allan"],
+      ["滤波对比", "chart-kf"],
+    ]
       .map(([title, id]) => `<h2>${title}</h2>${svgMarkup($(id))}`)
       .join("");
     const fitText = $("fit-info").innerText.replace(/\n+/g, "；");
@@ -736,7 +819,11 @@ ${blocks}
     p.set("q", Math.log10(state.q).toFixed(2));
     p.set("ch", state.channel);
     p.set("fs", String(state.fs));
-    try { history.replaceState(null, "", location.pathname + "?" + p.toString()); } catch (e) { /* file:// */ }
+    try {
+      history.replaceState(null, "", location.pathname + "?" + p.toString());
+    } catch (e) {
+      /* file:// */
+    }
   }
 
   function loadURL() {
@@ -763,7 +850,10 @@ ${blocks}
     }
     if (p.has("fs")) {
       const fs = parseFloat(p.get("fs"));
-      if (isFinite(fs) && fs > 0) { state.fs = fs; $("fs").value = fs; }
+      if (isFinite(fs) && fs > 0) {
+        state.fs = fs;
+        $("fs").value = fs;
+      }
     }
   }
 
@@ -778,9 +868,17 @@ ${blocks}
     const panel = document.querySelector(".controls");
     if (panel) {
       ["dragenter", "dragover"].forEach((ev) =>
-        panel.addEventListener(ev, (e) => { e.preventDefault(); panel.classList.add("dragging"); }));
+        panel.addEventListener(ev, (e) => {
+          e.preventDefault();
+          panel.classList.add("dragging");
+        })
+      );
       ["dragleave", "drop"].forEach((ev) =>
-        panel.addEventListener(ev, (e) => { e.preventDefault(); panel.classList.remove("dragging"); }));
+        panel.addEventListener(ev, (e) => {
+          e.preventDefault();
+          panel.classList.remove("dragging");
+        })
+      );
       panel.addEventListener("drop", (e) => {
         const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
         if (f) loadFile(f);
@@ -814,8 +912,12 @@ ${blocks}
         scheduleKF();
       });
     };
-    bindSlider("logR", "r-val", (e) => { state.r = Math.pow(10, e); });
-    bindSlider("logQ", "q-val", (e) => { state.q = Math.pow(10, e); });
+    bindSlider("logR", "r-val", (e) => {
+      state.r = Math.pow(10, e);
+    });
+    bindSlider("logQ", "q-val", (e) => {
+      state.q = Math.pow(10, e);
+    });
 
     $("reset").addEventListener("click", () => {
       state.fs = 100;
@@ -830,7 +932,10 @@ ${blocks}
         gy: Number($("map-gy").value),
         gz: Number($("map-gz").value),
       });
-      if (!rows.length) { flash("映射后没有有效数据"); return; }
+      if (!rows.length) {
+        flash("映射后没有有效数据");
+        return;
+      }
       applyRows(rows, state.pendingName || "手动映射");
     });
 
@@ -933,7 +1038,9 @@ ${blocks}
       }
       try {
         parseWorker = new Worker("data-worker.js");
-        parseWorker.onerror = () => { parseWorker = null; };
+        parseWorker.onerror = () => {
+          parseWorker = null;
+        };
       } catch (e) {
         parseWorker = null;
       }

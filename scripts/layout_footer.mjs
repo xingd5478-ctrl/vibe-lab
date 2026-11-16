@@ -1,0 +1,25 @@
+import fs from "node:fs";
+import path from "node:path";
+import { FOOTERS, footerFor } from "./site_footer.mjs";
+
+const ROOT = path.resolve(import.meta.dirname, "..");
+const WRITE = process.argv.includes("--write");
+let changed = 0;
+let failed = 0;
+for (const rel of Object.keys(FOOTERS)) {
+  const file = path.join(ROOT, rel);
+  const before = fs.readFileSync(file, "utf8");
+  const next = before.replace(/<footer[^>]*>[\s\S]*?<\/footer>/, footerFor(rel));
+  if (next === before) continue;
+  if (WRITE) {
+    fs.writeFileSync(file, next);
+    changed++;
+    console.log("wrote", rel);
+  } else {
+    console.error("footer out of date:", rel);
+    failed++;
+  }
+}
+if (WRITE) console.log(`updated ${changed} footers`);
+else if (failed) process.exit(1);
+else console.log("FOOTER OK");

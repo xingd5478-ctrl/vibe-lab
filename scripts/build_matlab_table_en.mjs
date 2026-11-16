@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { PAGES, navFor } from "./site_layout.mjs";
+import { footerFor } from "./site_footer.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const data = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "matlab-probes.json"), "utf8"));
@@ -157,5 +158,6 @@ ${rows}
 </html>
 `;
 html = html.replace(/<nav class="topnav"[\s\S]*?<\/nav>/, navFor(PAGES["about/matlab-en.html"]));
+html = html.replace(/<footer[^>]*>[\s\S]*?<\/footer>/, footerFor("about/matlab-en.html"));
 fs.writeFileSync(path.join(ROOT, "about", "matlab-en.html"), html);
 console.log(`wrote about/matlab-en.html (${data.models.length} rows, ${cjk} CJK left)`);

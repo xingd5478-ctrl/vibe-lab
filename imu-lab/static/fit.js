@@ -12,7 +12,8 @@
   function quantile(sorted, q) {
     if (!sorted.length) return NaN;
     const pos = (sorted.length - 1) * q;
-    const lo = Math.floor(pos), hi = Math.ceil(pos);
+    const lo = Math.floor(pos),
+      hi = Math.ceil(pos);
     if (lo === hi) return sorted[lo];
     return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
   }
@@ -30,18 +31,37 @@
     const yv = (p) => p.adev * p.adev;
 
     // Huber IRLS
-    let A = NaN, B = NaN;
-    let varA = NaN, varB = NaN;
+    let A = NaN,
+      B = NaN;
+    let varA = NaN,
+      varB = NaN;
     let robust = false;
     let w = new Array(n).fill(1);
-    let S11 = 0, S12 = 0, S22 = 0, T1 = 0, T2 = 0, sw = 0;
+    let S11 = 0,
+      S12 = 0,
+      S22 = 0,
+      T1 = 0,
+      T2 = 0,
+      sw = 0;
     for (let iter = 0; iter < 25; iter++) {
-      S11 = 0; S12 = 0; S22 = 0; T1 = 0; T2 = 0; sw = 0;
+      S11 = 0;
+      S12 = 0;
+      S22 = 0;
+      T1 = 0;
+      T2 = 0;
+      sw = 0;
       for (let i = 0; i < n; i++) {
-        const p = pts[i], wi = w[i];
-        const a = x1(p), b = x2(p), y = yv(p);
-        S11 += wi * a * a; S12 += wi * a * b; S22 += wi * b * b;
-        T1 += wi * a * y; T2 += wi * b * y; sw += wi;
+        const p = pts[i],
+          wi = w[i];
+        const a = x1(p),
+          b = x2(p),
+          y = yv(p);
+        S11 += wi * a * a;
+        S12 += wi * a * b;
+        S22 += wi * b * b;
+        T1 += wi * a * y;
+        T2 += wi * b * y;
+        sw += wi;
       }
       const det = S11 * S22 - S12 * S12;
       if (Math.abs(det) < 1e-30) break;
@@ -65,7 +85,8 @@
       if (maxChange < 1e-6) break;
     }
 
-    let N = NaN, K = NaN;
+    let N = NaN,
+      K = NaN;
     if (isFinite(A) && isFinite(B) && A > 0 && B > 0 && sw > 2) {
       N = Math.sqrt(A);
       K = Math.sqrt(B);
@@ -79,12 +100,14 @@
         varA = (s2 * S22) / det;
         varB = (s2 * S11) / det;
       } else {
-        varA = NaN; varB = NaN;
+        varA = NaN;
+        varB = NaN;
       }
     }
 
     // 回退：短/长段中位数
-    const tmin = pts[0].tau, tmax = pts[pts.length - 1].tau;
+    const tmin = pts[0].tau,
+      tmax = pts[pts.length - 1].tau;
     if (!isFinite(N) || !isFinite(K) || N <= 0 || K <= 0) {
       const shortMax0 = Math.min(1.0, tmax / 3);
       const longMin0 = Math.max(2 * tmin, tmax / 4);
@@ -94,14 +117,16 @@
       N = median(short.map((p) => p.adev * Math.sqrt(p.tau)));
       K = median(long.map((p) => p.adev / Math.sqrt(p.tau / 3)));
       if (!isFinite(N) || !isFinite(K) || N <= 0 || K <= 0) return null;
-      varA = NaN; varB = NaN;
+      varA = NaN;
+      varB = NaN;
       robust = false;
     }
 
     const logs = pts.map((p) => Math.log(p.adev));
     const pred = pts.map((p) => Math.log(Math.sqrt((N * N) / p.tau + (K * K * p.tau) / 3)));
     const mean = logs.reduce((a, b) => a + b, 0) / logs.length;
-    let ssTot = 0, ssRes = 0;
+    let ssTot = 0,
+      ssRes = 0;
     for (let i = 0; i < logs.length; i++) {
       ssTot += Math.pow(logs[i] - mean, 2);
       ssRes += Math.pow(logs[i] - pred[i], 2);
@@ -133,14 +158,17 @@
     const method = robust ? (w.some((wi) => wi < 0.99) ? "irls" : "wls") : "median";
 
     return {
-      N, K,
+      N,
+      K,
       arw: N * 60,
       rrw: K * 60,
       r: N * N * dt,
       q: K * K * dt,
       r2,
-      nCI, kCI,
-      shortMax, longMin,
+      nCI,
+      kCI,
+      shortMax,
+      longMin,
       nShort: pts.filter((p) => p.tau <= shortMax).length,
       nLong: pts.filter((p) => p.tau >= longMin).length,
       method,

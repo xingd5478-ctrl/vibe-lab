@@ -64,9 +64,12 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, H);
 
-    const iw = w - pad.l - pad.r, ih = H - pad.t - pad.b;
-    const xmin = raw[0].t, xmax = raw[raw.length - 1].t;
-    const ymin = -6, ymax = 6;
+    const iw = w - pad.l - pad.r,
+      ih = H - pad.t - pad.b;
+    const xmin = raw[0].t,
+      xmax = raw[raw.length - 1].t;
+    const ymin = -6,
+      ymax = 6;
     const X = (t) => pad.l + ((t - xmin) / (xmax - xmin)) * iw;
     const Y = (v) => pad.t + (1 - (v - ymin) / (ymax - ymin)) * ih;
 
@@ -79,18 +82,27 @@
     ctx.lineWidth = 1;
     for (const v of [-5, 0, 5]) {
       const y = Y(v);
-      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(w - pad.r, y);
+      ctx.stroke();
       ctx.fillText(String(v), pad.l - 22, y + 4);
     }
     for (let i = 0; i <= 5; i++) {
       const t = xmin + (i / 5) * (xmax - xmin);
       const x = X(t);
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, H - pad.b); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, pad.t);
+      ctx.lineTo(x, H - pad.b);
+      ctx.stroke();
       ctx.fillText(t.toFixed(1), x - 12, H - pad.b + 15);
     }
     ctx.strokeStyle = ink;
-    ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b);
-    ctx.lineTo(w - pad.r, H - pad.b); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t);
+    ctx.lineTo(pad.l, H - pad.b);
+    ctx.lineTo(w - pad.r, H - pad.b);
+    ctx.stroke();
     ctx.fillStyle = muted;
     ctx.fillText("角速度 (°/s)", pad.l, pad.t - 10);
     ctx.fillText("时间 (s)", w - pad.r - 48, H - 4);
@@ -102,7 +114,8 @@
       let idx = 0;
       for (let px = 0; px <= iw; px++) {
         const t = xmin + (px / iw) * (xmax - xmin);
-        let lo = Infinity, hi = -Infinity;
+        let lo = Infinity,
+          hi = -Infinity;
         while (idx < rows.length && rows[idx].t <= t) {
           const v = rows[idx][ch];
           if (v < lo) lo = v;
@@ -121,28 +134,39 @@
 
     canvas.setAttribute("aria-label", `时域图：${raw.length} 帧，Canvas 绘制`);
     let tip = el.querySelector(".tip");
-    if (!tip) { tip = document.createElement("div"); tip.className = "tip"; el.appendChild(tip); }
+    if (!tip) {
+      tip = document.createElement("div");
+      tip.className = "tip";
+      el.appendChild(tip);
+    }
     canvas.onmousemove = (ev) => {
       const rect = canvas.getBoundingClientRect();
       const frac = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
       const t = xmin + frac * (xmax - xmin);
-      let lo = 0, hi = raw.length - 1;
+      let lo = 0,
+        hi = raw.length - 1;
       while (lo < hi) {
         const mid = (lo + hi) >> 1;
-        if (raw[mid].t < t) lo = mid + 1; else hi = mid;
+        if (raw[mid].t < t) lo = mid + 1;
+        else hi = mid;
       }
-      let l2 = 0, h2 = clean.length - 1;
+      let l2 = 0,
+        h2 = clean.length - 1;
       while (l2 < h2) {
         const mid = (l2 + h2) >> 1;
-        if (clean[mid].t < t) l2 = mid + 1; else h2 = mid;
+        if (clean[mid].t < t) l2 = mid + 1;
+        else h2 = mid;
       }
-      const r = raw[lo], c = clean[Math.min(l2, clean.length - 1)];
+      const r = raw[lo],
+        c = clean[Math.min(l2, clean.length - 1)];
       tip.textContent = `时间 ${r.t.toFixed(2)} s · 原始 ${r[ch].toFixed(3)} · 清洗 ${c[ch].toFixed(3)} °/s`;
       tip.style.left = `${frac * 100}%`;
       tip.style.top = "12%";
       tip.style.opacity = "1";
     };
-    canvas.onmouseleave = () => { tip.style.opacity = "0"; };
+    canvas.onmouseleave = () => {
+      tip.style.opacity = "0";
+    };
 
     canvas.tabIndex = 0;
     let kidx = 0;
@@ -151,10 +175,12 @@
     const showIdx = (i) => {
       kidx = Math.max(0, Math.min(raw.length - 1, i));
       const r = raw[kidx];
-      let lo = 0, hi = clean.length - 1;
+      let lo = 0,
+        hi = clean.length - 1;
       while (lo < hi) {
         const mid = (lo + hi) >> 1;
-        if (clean[mid].t < r.t) lo = mid + 1; else hi = mid;
+        if (clean[mid].t < r.t) lo = mid + 1;
+        else hi = mid;
       }
       const c = clean[Math.min(lo, clean.length - 1)];
       const text = `时间 ${r.t.toFixed(2)} s · 原始 ${r[ch].toFixed(3)} · 清洗 ${c[ch].toFixed(3)} °/s`;
@@ -165,12 +191,23 @@
       if (live) live.textContent = text;
     };
     canvas.addEventListener("focus", () => showIdx(kidx));
-    canvas.addEventListener("blur", () => { tip.style.opacity = "0"; });
+    canvas.addEventListener("blur", () => {
+      tip.style.opacity = "0";
+    });
     canvas.addEventListener("keydown", (ev) => {
-      if (ev.key === "ArrowRight" || ev.key === "ArrowUp") { showIdx(kidx + step); ev.preventDefault(); }
-      else if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") { showIdx(kidx - step); ev.preventDefault(); }
-      else if (ev.key === "Home") { showIdx(0); ev.preventDefault(); }
-      else if (ev.key === "End") { showIdx(raw.length - 1); ev.preventDefault(); }
+      if (ev.key === "ArrowRight" || ev.key === "ArrowUp") {
+        showIdx(kidx + step);
+        ev.preventDefault();
+      } else if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") {
+        showIdx(kidx - step);
+        ev.preventDefault();
+      } else if (ev.key === "Home") {
+        showIdx(0);
+        ev.preventDefault();
+      } else if (ev.key === "End") {
+        showIdx(raw.length - 1);
+        ev.preventDefault();
+      }
     });
   }
 
@@ -216,7 +253,8 @@
     const out = [];
     for (let i = 0; i < pts.length; i += bucket) {
       const slice = pts.slice(i, i + bucket);
-      let lo = slice[0], hi = slice[0];
+      let lo = slice[0],
+        hi = slice[0];
       for (const p of slice) {
         if (p[1] < lo[1]) lo = p;
         if (p[1] > hi[1]) hi = p;
@@ -229,7 +267,9 @@
 
   function path(points, color, width, dash) {
     let d = "";
-    points.forEach(([x, y], i) => { d += `${i ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`; });
+    points.forEach(([x, y], i) => {
+      d += `${i ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`;
+    });
     return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width || 1.5}" stroke-linejoin="round" stroke-linecap="round"${dash ? ` stroke-dasharray="${dash}"` : ""}/>`;
   }
 
@@ -257,13 +297,15 @@
     svg.appendChild(dot);
 
     const nearest = (pts, xv) => {
-      let lo = 0, hi = pts.length - 1;
+      let lo = 0,
+        hi = pts.length - 1;
       while (lo < hi) {
         const mid = (lo + hi) >> 1;
         if (pts[mid][0] < xv) lo = mid + 1;
         else hi = mid;
       }
-      const a = pts[lo], b = pts[Math.max(0, lo - 1)];
+      const a = pts[lo],
+        b = pts[Math.max(0, lo - 1)];
       return Math.abs(a[0] - xv) <= Math.abs(b[0] - xv) ? a : b;
     };
 
@@ -278,8 +320,7 @@
       dot.setAttribute("cx", px);
       dot.setAttribute("cy", meta.yDot ? meta.yDot(first) : meta.Y(first[1]));
       dot.setAttribute("opacity", "1");
-      const text = `${meta.xLabel} ${fmt(first[0])} · ` +
-        hits.map((h) => `${h.s.name} ${fmt(h.p[1])}`).join(" · ");
+      const text = `${meta.xLabel} ${fmt(first[0])} · ` + hits.map((h) => `${h.s.name} ${fmt(h.p[1])}`).join(" · ");
       tip.textContent = text;
       tip.style.left = `${(px / meta.w) * 100}%`;
       tip.style.top = `${Math.max(8, (Number(dot.getAttribute("cy")) / meta.h) * 100 - 4)}%`;
@@ -311,10 +352,19 @@
     svg.addEventListener("focus", () => showIdx(idx));
     svg.addEventListener("blur", hide);
     svg.addEventListener("keydown", (ev) => {
-      if (ev.key === "ArrowRight" || ev.key === "ArrowUp") { showIdx(idx + 1); ev.preventDefault(); }
-      else if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") { showIdx(idx - 1); ev.preventDefault(); }
-      else if (ev.key === "Home") { showIdx(0); ev.preventDefault(); }
-      else if (ev.key === "End") { showIdx(meta.series[0].points.length - 1); ev.preventDefault(); }
+      if (ev.key === "ArrowRight" || ev.key === "ArrowUp") {
+        showIdx(idx + 1);
+        ev.preventDefault();
+      } else if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") {
+        showIdx(idx - 1);
+        ev.preventDefault();
+      } else if (ev.key === "Home") {
+        showIdx(0);
+        ev.preventDefault();
+      } else if (ev.key === "End") {
+        showIdx(meta.series[0].points.length - 1);
+        ev.preventDefault();
+      }
     });
   }
 
@@ -322,32 +372,53 @@
     const pad = { l: 58, r: 16, t: 28, b: 34 };
     const w = Math.max(el.clientWidth || 640, 320);
     const h = cfg.height || 230;
-    const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    const iw = w - pad.l - pad.r,
+      ih = h - pad.t - pad.b;
     const tr = (s) => (root.VibeI18n ? root.VibeI18n.translate(s) : s);
     const series = cfg.series
-      .map((s) => ({ ...s, name: tr(s.name), color: themed(s.color), points: decimate(s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])), 1500) }))
+      .map((s) => ({
+        ...s,
+        name: tr(s.name),
+        color: themed(s.color),
+        points: decimate(
+          s.points.filter((p) => isFinite(p[0]) && isFinite(p[1])),
+          1500
+        ),
+      }))
       .filter((s) => s.points.length > 1 || s.marker);
 
-    if (!series.length) { el.innerHTML = ""; return; }
+    if (!series.length) {
+      el.innerHTML = "";
+      return;
+    }
 
-    let xs = [], ys = [];
-    series.forEach((s) => s.points.forEach(([x, y]) => { xs.push(x); ys.push(y); }));
+    let xs = [],
+      ys = [];
+    series.forEach((s) =>
+      s.points.forEach(([x, y]) => {
+        xs.push(x);
+        ys.push(y);
+      })
+    );
 
-    const logX = !!cfg.logX, logY = !!cfg.logY;
+    const logX = !!cfg.logX,
+      logY = !!cfg.logY;
     const pos = (a) => a.filter((v) => v > 0);
-    let xmin = cfg.xMin !== undefined ? cfg.xMin : (logX ? Math.min(...pos(xs)) : Math.min(...xs));
-    let xmax = cfg.xMax !== undefined ? cfg.xMax : (logX ? Math.max(...pos(xs)) : Math.max(...xs));
-    let ymin = cfg.yMin !== undefined ? cfg.yMin : (logY ? Math.min(...pos(ys)) : Math.min(...ys));
-    let ymax = cfg.yMax !== undefined ? cfg.yMax : (logY ? Math.max(...pos(ys)) : Math.max(...ys));
+    let xmin = cfg.xMin !== undefined ? cfg.xMin : logX ? Math.min(...pos(xs)) : Math.min(...xs);
+    let xmax = cfg.xMax !== undefined ? cfg.xMax : logX ? Math.max(...pos(xs)) : Math.max(...xs);
+    let ymin = cfg.yMin !== undefined ? cfg.yMin : logY ? Math.min(...pos(ys)) : Math.min(...ys);
+    let ymax = cfg.yMax !== undefined ? cfg.yMax : logY ? Math.max(...pos(ys)) : Math.max(...ys);
 
     if (xmax <= xmin) xmax = xmin + 1;
     if (ymax <= ymin) ymax = ymin + 1;
     if (!logY && cfg.yMin === undefined && cfg.yMax === undefined) {
       const padv = (ymax - ymin) * 0.06;
-      ymin -= padv; ymax += padv;
+      ymin -= padv;
+      ymax += padv;
     }
     if (cfg.equalAspect && !logX && !logY) {
-      const xr = xmax - xmin, yr = ymax - ymin;
+      const xr = xmax - xmin,
+        yr = ymax - ymin;
       const targetY = xr * (ih / iw);
       if (yr < targetY) {
         const c = (ymin + ymax) / 2;
@@ -361,8 +432,10 @@
       }
     }
 
-    const lx0 = logX ? Math.log10(xmin) : xmin, lx1 = logX ? Math.log10(xmax) : xmax;
-    const ly0 = logY ? Math.log10(ymin) : ymin, ly1 = logY ? Math.log10(ymax) : ymax;
+    const lx0 = logX ? Math.log10(xmin) : xmin,
+      lx1 = logX ? Math.log10(xmax) : xmax;
+    const ly0 = logY ? Math.log10(ymin) : ymin,
+      ly1 = logY ? Math.log10(ymax) : ymax;
     const X = (v) => pad.l + (((logX ? Math.log10(v) : v) - lx0) / (lx1 - lx0)) * iw;
     const Y = (v) => pad.t + (1 - ((logY ? Math.log10(v) : v) - ly0) / (ly1 - ly0)) * ih;
     const xInv = (frac) => {
@@ -374,7 +447,7 @@
     const yt = logY ? logTicks(ymin, ymax) : linTicks(ymin, ymax, 4);
 
     let svg = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${tr(cfg.aria || "数据图")}">`;
-    const clipId = "clip" + ((el._cid = (el._cid || 0) + 1));
+    const clipId = "clip" + (el._cid = (el._cid || 0) + 1);
     svg += `<defs><clipPath id="${clipId}"><rect x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}"/></clipPath></defs>`;
 
     yt.forEach((v) => {
@@ -407,7 +480,9 @@
     series.forEach((s) => {
       if (s.line !== false && s.points.length > 1) {
         let d = "";
-        s.points.forEach(([x, y], i) => { d += `${i ? "L" : "M"}${X(x).toFixed(2)},${Y(y).toFixed(2)}`; });
+        s.points.forEach(([x, y], i) => {
+          d += `${i ? "L" : "M"}${X(x).toFixed(2)},${Y(y).toFixed(2)}`;
+        });
         svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.width || 1.2}" stroke-linejoin="round" stroke-linecap="round"${s.dash ? ` stroke-dasharray="${s.dash}"` : ""}/>`;
       }
       if (s.marker) {
@@ -419,7 +494,9 @@
     svg += `</g>`;
 
     let total = 0;
-    series.forEach((s) => { if (s.legend !== false) total += 28 + s.name.length * 11; });
+    series.forEach((s) => {
+      if (s.legend !== false) total += 28 + s.name.length * 11;
+    });
     let lx = Math.max(pad.l + 84, w - pad.r - total);
     series.forEach((s) => {
       if (s.legend === false) return;
@@ -434,9 +511,31 @@
 
     svg += "</svg>";
     el.innerHTML = svg;
-    attachHover(el, { w, h, pad, series, X, yDot: (p) => Y(p[1]), xInv, xLabel: cfg.xLabel || "x", aria: cfg.aria || "" });
+    attachHover(el, {
+      w,
+      h,
+      pad,
+      series,
+      X,
+      yDot: (p) => Y(p[1]),
+      xInv,
+      xLabel: cfg.xLabel || "x",
+      aria: cfg.aria || "",
+    });
   }
 
-  const api = { plot, plotTimeCanvas, attachHover, path, fmt, linTicks, logTicks, niceStep, decimate, themed, lightColor };
+  const api = {
+    plot,
+    plotTimeCanvas,
+    attachHover,
+    path,
+    fmt,
+    linTicks,
+    logTicks,
+    niceStep,
+    decimate,
+    themed,
+    lightColor,
+  };
   root.IMUChart = api;
 })(typeof window !== "undefined" ? window : globalThis);

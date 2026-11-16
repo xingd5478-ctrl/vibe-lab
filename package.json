@@ -29,11 +29,11 @@
     "live": "node scripts/live_check.mjs",
     "check:sw": "node scripts/check_sw.mjs",
     "check:static": "node scripts/check_static.mjs",
-    "lint": "eslint scripts tests shared/i18n.js landing/motion.js --max-warnings=0",
-    "format": "prettier --write scripts tests shared/i18n.js landing/motion.js",
-    "format:check": "prettier --check scripts tests shared/i18n.js landing/motion.js",
-    "layout": "node scripts/layout_nav.mjs --write",
-    "check:layout": "node scripts/layout_nav.mjs"
+    "lint": "eslint scripts/**/*.mjs tests/**/*.js landing/**/*.js shared/**/*.js imu-lab/static/**/*.js control-play/**/*.js simulink/**/*.js --max-warnings=0",
+    "format": "prettier --write \"scripts/**/*.mjs\" \"tests/**/*.js\" \"landing/**/*.js\" \"shared/**/*.js\" \"imu-lab/static/**/*.js\" \"control-play/**/*.js\" \"simulink/**/*.js\"",
+    "format:check": "prettier --check \"scripts/**/*.mjs\" \"tests/**/*.js\" \"landing/**/*.js\" \"shared/**/*.js\" \"imu-lab/static/**/*.js\" \"control-play/**/*.js\" \"simulink/**/*.js\"",
+    "layout": "node scripts/layout_nav.mjs --write && node scripts/layout_footer.mjs --write",
+    "check:layout": "node scripts/layout_nav.mjs && node scripts/layout_footer.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.14.0",

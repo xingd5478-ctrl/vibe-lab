@@ -14,7 +14,9 @@
   const lessons = [];
   DATA.phases.forEach((ph) => ph.items.forEach((l) => lessons.push({ ...l, phase: ph.title })));
   const byId = {};
-  lessons.forEach((l) => { byId[l.id] = l; });
+  lessons.forEach((l) => {
+    byId[l.id] = l;
+  });
   const LEVELS = DATA.levels || { core: [], concept: [] };
   const levelOf = (id) => (LEVELS.core.includes(id) ? "core" : LEVELS.concept.includes(id) ? "concept" : "ok");
   const LEVEL_LABEL = { core: "精读", concept: "概念", ok: "合格" };
@@ -117,7 +119,9 @@
     fb.rel = "noreferrer";
     links.appendChild(fb);
     intro.appendChild(links);
-    intro.appendChild(el("p", "hint", "模型已托管在本站（MIT），下载后用 MATLAB/Simulink 打开；浏览器不能直接运行 .slx。"));
+    intro.appendChild(
+      el("p", "hint", "模型已托管在本站（MIT），下载后用 MATLAB/Simulink 打开；浏览器不能直接运行 .slx。")
+    );
     return intro;
   }
 
@@ -224,9 +228,15 @@
       img.alt = `${lesson.title} 结果图 ${i + 1}`;
       img.addEventListener("error", () => {
         const stage = img.dataset.stage || "0";
-        if (stage === "0") { img.dataset.stage = "1"; img.src = CDN + "docs/images/" + name; }
-        else if (stage === "1") { img.dataset.stage = "2"; img.src = RAW + "docs/images/" + name; }
-        else { fig.remove(); }
+        if (stage === "0") {
+          img.dataset.stage = "1";
+          img.src = CDN + "docs/images/" + name;
+        } else if (stage === "1") {
+          img.dataset.stage = "2";
+          img.src = RAW + "docs/images/" + name;
+        } else {
+          fig.remove();
+        }
       });
       const cap = el("figcaption", "", `docs/images/${name}`);
       fig.appendChild(img);
@@ -266,10 +276,16 @@
 
   async function load(id) {
     const lesson = byId[id];
-    if (!lesson) { setStatus("未找到该课程"); return; }
+    if (!lesson) {
+      setStatus("未找到该课程");
+      return;
+    }
     current = id;
-    try { history.replaceState(null, "", `course.html?id=${id}`); }
-    catch (e) { location.hash = id; }
+    try {
+      history.replaceState(null, "", `course.html?id=${id}`);
+    } catch (e) {
+      location.hash = id;
+    }
     document.querySelectorAll(".lesson").forEach((b) => {
       b.setAttribute("aria-current", String(b.dataset.id === id));
     });
@@ -279,7 +295,10 @@
     $("lesson-body").innerHTML = "";
     renderNav(id);
     const cached = cache.get(id);
-    if (cached) { render(lesson, cached); return; }
+    if (cached) {
+      render(lesson, cached);
+      return;
+    }
     $("lesson-body").appendChild(introFor(lesson));
     const guide = guideFor(lesson);
     if (guide) $("lesson-body").appendChild(guide);
@@ -289,8 +308,13 @@
       for (const base of [LOCAL, CDN, RAW]) {
         try {
           const res = await fetch(base + lesson.file, { mode: "cors" });
-          if (res.ok) { text = await res.text(); break; }
-        } catch (e) { /* try fallback */ }
+          if (res.ok) {
+            text = await res.text();
+            break;
+          }
+        } catch (e) {
+          /* try fallback */
+        }
       }
       if (text === null) throw new Error("fetch failed");
       cache.set(id, text);
@@ -327,7 +351,8 @@
         b.type = "button";
         b.dataset.id = l.id;
         b.dataset.text = (l.id + " " + l.title + " " + l.desc + " " + ph.title).toLowerCase();
-        b.innerHTML = `<span class="n">${l.id}</span>${l.title}` +
+        b.innerHTML =
+          `<span class="n">${l.id}</span>${l.title}` +
           `<span class="tag ${levelOf(l.id)}">${LEVEL_LABEL[levelOf(l.id)]}</span>` +
           (l.demo ? '<span class="tag">交互</span>' : "");
         b.addEventListener("click", () => load(l.id));
@@ -344,7 +369,6 @@
   });
 
   buildList();
-  const initial = new URLSearchParams(location.search).get("id") ||
-    location.hash.replace(/^#/, "") || "t01";
+  const initial = new URLSearchParams(location.search).get("id") || location.hash.replace(/^#/, "") || "t01";
   load(initial);
 })();

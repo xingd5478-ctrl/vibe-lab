@@ -72,28 +72,33 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE);
-    await cache.addAll(ASSETS);
-    try {
-      const res = await fetch("simulink/course-src/manifest.json");
-      if (res.ok) {
-        const files = await res.json();
-        await cache.addAll(files.map((f) => "simulink/course-src/" + f));
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE);
+      await cache.addAll(ASSETS);
+      try {
+        const res = await fetch("simulink/course-src/manifest.json");
+        if (res.ok) {
+          const files = await res.json();
+          await cache.addAll(files.map((f) => "simulink/course-src/" + f));
+        }
+        const imgRes = await fetch("simulink/course-img/manifest.json");
+        if (imgRes.ok) {
+          const imgs = await imgRes.json();
+          await Promise.all(imgs.map((f) => cache.add("simulink/course-img/" + f).catch(() => {})));
+        }
+      } catch (e) {
+        /* 课程清单不可用时仍可安装 */
       }
-      const imgRes = await fetch("simulink/course-img/manifest.json");
-      if (imgRes.ok) {
-        const imgs = await imgRes.json();
-        await Promise.all(imgs.map((f) => cache.add("simulink/course-img/" + f).catch(() => {})));
-      }
-    } catch (e) { /* 课程清单不可用时仍可安装 */ }
-    await self.skipWaiting();
-  })());
+      await self.skipWaiting();
+    })()
+  );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys()
+    caches
+      .keys()
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
@@ -106,15 +111,17 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== location.origin) return;
   if (/\.csv(\.gz)?$/.test(url.pathname)) return; // 不缓存数据文件
 
-  event.respondWith((async () => {
-    const cache = await caches.open(CACHE);
-    const hit = await cache.match(req);
-    const network = fetch(req)
-      .then((res) => {
-        if (res.ok) cache.put(req, res.clone());
-        return res;
-      })
-      .catch(() => hit || caches.match("./imu/"));
-    return hit || network;
-  })());
+  event.respondWith(
+    (async () => {
+      const cache = await caches.open(CACHE);
+      const hit = await cache.match(req);
+      const network = fetch(req)
+        .then((res) => {
+          if (res.ok) cache.put(req, res.clone());
+          return res;
+        })
+        .catch(() => hit || caches.match("./imu/"));
+      return hit || network;
+    })()
+  );
 });

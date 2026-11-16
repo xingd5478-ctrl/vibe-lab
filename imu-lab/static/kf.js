@@ -29,7 +29,10 @@
     fs = fs || 100;
     const out = new Float64Array(rate.length);
     let s = 0;
-    for (let i = 0; i < rate.length; i++) { s += rate[i]; out[i] = s / fs; }
+    for (let i = 0; i < rate.length; i++) {
+      s += rate[i];
+      out[i] = s / fs;
+    }
     return out;
   }
 

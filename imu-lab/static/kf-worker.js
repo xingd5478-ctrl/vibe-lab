@@ -14,7 +14,9 @@ self.onmessage = function (e) {
     const kf = self.IMUKF.kf1d(angle, m.r, m.q, angle[0], 1);
     const comp = m.compare ? self.IMUKF.kf1d(angle, m.compare.r, m.compare.q, angle[0], 1) : null;
     const step = Math.max(1, Math.ceil(angle.length / 1500));
-    const a = [], k = [], c = [];
+    const a = [],
+      k = [],
+      c = [];
     for (let i = 0; i < angle.length; i += step) {
       const t = i / fs;
       a.push([t, angle[i] - angle[0]]);

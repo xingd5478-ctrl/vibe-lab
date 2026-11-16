@@ -9,10 +9,22 @@ window.SIMULINK_GUIDE_EN = {
       ["Scope", "An oscilloscope; double-click it to see the waveform."],
     ],
     math: "y(t) = K · u(t)",
-    steps: ["Drag Sine Wave from Sources", "Drag Gain from Math Operations and change it to 2", "Drag Scope from Sinks", "Connect the lines in order and click Run", "Double-click Scope to see the waveform"],
+    steps: [
+      "Drag Sine Wave from Sources",
+      "Drag Gain from Math Operations and change it to 2",
+      "Drag Scope from Sinks",
+      "Connect the lines in order and click Run",
+      "Double-click Scope to see the waveform",
+    ],
     watch: "The sine amplitude in Scope becomes twice the input; set K to 0.5 and the amplitude halves at once.",
     pitfall: "Scope does not pop up by itself, you must double-click it; Sine defaults to 1 rad/s, not 1 Hz.",
-    quiz: [["What is the output amplitude when K=0.5?", "Half of the input."], ["If Scope shows no waveform, what do you check first?", "The wiring, whether Run was clicked, and whether Scope was opened."]],
+    quiz: [
+      ["What is the output amplitude when K=0.5?", "Half of the input."],
+      [
+        "If Scope shows no waveform, what do you check first?",
+        "The wiring, whether Run was clicked, and whether Scope was opened.",
+      ],
+    ],
     blocks: ["Sine Wave", "Gain K", "Scope"],
     demo: "signal",
   },
@@ -25,10 +37,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Mux", "Packs several signals into one bus so a single Scope can show multiple curves."],
     ],
     math: "y = (u1 + u2) · K",
-    steps: ["Drag two Sine blocks as u1 and u2", "Drag Sum and change the signs to + +", "Drag Gain and set K", "Drag Mux to bundle both inputs and the result", "Connect Scope and run"],
+    steps: [
+      "Drag two Sine blocks as u1 and u2",
+      "Drag Sum and change the signs to + +",
+      "Drag Gain and set K",
+      "Drag Mux to bundle both inputs and the result",
+      "Connect Scope and run",
+    ],
     watch: "Scope shows u1, u2 and their sum; change K and the sum curve scales as a whole.",
     pitfall: "Sum input ports default to + +, double-click to subtract; Mux only packs, it performs no math.",
-    quiz: [["Does Mux add the signals together?", "No, it only packs them for display."], ["How do you make Sum compute u1−u2?", "Double-click Sum and change the second port sign to −."]],
+    quiz: [
+      ["Does Mux add the signals together?", "No, it only packs them for display."],
+      ["How do you make Sum compute u1−u2?", "Double-click Sum and change the second port sign to −."],
+    ],
     blocks: ["Sine u1", "Sum", "Gain K", "Scope"],
     demo: "signal",
   },
@@ -41,10 +62,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Settling time", "About 4τ until the response enters the ±2% band."],
     ],
     math: "G(s) = K / (τs + 1); step response y(t) = K(1 − e^(−t/τ))",
-    steps: ["Drag Step as the input", "Drag Transfer Fcn with numerator [K] and denominator [τ 1]", "Connect Scope and Run", "Change τ to see the speed, change K to see the final height"],
-    watch: "With τ=1 the response reaches 63.2% at 1 s; with τ=3 it reaches the same height but needs 3 s. K changes only the final height, not the speed.",
+    steps: [
+      "Drag Step as the input",
+      "Drag Transfer Fcn with numerator [K] and denominator [τ 1]",
+      "Connect Scope and Run",
+      "Change τ to see the speed, change K to see the final height",
+    ],
+    watch:
+      "With τ=1 the response reaches 63.2% at 1 s; with τ=3 it reaches the same height but needs 3 s. K changes only the final height, not the speed.",
     pitfall: "Transfer Fcn denominator is [τ 1], not [1 τ]; Step jumps at 1 s by default, not at 0 s.",
-    quiz: [["With τ=2 s, when is 63.2% reached?", "At about 2 s (counted from the step instant)."], ["Does a larger K make the response faster?", "No, it changes only the final amplitude."]],
+    quiz: [
+      ["With τ=2 s, when is 63.2% reached?", "At about 2 s (counted from the step instant)."],
+      ["Does a larger K make the response faster?", "No, it changes only the final amplitude."],
+    ],
     blocks: ["Step", "K/(τs+1)", "Scope"],
     demo: "first-order",
   },
@@ -57,10 +87,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Overshoot", "The largest percentage by which the first peak exceeds the target."],
     ],
     math: "G(s)=ωn²/(s²+2ζωn s+ωn²); overshoot ≈ exp(−πζ/√(1−ζ²))",
-    steps: ["Step input", "Transfer Fcn with denominator [1 2ζωn ωn²] and numerator [ωn²]", "Connect Scope and run", "Change ωn and ζ separately and compare"],
-    watch: "Raising ζ from 0.2 to 0.7 clearly reduces the overshoot; a larger ωn speeds up the whole curve, but ζ sets the shape.",
+    steps: [
+      "Step input",
+      "Transfer Fcn with denominator [1 2ζωn ωn²] and numerator [ωn²]",
+      "Connect Scope and run",
+      "Change ωn and ζ separately and compare",
+    ],
+    watch:
+      "Raising ζ from 0.2 to 0.7 clearly reduces the overshoot; a larger ωn speeds up the whole curve, but ζ sets the shape.",
     pitfall: "More damping is not always better: too large a ζ slows the response; look at ωn and ζ together.",
-    quiz: [["Does ζ=1 overshoot?", "No, that is critical damping."], ["To go faster without overshoot, what do you tune?", "Keep ζ≈0.7 first, then increase ωn."]],
+    quiz: [
+      ["Does ζ=1 overshoot?", "No, that is critical damping."],
+      ["To go faster without overshoot, what do you tune?", "Keep ζ≈0.7 first, then increase ωn."],
+    ],
     blocks: ["Step", "Second-order system", "Scope"],
     demo: "second-order",
   },
@@ -73,10 +112,19 @@ window.SIMULINK_GUIDE_EN = {
       ["D", "Reacts to the error rate and suppresses overshoot; it amplifies noise."],
     ],
     math: "u = Kp·e + Ki·∫e dt + Kd·de/dt",
-    steps: ["Step → Sum (reference − output)", "Feed the Sum into PID Controller", "Connect the PID output to the plant (e.g. 1/(s²+2ζωn s+ωn²))", "Feedback the output to the Sum and connect Scope"],
-    watch: "P only: steady-state error remains; add I: the error disappears but overshoot may appear; add D: less overshoot but more noise.",
+    steps: [
+      "Step → Sum (reference − output)",
+      "Feed the Sum into PID Controller",
+      "Connect the PID output to the plant (e.g. 1/(s²+2ζωn s+ωn²))",
+      "Feedback the output to the Sum and connect Scope",
+    ],
+    watch:
+      "P only: steady-state error remains; add I: the error disappears but overshoot may appear; add D: less overshoot but more noise.",
     pitfall: "I can wind up; D is noise-sensitive, so filter it in practice. Tune P first, then I, then D.",
-    quiz: [["Which term removes steady-state error?", "I."], ["With large overshoot and noise, what do you adjust first?", "Reduce Kd or filter D, then retune Kp."]],
+    quiz: [
+      ["Which term removes steady-state error?", "I."],
+      ["With large overshoot and noise, what do you adjust first?", "Reduce Kd or filter D, then retune Kp."],
+    ],
     blocks: ["Step", "Σ", "PID", "Plant", "Scope"],
     demo: "pid",
   },
@@ -89,10 +137,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Sample time", "The time column of the data must match the model sample time."],
     ],
     math: "Variable format: t = (0:0.01:10)'; u = sin(t);",
-    steps: ["Prepare t and u at the command line", "Drag From Workspace and enter [t u]", "Connect Scope or Gain", "Drag To Workspace to save y", "After Run, plot(tout, y) at the command line"],
+    steps: [
+      "Prepare t and u at the command line",
+      "Drag From Workspace and enter [t u]",
+      "Connect Scope or Gain",
+      "Drag To Workspace to save y",
+      "After Run, plot(tout, y) at the command line",
+    ],
     watch: "The Scope waveform should match plot(t,u); the To Workspace variable appears after Run.",
-    pitfall: "A misspelled variable name, a non-monotonic time column and a missing sample time all raise errors or give a bad waveform.",
-    quiz: [["How does data enter Simulink?", "Through From Workspace."], ["How do results get back to MATLAB?", "Through To Workspace."]],
+    pitfall:
+      "A misspelled variable name, a non-monotonic time column and a missing sample time all raise errors or give a bad waveform.",
+    quiz: [
+      ["How does data enter Simulink?", "Through From Workspace."],
+      ["How do results get back to MATLAB?", "Through To Workspace."],
+    ],
     blocks: ["Workspace", "From Workspace", "Scope"],
     demo: "signal",
   },
@@ -105,10 +163,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Reuse", "The same subsystem can be called in many places."],
     ],
     math: "Outside: u → [subsystem] → y; inside it is still the original block wiring.",
-    steps: ["Select the blocks to wrap", "Right-click Create Subsystem from Selection", "Double-click to enter the subsystem and check the ports", "Name the subsystem, wire it outside and run"],
-    watch: "The waveform is identical before and after wrapping; you can still double-click inside to change parameters.",
+    steps: [
+      "Select the blocks to wrap",
+      "Right-click Create Subsystem from Selection",
+      "Double-click to enter the subsystem and check the ports",
+      "Name the subsystem, wire it outside and run",
+    ],
+    watch:
+      "The waveform is identical before and after wrapping; you can still double-click inside to change parameters.",
     pitfall: "Port order may change after wrapping; changes to internal parameters are not visible from outside.",
-    quiz: [["Does a subsystem change the system dynamics?", "No, it is only an organizational structure."], ["How do you enter a subsystem?", "Double-click the subsystem block."]],
+    quiz: [
+      ["Does a subsystem change the system dynamics?", "No, it is only an organizational structure."],
+      ["How do you enter a subsystem?", "Double-click the subsystem block."],
+    ],
     blocks: ["Input", "[Subsystem]", "Output"],
   },
   t08: {
@@ -120,10 +187,22 @@ window.SIMULINK_GUIDE_EN = {
       ["Initialization", "A Mask can run initialization code to compute initial values from the parameters."],
     ],
     math: "Panel parameter K → internal Gain value = K.",
-    steps: ["Right-click the subsystem → Mask → Create Mask", "Add a parameter named K under Parameters", "Enter K as the gain of the internal Gain block", "Confirm, then double-click the subsystem to see the panel"],
-    watch: "Double-clicking the subsystem shows only the parameter panel; after changing K the internal Gain follows and the waveform changes.",
+    steps: [
+      "Right-click the subsystem → Mask → Create Mask",
+      "Add a parameter named K under Parameters",
+      "Enter K as the gain of the internal Gain block",
+      "Confirm, then double-click the subsystem to see the panel",
+    ],
+    watch:
+      "Double-clicking the subsystem shows only the parameter panel; after changing K the internal Gain follows and the waveform changes.",
     pitfall: "The parameter name must match the internal reference; click Apply or the change has no effect.",
-    quiz: [["What does a Mask do?", "Exposes internal parameters as a dialog for easy reuse."], ["If a panel parameter has no effect, what do you check first?", "Whether the parameter name matches the internal reference."]],
+    quiz: [
+      ["What does a Mask do?", "Exposes internal parameters as a dialog for easy reuse."],
+      [
+        "If a panel parameter has no effect, what do you check first?",
+        "Whether the parameter name matches the internal reference.",
+      ],
+    ],
     blocks: ["Masked Block", "Scope"],
   },
   t09: {
@@ -135,10 +214,20 @@ window.SIMULINK_GUIDE_EN = {
       ["C / D", "C picks which combination of states you measure, D is input feedthrough (usually 0)."],
     ],
     math: "Double integrator: ẋ1=x2, ẋ2=u; A=[0 1;0 0], B=[0;1], C=[1 0], D=0",
-    steps: ["Drag a State-Space block", "Fill the A, B, C, D matrices (semicolons separate rows)", "Step → State-Space → Scope", "Run; then change C to [0 1] and look again"],
-    watch: "C=[1 0] outputs position; C=[0 1] outputs only velocity, which becomes a constant — you are only 'measuring' velocity.",
-    pitfall: "MATLAB matrices use semicolons for rows and spaces/commas for columns; leaving D out raises a dimension error; initial values live in the block's Initial condition.",
-    quiz: [["What does C do?", "Decides which combination of states is the output."], ["What are the states of a double-integrator system?", "Position and velocity."]],
+    steps: [
+      "Drag a State-Space block",
+      "Fill the A, B, C, D matrices (semicolons separate rows)",
+      "Step → State-Space → Scope",
+      "Run; then change C to [0 1] and look again",
+    ],
+    watch:
+      "C=[1 0] outputs position; C=[0 1] outputs only velocity, which becomes a constant — you are only 'measuring' velocity.",
+    pitfall:
+      "MATLAB matrices use semicolons for rows and spaces/commas for columns; leaving D out raises a dimension error; initial values live in the block's Initial condition.",
+    quiz: [
+      ["What does C do?", "Decides which combination of states is the output."],
+      ["What are the states of a double-integrator system?", "Position and velocity."],
+    ],
     blocks: ["Step", "State-Space", "Scope"],
   },
   t10: {
@@ -147,13 +236,27 @@ window.SIMULINK_GUIDE_EN = {
     concepts: [
       ["State feedback K", "Multiply each state by a gain and sum them to form the control input."],
       ["Closed-loop poles", "Set the response speed and oscillation; the further left, the faster."],
-      ["LQR Q/R", "Large Q cares more about state error (more aggressive), large R cares more about saving control effort (more conservative)."],
+      [
+        "LQR Q/R",
+        "Large Q cares more about state error (more aggressive), large R cares more about saving control effort (more conservative).",
+      ],
     ],
     math: "Double integrator: K=[ωn², 2ζωn], u=k1(r−x1)−k2x2, closed-loop poles −ζωn ± jωn√(1−ζ²)",
-    steps: ["Step → Sum (+ −)", "Feed the Sum into a Gain as the control u", "Feed u into 1/s² (two Integrators in series)", "Multiply x1, x2 by K and feed them back to Sum", "Connect Scope to see position"],
-    watch: "Raising ζ from 0.3 to 1 removes the overshoot; a larger ωn speeds up the response but also raises the control peak.",
-    pitfall: "K is only feedback gain, the reference needs separate feedforward (otherwise the steady state never reaches 1); the control saturates, so limit it in practice.",
-    quiz: [["What do poles further left mean?", "Faster convergence."], ["Does a larger R in LQR make control more aggressive or more conservative?", "More conservative."]],
+    steps: [
+      "Step → Sum (+ −)",
+      "Feed the Sum into a Gain as the control u",
+      "Feed u into 1/s² (two Integrators in series)",
+      "Multiply x1, x2 by K and feed them back to Sum",
+      "Connect Scope to see position",
+    ],
+    watch:
+      "Raising ζ from 0.3 to 1 removes the overshoot; a larger ωn speeds up the response but also raises the control peak.",
+    pitfall:
+      "K is only feedback gain, the reference needs separate feedforward (otherwise the steady state never reaches 1); the control saturates, so limit it in practice.",
+    quiz: [
+      ["What do poles further left mean?", "Faster convergence."],
+      ["Does a larger R in LQR make control more aggressive or more conservative?", "More conservative."],
+    ],
     blocks: ["Step", "Σ", "Plant 1/s²", "Scope"],
     demo: "state-feedback",
   },
@@ -166,10 +269,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Separation principle", "Controller and observer can be designed separately without interfering."],
     ],
     math: "x̂' = Ax̂ + Bu + L(y − Cx̂); error e=x−x̂ converges as (A−LC)",
-    steps: ["Copy the plant model as the observer", "Feed u into both the plant and the observer", "Subtract ŷ from y, multiply by L and add it back to the observer", "Use the observer states for feedback; Scope compares true vs estimated"],
-    watch: "Deliberately start with a wrong estimate: the error decays at a rate set by L; too large an L makes noise shake the estimate.",
-    pitfall: "Observer poles are usually 2–5 times faster than the controller's; when only position is measured, velocity is computed and its noise is amplified.",
-    quiz: [["What corrects the observer estimate?", "The output error y−Cx̂."], ["Is a larger L always better?", "No, it amplifies noise and may destabilize."]],
+    steps: [
+      "Copy the plant model as the observer",
+      "Feed u into both the plant and the observer",
+      "Subtract ŷ from y, multiply by L and add it back to the observer",
+      "Use the observer states for feedback; Scope compares true vs estimated",
+    ],
+    watch:
+      "Deliberately start with a wrong estimate: the error decays at a rate set by L; too large an L makes noise shake the estimate.",
+    pitfall:
+      "Observer poles are usually 2–5 times faster than the controller's; when only position is measured, velocity is computed and its noise is amplified.",
+    quiz: [
+      ["What corrects the observer estimate?", "The output error y−Cx̂."],
+      ["Is a larger L always better?", "No, it amplifies noise and may destabilize."],
+    ],
     blocks: ["Step", "Σ", "Plant", "Observer", "Scope"],
     demo: "observer",
   },
@@ -182,10 +295,21 @@ window.SIMULINK_GUIDE_EN = {
       ["Kalman gain K", "The measurement weight computed automatically at each step."],
     ],
     math: "Predict P←P+Q; update K=P/(P+R), x̂←x̂+K(z−x̂), P←(1−K)P",
-    steps: ["Generate a noisy measurement z", "Initialize x̂ and P", "Predict, then add Q, at each step", "Compute K, correct with z, update P", "Plot z against x̂"],
-    watch: "Larger R gives a smoother estimate that lags real changes; larger Q follows the measurement more closely but is noisier.",
-    pitfall: "Swapping Q/R is the most common mistake: R is sensor noise, not a 'trust level'; keep the units consistent.",
-    quiz: [["With larger R, what does the filter trust more?", "The model."], ["What does a large K mean?", "This step trusts the measurement more."]],
+    steps: [
+      "Generate a noisy measurement z",
+      "Initialize x̂ and P",
+      "Predict, then add Q, at each step",
+      "Compute K, correct with z, update P",
+      "Plot z against x̂",
+    ],
+    watch:
+      "Larger R gives a smoother estimate that lags real changes; larger Q follows the measurement more closely but is noisier.",
+    pitfall:
+      "Swapping Q/R is the most common mistake: R is sensor noise, not a 'trust level'; keep the units consistent.",
+    quiz: [
+      ["With larger R, what does the filter trust more?", "The model."],
+      ["What does a large K mean?", "This step trusts the measurement more."],
+    ],
     blocks: ["Predict", "Update K", "Scope"],
     demo: "kalman",
   },
@@ -198,10 +322,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Mechanical τm=J/B", "Speed-loop response speed, usually tens to hundreds of milliseconds."],
     ],
     math: "Electrical: L di/dt = u − R i − Keω; mechanical: J dω/dt = Kt i − Bω",
-    steps: ["First close only the current PI loop with a current step reference", "Then add the speed loop, whose output is the current reference", "Set the speed-loop bandwidth to 1/5–1/10 of the current loop", "Look at the speed and current waveforms"],
-    watch: "The inner loop is fast and the outer loop is slower; a load-torque step drops the speed, which the outer loop pulls back.",
+    steps: [
+      "First close only the current PI loop with a current step reference",
+      "Then add the speed loop, whose output is the current reference",
+      "Set the speed-loop bandwidth to 1/5–1/10 of the current loop",
+      "Look at the speed and current waveforms",
+    ],
+    watch:
+      "The inner loop is fast and the outer loop is slower; a load-torque step drops the speed, which the outer loop pulls back.",
     pitfall: "Loops with too similar bandwidths oscillate; limiting and anti-windup are mandatory.",
-    quiz: [["Which loop should be faster?", "The current inner loop."], ["What does back-EMF grow with?", "Speed."]],
+    quiz: [
+      ["Which loop should be faster?", "The current inner loop."],
+      ["What does back-EMF grow with?", "Speed."],
+    ],
     blocks: ["Speed PI", "Current PI", "Motor", "Scope"],
   },
   t14: {
@@ -213,10 +346,20 @@ window.SIMULINK_GUIDE_EN = {
       ["d/q", "The d axis is the flux axis and the q axis produces torque; surface PM motors usually set id=0."],
     ],
     math: "id and iq are DC quantities; torque Te ∝ iq (with id=0)",
-    steps: ["Sample the three phase currents", "Clarke → Park (rotor angle θ required)", "d/q current PI", "Inverse Park → SVPWM driving the inverter"],
-    watch: "In steady state id≈0 and iq follows the reference; under load iq grows while the outer loop holds the speed.",
-    pitfall: "θ must be accurate (encoder/observer); a wrong pole-pair count or phase sequence reverses the torque direction.",
-    quiz: [["What key information does the Park transform need?", "The rotor angle θ."], ["What id value is usual for a surface PMSM?", "0."]],
+    steps: [
+      "Sample the three phase currents",
+      "Clarke → Park (rotor angle θ required)",
+      "d/q current PI",
+      "Inverse Park → SVPWM driving the inverter",
+    ],
+    watch:
+      "In steady state id≈0 and iq follows the reference; under load iq grows while the outer loop holds the speed.",
+    pitfall:
+      "θ must be accurate (encoder/observer); a wrong pole-pair count or phase sequence reverses the torque direction.",
+    quiz: [
+      ["What key information does the Park transform need?", "The rotor angle θ."],
+      ["What id value is usual for a surface PMSM?", "0."],
+    ],
     blocks: ["Clarke", "Park", "d/q PI", "SVPWM"],
   },
   t15: {
@@ -228,10 +371,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Fixed/floating point", "Whether the MCU has an FPU decides float or fixed point."],
     ],
     math: "x[k+1] = Ad x[k] + Bd u[k]; Ad=e^{ATs}",
-    steps: ["Fix the hardware sample period Ts", "Discretize with c2d and design K with dlqr", "Set the model fixed step to Ts", "Generate code and check interfaces and limits"],
-    watch: "The discrete simulation should stay close to the continuous one; too large a Ts clearly degrades performance and can even destabilize.",
-    pitfall: "Inconsistent sample times make the code behave differently from the simulation; forgetting limits/anti-windup blows up the integrator.",
-    quiz: [["What does c2d do?", "Converts a continuous model into a discrete one."], ["Is a larger Ts better?", "No, too large loses performance and can even destabilize."]],
+    steps: [
+      "Fix the hardware sample period Ts",
+      "Discretize with c2d and design K with dlqr",
+      "Set the model fixed step to Ts",
+      "Generate code and check interfaces and limits",
+    ],
+    watch:
+      "The discrete simulation should stay close to the continuous one; too large a Ts clearly degrades performance and can even destabilize.",
+    pitfall:
+      "Inconsistent sample times make the code behave differently from the simulation; forgetting limits/anti-windup blows up the integrator.",
+    quiz: [
+      ["What does c2d do?", "Converts a continuous model into a discrete one."],
+      ["Is a larger Ts better?", "No, too large loses performance and can even destabilize."],
+    ],
     blocks: ["Continuous model", "c2d", "C code"],
   },
   t16: {
@@ -243,10 +396,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Margin", "How much room is left before instability; phase margin is usually 45°–60°."],
     ],
     math: "|G(jω)|dB = 20·log10|G(jω)|; a second-order system resonates near ω≈ωn√(1−2ζ²)",
-    steps: ["Build a second-order transfer function", "Connect a Bode block or call bode(sys)", "Read the low-frequency gain, the −3 dB point and the resonant peak", "Change ζ and watch the peak and the phase"],
-    watch: "Small ζ → tall resonant peak and steep phase change; large ζ → the peak disappears, bandwidth widens but the response slows.",
+    steps: [
+      "Build a second-order transfer function",
+      "Connect a Bode block or call bode(sys)",
+      "Read the low-frequency gain, the −3 dB point and the resonant peak",
+      "Change ζ and watch the peak and the phase",
+    ],
+    watch:
+      "Small ζ → tall resonant peak and steep phase change; large ζ → the peak disappears, bandwidth widens but the response slows.",
     pitfall: "dB is 20log10, not 10log10; the horizontal axis is logarithmic, so equal spacing is not equal frequency.",
-    quiz: [["The −3 dB point corresponds to about what magnitude?", "0.707 times."], ["What happens if the phase margin is too small?", "Easy oscillation/instability."]],
+    quiz: [
+      ["The −3 dB point corresponds to about what magnitude?", "0.707 times."],
+      ["What happens if the phase margin is too small?", "Easy oscillation/instability."],
+    ],
     blocks: ["Sine Sweep", "G(s)", "Bode"],
     demo: "bode",
   },
@@ -259,10 +421,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Frequency shaping", "You do not add zeros and poles at random, you shape the target band."],
     ],
     math: "Lead: Gc=(1+αTs)/(1+Ts), α>1; Lag: α<1",
-    steps: ["Look at the uncompensated Bode plot, find the crossover frequency and phase margin", "Add a Lead zero/pole and watch the phase lift", "Add Lag when steady-state accuracy is needed", "Verify overshoot and settling time with a closed-loop step"],
-    watch: "Lead increases the phase margin and reduces overshoot; Lag raises low-frequency gain and cuts steady-state error, but slows the response.",
-    pitfall: "Lead amplifies high-frequency noise; Lag reduces bandwidth. Zeros and poles cannot be placed blindly, always look at the band.",
-    quiz: [["Which one raises the phase margin?", "Lead."], ["Which one reduces steady-state error?", "Lag."]],
+    steps: [
+      "Look at the uncompensated Bode plot, find the crossover frequency and phase margin",
+      "Add a Lead zero/pole and watch the phase lift",
+      "Add Lag when steady-state accuracy is needed",
+      "Verify overshoot and settling time with a closed-loop step",
+    ],
+    watch:
+      "Lead increases the phase margin and reduces overshoot; Lag raises low-frequency gain and cuts steady-state error, but slows the response.",
+    pitfall:
+      "Lead amplifies high-frequency noise; Lag reduces bandwidth. Zeros and poles cannot be placed blindly, always look at the band.",
+    quiz: [
+      ["Which one raises the phase margin?", "Lead."],
+      ["Which one reduces steady-state error?", "Lag."],
+    ],
     blocks: ["Step", "Lead/Lag", "G(s)", "Scope"],
   },
   t18: {
@@ -274,10 +446,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Model validation", "Hold back a data segment and check whether predictions still hold."],
     ],
     math: "First order: y(t)=K(1−e^(−t/τ)); K=y(∞), τ=t₆₃",
-    steps: ["Apply a step input to the plant and log the output", "Read the final value K and the 63.2% time τ", "Refine with least squares", "Validate on another data segment"],
-    watch: "The fitted curve should hug the measurements; a large deviation on new data means the model structure is wrong.",
-    pitfall: "Too small an excitation gives poor SNR; remove offset/delay first; never validate on the fitting data itself.",
-    quiz: [["How do you read τ for a first-order system?", "The time to reach 63.2% of the response."], ["Why keep a validation set?", "To prevent overfitting and test generalization."]],
+    steps: [
+      "Apply a step input to the plant and log the output",
+      "Read the final value K and the 63.2% time τ",
+      "Refine with least squares",
+      "Validate on another data segment",
+    ],
+    watch:
+      "The fitted curve should hug the measurements; a large deviation on new data means the model structure is wrong.",
+    pitfall:
+      "Too small an excitation gives poor SNR; remove offset/delay first; never validate on the fitting data itself.",
+    quiz: [
+      ["How do you read τ for a first-order system?", "The time to reach 63.2% of the response."],
+      ["Why keep a validation set?", "To prevent overfitting and test generalization."],
+    ],
     blocks: ["Step", "Unknown Plant", "Log Data"],
   },
   t19: {
@@ -285,14 +467,27 @@ window.SIMULINK_GUIDE_EN = {
     goal: "Understand the sensitivity function S, the complementary sensitivity T, and what the weighting functions suppress.",
     concepts: [
       ["S sensitivity", "Effect of disturbance/model error on the output; it should be small at low frequency."],
-      ["T complementary sensitivity", "Effect of noise/high-frequency uncertainty; it should be small at high frequency."],
+      [
+        "T complementary sensitivity",
+        "Effect of noise/high-frequency uncertainty; it should be small at high frequency.",
+      ],
       ["Weights", "W1/W2/W3 tell the optimizer which frequency band matters more."],
     ],
     math: "min ‖[W1S; W2KS; W3T]‖∞ < 1",
-    steps: ["Build the nominal model and the uncertainty", "Choose the sensitivity weight W1 and the control weight W2", "Solve for the controller with hinfsyn", "μ analysis / time-domain validation"],
-    watch: "With weights, S is pushed down at low frequency and T at high frequency; the robust stability margin grows.",
-    pitfall: "Harsher weights are not better: they may be infeasible or blow up the controller order; the nominal model must stay realistic.",
-    quiz: [["What does a large S mean?", "Disturbance/error strongly affects the output."], ["What does H∞ optimize?", "The worst-case gain (∞ norm)."]],
+    steps: [
+      "Build the nominal model and the uncertainty",
+      "Choose the sensitivity weight W1 and the control weight W2",
+      "Solve for the controller with hinfsyn",
+      "μ analysis / time-domain validation",
+    ],
+    watch:
+      "With weights, S is pushed down at low frequency and T at high frequency; the robust stability margin grows.",
+    pitfall:
+      "Harsher weights are not better: they may be infeasible or blow up the controller order; the nominal model must stay realistic.",
+    quiz: [
+      ["What does a large S mean?", "Disturbance/error strongly affects the output."],
+      ["What does H∞ optimize?", "The worst-case gain (∞ norm)."],
+    ],
     blocks: ["w", "K", "G", "z"],
   },
   t20: {
@@ -304,10 +499,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Constraints", "Input/state limits go straight into the optimization — MPC's killer feature."],
     ],
     math: "min Σ [Q(x−r)² + R u²], s.t. |u|≤umax",
-    steps: ["Discretize the plant model", "Set the prediction horizon N and the weights Q/R", "Add input/state constraints", "Solve the QP each step and apply the first u"],
-    watch: "With a small uMax the input sits on the limit and the response slows; too small an N is shortsighted, a large N costs computation.",
-    pitfall: "An inaccurate prediction model walks confidently in the wrong direction; conflicting constraints make the QP infeasible; check QP timing for real-time use.",
-    quiz: [["How many control moves does MPC apply per step?", "Only the first one."], ["Is a larger N always better?", "Not necessarily, computation and model error both grow."]],
+    steps: [
+      "Discretize the plant model",
+      "Set the prediction horizon N and the weights Q/R",
+      "Add input/state constraints",
+      "Solve the QP each step and apply the first u",
+    ],
+    watch:
+      "With a small uMax the input sits on the limit and the response slows; too small an N is shortsighted, a large N costs computation.",
+    pitfall:
+      "An inaccurate prediction model walks confidently in the wrong direction; conflicting constraints make the QP infeasible; check QP timing for real-time use.",
+    quiz: [
+      ["How many control moves does MPC apply per step?", "Only the first one."],
+      ["Is a larger N always better?", "Not necessarily, computation and model error both grow."],
+    ],
     blocks: ["Reference", "MPC", "Plant", "Scope"],
     demo: "mpc",
   },
@@ -320,10 +525,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Boundary layer φ", "Use sat instead of sign to reduce chattering at some accuracy cost."],
     ],
     math: "s=ė+λe; u=−k·sat(s/φ)",
-    steps: ["Define the error e and the sliding surface s", "Design the switching control so that s→0", "Suppress chattering with a boundary layer/super-twisting", "Look at the control signal and the error"],
-    watch: "Small φ: small error but chattering control; large φ: smooth control but larger steady-state error; λ sets the convergence speed on the surface.",
+    steps: [
+      "Define the error e and the sliding surface s",
+      "Design the switching control so that s→0",
+      "Suppress chattering with a boundary layer/super-twisting",
+      "Look at the control signal and the error",
+    ],
+    watch:
+      "Small φ: small error but chattering control; large φ: smooth control but larger steady-state error; λ sets the convergence speed on the surface.",
     pitfall: "Chattering wears out actuators; too large a λ is noise-sensitive; k must exceed the disturbance bound.",
-    quiz: [["What happens when φ shrinks?", "More chattering, higher accuracy."], ["How does the error converge on the surface?", "Exponentially, as ė=−λe."]],
+    quiz: [
+      ["What happens when φ shrinks?", "More chattering, higher accuracy."],
+      ["How does the error converge on the surface?", "Exponentially, as ė=−λe."],
+    ],
     blocks: ["Step", "Σ", "SMC", "Plant", "Scope"],
     demo: "smc",
   },
@@ -336,10 +550,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Imaginary axis", "The locus crossing it means stability changes."],
     ],
     math: "Closed-loop characteristic equation 1 + K·G(s) = 0",
-    steps: ["Write the open-loop G(s)", "Plot with rlocus(G) (X=poles, O=zeros)", "Find the imaginary-axis crossing (critical K)", "Pick the K on the locus that gives the desired damping"],
-    watch: "Small K keeps the poles near the open-loop poles; as K grows some poles move into the right half-plane and the system goes from stable to oscillatory/unstable.",
-    pitfall: "The root locus shows pole positions only, it does not prove enough margin; too large a K is unstable; zeros matter too.",
-    quiz: [["What does a locus crossing the imaginary axis mean?", "Critical stability."], ["Does a larger K always mean faster?", "No, it may oscillate or even destabilize."]],
+    steps: [
+      "Write the open-loop G(s)",
+      "Plot with rlocus(G) (X=poles, O=zeros)",
+      "Find the imaginary-axis crossing (critical K)",
+      "Pick the K on the locus that gives the desired damping",
+    ],
+    watch:
+      "Small K keeps the poles near the open-loop poles; as K grows some poles move into the right half-plane and the system goes from stable to oscillatory/unstable.",
+    pitfall:
+      "The root locus shows pole positions only, it does not prove enough margin; too large a K is unstable; zeros matter too.",
+    quiz: [
+      ["What does a locus crossing the imaginary axis mean?", "Critical stability."],
+      ["Does a larger K always mean faster?", "No, it may oscillate or even destabilize."],
+    ],
     blocks: ["K", "G(s)", "rlocus"],
     demo: "rootlocus",
   },
@@ -352,10 +576,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Adaptation law", "Adjusts controller parameters online from the error (e.g. the MIT rule)."],
     ],
     math: "θ̇ = −γ·e·x (MIT rule, γ is the adaptation gain)",
-    steps: ["Choose a reference model", "Define the tracking error", "Design an adaptation law to update the parameters", "Verify recovery after a parameter jump"],
-    watch: "Wrong initial parameters give a large error that then shrinks as the parameters converge; too large a γ causes high-frequency oscillation.",
-    pitfall: "Excessive adaptation gain destabilizes; insufficient excitation lets the parameters drift; add parameter limits.",
-    quiz: [["What is the reference model for?", "It defines the ideal response."], ["Does a larger γ converge faster?", "Not necessarily, too large oscillates."]],
+    steps: [
+      "Choose a reference model",
+      "Define the tracking error",
+      "Design an adaptation law to update the parameters",
+      "Verify recovery after a parameter jump",
+    ],
+    watch:
+      "Wrong initial parameters give a large error that then shrinks as the parameters converge; too large a γ causes high-frequency oscillation.",
+    pitfall:
+      "Excessive adaptation gain destabilizes; insufficient excitation lets the parameters drift; add parameter limits.",
+    quiz: [
+      ["What is the reference model for?", "It defines the ideal response."],
+      ["Does a larger γ converge faster?", "Not necessarily, too large oscillates."],
+    ],
     blocks: ["Reference model", "Adaptation law", "Controller", "Plant"],
   },
   t24: {
@@ -367,10 +601,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Defuzzification", "Weighted-averages the rule outputs into a single concrete control value."],
     ],
     math: "u = Σ wᵢ·uᵢ / Σ wᵢ (Sugeno weighted average)",
-    steps: ["Define the input membership functions", "Write the rule table", "Choose the defuzzification method", "Tune the scaling factors in closed loop"],
-    watch: "Reasonable rules/scaling give a smooth response; too large overshoots, too small is sluggish; conflicting rules chatter.",
-    pitfall: "More rules are not always better; unnormalized input scaling is hard to tune; fuzzy control has no stability guarantee.",
-    quiz: [["Does fuzzy control need an accurate model?", "No, it relies on rules/experience."], ["What does defuzzification do?", "Combines the rule outputs into one concrete control value."]],
+    steps: [
+      "Define the input membership functions",
+      "Write the rule table",
+      "Choose the defuzzification method",
+      "Tune the scaling factors in closed loop",
+    ],
+    watch:
+      "Reasonable rules/scaling give a smooth response; too large overshoots, too small is sluggish; conflicting rules chatter.",
+    pitfall:
+      "More rules are not always better; unnormalized input scaling is hard to tune; fuzzy control has no stability guarantee.",
+    quiz: [
+      ["Does fuzzy control need an accurate model?", "No, it relies on rules/experience."],
+      ["What does defuzzification do?", "Combines the rule outputs into one concrete control value."],
+    ],
     blocks: ["e", "Fuzzy", "Plant", "Scope"],
     demo: "fuzzy",
   },
@@ -378,15 +622,30 @@ window.SIMULINK_GUIDE_EN = {
     hook: "Simscape is like building blocks: no differential equations needed, just connect mass, spring and damper.",
     goal: "Understand physical vs signal modeling and build the simplest mass-spring-damper.",
     concepts: [
-      ["Physical domain", "Mechanical, electrical and hydraulic parts connect to each other, with effort/flow variables."],
+      [
+        "Physical domain",
+        "Mechanical, electrical and hydraulic parts connect to each other, with effort/flow variables.",
+      ],
       ["Physical elements", "Mass, spring, damper and force source, each with real parameters."],
       ["Solver", "Simscape generates the equations automatically, but you still pick a suitable solver."],
     ],
     math: "m·ẍ = F − c·ẋ − k·x",
-    steps: ["Place Mass, Spring, Damper and Force elements", "Connect them by physical (not signal) lines", "Set m, k, c and the initial conditions", "Connect Scope to see displacement/velocity"],
+    steps: [
+      "Place Mass, Spring, Damper and Force elements",
+      "Connect them by physical (not signal) lines",
+      "Set m, k, c and the initial conditions",
+      "Connect Scope to see displacement/velocity",
+    ],
     watch: "Larger k oscillates faster; larger c damps faster; a larger mass responds more sluggishly.",
-    pitfall: "Physical lines are not signal arrows; keep units consistent (N, kg, m); algebraic loops or conflicting initial conditions raise errors.",
-    quiz: [["How do Simscape connections differ from Simulink signal lines?", "Physical connections carry power, not one-way signals."], ["How does the response change as damping c grows?", "The oscillation decays faster."]],
+    pitfall:
+      "Physical lines are not signal arrows; keep units consistent (N, kg, m); algebraic loops or conflicting initial conditions raise errors.",
+    quiz: [
+      [
+        "How do Simscape connections differ from Simulink signal lines?",
+        "Physical connections carry power, not one-way signals.",
+      ],
+      ["How does the response change as damping c grows?", "The oscillation decays faster."],
+    ],
     blocks: ["Force", "Mass", "Spring/Damper", "Scope"],
   },
   t26: {
@@ -398,10 +657,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Singular/unreachable", "A target too far away cannot be reached; some poses make joint speeds blow up."],
     ],
     math: "x=l1cosθ1+l2cos(θ1+θ2); y=l1sinθ1+l2sin(θ1+θ2)",
-    steps: ["Measure the link lengths l1, l2", "Write the forward kinematics equations", "Solve IK geometrically/analytically", "Check multiple solutions and reachability"],
+    steps: [
+      "Measure the link lengths l1, l2",
+      "Write the forward kinematics equations",
+      "Solve IK geometrically/analytically",
+      "Check multiple solutions and reachability",
+    ],
     watch: "Joint angles change sharply near the boundary; one end point often has two elbow-up/elbow-down solutions.",
-    pitfall: "Forgetting to pick among multiple solutions; targets beyond l1+l2 have no solution; unify the angle units and zero positions.",
-    quiz: [["What are the FK input and output?", "Joint angles → end-effector position."], ["What happens if the target is too far?", "It is unreachable, no solution."]],
+    pitfall:
+      "Forgetting to pick among multiple solutions; targets beyond l1+l2 have no solution; unify the angle units and zero positions.",
+    quiz: [
+      ["What are the FK input and output?", "Joint angles → end-effector position."],
+      ["What happens if the target is too far?", "It is unreachable, no solution."],
+    ],
     blocks: ["θ1, θ2", "FK", "End effector (x,y)"],
     demo: "arm",
   },
@@ -411,13 +679,25 @@ window.SIMULINK_GUIDE_EN = {
     concepts: [
       ["ωn=√(k/m)", "Natural vibration frequency without damping."],
       ["ζ=c/(2√(km))", "Damping ratio: <1 oscillates, =1 critical, >1 overdamped."],
-      ["Four model forms", "Transfer function, state space, discretization and numerical integration describe the same system."],
+      [
+        "Four model forms",
+        "Transfer function, state space, discretization and numerical integration describe the same system.",
+      ],
     ],
     math: "m ẍ + c ẋ + k x = F(t); ωn=√(k/m), ζ=c/(2√(km))",
-    steps: ["Set m, k, c", "Write the transfer function or state space", "Apply a step/impulse input", "Look at displacement, velocity and overshoot"],
+    steps: [
+      "Set m, k, c",
+      "Write the transfer function or state space",
+      "Apply a step/impulse input",
+      "Look at displacement, velocity and overshoot",
+    ],
     watch: "Larger k → higher frequency; larger c → less overshoot and faster settling; larger m → slower.",
-    pitfall: "Inconsistent units (mm vs m); missing initial conditions; too large a discretization step causes numerical instability.",
-    quiz: [["Does ζ=0.2 oscillate?", "Yes, it is underdamped."], ["How does ωn change as k grows?", "It grows."]],
+    pitfall:
+      "Inconsistent units (mm vs m); missing initial conditions; too large a discretization step causes numerical instability.",
+    quiz: [
+      ["Does ζ=0.2 oscillate?", "Yes, it is underdamped."],
+      ["How does ωn change as k grows?", "It grows."],
+    ],
     blocks: ["Force", "m", "k / c", "Scope"],
     demo: "msd",
   },
@@ -430,10 +710,20 @@ window.SIMULINK_GUIDE_EN = {
       ["FFT/window", "Converts time to frequency; truncation leaks, so apply a window."],
     ],
     math: "Nyquist frequency fs/2; aliased frequency = |f − round(f/fs)·fs|",
-    steps: ["Feed in a sine", "Sample it at different fs", "Plot the samples/reconstructed waveform", "Run an FFT and check the spectral lines"],
-    watch: "With enough fs the samples reconstruct the sine; with too little fs a fake low-frequency wave appears whose frequency is completely different from the original.",
-    pitfall: "Time-domain 'looks fine' does not prove there is no aliasing; use an anti-alias filter before sampling; FFT resolution = fs/N.",
-    quiz: [["What is the highest frequency measurable with fs=40 Hz?", "20 Hz."], ["What does a 30 Hz signal become when sampled at 40 Hz?", "A fake 10 Hz signal."]],
+    steps: [
+      "Feed in a sine",
+      "Sample it at different fs",
+      "Plot the samples/reconstructed waveform",
+      "Run an FFT and check the spectral lines",
+    ],
+    watch:
+      "With enough fs the samples reconstruct the sine; with too little fs a fake low-frequency wave appears whose frequency is completely different from the original.",
+    pitfall:
+      "Time-domain 'looks fine' does not prove there is no aliasing; use an anti-alias filter before sampling; FFT resolution = fs/N.",
+    quiz: [
+      ["What is the highest frequency measurable with fs=40 Hz?", "20 Hz."],
+      ["What does a 30 Hz signal become when sampled at 40 Hz?", "A fake 10 Hz signal."],
+    ],
     blocks: ["Sine", "Sampling", "FFT"],
     demo: "dsp",
   },
@@ -446,10 +736,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Comparison axes", "Overshoot, settling time, control energy, noise robustness."],
     ],
     math: "PID: u=Kp e+Ki∫e+Kd de; LQR: u=−Kx, K from the Riccati equation with Q/R",
-    steps: ["First tune PID to an acceptable response", "Build the state-space model and design LQR", "Add sensor noise/actuator limits", "Compare on the same plot"],
+    steps: [
+      "First tune PID to an acceptable response",
+      "Build the state-space model and design LQR",
+      "Add sensor noise/actuator limits",
+      "Compare on the same plot",
+    ],
     watch: "A well-tuned LQR is usually smoother and uses less control energy; PID chatters more under noise.",
-    pitfall: "Compare with the same limits and noise; a different LQR weight is a different controller, do not report only the best set.",
-    quiz: [["What does LQR need?", "A state-space model and Q/R."], ["What is PID's advantage?", "No accurate model needed, easy to start with."]],
+    pitfall:
+      "Compare with the same limits and noise; a different LQR weight is a different controller, do not report only the best set.",
+    quiz: [
+      ["What does LQR need?", "A state-space model and Q/R."],
+      ["What is PID's advantage?", "No accurate model needed, easy to start with."],
+    ],
     blocks: ["Reference", "PID / LQR", "MSD", "Scope"],
   },
   t30: {
@@ -461,10 +760,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Active control", "An actuator applies force to cancel body vibration."],
     ],
     math: "Coupled two-mass equations; the usual goals are low body acceleration and low tire dynamic load",
-    steps: ["Build the quarter-car model", "Apply a road step/sine", "Start passive, then add PID/skyhook control", "Look at the body acceleration and the tire dynamic load"],
-    watch: "Too soft is comfortable but rolls and grips poorly; too stiff grips well but is harsh; active control can compromise but costs energy.",
-    pitfall: "Watching body displacement but not acceleration; ignoring actuator bandwidth/limits; an overly ideal road model.",
-    quiz: [["What is the core conflict in active suspension?", "Comfort vs grip."], ["Why look at the tire dynamic load?", "It reflects the grip/road contact."]],
+    steps: [
+      "Build the quarter-car model",
+      "Apply a road step/sine",
+      "Start passive, then add PID/skyhook control",
+      "Look at the body acceleration and the tire dynamic load",
+    ],
+    watch:
+      "Too soft is comfortable but rolls and grips poorly; too stiff grips well but is harsh; active control can compromise but costs energy.",
+    pitfall:
+      "Watching body displacement but not acceleration; ignoring actuator bandwidth/limits; an overly ideal road model.",
+    quiz: [
+      ["What is the core conflict in active suspension?", "Comfort vs grip."],
+      ["Why look at the tire dynamic load?", "It reflects the grip/road contact."],
+    ],
     blocks: ["Road", "Suspension", "Body", "Scope"],
   },
   t31: {
@@ -476,10 +785,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Predict/update", "Same as the KF, except the matrices are recomputed every step."],
     ],
     math: "F=∂f/∂x, H=∂h/∂x; P⁻=F P Fᵀ+Q, K=P⁻Hᵀ(H P⁻Hᵀ+R)⁻¹",
-    steps: ["Write the nonlinear state/measurement equations", "Derive the Jacobians F and H", "Initialize x̂ and P", "Predict/update at each step"],
-    watch: "With a poor initial value it converges first and then tracks; under strong nonlinearity the linearization error makes the covariance over-optimistic.",
+    steps: [
+      "Write the nonlinear state/measurement equations",
+      "Derive the Jacobians F and H",
+      "Initialize x̂ and P",
+      "Predict/update at each step",
+    ],
+    watch:
+      "With a poor initial value it converges first and then tracks; under strong nonlinearity the linearization error makes the covariance over-optimistic.",
     pitfall: "A wildly wrong initial value or a wrong Jacobian diverges; Q/R swapped; angles must handle ±π wrapping.",
-    quiz: [["What is the main difference between EKF and KF?", "A Jacobian-based local linearization at every step."], ["Does the EKF always converge?", "No, strong nonlinearity or bad initial values can diverge."]],
+    quiz: [
+      ["What is the main difference between EKF and KF?", "A Jacobian-based local linearization at every step."],
+      ["Does the EKF always converge?", "No, strong nonlinearity or bad initial values can diverge."],
+    ],
     blocks: ["Nonlinear model", "EKF", "Scope"],
   },
   t32: {
@@ -491,10 +809,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Estimation", "When only the angle is measured, the rate comes from the model/filter."],
     ],
     math: "θ̈ = (g sinθ − u cosθ)/(l) (simplified); measurement h=θ",
-    steps: ["Write the nonlinear pendulum equation", "Linearize or use an EKF", "Design the controller (LQR/energy)", "Start from an offset angle and watch convergence"],
-    watch: "With a large initial offset it swings back first and then stabilizes; with heavy noise the rate estimate chatters.",
-    pitfall: "Angle wrapping (±π); over-confident initial values/covariance prevent convergence; insufficient control limits.",
-    quiz: [["Why is the inverted pendulum hard?", "Strong nonlinearity + an unstable equilibrium."], ["Where does the rate come from when only the angle is measured?", "From the model/observer estimate."]],
+    steps: [
+      "Write the nonlinear pendulum equation",
+      "Linearize or use an EKF",
+      "Design the controller (LQR/energy)",
+      "Start from an offset angle and watch convergence",
+    ],
+    watch:
+      "With a large initial offset it swings back first and then stabilizes; with heavy noise the rate estimate chatters.",
+    pitfall:
+      "Angle wrapping (±π); over-confident initial values/covariance prevent convergence; insufficient control limits.",
+    quiz: [
+      ["Why is the inverted pendulum hard?", "Strong nonlinearity + an unstable equilibrium."],
+      ["Where does the rate come from when only the angle is measured?", "From the model/observer estimate."],
+    ],
     blocks: ["θ", "EKF", "Controller", "Pendulum"],
   },
   t33: {
@@ -506,10 +834,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Weights", "Center and symmetric points get different weights and can carry higher-order information."],
     ],
     math: "xᵢ = x̂ ± √((n+λ)P); y = Σ wᵢ f(xᵢ)",
-    steps: ["Choose the sigma points and weights", "Push each point through the nonlinear model", "Weight them into the predicted mean/covariance", "Update with the measurement"],
-    watch: "Under strong nonlinearity the UKF is usually more accurate than the EKF; the cost grows with the dimension.",
-    pitfall: "A non-positive-definite covariance or a bad weight choice diverges; the UKF is not magic — a wrong model breaks both.",
-    quiz: [["Does the UKF need Jacobians?", "No."], ["How many sigma points are there?", "2n+1 (n is the state dimension)."]],
+    steps: [
+      "Choose the sigma points and weights",
+      "Push each point through the nonlinear model",
+      "Weight them into the predicted mean/covariance",
+      "Update with the measurement",
+    ],
+    watch:
+      "Under strong nonlinearity the UKF is usually more accurate than the EKF; the cost grows with the dimension.",
+    pitfall:
+      "A non-positive-definite covariance or a bad weight choice diverges; the UKF is not magic — a wrong model breaks both.",
+    quiz: [
+      ["Does the UKF need Jacobians?", "No."],
+      ["How many sigma points are there?", "2n+1 (n is the state dimension)."],
+    ],
     blocks: ["Sigma points", "Nonlinear f", "Weighted reconstruction"],
   },
   t34: {
@@ -521,10 +859,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Selection", "Depends on nonlinearity, dimension and real-time requirements."],
     ],
     math: "EKF: F=∂f/∂x; UKF: sigma-point propagation",
-    steps: ["Implement EKF/UKF on the same model", "Run Monte Carlo over many initial values/noise seeds", "Compare RMSE, runtime and divergence rate", "Choose per scenario"],
-    watch: "Under strong nonlinearity/large initial error the UKF has smaller error; on linear systems the two nearly coincide.",
+    steps: [
+      "Implement EKF/UKF on the same model",
+      "Run Monte Carlo over many initial values/noise seeds",
+      "Compare RMSE, runtime and divergence rate",
+      "Choose per scenario",
+    ],
+    watch:
+      "Under strong nonlinearity/large initial error the UKF has smaller error; on linear systems the two nearly coincide.",
     pitfall: "Concluding from a single run; ignoring computation; parameters not aligned (different Q/R).",
-    quiz: [["Does the UKF help much on linear systems?", "Not much, it is close to the KF."], ["What is the UKF's cost?", "Higher computation."]],
+    quiz: [
+      ["Does the UKF help much on linear systems?", "Not much, it is close to the KF."],
+      ["What is the UKF's cost?", "Higher computation."],
+    ],
     blocks: ["EKF", "UKF", "Comparison"],
   },
   t35: {
@@ -536,10 +883,20 @@ window.SIMULINK_GUIDE_EN = {
       ["Complementary α", "Larger α trusts the gyro, smaller α trusts the accelerometer."],
     ],
     math: "θ̂ ← α(θ̂ + ω·dt) + (1−α)·θacc",
-    steps: ["Read the gyro rate and integrate it", "Read the accelerometer and compute the tilt", "Fuse them with weight α", "Tune α and watch drift/jitter"],
-    watch: "Large α: smooth but slowly drifting; small α: responsive but jittery. A Kalman filter can be seen as an adaptive α.",
-    pitfall: "During vigorous motion the accelerometer does not see pure gravity and biases the estimate; calibrate the gyro bias first.",
-    quiz: [["Larger α trusts which sensor more?", "The gyro."], ["When is the accelerometer unreliable?", "When there is motion acceleration/vibration."]],
+    steps: [
+      "Read the gyro rate and integrate it",
+      "Read the accelerometer and compute the tilt",
+      "Fuse them with weight α",
+      "Tune α and watch drift/jitter",
+    ],
+    watch:
+      "Large α: smooth but slowly drifting; small α: responsive but jittery. A Kalman filter can be seen as an adaptive α.",
+    pitfall:
+      "During vigorous motion the accelerometer does not see pure gravity and biases the estimate; calibrate the gyro bias first.",
+    quiz: [
+      ["Larger α trusts which sensor more?", "The gyro."],
+      ["When is the accelerometer unreliable?", "When there is motion acceleration/vibration."],
+    ],
     blocks: ["Gyro", "Accel", "Complementary filter", "Scope"],
     demo: "imu",
   },
@@ -552,10 +909,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Action", "Operations performed on entry/exit/transition."],
     ],
     math: "No formula; the core is 'state × event → new state'",
-    steps: ["Draw the states and transitions", "Write the transition conditions (events/guards)", "Add entry/during/exit actions", "Trigger tests with a signal source"],
-    watch: "States change only on a condition edge/event; priority decides which of several simultaneous transitions wins.",
+    steps: [
+      "Draw the states and transitions",
+      "Write the transition conditions (events/guards)",
+      "Add entry/during/exit actions",
+      "Trigger tests with a signal source",
+    ],
+    watch:
+      "States change only on a condition edge/event; priority decides which of several simultaneous transitions wins.",
     pitfall: "Conflicting/deadlocked transitions; missing initialization; action side effects executed repeatedly.",
-    quiz: [["What is Stateflow good for?", "Logic/mode switching."], ["What happens when transition conditions conflict?", "Priority decides, which may not match expectations."]],
+    quiz: [
+      ["What is Stateflow good for?", "Logic/mode switching."],
+      ["What happens when transition conditions conflict?", "Priority decides, which may not match expectations."],
+    ],
     blocks: ["Event", "Stateflow", "Output"],
   },
   t37: {
@@ -567,10 +933,18 @@ window.SIMULINK_GUIDE_EN = {
       ["Reset", "Resets the internal state."],
     ],
     math: "y(k)=f(u(k)) updates only at trigger instants",
-    steps: ["Create a Triggered Subsystem", "Choose the trigger type (rising/falling/either)", "Add hold/count logic inside", "Observe the staircase output"],
+    steps: [
+      "Create a Triggered Subsystem",
+      "Choose the trigger type (rising/falling/either)",
+      "Add hold/count logic inside",
+      "Observe the staircase output",
+    ],
     watch: "The output jumps on the trigger edge and holds in between; triggering too fast misses events.",
     pitfall: "Wrong trigger edge; sample-time conflicts; forgetting reset lets the state accumulate.",
-    quiz: [["When does a Triggered subsystem execute?", "When the trigger event arrives."], ["Why is the output a staircase?", "It updates only at trigger instants."]],
+    quiz: [
+      ["When does a Triggered subsystem execute?", "When the trigger event arrives."],
+      ["Why is the output a staircase?", "It updates only at trigger instants."],
+    ],
     blocks: ["Signal", "Triggered", "Hold"],
   },
   t38: {
@@ -582,10 +956,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Elements", "Each signal has a name/type; the interfaces must match."],
     ],
     math: "No formula; essentially structured signal packing",
-    steps: ["Feed several signals into Bus Creator", "Name each signal", "Extract signals by name with Bus Selector", "Connect Scope to check"],
+    steps: [
+      "Feed several signals into Bus Creator",
+      "Name each signal",
+      "Extract signals by name with Bus Selector",
+      "Connect Scope to check",
+    ],
     watch: "One line carries several signals after packing; a wrong selector name errors or grabs the wrong signal.",
-    pitfall: "Name spelling/type mismatch; packing order changed while the Selector uses indices; cannot see inside while debugging.",
-    quiz: [["Does a Bus change the signal values?", "No, it only packs them."], ["How does the Selector pick signals?", "By name or index."]],
+    pitfall:
+      "Name spelling/type mismatch; packing order changed while the Selector uses indices; cannot see inside while debugging.",
+    quiz: [
+      ["Does a Bus change the signal values?", "No, it only packs them."],
+      ["How does the Selector pick signals?", "By name or index."],
+    ],
     blocks: ["u1..u4", "Bus Creator", "Bus Selector", "Scope"],
     demo: "bus",
   },
@@ -598,10 +981,18 @@ window.SIMULINK_GUIDE_EN = {
       ["Independent testing", "A submodel can be simulated alone, which helps parallel work."],
     ],
     math: "No formula; a project organization technique",
-    steps: ["Create the submodel and define its ports", "Place a Model block in the top model and reference it", "Align the interface", "Test/integrate separately"],
+    steps: [
+      "Create the submodel and define its ports",
+      "Place a Model block in the top model and reference it",
+      "Align the interface",
+      "Test/integrate separately",
+    ],
     watch: "The top model cannot see inside the submodel; a mismatched interface errors immediately.",
     pitfall: "Interface version mismatch; lost submodel path; global variable conflicts.",
-    quiz: [["What is the benefit of a Model block?", "Reuse, parallel work, independent testing."], ["What happens on an interface mismatch?", "The build fails."]],
+    quiz: [
+      ["What is the benefit of a Model block?", "Reuse, parallel work, independent testing."],
+      ["What happens on an interface mismatch?", "The build fails."],
+    ],
     blocks: ["Top", "Model ref", "Submodel"],
   },
   t40: {
@@ -613,10 +1004,18 @@ window.SIMULINK_GUIDE_EN = {
       ["Build", "You can compile only the active variant or check all of them."],
     ],
     math: "No formula; configuration management",
-    steps: ["Create a Variant Subsystem", "Add several candidate implementations", "Set the activation variable", "Switch the variable and verify"],
+    steps: [
+      "Create a Variant Subsystem",
+      "Add several candidate implementations",
+      "Set the activation variable",
+      "Switch the variable and verify",
+    ],
     watch: "Switching variants changes the output for the same input; inactive variants may not be compiled.",
     pitfall: "Undefined variable; testing only the active variant; inconsistent interfaces.",
-    quiz: [["What is a variant for?", "One model, several implementations."], ["How do you switch?", "Through the activation condition/variable."]],
+    quiz: [
+      ["What is a variant for?", "One model, several implementations."],
+      ["How do you switch?", "Through the activation condition/variable."],
+    ],
     blocks: ["Input", "Variant", "Output"],
   },
   t41: {
@@ -628,10 +1027,19 @@ window.SIMULINK_GUIDE_EN = {
       ["StopFcn", "Saves/cleans up after the simulation ends."],
     ],
     math: "No formula; lifecycle hooks",
-    steps: ["Write callbacks in the model properties", "Verify the timing with disp/assignin", "Avoid slow work/side effects", "Agree on variable initialization as a team"],
+    steps: [
+      "Write callbacks in the model properties",
+      "Verify the timing with disp/assignin",
+      "Avoid slow work/side effects",
+      "Agree on variable initialization as a team",
+    ],
     watch: "Callbacks run automatically at their moments; wrong ordering leaves variables undefined.",
-    pitfall: "Heavy work/popups in callbacks; depending on uninitialized workspace variables; implicit behavior in team projects.",
-    quiz: [["When does InitFcn run?", "Before the simulation starts."], ["What belongs in callbacks?", "Light initialization/cleanup."]],
+    pitfall:
+      "Heavy work/popups in callbacks; depending on uninitialized workspace variables; implicit behavior in team projects.",
+    quiz: [
+      ["When does InitFcn run?", "Before the simulation starts."],
+      ["What belongs in callbacks?", "Light initialization/cleanup."],
+    ],
     blocks: ["PreLoad", "Init", "Sim", "Stop"],
   },
   t42: {
@@ -643,10 +1051,18 @@ window.SIMULINK_GUIDE_EN = {
       ["When to use", "Algorithms Simulink lacks or external integration."],
     ],
     math: "Discrete/continuous state updates implemented by you",
-    steps: ["Write setup to register the ports", "Implement Outputs/Update", "Place it in a MATLAB Function/S-Function block", "Test the edge cases"],
+    steps: [
+      "Write setup to register the ports",
+      "Implement Outputs/Update",
+      "Place it in a MATLAB Function/S-Function block",
+      "Test the edge cases",
+    ],
     watch: "A custom block takes part in the solve like a built-in one; the method order decides the state updates.",
     pitfall: "Wrong port/dimension registration; mixing continuous/discrete states; slower than built-in blocks.",
-    quiz: [["What are S-Functions for?", "Custom blocks/algorithms."], ["Which method computes the output?", "Outputs."]],
+    quiz: [
+      ["What are S-Functions for?", "Custom blocks/algorithms."],
+      ["Which method computes the output?", "Outputs."],
+    ],
     blocks: ["Input", "S-Function", "Output"],
   },
   t43: {
@@ -658,10 +1074,19 @@ window.SIMULINK_GUIDE_EN = {
       ["Limits", "The tool does not know your intent; a warning is not necessarily an error."],
     ],
     math: "No formula; static checks",
-    steps: ["Open Model Advisor", "Choose a check set (e.g. ISO 26262)", "Read the report item by item", "Fix/waive and record"],
+    steps: [
+      "Open Model Advisor",
+      "Choose a check set (e.g. ISO 26262)",
+      "Read the report item by item",
+      "Fix/waive and record",
+    ],
     watch: "Algebraic loops, unconnected ports and sample-time conflicts are flagged; some are design trade-offs.",
-    pitfall: "Believing every report or ignoring all of it; not recording waiver reasons; check sets that do not match project standards.",
-    quiz: [["What does Model Advisor check?", "Modeling standards/static issues."], ["Is a warning always a bug?", "No, it may be a design trade-off."]],
+    pitfall:
+      "Believing every report or ignoring all of it; not recording waiver reasons; check sets that do not match project standards.",
+    quiz: [
+      ["What does Model Advisor check?", "Modeling standards/static issues."],
+      ["Is a warning always a bug?", "No, it may be a design trade-off."],
+    ],
     blocks: ["Model", "Advisor", "Report"],
   },
 };
