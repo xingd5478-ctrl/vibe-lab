@@ -1,4 +1,4 @@
 # Report-only CSP for hosts that support response headers (Cloudflare Pages/Worker).
 # GitHub Pages ignores this file and cannot set headers; see docs/SECURITY.md.
 /*
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn.jsdelivr.net https://raw.githubusercontent.com; connect-src 'self' https://cdn.jsdelivr.net https://raw.githubusercontent.com https://gc.zgo.at https://tally.so; frame-src https://tally.so; worker-src 'self' blob:; base-uri 'none'; form-action 'self' https://tally.so
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn.jsdelivr.net https://raw.githubusercontent.com; connect-src 'self' https://cdn.jsdelivr.net https://raw.githubusercontent.com https://gc.zgo.at https://tally.so https://*.sentry.io https://*.glitchtip.com; frame-src https://tally.so; worker-src 'self' blob:; base-uri 'none'; form-action 'self' https://tally.so

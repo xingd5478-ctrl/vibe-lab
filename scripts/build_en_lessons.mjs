@@ -1,21 +1,18 @@
 /* Generate the English lesson index (landing/en/lessons.html) from lessons.js. */
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 import { PAGES, navFor } from "./site_layout.mjs";
 import { footerFor } from "./site_footer.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const lessonsSrc = fs.readFileSync(path.join(ROOT, "simulink", "lessons.js"), "utf8");
-const re =
-  /\{ id: "(t\d+)", n: (\d+), title: "([^"]+)", desc: "([^"]+)", file: "([^"]+)", model: "([^"]+)"(?:, demo: "([^"]+)")? \}/g;
-const lessons = [...lessonsSrc.matchAll(re)].map((m) => ({
-  id: m[1],
-  n: Number(m[2]),
-  zh: m[3],
-  file: m[5],
-  model: m[6],
-  demo: m[7] || null,
-}));
+const ctx = { window: {} };
+vm.runInNewContext(fs.readFileSync(path.join(ROOT, "simulink", "lessons.js"), "utf8"), ctx, {
+  filename: "simulink/lessons.js",
+});
+const DATA = ctx.window.SIMULINK_LESSONS;
+const lessons = [];
+DATA.phases.forEach((ph) => ph.items.forEach((l) => lessons.push({ ...l, zh: l.title })));
 const i18n = fs.readFileSync(path.join(ROOT, "shared", "i18n.js"), "utf8");
 const block = i18n.match(/const TITLES = \{([\s\S]*?)\n  \};/);
 if (!block) throw new Error("TITLES block not found");
@@ -57,6 +54,8 @@ let html = `<!DOCTYPE html>
     .note { border-left: 2px solid var(--accent); background: #fbf9f2; color: var(--muted); padding: 8px 12px; font-size: 13px; margin: 18px 0; }
     @media (prefers-color-scheme: dark) { .note { background: #222831; } }
   </style>
+  <script src="../shared/sentry-config.js"></script>
+  <script src="../shared/observability.js"></script>
 </head>
 <body>
   <div class="wrap">

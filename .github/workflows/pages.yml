@@ -10,7 +10,7 @@ on:
       - "landing/**"
       - "about/**"
       - "data/**"
-      - "shared/i18n.js"
+      - "shared/**"
       - "LICENSE"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -55,7 +55,7 @@ jobs:
           cp -r about/. _site/about/
           mkdir -p _site/data _site/shared
           cp data/matlab-probes.json data/feedback.json _site/data/
-          cp shared/i18n.js _site/shared/
+          cp -r shared/. _site/shared/
           cp LICENSE _site/LICENSE
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -35,7 +35,8 @@
     "layout": "node scripts/layout_nav.mjs --write && node scripts/layout_footer.mjs --write",
     "check:layout": "node scripts/layout_nav.mjs && node scripts/layout_footer.mjs",
     "provenance": "node scripts/build_provenance.mjs",
-    "check:provenance": "node scripts/build_provenance.mjs --check"
+    "check:provenance": "node scripts/build_provenance.mjs --check",
+    "sentry:set": "node scripts/set_sentry.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.14.0",

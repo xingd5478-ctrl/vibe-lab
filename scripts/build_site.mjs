@@ -42,8 +42,7 @@ fs.mkdirSync(path.join(OUT, "data"), { recursive: true });
 for (const f of ["matlab-probes.json", "feedback.json"]) {
   fs.copyFileSync(path.join(ROOT, "data", f), path.join(OUT, "data", f));
 }
-fs.mkdirSync(path.join(OUT, "shared"), { recursive: true });
-fs.copyFileSync(path.join(ROOT, "shared", "i18n.js"), path.join(OUT, "shared", "i18n.js"));
+copyDir(path.join(ROOT, "shared"), path.join(OUT, "shared"));
 
 const count = (dir) =>
   fs

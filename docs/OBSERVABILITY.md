@@ -10,15 +10,16 @@
 
 ## Error aggregation (optional, needs an account)
 
-The current `js-error` event is a count, not a grouped stack trace. For grouping, use a
-free Sentry or GlitchTip project:
+The site now has a lightweight Sentry/GlitchTip client at `shared/observability.js`. It posts
+bounded browser errors (no cookies, no PII, 5 events/page max) directly to the DSN project.
+It is **dormant until a DSN is set**. Configure a free Sentry or GlitchTip project:
 
 1. Create a project in Sentry/GlitchTip; copy the browser DSN.
-2. Do **not** commit the DSN as a secret; a public static DSN is acceptable but treat it as public.
-3. Add the Sentry browser SDK with an explicit version and SRI, or self-host the SDK.
-4. Initialize only when `window.VIBE_SENTRY_DSN` is set; keep `sendDefaultPii: false`.
-5. Add the SDK domain to the CSP plan in [SECURITY.md](SECURITY.md).
-6. Verify with a deliberate `throw new Error("sentry-check")` on a preview, then remove it.
+2. Run `npm run sentry:set -- https://<key>@<host>/<project-id>` (the DSN is public, not a server secret).
+3. Deploy; `shared/sentry-config.js` now carries the DSN and `shared/observability.js` posts errors.
+4. Verify with a deliberate `throw new Error("sentry-check")` on a preview, then remove it.
+5. Add the Sentry/GlitchTip host to the CSP `connect-src` in `landing/_headers` (wildcards are pre-added for sentry.io/glitchtip.com).
+6. Confirm the event appears with page/tags, then delete it from the test project if desired.
 
 Until a project exists, GoatCounter `event/js-error` plus the GitHub incident issue is the
 honest baseline. Do not claim stack-level monitoring.

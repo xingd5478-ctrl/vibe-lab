@@ -18,7 +18,7 @@ Content-Security-Policy-Report-Only:
   script-src 'self' https://gc.zgo.at 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: https://cdn.jsdelivr.net https://raw.githubusercontent.com;
-  connect-src 'self' https://cdn.jsdelivr.net https://raw.githubusercontent.com https://gc.zgo.at https://tally.so;
+  connect-src 'self' https://cdn.jsdelivr.net https://raw.githubusercontent.com https://gc.zgo.at https://tally.so https://*.sentry.io https://*.glitchtip.com;
   frame-src https://tally.so;
   base-uri 'none';
   form-action 'self' https://tally.so;
