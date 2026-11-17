@@ -103,7 +103,6 @@
     try {
       fetch(parsed.endpoint, {
         method: "POST",
-        keepalive: true,
         headers: {
           "Content-Type": "application/json",
           "X-Sentry-Auth": "Sentry sentry_version=7, sentry_key=" + parsed.key + ", sentry_client=vibe-lab/1.0",
