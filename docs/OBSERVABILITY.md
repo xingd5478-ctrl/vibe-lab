@@ -5,14 +5,14 @@
 - **GoatCounter** page/event counts: `https://xingdong.goatcounter.com`.
 - **CTA events**: `cta-imu`, `cta-simulink`, `open-*`, `scope-replay`.
 - **JS errors**: `event/js-error` on `error` / `unhandledrejection`; no stack or user data is sent.
-- **Live smoke**: `npm run live` checks 8 endpoints; GitHub Actions opens an issue on failure.
+- **Live smoke**: `npm run live` checks 9 endpoints; GitHub Actions opens an issue on failure.
 - **Incidents**: [INCIDENTS.md](INCIDENTS.md).
 
 ## Error aggregation (optional, needs an account)
 
 The site now has a lightweight Sentry/GlitchTip client at `shared/observability.js`. It posts
 bounded browser errors (no cookies, no PII, 5 events/page max) directly to the DSN project.
-It is **dormant until a DSN is set**. Configure a free Sentry or GlitchTip project:
+Status: **active** with GlitchTip project `29862` (host `app.glitchtip.com`). The DSN is public and stored in `shared/sentry-config.js`. Configure another project with:
 
 1. Create a project in Sentry/GlitchTip; copy the browser DSN.
 2. Run `npm run sentry:set -- https://<key>@<host>/<project-id>` (the DSN is public, not a server secret).

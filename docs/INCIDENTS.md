@@ -41,7 +41,7 @@ so the next maintainer does not rediscover them.
 
 ## Open known issues
 
-- No dedicated error aggregator (Sentry/GlitchTip); page/event counts only.
+- ~~No dedicated error aggregator~~ → GlitchTip project `29862` is active; source maps are not uploaded.
 - No physical iOS/Android device lab; mobile is emulated.
 - CSP/SRI are not enforced because GitHub Pages cannot set response headers.
 - Tally and GitHub Issues are intentionally separate; no unified private dashboard.
