@@ -335,3 +335,15 @@ code { font-family: var(--mono); font-size: 0.92em; background: var(--code-bg); 
 }
 
 .lang-en #demo-note, .lang-en #links, .lang-en .howto { display: none !important; }
+
+
+/* Local lesson progress (no account, no upload). */
+.progress-card { border: 1px solid var(--line); padding: 10px; margin-bottom: 14px; }
+.progress-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.progress-top b { font-family: var(--mono); color: var(--ink); font-weight: 600; }
+.progress-track { height: 5px; background: var(--grid); margin-top: 8px; overflow: hidden; }
+.progress-track i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s ease; }
+.continue { display: inline-block; margin-top: 8px; font-size: 12px; color: var(--accent); }
+.lesson.read .n::after { content: " ✓"; color: var(--green); }
+
+@media (prefers-color-scheme: dark) { .continue { color: #8db3d8; } }

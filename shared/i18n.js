@@ -108,6 +108,14 @@
     方法说明与局限: "Methods & limitations",
     "IMU 数据实验室": "IMU data lab",
     "Control Play · 二阶系统": "Control Play · second-order systems",
+    课程阅读进度: "Course reading progress",
+    继续上次: "Continue where you left off",
+    学习进度: "Progress",
+    "学完这 43 课，你应该能：搭一阶/二阶/闭环、读 Bode 与阶跃、解释 PID / 状态反馈 / 观测器 / Kalman 的取舍，并知道何时该回到真实标定。":
+      "After 43 lessons you should be able to build first/second-order and closed-loop models, read Bode and step responses, explain the trade-offs in PID, state feedback, observers and Kalman filters, and know when a real calibration is still required.",
+    复制当前参数链接: "Copy parameter link",
+    已复制当前参数链接: "Parameter link copied",
+    "复制失败，可直接复制地址栏 URL": "Copy failed; copy the address bar URL",
     "上传 MPU6050 CSV → CRC 清洗 → Allan 方差 → 拖动 R/Q 看滤波。全部在浏览器内计算，无后端。":
       "Upload MPU6050 CSV → CRC cleaning → Allan deviation → drag R/Q to filter. Everything runs in your browser; no backend.",
     演示数据: "Demo data",

@@ -261,6 +261,22 @@
     syncURL();
   }
 
+  const copyLink = $("copy-link");
+  if (copyLink) {
+    copyLink.addEventListener("click", async () => {
+      const status = $("copy-status");
+      try {
+        await navigator.clipboard.writeText(location.href);
+        if (status) status.textContent = "已复制当前参数链接";
+      } catch (e) {
+        if (status) status.textContent = "复制失败，可直接复制地址栏 URL";
+      }
+      setTimeout(() => {
+        if (status) status.textContent = "";
+      }, 2400);
+    });
+  }
+
   function syncURL() {
     const p = new URLSearchParams();
     p.set("wn", state.wn.toFixed(2));

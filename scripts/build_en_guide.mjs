@@ -114,6 +114,7 @@ let html = `<!DOCTYPE html>
       <div class="kicker">vibe-lab / simulink / 43-lesson guide</div>
       <h1>The 43-lesson English guide</h1>
       <p class="sub">Every lesson in English: goal, concepts, formula, steps, what to watch, pitfalls and a self-check. Download the <code>.slx</code> model or the original <code>.m</code>; the Chinese source notes remain available for comparison.</p>
+<p class="hint">After 43 lessons you should be able to: build first/second-order and closed-loop models, read Bode and step responses, explain the trade-offs in PID, state feedback, observers and Kalman filters, and know when a real calibration is still required.</p>
       <p class="hint">This is the readable English companion to the interactive demos. The original Chinese lesson prose is not hidden here as a requirement; it is linked per lesson.</p>
     </header>
     <main id="main">

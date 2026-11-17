@@ -83,6 +83,10 @@ Current canonical: `https://xingd5478-ctrl.github.io/vibe-lab/`.
 - If buying a domain: point its CNAME at `xingd5478-ctrl.github.io` (or use Cloudflare Pages/Worker custom domain), then run `node scripts/set_domain.mjs <url>` and verify with `npm run live`.
 - If keeping `workers.dev`: run `node scripts/set_domain.mjs https://<worker>.workers.dev --no-cname`; it is a mirror, not the primary.
 
+## Observability and security
+
+See [OBSERVABILITY.md](OBSERVABILITY.md), [SECURITY.md](SECURITY.md) and [ENGLISH_REVIEW.md](ENGLISH_REVIEW.md).
+
 ## Incidents
 
 Record user-visible incidents in [docs/INCIDENTS.md](INCIDENTS.md); the Live smoke workflow opens a GitHub issue on failure.

@@ -23,6 +23,49 @@
 
   const cache = new Map();
   let current = null;
+  const PROGRESS_KEY = "vibe-course-read-v1";
+  let read = new Set();
+  let lastRead = null;
+  try {
+    const saved = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
+    if (Array.isArray(saved.ids)) read = new Set(saved.ids);
+    lastRead = saved.last || null;
+  } catch (e) {
+    /* private mode */
+  }
+
+  function saveProgress() {
+    try {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify({ ids: [...read], last: lastRead }));
+    } catch (e) {}
+  }
+
+  function updateProgress() {
+    const count = $("progress-count");
+    if (!count) return;
+    count.textContent = read.size + " / " + lessons.length;
+    const fill = $("progress-fill");
+    if (fill) fill.style.width = Math.round((read.size / lessons.length) * 100) + "%";
+    const track = document.querySelector("#course-progress .progress-track");
+    if (track) track.setAttribute("aria-valuenow", String(read.size));
+    const cont = $("continue-link");
+    if (cont) {
+      if (lastRead && byId[lastRead]) {
+        cont.hidden = false;
+        cont.href = "course.html?id=" + lastRead;
+        cont.textContent = "继续 " + lastRead.toUpperCase() + " →";
+      } else cont.hidden = true;
+    }
+    document.querySelectorAll(".lesson").forEach((b) => b.classList.toggle("read", read.has(b.dataset.id)));
+  }
+
+  function markRead(id) {
+    if (!byId[id]) return;
+    read.add(id);
+    lastRead = id;
+    saveProgress();
+    updateProgress();
+  }
 
   function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -276,6 +319,7 @@
 
   async function load(id) {
     const lesson = byId[id];
+    markRead(id);
     if (!lesson) {
       setStatus("未找到该课程");
       return;
@@ -369,6 +413,7 @@
   });
 
   buildList();
+  updateProgress();
   const initial = new URLSearchParams(location.search).get("id") || location.hash.replace(/^#/, "") || "t01";
   load(initial);
 })();
