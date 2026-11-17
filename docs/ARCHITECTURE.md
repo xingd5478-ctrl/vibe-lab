@@ -28,7 +28,7 @@ tools/probe_all.m
   → about/matlab.html
 ```
 
-`npm run check:matlab` re-runs the generator and verifies 43 rows, model hashes and table sync.
+`npm run check:matlab` re-runs the generator and verifies 43 rows, model hashes and table sync. `npm run check:provenance` verifies the per-model source/license/modification report.
 
 ```
 simulink/lessons.js + guide-en.js

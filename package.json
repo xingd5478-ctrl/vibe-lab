@@ -33,7 +33,9 @@
     "format": "prettier --write \"scripts/**/*.mjs\" \"tests/**/*.js\" \"landing/**/*.js\" \"shared/**/*.js\" \"imu-lab/static/**/*.js\" \"control-play/**/*.js\" \"simulink/**/*.js\" \"simulink/**/*.mjs\"",
     "format:check": "prettier --check \"scripts/**/*.mjs\" \"tests/**/*.js\" \"landing/**/*.js\" \"shared/**/*.js\" \"imu-lab/static/**/*.js\" \"control-play/**/*.js\" \"simulink/**/*.js\" \"simulink/**/*.mjs\"",
     "layout": "node scripts/layout_nav.mjs --write && node scripts/layout_footer.mjs --write",
-    "check:layout": "node scripts/layout_nav.mjs && node scripts/layout_footer.mjs"
+    "check:layout": "node scripts/layout_nav.mjs && node scripts/layout_footer.mjs",
+    "provenance": "node scripts/build_provenance.mjs",
+    "check:provenance": "node scripts/build_provenance.mjs --check"
   },
   "devDependencies": {
     "axe-core": "^4.14.0",
