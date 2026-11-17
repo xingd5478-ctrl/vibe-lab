@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v28";
+const CACHE = "vibe-lab-v32";
 const ASSETS = [
   "./",
   "./index.html",
@@ -35,8 +35,16 @@ const ASSETS = [
   "./data/matlab-probes.json",
   "./data/feedback.json",
   "./simulink/lab-kit.js",
-  "./simulink/guide.js",
+
   "./404.html",
+  "./simulink/guide/t01-t08.js",
+  "./simulink/guide/t09-t16.js",
+  "./simulink/guide/t17-t24.js",
+  "./simulink/guide/t25-t32.js",
+  "./simulink/guide/t33-t40.js",
+  "./simulink/guide/t41-t43.js",
+  "./simulink/guide/examples.js",
+  "./simulink/guide/cases.js",
   "./shared/i18n.js",
   "./imu/",
   "./imu/index.html",
@@ -63,9 +71,9 @@ const ASSETS = [
   "./simulink/",
   "./simulink/index.html",
   "./simulink/style.css",
-  "./simulink/app-core.js",
-  "./simulink/app-demos.js",
-  "./simulink/app-ui.js",
+  "./simulink/app-core.mjs",
+  "./simulink/app-demos.mjs",
+  "./simulink/app-ui.mjs",
   "./simulink/course.html",
   "./simulink/course.js",
   "./simulink/lessons.js",

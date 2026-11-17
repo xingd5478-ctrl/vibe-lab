@@ -54,6 +54,11 @@ export default [
     },
   },
   {
+    files: ["simulink/**/*.mjs"],
+    languageOptions: { ecmaVersion: 2024, sourceType: "module", globals: browser },
+    rules: { "no-undef": "error", "no-unused-vars": "off", "no-redeclare": "error" },
+  },
+  {
     files: ["landing/sw.js"],
     languageOptions: { ecmaVersion: 2022, sourceType: "script", globals: { ...browser, ...globals.serviceworker } },
     rules: { "no-undef": "error", "no-unused-vars": "off", "no-redeclare": "error" },

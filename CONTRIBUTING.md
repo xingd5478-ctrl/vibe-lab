@@ -55,6 +55,16 @@ npm run check:layout
 
 The generated pages are committed; CI fails if a page nav/footer and the shared source drift. 404 keeps a dynamic footer and is intentionally excluded.
 
+## Simulink modules
+
+- Page UI: `simulink/app-ui.mjs`
+- Shared helpers/state: `simulink/app-core.mjs`
+- Interactive demos: `simulink/app-demos.mjs`
+- Beginner guide data: `simulink/guide/t*.js`
+- Worked examples/cases: `simulink/guide/examples.js`, `simulink/guide/cases.js`
+
+Add a demo in `app-demos.mjs`; add a guide entry to the matching `guide/t*.js` chunk, then run the tests.
+
 ## Conventions
 
 - No runtime npm dependencies; no external animation/font libraries.

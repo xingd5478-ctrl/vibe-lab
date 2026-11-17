@@ -1,4 +1,5 @@
 /* DOM smoke test via Edge CDP (works while a normal Edge window is open). */
+import http from "node:http";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -15,7 +16,36 @@ if (!EDGE) {
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const fileUrl = (p) => new URL("file:///" + path.resolve(ROOT, p).replace(/\\/g, "/")).href;
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".png": "image/png",
+  ".webmanifest": "application/manifest+json",
+};
+function serve() {
+  const server = http.createServer((req, res) => {
+    const url = decodeURIComponent((req.url || "/").split("?")[0]);
+    const file = path.join(ROOT, url);
+    if (!file.startsWith(ROOT)) {
+      res.statusCode = 403;
+      res.end();
+      return;
+    }
+    fs.readFile(file, (err, data) => {
+      if (err) {
+        res.statusCode = 404;
+        res.end("nf");
+        return;
+      }
+      res.setHeader("Content-Type", MIME[path.extname(file)] || "application/octet-stream");
+      res.end(data);
+    });
+  });
+  return new Promise((resolve) => server.listen(0, "127.0.0.1", () => resolve(server)));
+}
+const httpUrl = (base, p) => base + "/" + p.replace(/\\/g, "/");
 
 function cdp(wsUrl) {
   const ws = new WebSocket(wsUrl);
@@ -59,6 +89,8 @@ async function main() {
   const modelDir = path.join(ROOT, "simulink", "models");
   const nModels = fs.existsSync(modelDir) ? fs.readdirSync(modelDir).filter((f) => f.endsWith(".slx")).length : 0;
   if (nModels !== 43) throw new Error(`simulink: expected 43 vendored models, got ${nModels}`);
+  const server = await serve();
+  const base = `http://127.0.0.1:${server.address().port}`;
   const port = 9336;
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-smoke-"));
   const edge = spawn(
@@ -98,7 +130,7 @@ async function main() {
       console.log("ok", name);
     }
 
-    await check("imu", fileUrl("imu-lab/static/index.html"), async (e) => {
+    await check("imu", httpUrl(base, "imu-lab/static/index.html"), async (e) => {
       await waitFor(() => e("!!document.querySelector('#chart-time svg')"));
       if (!(await e("document.querySelector('#fit-info').textContent")).includes("ARW="))
         throw new Error("imu: fit missing");
@@ -115,7 +147,7 @@ async function main() {
         throw new Error("imu: no keyboard focus");
     });
 
-    await check("control", fileUrl("control-play/index.html") + "?kp=3&ki=1&kd=0.1", async (e) => {
+    await check("control", httpUrl(base, "control-play/index.html") + "?kp=3&ki=1&kd=0.1", async (e) => {
       await waitFor(() => e("!!document.querySelector('#bode svg')"));
       if (!/Kp=3\.00/.test(await e("document.querySelector('#meta-step').textContent")))
         throw new Error("control: PID URL");
@@ -156,7 +188,7 @@ async function main() {
       if (cy1 === cy50) throw new Error("control: root locus poles did not move with K");
     });
 
-    await check("control-state", fileUrl("control-play/index.html") + "#labs&K=50", async (e) => {
+    await check("control-state", httpUrl(base, "control-play/index.html") + "#labs&K=50", async (e) => {
       await waitFor(async () => (await e("document.getElementById('labs').hidden")) === false);
       await waitFor(async () =>
         (await e("document.querySelector('#lab-rl .lab-metrics').textContent")).includes("不稳定")
@@ -165,7 +197,7 @@ async function main() {
         throw new Error("control-state: poles missing");
     });
 
-    await check("landing", fileUrl("landing/index.html"), async (e) => {
+    await check("landing", httpUrl(base, "landing/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 3);
       if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 3)
         throw new Error("landing: path chooser");
@@ -173,7 +205,7 @@ async function main() {
       if (!(await e("document.title")).includes("vibe-lab")) throw new Error("landing: title");
     });
 
-    await check("landing-en", fileUrl("landing/en/index.html"), async (e) => {
+    await check("landing-en", httpUrl(base, "landing/en/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 3);
       if ((await e("document.documentElement.lang")) !== "en") throw new Error("landing-en: lang");
       if ((await e("document.querySelectorAll('.topnav a').length")) !== 6) throw new Error("landing-en: global nav");
@@ -184,11 +216,11 @@ async function main() {
       if (!/index\.html$/.test(zh)) throw new Error("landing-en: language switch");
     });
 
-    await check("about", fileUrl("about/index.html"), async (e) => {
+    await check("about", httpUrl(base, "about/index.html"), async (e) => {
       if (!(await e("document.body.textContent")).includes("方法说明")) throw new Error("about: content");
     });
 
-    await check("about-matlab", fileUrl("about/matlab.html"), async (e) => {
+    await check("about-matlab", httpUrl(base, "about/matlab.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#matlab-rows tr').length")) === 43);
       if (!(await e("document.body.textContent")).includes("43 / 43")) throw new Error("about-matlab: header");
       if ((await e("document.querySelector('#matlab-count').textContent")).trim() !== "43 / 43")
@@ -201,14 +233,14 @@ async function main() {
         throw new Error("about-matlab: filter");
     });
 
-    await check("about-en", fileUrl("about/en.html"), async (e) => {
+    await check("about-en", httpUrl(base, "about/en.html"), async (e) => {
       if ((await e("document.documentElement.lang")) !== "en") throw new Error("about-en: lang");
       if (!(await e("document.body.textContent")).includes("Methods & limitations"))
         throw new Error("about-en: content");
       if (!(await e("document.body.textContent")).includes("43/43")) throw new Error("about-en: matlab");
     });
 
-    await check("simulink", fileUrl("simulink/index.html"), async (e) => {
+    await check("simulink", httpUrl(base, "simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#phases .phase-link').length")) === 8, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));
       if ((await e("document.querySelectorAll('#tabs button').length")) !== 29) throw new Error("simulink: demo tabs");
@@ -216,7 +248,7 @@ async function main() {
       await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("抖振"));
     });
 
-    await check("course", fileUrl("simulink/course.html") + "#t03", async (e) => {
+    await check("course", httpUrl(base, "simulink/course.html") + "#t03", async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#lesson-list .lesson').length")) === 43);
       if (!(await e("document.querySelector('#lesson-title').textContent")).includes("t03"))
         throw new Error("course: lesson title");
@@ -238,7 +270,7 @@ async function main() {
       }
     });
 
-    await check("course-example", fileUrl("simulink/course.html") + "#t19", async (e) => {
+    await check("course-example", httpUrl(base, "simulink/course.html") + "#t19", async (e) => {
       await waitFor(async () => (await e("document.querySelector('#lesson-title').textContent")).includes("t19"));
       if (!(await e("document.body.textContent")).includes("小例子"))
         throw new Error("course: concept example missing");
@@ -247,6 +279,7 @@ async function main() {
 
     console.log("SMOKE OK (landing + landing-en + imu + control + about + matlab + about-en + simulink)");
   } finally {
+    if (server) server.close();
     edge.kill();
     await new Promise((r) => {
       edge.once("exit", r);

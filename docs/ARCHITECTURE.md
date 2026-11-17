@@ -36,7 +36,7 @@ simulink/lessons.js + guide-en.js
   → landing/en/guide.html
 ```
 
-`landing/en/lessons.html` and `about/matlab-en.html` are generated the same way.
+`landing/en/lessons.html` and `about/matlab-en.html` are generated the same way. The Chinese beginner guide is split into `simulink/guide/t*.js`; `course.html` loads the chunks before `course.js`.
 
 ## Deployments
 
@@ -57,7 +57,7 @@ Canonical URL is currently `https://xingd5478-ctrl.github.io/vibe-lab/`. The Wor
 
 ## Known debt
 
-- `simulink/app.js` is split into `app-core.js` / `app-demos.js` / `app-ui.js` (classic scripts, not ESM yet). `guide.js` (≈56 KB) is still a data monolith.
+- `simulink/app-core.mjs` / `app-demos.mjs` / `app-ui.mjs` are native ES modules. `simulink/guide/*.js` holds six beginner-guide chunks plus `examples.js` / `cases.js`; no 56 KB guide monolith.
 - Top navigation and footer are generated from `scripts/site_layout.mjs` / `scripts/site_footer.mjs` (`npm run layout`); 404 stays dynamic.
 - `chart.js` is copied into `imu-lab`, `control-play`, `simulink`; `npm run check:chart` keeps them in sync.
 - i18n uses Chinese source strings as dictionary keys and a MutationObserver; static metadata is improved at runtime. ESLint/Prettier cover `scripts/`, `tests/`, `landing/`, `shared/`, `imu-lab/static/`, `control-play/` and `simulink/` JavaScript.

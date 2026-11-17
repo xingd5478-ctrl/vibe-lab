@@ -7,7 +7,13 @@ const vm = require("node:vm");
 function load() {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  for (const f of ["simulink/lessons.js", "simulink/guide.js"]) {
+  for (const f of [
+    "simulink/lessons.js",
+    ...fs
+      .readdirSync(path.resolve(__dirname, "..", "simulink", "guide"))
+      .filter((x) => x.endsWith(".js"))
+      .map((x) => "simulink/guide/" + x),
+  ]) {
     vm.runInContext(fs.readFileSync(path.resolve(__dirname, "..", f), "utf8"), sandbox);
   }
   return {
