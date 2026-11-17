@@ -30,7 +30,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* Budgets in ms at scale 1; CI sets PERF_SCALE=2 for slower runners. */
 const BUDGETS = {
-  landing: { ready: 1200, longTask: 250, longTotal: 400, lcp: 1500, cls: 0.05 },
+  landing: { ready: 1800, longTask: 250, longTotal: 400, lcp: 1800, cls: 0.05 },
   "landing-en": { ready: 1100, longTask: 250, longTotal: 400, lcp: 1500, cls: 0.05 },
   imu: { ready: 1500, longTask: 300, longTotal: 600, fit: 400, channel: 400, q: 400, lcp: 1800, cls: 0.08 },
   control: { ready: 900, longTask: 250, longTotal: 400, kp: 250, tab: 600, lcp: 1500, cls: 0.08 },

@@ -80,8 +80,8 @@ let html = `<!DOCTYPE html>
   <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/about/matlab.html" />
   <meta property="og:image" content="https://xingd5478-ctrl.github.io/vibe-lab/icon-512.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <script src="../shared/sentry-config.js"></script>
-  <script src="../shared/observability.js"></script>
+  <script defer src="../shared/sentry-config.js"></script>
+  <script defer src="../shared/observability.js"></script>
 </head>
 <body class="wide">
   <a class="skip" href="#main">跳到内容</a>
