@@ -281,6 +281,15 @@ async function main() {
       if (!(await e("!!document.querySelector('#chart svg')"))) throw new Error("model: ETFE chart missing");
     });
 
+    await check("model-mimo", httpUrl(base, "model-lab/static/index.html"), async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('#metrics .metric').length")) >= 4, 12000);
+      await e(
+        "document.querySelector('#model').value = 'MIMO-ARX'; document.querySelector('#model').dispatchEvent(new Event('change'))"
+      );
+      await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("MIMO"), 15000);
+      if (!(await e("!!document.querySelector('#chart svg')"))) throw new Error("model: MIMO chart");
+    });
+
     await check("simulink", httpUrl(base, "simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#phases .phase-link').length")) === 8, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));

@@ -217,6 +217,112 @@
     };
   }
 
+  function ridgeSolve(A, b, lambda) {
+    const p = A[0].length;
+    const M = Array.from({ length: p }, () => new Array(p).fill(0));
+    const v = new Array(p).fill(0);
+    for (let i = 0; i < A.length; i++) {
+      for (let j = 0; j < p; j++) {
+        v[j] += A[i][j] * b[i];
+        for (let k = 0; k < p; k++) M[j][k] += A[i][j] * A[i][k];
+      }
+    }
+    let scale = 0;
+    for (let i = 0; i < p; i++) scale += M[i][i];
+    const ridge = (lambda || 1e-8) * Math.max(1, scale / p);
+    for (let i = 0; i < p; i++) M[i][i] += ridge;
+    for (let i = 0; i < p; i++) {
+      let pivot = i;
+      for (let k = i + 1; k < p; k++) if (Math.abs(M[k][i]) > Math.abs(M[pivot][i])) pivot = k;
+      [M[i], M[pivot]] = [M[pivot], M[i]];
+      [v[i], v[pivot]] = [v[pivot], v[i]];
+      const d = M[i][i] || 1e-12;
+      for (let j = i; j < p; j++) M[i][j] /= d;
+      v[i] /= d;
+      for (let k = 0; k < p; k++) {
+        if (k === i) continue;
+        const f = M[k][i];
+        for (let j = i; j < p; j++) M[k][j] -= f * M[i][j];
+        v[k] -= f * v[i];
+      }
+    }
+    return v;
+  }
+
+  function fitMIMOARX(t, U, Y, opts) {
+    const n = t.length;
+    const m = U.length;
+    const p = Y.length;
+    const trainEnd = opts && opts.trainEnd ? Math.min(n, Math.max(8, opts.trainEnd)) : n;
+    const na = Math.max(1, Math.min(4, (opts && opts.na) || 2));
+    const nb = Math.max(1, Math.min(4, (opts && opts.nb) || 2));
+    const nk = Math.max(0, Math.min(4, opts && opts.nk != null ? opts.nk : 1));
+    const start = Math.max(na, nk + nb - 1);
+    if (start >= trainEnd - 2) throw new Error("Not enough samples for MIMO ARX.");
+    const coefA = [],
+      coefB = [];
+    for (let out = 0; out < p; out++) {
+      const A = [],
+        B = [];
+      for (let k = start; k < trainEnd; k++) {
+        const row = [];
+        for (let j = 0; j < p; j++) for (let i = 1; i <= na; i++) row.push(-Y[j][k - i]);
+        for (let j = 0; j < m; j++) for (let i = 0; i < nb; i++) row.push(U[j][k - nk - i]);
+        A.push(row);
+        B.push(Y[out][k]);
+      }
+      const theta = ridgeSolve(A, B, 1e-6);
+      coefA.push(theta.slice(0, p * na));
+      coefB.push(theta.slice(p * na));
+    }
+    const simulate = (begin, end) => {
+      const out = Y.map((row) => row.slice());
+      for (let k = begin; k < end; k++) {
+        for (let o = 0; o < p; o++) {
+          let v = 0;
+          for (let j = 0; j < p; j++) for (let i = 1; i <= na; i++) v -= coefA[o][j * na + i - 1] * out[j][k - i];
+          for (let j = 0; j < m; j++) for (let i = 0; i < nb; i++) v += coefB[o][j * nb + i] * U[j][k - nk - i];
+          out[o][k] = v;
+        }
+      }
+      return out;
+    };
+    const trainHat = simulate(start, trainEnd);
+    const valHat = trainEnd < n ? simulate(trainEnd, n) : Y.map((r) => r.slice());
+    const yhat = Y.map((row, o) => row.map((v, i) => (i < trainEnd ? trainHat[o][i] : valHat[o][i])));
+    const fitOut = [];
+    const fitTrainOut = [];
+    const fitValOut = [];
+    for (let o = 0; o < p; o++) {
+      fitOut.push(fitStats(Y[o], yhat[o], 2 + p * na + m * nb).fit);
+      fitTrainOut.push(fitStats(Y[o].slice(start, trainEnd), yhat[o].slice(start, trainEnd), 2 + p * na + m * nb).fit);
+      fitValOut.push(
+        trainEnd < n ? fitStats(Y[o].slice(trainEnd), yhat[o].slice(trainEnd), 2 + p * na + m * nb).fit : null
+      );
+    }
+    const avg = (a) =>
+      a.filter((x) => x != null).reduce((x, y) => x + y, 0) / Math.max(1, a.filter((x) => x != null).length);
+    return {
+      model: "MIMO-ARX",
+      na,
+      nb,
+      nk,
+      m,
+      p,
+      coefA,
+      coefB,
+      yhat,
+      fit: avg(fitOut),
+      fitTrain: avg(fitTrainOut),
+      fitVal: avg(fitValOut),
+      fitOut,
+      fitTrainOut,
+      fitValOut,
+      start,
+      trainEnd,
+    };
+  }
+
   function qrSolve(A, b) {
     const m = A.length;
     const n = A[0].length;
@@ -515,6 +621,14 @@
   }
 
   function toMatlab(p) {
+    if (p.model === "MIMO-ARX") {
+      const lines = ["% MIMO ARX: y_o(k) = A_o(z^-1) y(k) + B_o(z^-1) u(k), Ts = 1 sample"];
+      for (let o = 0; o < p.p; o++) {
+        lines.push(`A${o + 1} = [1, ${p.coefA[o].map((x) => x.toPrecision(6)).join(", ")}];`);
+        lines.push(`B${o + 1} = [${p.coefB[o].map((x) => x.toPrecision(6)).join(", ")}];`);
+      }
+      return lines.join("\n");
+    }
     if (p.model === "ETFE") {
       return [
         `f = [${p.freq.map((x) => x.toPrecision(6)).join(", ")}];`,
@@ -559,6 +673,7 @@
     fitFOPDT,
     fitSOPDT,
     fitARX,
+    fitMIMOARX,
     fitETFE,
     bootstrap,
     simulate,

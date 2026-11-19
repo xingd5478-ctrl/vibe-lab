@@ -230,6 +230,10 @@
       "V0.6 scope: SISO / open-loop / linear. MIMO, closed-loop identification and nonlinear models are not implemented; closed-loop data is for reference only.",
     "闭环数据：普通最小二乘可能有偏，结果只作参考。":
       "Closed-loop data: ordinary least squares can be biased; treat the result as a reference.",
+    "FOPDT 估 K、τ、L；SOPDT 估 K、ζ、ωn；ARX/MIMO-ARX 估离散系数；ETFE 给频率响应。拟合失败会说明原因，不硬给结果。":
+      "FOPDT estimates K, τ, L; SOPDT estimates K, ζ, ωn; ARX/MIMO-ARX estimates discrete coefficients; ETFE gives a frequency response. Failures explain themselves instead of returning a fake result.",
+    "V0.6 边界：CSV 只支持 SISO；MIMO 目前只有 2×2 虚拟对象；闭环数据只警告，非线性未实现。":
+      "V0.6 scope: CSV is SISO only; MIMO is limited to the 2×2 virtual plant; closed-loop data gets a warning; nonlinear models are not implemented.",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

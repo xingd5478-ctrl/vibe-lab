@@ -75,7 +75,14 @@
     };
     try {
       const ex = $("excitation").value;
-      const d = ex === "chirp" ? P.virtualChirp(opts) : ex === "prbs" ? P.virtualPRBS(opts) : P.virtualStep(opts);
+      const d =
+        opts.plant === "mimo"
+          ? P.virtualMimo(opts)
+          : ex === "chirp"
+            ? P.virtualChirp(opts)
+            : ex === "prbs"
+              ? P.virtualPRBS(opts)
+              : P.virtualStep(opts);
       state.source = "virtual";
       state.fileName = "";
       $("file-name").textContent = "";
@@ -157,13 +164,15 @@
       const nb = Math.max(1, Math.min(6, Number($("arx-nb").value) || 2));
       const nk = Math.max(0, Math.min(5, Number($("arx-nk").value) || 0));
       const f =
-        model === "ETFE"
-          ? I.fitETFE(state.data.t, state.data.u, state.data.y)
-          : model === "ARX"
-            ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
-            : model === "SOPDT"
-              ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
-              : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
+        model === "MIMO-ARX"
+          ? I.fitMIMOARX(state.data.t, state.data.U, state.data.Y, { trainEnd, na, nb, nk })
+          : model === "ETFE"
+            ? I.fitETFE(state.data.t, state.data.u, state.data.y)
+            : model === "ARX"
+              ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
+              : model === "SOPDT"
+                ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
+                : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
       state.fit = f;
       state.uncertainty = null;
       if (f.model === "ETFE") state.split = 1;
@@ -172,7 +181,7 @@
       renderMetrics();
       renderWarnings();
       $("actions").hidden = false;
-      $("uncertainty").hidden = f.model === "ETFE";
+      $("uncertainty").hidden = f.model === "ETFE" || f.model === "MIMO-ARX";
       $("fit-hint").textContent = T(
         "拟合完成。检查 FIT、残差和参数是否物理合理。",
         "Fit complete. Check FIT, residuals and physical plausibility."
@@ -212,7 +221,12 @@
     };
     add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain != null ? f.fitTrain : f.fit, 1)} %`);
     if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
-    if (f.model === "ETFE") {
+    if (f.model === "MIMO-ARX") {
+      add(T("FIT y1", "FIT y1"), `${fmt(f.fitOut[0], 1)} %`);
+      add(T("FIT y2", "FIT y2"), `${fmt(f.fitOut[1], 1)} %`);
+      add("ARX", `${f.na}/${f.nb}/${f.nk}`);
+      add("MIMO", `${f.m}×${f.p}`);
+    } else if (f.model === "ETFE") {
       add("coherence", fmt(f.medianCoherence, 2));
       add("segments", String(f.segments));
       add("bins", String(f.freq.length));
@@ -326,12 +340,13 @@
     const d = state.data;
     const f = state.fit;
     if (f && f.model === "ETFE") drawBode(el, f);
+    else if (f && f.model === "MIMO-ARX") drawMimo(el, f, d);
     else drawSvg(el, 800, 300, d, f);
   }
 
   function drawResidual(fit) {
     const el = $("residual");
-    if (!fit || fit.model === "ETFE" || !state.data) {
+    if (!fit || fit.model === "ETFE" || fit.model === "MIMO-ARX" || !state.data) {
       el.innerHTML = "";
       return;
     }
@@ -395,6 +410,37 @@
       ${xTicks}
       <text x="${m.l}" y="${m.t + 8}" style="fill:var(--muted);font:9px var(--mono)">y(t)</text>
     </svg>`;
+  }
+
+  function drawMimo(el, f, d) {
+    const width = 800,
+      height = 330,
+      m = { l: 48, r: 12, t: 10, b: 24 };
+    const w = width - m.l - m.r;
+    const t0 = d.t[0],
+      t1 = d.t[d.t.length - 1];
+    const sx = (t) => m.l + ((t - t0) / (t1 - t0 || 1)) * w;
+    const colors = ["var(--chart-1)", "var(--chart-2)"];
+    const series = d.Y.map((arr, o) => ({ name: `y${o + 1}`, y: arr, yhat: f.yhat[o], color: colors[o] }));
+    let svg = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="MIMO measured and predicted outputs">`;
+    series.forEach((s, o) => {
+      const vals = s.y.concat(s.yhat);
+      let lo = Math.min(...vals),
+        hi = Math.max(...vals);
+      const pad = (hi - lo || 1) * 0.1;
+      lo -= pad;
+      hi += pad;
+      const top = m.t + o * 150,
+        hh = 120;
+      const sy = (v) => top + hh - ((v - lo) / (hi - lo || 1)) * hh;
+      const path = (arr) => arr.map((v, i) => `${i ? "L" : "M"}${sx(d.t[i]).toFixed(1)},${sy(v).toFixed(1)}`).join(" ");
+      svg += `<line x1="${m.l}" y1="${top + hh}" x2="${width - m.r}" y2="${top + hh}" style="stroke:var(--line)"/>`;
+      svg += `<path d="${path(s.y)}" fill="none" style="stroke:var(--chart-raw);stroke-width:1.1;opacity:.8"/>`;
+      svg += `<path d="${path(s.yhat)}" fill="none" style="stroke:${s.color};stroke-width:1.7"/>`;
+      svg += `<text x="${m.l}" y="${top + 10}" style="fill:var(--muted);font:9px var(--mono)">${s.name} measured / fit</text>`;
+    });
+    svg += "</svg>";
+    el.innerHTML = svg;
   }
 
   function drawBode(el, f) {
@@ -577,7 +623,12 @@
     $("generate").addEventListener("click", generate);
     $("fit").addEventListener("click", fit);
     $("model").addEventListener("change", () => {
-      $("arx-orders").hidden = $("model").value !== "ARX";
+      $("arx-orders").hidden = $("model").value !== "ARX" && $("model").value !== "MIMO-ARX";
+      if ($("model").value === "MIMO-ARX") {
+        $("plant").value = "mimo";
+        $("excitation").value = "prbs";
+        generate();
+      }
       if ($("model").value === "ETFE") $("excitation").value = "chirp";
       if ($("model").value === "ARX") $("excitation").value = "prbs";
       if ($("model").value === "ETFE" || $("model").value === "ARX") generate();

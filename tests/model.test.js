@@ -92,6 +92,15 @@ test("bootstrap gives finite parameter intervals", () => {
   assert.throws(() => I.bootstrap(d.t, d.u, d.y, "ETFE"), /ETFE/);
 });
 
+test("MIMO ARX identifies a 2x2 plant", () => {
+  const d = P.virtualMimo({ noise: 0, seed: 7 });
+  const f = I.fitMIMOARX(d.t, d.U, d.Y, { trainEnd: 210, na: 2, nb: 2, nk: 1 });
+  assert.equal(f.m, 2);
+  assert.equal(f.p, 2);
+  assert.ok(f.fitTrain > 80, `train fit ${f.fitTrain}`);
+  assert.match(I.toMatlab(f), /MIMO ARX/);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

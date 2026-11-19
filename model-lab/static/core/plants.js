@@ -51,6 +51,20 @@
       chirp: { f0: 0.1, f1: 2, base: 0, amp: 1 },
       prbs: { base: 0, amp: 1, hold: 5 },
     },
+    mimo: {
+      id: "mimo",
+      name: "2×2 耦合水箱",
+      nameEn: "2×2 coupled tanks",
+      unitIn: "流量",
+      unitInEn: "flow",
+      unitOut: "液位",
+      unitOutEn: "level",
+      truth: { kind: "MIMO", K: 1, tau: 10, y0: 0, amp: 1, uMax: 2 },
+      fs: 10,
+      duration: 30,
+      noise: 0.005,
+      prbs: { base: 0.8, amp: 0.6, hold: 10 },
+    },
   };
 
   function rng(seed) {
@@ -196,6 +210,63 @@
     });
   }
 
+  function virtualMimo(opts) {
+    const cfg = PLANTS.mimo;
+    const fs = Number(opts.fs) || cfg.fs;
+    const duration = Number(opts.duration) || cfg.duration;
+    const n = Math.max(64, Math.round(duration * fs));
+    const t = [];
+    for (let i = 0; i < n; i++) t.push(i / fs);
+    const r = rng(opts.seed || 42);
+    const hold = 10;
+    const u1 = [],
+      u2 = [];
+    let a = 0.8,
+      b = 0.8;
+    for (let i = 0; i < n; i++) {
+      if (i % hold === 0) {
+        a = r() > 0.5 ? 1.4 : 0.2;
+        b = r() > 0.5 ? 1.4 : 0.2;
+      }
+      u1.push(a);
+      u2.push(b);
+    }
+    const tau1 = 8,
+      tau2 = 12;
+    let x1 = 0,
+      x2 = 0;
+    const y1 = [],
+      y2 = [];
+    const noise = Math.max(0, Number(opts.noise) || 0);
+    for (let i = 0; i < n; i++) {
+      const dt = 1 / fs;
+      x1 += (dt / tau1) * (-x1 + 0.9 * u1[i] + 0.3 * u2[i]);
+      x2 += (dt / tau2) * (-x2 + 0.2 * u1[i] + 1.1 * u2[i]);
+      y1.push(x1 + (noise ? gauss(r) * noise : 0));
+      y2.push(x2 + (noise ? gauss(r) * noise : 0));
+    }
+    return {
+      t,
+      u: u1,
+      y: y1,
+      U: [u1, u2],
+      Y: [y1, y2],
+      plant: "mimo",
+      truth: { ...cfg.truth },
+      meta: {
+        units: { u: "u1", uEn: "u1", y: "y1", yEn: "y1", u2: "u2", y2: "y2" },
+        uMin: Math.min(...u1, ...u2),
+        uMax: Math.max(...u1, ...u2),
+        closedLoop: false,
+        source: "prbs",
+        excitation: "prbs",
+        fs,
+        duration,
+        noise,
+      },
+    };
+  }
+
   function virtualChirp(opts) {
     const cfg = PLANTS[opts.plant];
     if (!cfg) throw new Error("Unknown plant");
@@ -279,5 +350,5 @@
     }));
   }
 
-  return { PLANTS, list, virtualStep, virtualChirp, virtualPRBS };
+  return { PLANTS, list, virtualStep, virtualChirp, virtualPRBS, virtualMimo };
 });
