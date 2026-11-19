@@ -302,11 +302,149 @@
     };
   }
 
+  function nextPow2(n) {
+    let p = 1;
+    while (p < n) p *= 2;
+    return p;
+  }
+
+  function fft(re, im, inverse) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) {
+        [re[i], re[j]] = [re[j], re[i]];
+        [im[i], im[j]] = [im[j], im[i]];
+      }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = ((inverse ? 2 : -2) * Math.PI) / len;
+      const wr = Math.cos(ang),
+        wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) {
+        let cr = 1,
+          ci = 0;
+        for (let j = 0; j < len / 2; j++) {
+          const ur = re[i + j],
+            ui = im[i + j];
+          const vr = re[i + j + len / 2] * cr - im[i + j + len / 2] * ci;
+          const vi = re[i + j + len / 2] * ci + im[i + j + len / 2] * cr;
+          re[i + j] = ur + vr;
+          im[i + j] = ui + vi;
+          re[i + j + len / 2] = ur - vr;
+          im[i + j + len / 2] = ui - vi;
+          const ncr = cr * wr - ci * wi;
+          ci = cr * wi + ci * wr;
+          cr = ncr;
+        }
+      }
+    }
+    if (inverse) {
+      for (let i = 0; i < n; i++) {
+        re[i] /= n;
+        im[i] /= n;
+      }
+    }
+  }
+
+  function fitETFE(t, u, y, opts) {
+    const n = t.length;
+    if (n < 64) throw new Error("ETFE needs at least 64 samples.");
+    const dt = [];
+    for (let i = 1; i < n; i++) dt.push(t[i] - t[i - 1]);
+    const dtMed = D.median(dt);
+    const jitter = (D.quantile(dt, 0.9) - D.quantile(dt, 0.1)) / (dtMed || 1);
+    if (!(dtMed > 0) || jitter > 0.3) throw new Error("ETFE needs a uniform sample interval.");
+    const fs = 1 / dtMed;
+    let segLen = 256;
+    while (segLen > 64 && segLen > n / 3) segLen /= 2;
+    const nSeg = Math.floor(n / segLen);
+    if (nSeg < 2) throw new Error("ETFE needs at least two segments; record longer data.");
+    const bins = segLen / 2;
+    const Suu = new Array(bins).fill(0);
+    const Syy = new Array(bins).fill(0);
+    const SyuR = new Array(bins).fill(0);
+    const SyuI = new Array(bins).fill(0);
+    for (let s = 0; s < nSeg; s++) {
+      const off = s * segLen;
+      const reU = new Array(segLen),
+        imU = new Array(segLen).fill(0);
+      const reY = new Array(segLen),
+        imY = new Array(segLen).fill(0);
+      let mu = 0,
+        my = 0;
+      for (let i = 0; i < segLen; i++) {
+        mu += u[off + i];
+        my += y[off + i];
+      }
+      mu /= segLen;
+      my /= segLen;
+      for (let i = 0; i < segLen; i++) {
+        const w = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (segLen - 1));
+        reU[i] = (u[off + i] - mu) * w;
+        reY[i] = (y[off + i] - my) * w;
+      }
+      fft(reU, imU, false);
+      fft(reY, imY, false);
+      for (let k = 1; k < bins; k++) {
+        const ur = reU[k],
+          ui = imU[k],
+          yr = reY[k],
+          yi = imY[k];
+        Suu[k] += ur * ur + ui * ui;
+        Syy[k] += yr * yr + yi * yi;
+        SyuR[k] += yr * ur + yi * ui;
+        SyuI[k] += yi * ur - yr * ui;
+      }
+    }
+    const freq = [],
+      mag = [],
+      phase = [],
+      coh = [];
+    for (let k = 1; k < bins; k++) {
+      const den = Suu[k] || 1e-18;
+      const hr = SyuR[k] / den;
+      const hi = SyuI[k] / den;
+      const c = Suu[k] * Syy[k] > 0 ? (SyuR[k] * SyuR[k] + SyuI[k] * SyuI[k]) / (Suu[k] * Syy[k]) : 0;
+      freq.push((k * fs) / segLen);
+      mag.push(Math.hypot(hr, hi));
+      phase.push(Math.atan2(hi, hr));
+      coh.push(Math.max(0, Math.min(1, c)));
+    }
+    const good = coh.filter((c) => c > 0.5);
+    const medianCoh = D.median(good.length ? good : coh);
+    return {
+      model: "ETFE",
+      freq,
+      mag,
+      phase,
+      coherence: coh,
+      medianCoherence: medianCoh,
+      fit: good.length ? 100 * medianCoh : 0,
+      fitTrain: good.length ? 100 * medianCoh : 0,
+      fitVal: null,
+      trainEnd: n,
+      segments: nSeg,
+      segLen,
+      fs,
+    };
+  }
+
   function metrics(y, yhat) {
     return fitStats(y, yhat, 3);
   }
 
   function toMatlab(p) {
+    if (p.model === "ETFE") {
+      return [
+        `f = [${p.freq.map((x) => x.toPrecision(6)).join(", ")}];`,
+        `H = [${p.mag.map((x, i) => `${x.toPrecision(6)}*exp(1j*${p.phase[i].toPrecision(6)})`).join(", ")}];`,
+        "figure; subplot(2,1,1); semilogx(f, 20*log10(abs(H))); grid on;",
+        "subplot(2,1,2); semilogx(f, unwrap(angle(H))*180/pi); grid on;",
+      ].join("\n");
+    }
     if (p.model === "ARX") {
       return [
         `a = [1, ${p.coefA.map((x) => x.toPrecision(6)).join(", ")}];`,
@@ -343,6 +481,7 @@
     fitFOPDT,
     fitSOPDT,
     fitARX,
+    fitETFE,
     simulate,
     metrics,
     toMatlab,

@@ -69,6 +69,18 @@ test("ARX recovers known coefficients on rich input", () => {
   assert.ok(f.fitTrain > 95, `train fit ${f.fitTrain}`);
 });
 
+test("ETFE estimates a coherent first-order frequency response", () => {
+  const d = P.virtualChirp({ plant: "thermal", noise: 0.01, seed: 4 });
+  const f = I.fitETFE(d.t, d.u, d.y);
+  assert.ok(f.segments >= 2);
+  assert.ok(f.medianCoherence > 0.4, `coherence ${f.medianCoherence}`);
+  assert.ok(
+    f.mag.some((v) => v > 0.5 && v < 5),
+    "magnitude should be physical"
+  );
+  assert.match(I.toMatlab(f), /semilogx/);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

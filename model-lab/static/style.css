@@ -157,3 +157,7 @@ footer a { color: var(--muted); }
 
 .lang-banner a { color: var(--accent); }
 @media (prefers-color-scheme: dark) { .lang-banner a { color: #8db3d8; } }
+
+.manual details { background: var(--panel); border: 1px solid var(--line); border-radius: 3px; margin-bottom: 8px; padding: 12px 14px; }
+.manual summary { cursor: pointer; font-weight: 600; font-size: 13px; }
+.manual details p { margin: 9px 0 0; color: var(--muted); font-size: 12px; max-width: 80ch; }

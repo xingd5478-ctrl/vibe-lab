@@ -73,7 +73,8 @@
       seed: 42,
     };
     try {
-      const d = P.virtualStep(opts);
+      const ex = $("excitation").value;
+      const d = ex === "chirp" ? P.virtualChirp(opts) : ex === "prbs" ? P.virtualPRBS(opts) : P.virtualStep(opts);
       state.source = "virtual";
       state.fileName = "";
       $("file-name").textContent = "";
@@ -149,12 +150,15 @@
     $("fit-hint").textContent = T("正在拟合…", "Fitting…");
     try {
       const f =
-        model === "ARX"
-          ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na: 2, nb: 2, nk: 1 })
-          : model === "SOPDT"
-            ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
-            : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
+        model === "ETFE"
+          ? I.fitETFE(state.data.t, state.data.u, state.data.y)
+          : model === "ARX"
+            ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na: 2, nb: 2, nk: 1 })
+            : model === "SOPDT"
+              ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
+              : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
       state.fit = f;
+      if (f.model === "ETFE") state.split = 1;
       drawMainChart();
       drawResidual(f);
       renderMetrics();
@@ -196,7 +200,11 @@
     };
     add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain != null ? f.fitTrain : f.fit, 1)} %`);
     if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
-    if (f.model === "ARX") {
+    if (f.model === "ETFE") {
+      add("coherence", fmt(f.medianCoherence, 2));
+      add("segments", String(f.segments));
+      add("bins", String(f.freq.length));
+    } else if (f.model === "ARX") {
       add("ARX", `${f.na}/${f.nb}/${f.nk}`);
     } else {
       add(
@@ -211,7 +219,7 @@
       }
       add("L", `${fmt(f.L, 2)} s`);
     }
-    if (f.model !== "ARX") {
+    if (f.model === "FOPDT" || f.model === "SOPDT") {
       const real = f.model === "SOPDT" ? -f.zeta * f.wn : -1 / f.tau;
       const pole =
         f.model === "SOPDT"
@@ -247,6 +255,14 @@
           "FIT is low: the model may be insufficient, or unmodeled dynamics/disturbances remain."
         )
       );
+    if (f.model === "ETFE" && state.data.meta?.excitation === "step") {
+      lines.push(
+        T(
+          "ETFE 需要扫频/PRBS 等周期激励；阶跃数据只能做演示。",
+          "ETFE needs a sweep/PRBS periodic excitation; step data is only a demo."
+        )
+      );
+    }
     if (f.model === "ARX" && new Set(state.data.u).size < 5)
       lines.push(
         T(
@@ -284,12 +300,13 @@
     }
     const d = state.data;
     const f = state.fit;
-    drawSvg(el, 800, 300, d, f);
+    if (f && f.model === "ETFE") drawBode(el, f);
+    else drawSvg(el, 800, 300, d, f);
   }
 
   function drawResidual(fit) {
     const el = $("residual");
-    if (!fit || !state.data) {
+    if (!fit || fit.model === "ETFE" || !state.data) {
       el.innerHTML = "";
       return;
     }
@@ -352,6 +369,47 @@
       <text x="${m.l}" y="${iy - 5}" style="fill:var(--muted);font:9px var(--mono)">u(t)</text>
       ${xTicks}
       <text x="${m.l}" y="${m.t + 8}" style="fill:var(--muted);font:9px var(--mono)">y(t)</text>
+    </svg>`;
+  }
+
+  function drawBode(el, f) {
+    const width = 800,
+      height = 330,
+      m = { l: 54, r: 16, t: 12, b: 26 };
+    const w = width - m.l - m.r;
+    const topH = 145,
+      botY = 196,
+      botH = 100;
+    const mags = f.mag.map((v) => 20 * Math.log10(Math.max(v, 1e-9)));
+    let lo = Math.min(...mags),
+      hi = Math.max(...mags);
+    const pad = (hi - lo || 1) * 0.12;
+    lo -= pad;
+    hi += pad;
+    const sx = (i) => m.l + (i / Math.max(1, f.freq.length - 1)) * w;
+    const sy = (v) => m.t + topH - ((v - lo) / (hi - lo || 1)) * topH;
+    const magPath = mags.map((v, i) => `${i ? "L" : "M"}${sx(i).toFixed(1)},${sy(v).toFixed(1)}`).join(" ");
+    const ph = f.phase.map((v) => (v * 180) / Math.PI);
+    let plo = Math.min(...ph),
+      phi = Math.max(...ph);
+    const ppad = (phi - plo || 1) * 0.12;
+    plo -= ppad;
+    phi += ppad;
+    const py = (v) => botY + botH - ((v - plo) / (phi - plo || 1)) * botH;
+    const phPath = ph.map((v, i) => `${i ? "L" : "M"}${sx(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ");
+    let grid = "";
+    for (let i = 0; i <= 3; i++) {
+      const v = lo + ((hi - lo) * i) / 3;
+      grid += `<line x1="${m.l}" y1="${sy(v).toFixed(1)}" x2="${width - m.r}" y2="${sy(v).toFixed(1)}" style="stroke:var(--grid)"/><text x="${m.l - 6}" y="${(sy(v) + 3).toFixed(1)}" text-anchor="end" style="fill:var(--muted);font:9px var(--mono)">${v.toFixed(0)}</text>`;
+    }
+    el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" aria-hidden="true">
+      ${grid}
+      <path d="${magPath}" fill="none" style="stroke:var(--chart-1);stroke-width:1.8"/>
+      <text x="${m.l}" y="${m.t + 10}" style="fill:var(--muted);font:9px var(--mono)">|H| dB</text>
+      <line x1="${m.l}" y1="${botY}" x2="${width - m.r}" y2="${botY}" style="stroke:var(--line)"/>
+      <path d="${phPath}" fill="none" style="stroke:var(--chart-2);stroke-width:1.6"/>
+      <text x="${m.l}" y="${botY + 12}" style="fill:var(--muted);font:9px var(--mono)">phase deg</text>
+      <text x="${width - m.r}" y="${height - 6}" text-anchor="end" style="fill:var(--muted);font:9px var(--mono)">${fmt(f.freq[0], 3)} – ${fmt(f.freq[f.freq.length - 1], 3)} Hz</text>
     </svg>`;
   }
 
@@ -444,12 +502,33 @@
     });
   }
 
+  function renderManual() {
+    const box = $("manual-list");
+    if (!box || !window.MODEL_MANUAL) return;
+    const data = isEn() ? window.MODEL_MANUAL.en : window.MODEL_MANUAL.zh;
+    box.innerHTML = "";
+    data.forEach((ch) => {
+      const d = document.createElement("details");
+      d.appendChild(Object.assign(document.createElement("summary"), { textContent: ch.title }));
+      const p = document.createElement("p");
+      p.textContent = ch.body;
+      d.appendChild(p);
+      box.appendChild(d);
+    });
+  }
+
   function init() {
     initPlants();
     drawHero();
     initUpload();
     $("generate").addEventListener("click", generate);
     $("fit").addEventListener("click", fit);
+    $("model").addEventListener("change", () => {
+      if ($("model").value === "ETFE") $("excitation").value = "chirp";
+      if ($("model").value === "ARX") $("excitation").value = "prbs";
+      if ($("model").value === "ETFE" || $("model").value === "ARX") generate();
+    });
+    renderManual();
     $("split").addEventListener("change", () => {
       const v = Number($("split").value);
       $("split-hint").textContent =

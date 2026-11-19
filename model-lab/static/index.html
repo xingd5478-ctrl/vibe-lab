@@ -42,7 +42,7 @@
         </div>
         <ul class="proof" aria-label="Model Lab 能力">
           <li><b>3</b> 个虚拟对象</li>
-          <li><b>3</b> 种模型</li>
+          <li><b>4</b> 种模型</li>
           <li><b>0</b> 上传</li>
           <li><b>MIT</b> 源码</li>
         </ul>
@@ -66,6 +66,13 @@
               <h3 id="data-title"><span class="step-no">1</span> 数据</h3>
               <label class="field">虚拟对象
                 <select id="plant"></select>
+              </label>
+              <label class="field">输入类型
+                <select id="excitation">
+                  <option value="step">阶跃</option>
+                  <option value="chirp">正弦扫频 Chirp</option>
+                  <option value="prbs">PRBS</option>
+                </select>
               </label>
               <div class="field-row">
                 <label class="field">阶跃幅值
@@ -101,6 +108,7 @@
                   <option value="FOPDT">一阶 + 延迟 FOPDT</option>
                   <option value="SOPDT">二阶 SOPDT</option>
                   <option value="ARX">ARX 离散</option>
+                  <option value="ETFE">ETFE 频域</option>
                 </select>
               </label>
               <label class="field">训练 / 验证
@@ -156,7 +164,7 @@
           <article class="panel">
             <div class="kicker">02 / IDENTIFY</div>
             <h3>再拟合</h3>
-            <p>FOPDT 估 K、τ、L；SOPDT 估 K、ζ、ωn；ARX 估离散系数。拟合失败会说明原因，不硬给结果。</p>
+            <p>FOPDT 估 K、τ、L；SOPDT 估 K、ζ、ωn；ARX 估离散系数；ETFE 给频率响应。拟合失败会说明原因，不硬给结果。</p>
           </article>
           <article class="panel">
             <div class="kicker">03 / USE</div>
@@ -164,6 +172,11 @@
             <p>SOPDT 可以直接送进 Control Play；所有模型都能导出 MATLAB .m。</p>
           </article>
         </div>
+      </section>
+
+      <section class="manual" id="manual">
+        <div class="section-head"><h2>手册 · 前五章</h2><span>先读这五章，再看结果。</span></div>
+        <div id="manual-list"></div>
       </section>
     </main>
 
@@ -176,6 +189,7 @@
   <script src="core/quality.js"></script>
   <script src="core/identify.js"></script>
   <script src="core/plants.js"></script>
+  <script src="manual.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

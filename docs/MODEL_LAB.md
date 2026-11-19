@@ -1,6 +1,6 @@
-# Model Lab (V0.2)
+# Model Lab (V0.3)
 
-**Status:** v0.2: FOPDT/SOPDT/ARX with train/validation split, not the full V1 scope.
+**Status:** v0.3: FOPDT/SOPDT/ARX/ETFE, train/validation split and the first five manual chapters; not the full V1 scope.
 
 ## Route
 
@@ -15,6 +15,8 @@
 - Data Quality Report (hard blockers + warnings)
 - FOPDT and SOPDT step identification
 - ARX (2/2/1) and 70/30 / 80/20 / all-data split
+- ETFE with chirp virtual data and coherence/Bode display
+- Manual chapters 1–5 (Chinese/English)
 - ARX (2/2/1) with 70/30 train/validation split
 - train/validation FIT and validation shading in the chart
 - FIT/residual/stability display, physical truth comparison for virtual plants
@@ -25,8 +27,8 @@
 
 ## Not in V0.1
 
-- ETFE, MIMO, closed-loop and nonlinear identification
-- manual chapters and full English guide
+- MIMO, closed-loop and nonlinear identification
+- manual chapters 6–10 and full English guide
 - user-configurable ARX orders
 - accounts/cloud sync
 - manual chapters and full English guide

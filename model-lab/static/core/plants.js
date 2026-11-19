@@ -18,6 +18,8 @@
       fs: 1,
       duration: 420,
       noise: 0.02,
+      chirp: { f0: 0.002, f1: 0.03, base: 0.6, amp: 0.4 },
+      prbs: { base: 1, amp: 1, hold: 20 },
     },
     motor: {
       id: "motor",
@@ -31,6 +33,8 @@
       fs: 100,
       duration: 5,
       noise: 1.2,
+      chirp: { f0: 0.05, f1: 2, base: 1.6, amp: 1.2 },
+      prbs: { base: 1.6, amp: 1.2, hold: 5 },
     },
     spring: {
       id: "spring",
@@ -44,6 +48,8 @@
       fs: 50,
       duration: 5,
       noise: 0.01,
+      chirp: { f0: 0.1, f1: 2, base: 0, amp: 1 },
+      prbs: { base: 0, amp: 1, hold: 5 },
     },
   };
 
@@ -138,6 +144,124 @@
     };
   }
 
+  function simulateInput(cfg, t, u, stepTime) {
+    const dt = t[1] - t[0];
+    const delay = Math.max(0, Math.round((cfg.truth.L || 0) / dt));
+    const y = [];
+    if (cfg.truth.kind === "SOPDT") {
+      let x = 0,
+        v = 0;
+      for (let i = 0; i < t.length; i++) {
+        const ui = i >= delay ? u[i - delay] : 0;
+        const acc =
+          cfg.truth.K * cfg.truth.wn * cfg.truth.wn * ui -
+          2 * cfg.truth.zeta * cfg.truth.wn * v -
+          cfg.truth.wn * cfg.truth.wn * x;
+        v += acc * dt;
+        x += v * dt;
+        y.push(cfg.truth.y0 + x);
+      }
+    } else {
+      let x = 0;
+      for (let i = 0; i < t.length; i++) {
+        const ui = i >= delay ? u[i - delay] : 0;
+        x += (dt / cfg.truth.tau) * (cfg.truth.K * ui - x);
+        y.push(cfg.truth.y0 + x);
+      }
+    }
+    return y;
+  }
+
+  function chirpInput(cfg, t) {
+    const duration = t[t.length - 1];
+    const f0 = cfg.chirp ? cfg.chirp.f0 : 0.01;
+    const f1 = cfg.chirp ? cfg.chirp.f1 : 0.2;
+    const base = cfg.chirp ? cfg.chirp.base : 0;
+    const amp = cfg.chirp ? cfg.chirp.amp : 1;
+    return t.map((x) => {
+      const phase = 2 * Math.PI * (f0 * x + ((f1 - f0) * x * x) / (2 * Math.max(duration, 1e-9)));
+      return base + amp * Math.sin(phase);
+    });
+  }
+
+  function prbsInput(cfg, t, seed) {
+    const r = rng(seed || 7);
+    const base = cfg.prbs ? cfg.prbs.base : 0;
+    const amp = cfg.prbs ? cfg.prbs.amp : 1;
+    const hold = cfg.prbs ? cfg.prbs.hold : 10;
+    let u = base;
+    return t.map((x, i) => {
+      if (i % hold === 0) u = base + (r() > 0.5 ? amp : -amp);
+      return u;
+    });
+  }
+
+  function virtualChirp(opts) {
+    const cfg = PLANTS[opts.plant];
+    if (!cfg) throw new Error("Unknown plant");
+    const fs = Number(opts.fs) || (cfg.id === "thermal" ? 5 : 50);
+    const duration = Number(opts.duration) || (cfg.id === "thermal" ? 300 : 12);
+    const n = Math.max(64, Math.round(duration * fs));
+    const t = [];
+    for (let i = 0; i < n; i++) t.push(i / fs);
+    const u = chirpInput(cfg, t);
+    const clean = simulateInput(cfg, t, u, 0);
+    const r = rng(opts.seed || 42);
+    const noise = Math.max(0, Number(opts.noise) || 0);
+    const y = clean.map((v) => v + (noise ? gauss(r) * noise : 0));
+    return {
+      t,
+      u,
+      y,
+      plant: cfg.id,
+      truth: { ...cfg.truth },
+      meta: {
+        units: { u: cfg.unitIn, uEn: cfg.unitInEn, y: cfg.unitOut, yEn: cfg.unitOutEn },
+        uMin: Math.min(...u),
+        uMax: Math.max(...u),
+        closedLoop: false,
+        source: "chirp",
+        excitation: "chirp",
+        fs,
+        duration,
+        noise,
+      },
+    };
+  }
+
+  function virtualPRBS(opts) {
+    const cfg = PLANTS[opts.plant];
+    if (!cfg) throw new Error("Unknown plant");
+    const fs = Number(opts.fs) || (cfg.id === "thermal" ? 5 : 50);
+    const duration = Number(opts.duration) || (cfg.id === "thermal" ? 300 : 12);
+    const n = Math.max(64, Math.round(duration * fs));
+    const t = [];
+    for (let i = 0; i < n; i++) t.push(i / fs);
+    const u = prbsInput(cfg, t, opts.seed || 42);
+    const clean = simulateInput(cfg, t, u, 0);
+    const r = rng(opts.seed || 42);
+    const noise = Math.max(0, Number(opts.noise) || 0);
+    const y = clean.map((v) => v + (noise ? gauss(r) * noise : 0));
+    return {
+      t,
+      u,
+      y,
+      plant: cfg.id,
+      truth: { ...cfg.truth },
+      meta: {
+        units: { u: cfg.unitIn, uEn: cfg.unitInEn, y: cfg.unitOut, yEn: cfg.unitOutEn },
+        uMin: Math.min(...u),
+        uMax: Math.max(...u),
+        closedLoop: false,
+        source: "prbs",
+        excitation: "prbs",
+        fs,
+        duration,
+        noise,
+      },
+    };
+  }
+
   function list() {
     return Object.values(PLANTS).map((p) => ({
       id: p.id,
@@ -155,5 +279,5 @@
     }));
   }
 
-  return { PLANTS, list, virtualStep };
+  return { PLANTS, list, virtualStep, virtualChirp, virtualPRBS };
 });
