@@ -234,6 +234,16 @@
       "FOPDT estimates K, τ, L; SOPDT estimates K, ζ, ωn; ARX/MIMO-ARX estimates discrete coefficients; ETFE gives a frequency response. Failures explain themselves instead of returning a fake result.",
     "V0.6 边界：CSV 只支持 SISO；MIMO 目前只有 2×2 虚拟对象；闭环数据只警告，非线性未实现。":
       "V0.6 scope: CSV is SISO only; MIMO is limited to the 2×2 virtual plant; closed-loop data gets a warning; nonlinear models are not implemented.",
+    "CSV 列映射": "CSV column mapping",
+    "多输入/多输出请选择列；单输入单输出也可以在这里改。":
+      "Pick columns for multi-input/multi-output, or remap a SISO file here.",
+    时间列: "Time column",
+    输入列: "Inputs",
+    输出列: "Outputs",
+    应用列映射: "Apply mapping",
+    "选择时间列、输入列和输出列，然后应用。": "Pick time, inputs and outputs, then apply.",
+    "V0.7 边界：MIMO 支持 2×2 虚拟对象和 CSV 多列映射；闭环数据只警告，非线性未实现。":
+      "V0.7 scope: MIMO supports the 2×2 virtual plant and CSV multi-column mapping; closed-loop data gets a warning; nonlinear models are not implemented.",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

@@ -290,6 +290,22 @@ async function main() {
       if (!(await e("!!document.querySelector('#chart svg')"))) throw new Error("model: MIMO chart");
     });
 
+    await check("model-csv-mimo", httpUrl(base, "model-lab/static/index.html"), async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('#metrics .metric').length")) >= 4, 12000);
+      await e(`(() => {
+        const text = "t,u1,u2,y1,y2\\n" + Array.from({length: 120}, (_, i) =>
+          (i * 0.1).toFixed(1) + "," + (i % 20 < 10 ? 0 : 1) + "," + (i % 30 < 15 ? 0 : 1) + "," +
+          (1 + Math.sin(i / 9)).toFixed(3) + "," + (2 + Math.cos(i / 7)).toFixed(3)).join("\\n");
+        const f = new File([text], "mimo.csv", { type: "text/csv" });
+        const dt = new DataTransfer(); dt.items.add(f);
+        const input = document.querySelector('#csv'); input.files = dt.files;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      })()`);
+      await waitFor(() => e("!document.querySelector('#csv-map').hidden"), 5000);
+      await e("document.querySelector('#apply-map').click()");
+      await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("MIMO"), 15000);
+    });
+
     await check("simulink", httpUrl(base, "simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#phases .phase-link').length")) === 8, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));

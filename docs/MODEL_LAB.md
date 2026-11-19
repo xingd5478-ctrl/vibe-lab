@@ -1,6 +1,6 @@
-# Model Lab (V0.7)
+# Model Lab (V0.8)
 
-**Status:** v0.7: SISO FOPDT/SOPDT/ARX/ETFE plus a 2×2 virtual MIMO-ARX experiment, validation, bootstrap, ten-chapter manual, first-order Control link and adjustable ARX orders.
+**Status:** v0.8: SISO FOPDT/SOPDT/ARX/ETFE plus 2×2 MIMO-ARX on virtual or mapped CSV data, validation, bootstrap, ten-chapter manual, first-order Control link and adjustable ARX orders.
 
 ## Route
 
@@ -28,11 +28,12 @@
 
 ## Not in V0.1
 
-- CSV MIMO column mapping, closed-loop identification and nonlinear models (out of scope)
+- closed-loop identification and nonlinear models (out of scope)
 - full English guide for the remaining course pages
 - FOPDT link to the first-order Control mode
 - adjustable ARX orders (na/nb/nk)
 - virtual 2×2 MIMO-ARX experiment
+- CSV multi-column mapping (time, multiple inputs, multiple outputs)
 - user-configurable ARX orders
 - accounts/cloud sync
 - manual chapters and full English guide

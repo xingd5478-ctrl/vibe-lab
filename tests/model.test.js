@@ -19,6 +19,21 @@ test("Model Lab CSV parses headers, separators and headerless rows", () => {
   assert.throws(() => D.parseCSV("a,b\n1,2"), /columns/);
 });
 
+test("CSV exposes columns for MIMO mapping", () => {
+  const d = D.parseCSV("t,u1,u2,y1,y2\n0,0,0,1,2\n1,1,0,2,3\n2,1,1,3,4\n");
+  assert.deepEqual(d.meta.headers, ["t", "u1", "u2", "y1", "y2"]);
+  const m = D.selectColumns(d, 0, [1, 2], [3, 4]);
+  assert.deepEqual(m.U, [
+    [0, 1, 1],
+    [0, 0, 1],
+  ]);
+  assert.deepEqual(m.Y, [
+    [1, 2, 3],
+    [2, 3, 4],
+  ]);
+  assert.throws(() => D.selectColumns(d, 0, [], [3]), /input/);
+});
+
 test("quality blocks flat input and non-monotonic time", () => {
   const flat = Q.analyze({ t: [0, 1, 2, 3, 4, 5], u: [1, 1, 1, 1, 1, 1], y: [0, 1, 2, 3, 4, 5] });
   assert.equal(flat.grade, "F");

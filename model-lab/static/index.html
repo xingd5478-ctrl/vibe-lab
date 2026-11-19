@@ -100,6 +100,15 @@
               </label>
               <label class="check"><input id="closed-loop" type="checkbox" /> 这组数据来自闭环实验</label>
               <p class="hint" id="file-name"></p>
+              <div class="csv-map" id="csv-map" hidden>
+                <h3>CSV 列映射</h3>
+                <p class="hint">多输入/多输出请选择列；单输入单输出也可以在这里改。</p>
+                <label class="field">时间列 <select id="map-time"></select></label>
+                <fieldset class="map-field"><legend>输入列</legend><div id="map-inputs" class="map-list"></div></fieldset>
+                <fieldset class="map-field"><legend>输出列</legend><div id="map-outputs" class="map-list"></div></fieldset>
+                <button class="btn primary wide" id="apply-map" type="button">应用列映射</button>
+                <p class="hint" id="map-hint"></p>
+              </div>
             </section>
 
             <section aria-labelledby="model-title">
@@ -184,7 +193,7 @@
         </div>
       </section>
 
-      <p class="hint scope">V0.6 边界：CSV 只支持 SISO；MIMO 目前只有 2×2 虚拟对象；闭环数据只警告，非线性未实现。</p>
+      <p class="hint scope">V0.7 边界：MIMO 支持 2×2 虚拟对象和 CSV 多列映射；闭环数据只警告，非线性未实现。</p>
 
       <section class="manual" id="manual">
         <div class="section-head"><h2>手册 · 十章</h2><span>十章：从数据、模型，到验证和控制器。</span></div>

@@ -35,37 +35,79 @@
   function parseCSV(text) {
     const { lines, delimiter } = splitRows(text);
     if (lines.length < 2) throw new Error("CSV needs a header and at least one data row.");
-    const header = lines[0].split(delimiter).map((s) => s.trim().toLowerCase());
-    const find = (...names) => header.findIndex((h) => names.includes(h));
+    const rawHeader = lines[0].split(delimiter).map((s) => s.trim());
+    const header = rawHeader.map((s) => s.toLowerCase());
+    const allNumeric = rawHeader.every((h) => h === "" || Number.isFinite(parseNumber(h)));
+    const dataStart = allNumeric ? 0 : 1;
+    const headers = allNumeric ? rawHeader.map((_, i) => `col${i + 1}`) : rawHeader;
+    if (headers.length < 3) throw new Error("CSV needs columns t, u, y (or time, input, output).");
+    const find = (...names) => headers.findIndex((h) => names.includes(String(h).toLowerCase()));
+    const prefix = (p) => headers.findIndex((h, i) => new RegExp(`^${p}\\d*$`, "i").test(h) && i > 0);
     let ti = find("t", "time", "timestamp", "时间");
     let ui = find("u", "input", "mv", "输入");
     let yi = find("y", "output", "cv", "输出");
-    let dataStart = 1;
+    if (ui < 0) ui = prefix("u");
+    if (yi < 0) yi = prefix("y");
     if (ti < 0 || ui < 0 || yi < 0) {
-      if (header.length >= 3) {
-        ti = 0;
-        ui = 1;
-        yi = 2;
-        dataStart = 0;
-      } else {
-        throw new Error("CSV needs columns t, u, y (or time, input, output).");
-      }
+      ti = 0;
+      ui = 1;
+      yi = 2;
     }
-    const t = [];
-    const u = [];
-    const y = [];
+    const columns = headers.map(() => []);
+    let rows = 0;
     for (let i = dataStart; i < lines.length; i++) {
       const cols = lines[i].split(delimiter);
-      const tv = parseNumber(cols[ti]);
-      const uv = parseNumber(cols[ui]);
-      const yv = parseNumber(cols[yi]);
-      if (Number.isNaN(tv) && Number.isNaN(uv) && Number.isNaN(yv)) continue;
-      t.push(tv);
-      u.push(uv);
-      y.push(yv);
+      const vals = headers.map((_, j) => parseNumber(cols[j]));
+      if (vals.every((v) => Number.isNaN(v))) continue;
+      vals.forEach((v, j) => columns[j].push(v));
+      rows++;
     }
-    if (t.length < 3) throw new Error("CSV needs at least 3 numeric rows.");
-    return { t, u, y, meta: { delimiter, rows: t.length, extraColumns: Math.max(0, header.length - 3) } };
+    if (rows < 3) throw new Error("CSV needs at least 3 numeric rows.");
+    return {
+      t: columns[ti],
+      u: columns[ui],
+      y: columns[yi],
+      meta: {
+        delimiter,
+        rows,
+        extraColumns: Math.max(0, headers.length - 3),
+        headers,
+        columns,
+        timeIndex: ti,
+        inputIndex: ui,
+        outputIndex: yi,
+      },
+    };
+  }
+
+  function selectColumns(parsed, timeIndex, inputIndices, outputIndices) {
+    const cols = parsed.meta && parsed.meta.columns;
+    if (!cols) throw new Error("CSV columns are not available.");
+    const ti = Number(timeIndex);
+    const ins = inputIndices.map(Number).filter((i) => Number.isInteger(i) && cols[i]);
+    const outs = outputIndices.map(Number).filter((i) => Number.isInteger(i) && cols[i]);
+    if (!Number.isInteger(ti) || !cols[ti]) throw new Error("Select a time column.");
+    if (!ins.length) throw new Error("Select at least one input column.");
+    if (!outs.length) throw new Error("Select at least one output column.");
+    if (ins.includes(ti) || outs.includes(ti)) throw new Error("Time column cannot also be an input/output.");
+    const t = cols[ti].slice();
+    const U = ins.map((i) => cols[i].slice());
+    const Y = outs.map((i) => cols[i].slice());
+    if (t.length !== U[0].length || t.length !== Y[0].length) throw new Error("Column lengths do not match.");
+    return {
+      t,
+      u: U[0],
+      y: Y[0],
+      U,
+      Y,
+      meta: {
+        ...(parsed.meta || {}),
+        columns: cols,
+        headers: parsed.meta.headers,
+        selected: { time: ti, inputs: ins, outputs: outs },
+        extraColumns: 0,
+      },
+    };
   }
 
   function median(values) {
@@ -131,6 +173,7 @@
 
   return {
     parseCSV,
+    selectColumns,
     median,
     mean,
     quantile,

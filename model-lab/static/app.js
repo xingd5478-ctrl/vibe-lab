@@ -33,6 +33,8 @@
     fileName: "",
     split: 0.7,
     uncertainty: null,
+    csvParsed: null,
+    csvName: "",
   };
 
   const PLANT_IDS = P.list();
@@ -580,6 +582,80 @@
     $("fit-hint").textContent = T("先修复数据，再拟合。", "Fix the data before fitting.");
   }
 
+  function applyColumns(parsed, timeIndex, ins, outs, name) {
+    const d = D.selectColumns(parsed, timeIndex, ins, outs);
+    d.meta = {
+      ...(d.meta || {}),
+      units: { u: "", y: "" },
+      closedLoop: $("closed-loop").checked,
+      source: "csv",
+      mimoChannels: d.U.length,
+    };
+    state.source = "csv";
+    state.fileName = name;
+    const mimo = d.U.length > 1 || d.Y.length > 1;
+    if (mimo) {
+      $("model").value = "MIMO-ARX";
+      $("arx-orders").hidden = false;
+    } else if ($("model").value === "MIMO-ARX") {
+      $("model").value = "FOPDT";
+    }
+    $("file-name").textContent =
+      `${T("已读取", "Loaded")}：${name} · ${d.t.length} ${T("行", "rows")} · ${d.U.length} u / ${d.Y.length} y`;
+    setData(d, `CSV：${name}`);
+    $("csv-map").hidden = true;
+  }
+
+  function showMapping(parsed, name) {
+    state.csvParsed = parsed;
+    state.csvName = name;
+    const headers = parsed.meta.headers;
+    const time = $("map-time");
+    time.innerHTML = "";
+    headers.forEach((h, i) => {
+      const o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = h;
+      time.appendChild(o);
+    });
+    time.value = String(parsed.meta.timeIndex || 0);
+    const fill = (box, kind) => {
+      box.innerHTML = "";
+      headers.forEach((h, i) => {
+        if (i === Number(time.value)) return;
+        const lab = document.createElement("label");
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = String(i);
+        cb.dataset.kind = kind;
+        const auto = kind === "in" ? /^u\d*$/i.test(h) || /^input/i.test(h) : /^y\d*$/i.test(h) || /^output/i.test(h);
+        cb.checked = auto || (kind === "in" ? i === parsed.meta.inputIndex : i === parsed.meta.outputIndex);
+        lab.appendChild(cb);
+        lab.appendChild(document.createTextNode(h));
+        box.appendChild(lab);
+      });
+    };
+    fill($("map-inputs"), "in");
+    fill($("map-outputs"), "out");
+    $("map-hint").textContent = T(
+      "选择时间列、输入列和输出列，然后应用。",
+      "Pick time, inputs and outputs, then apply."
+    );
+    $("csv-map").hidden = false;
+    $("file-name").textContent = `${T("已读取", "Loaded")}：${name} · ${parsed.t.length} ${T("行", "rows")}`;
+  }
+
+  function applyMapping() {
+    if (!state.csvParsed) return;
+    const ins = Array.from(document.querySelectorAll("#map-inputs input:checked")).map((x) => x.value);
+    const outs = Array.from(document.querySelectorAll("#map-outputs input:checked")).map((x) => x.value);
+    try {
+      applyColumns(state.csvParsed, $("map-time").value, ins, outs, state.csvName);
+    } catch (e) {
+      $("map-hint").textContent = e.message;
+    }
+  }
+
   function initUpload() {
     $("csv").addEventListener("change", (ev) => {
       const file = ev.target.files && ev.target.files[0];
@@ -588,16 +664,23 @@
       reader.onload = () => {
         try {
           const d = D.parseCSV(String(reader.result));
-          d.meta = { ...(d.meta || {}), units: { u: "", y: "" }, closedLoop: false, source: "csv" };
           state.source = "csv";
           state.fileName = file.name;
-          $("file-name").textContent = `${T("已读取", "Loaded")}：${file.name} · ${d.t.length} ${T("行", "rows")}`;
-          setData(d, `CSV：${file.name}`);
+          if (d.meta.headers.length > 3) showMapping(d, file.name);
+          else applyColumns(d, d.meta.timeIndex, [d.meta.inputIndex], [d.meta.outputIndex], file.name);
         } catch (e) {
           showError(`CSV 解析失败：${e.message}`);
         }
       };
       reader.readAsText(file);
+    });
+    $("apply-map").addEventListener("click", applyMapping);
+    $("map-time").addEventListener("change", () => {
+      const t = Number($("map-time").value);
+      document.querySelectorAll("#map-inputs input, #map-outputs input").forEach((cb) => {
+        cb.disabled = Number(cb.value) === t;
+        if (cb.disabled) cb.checked = false;
+      });
     });
   }
 

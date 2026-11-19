@@ -121,6 +121,15 @@
       fix: snr < 4 ? "增大信号幅值、降低噪声或多次平均。" : "",
     });
 
+    if (limits.mimoChannels > 1) {
+      checks.push({
+        id: "mimo",
+        level: "warn",
+        message: `${limits.mimoChannels} MIMO channels; health checks use the first u/y pair`,
+        fix: "MIMO ARX needs all channels; also inspect each channel separately.",
+      });
+    }
+
     if (limits.extraColumns > 0) {
       checks.push({
         id: "mimo",
