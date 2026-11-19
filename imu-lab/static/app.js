@@ -1019,6 +1019,91 @@ ${blocks}
     });
   }
 
+  function drawFusion() {
+    const el = $("chart-fusion");
+    if (!el) return;
+    const alpha = Number($("fusion-alpha").value) || 0.02;
+    $("fusion-alpha-val").textContent = alpha.toFixed(3);
+    const rnd = mulberry32(7);
+    const dt = 0.02,
+      n = 1500;
+    const t = [],
+      truth = [],
+      gyro = [],
+      acc = [],
+      fused = [],
+      integrated = [];
+    let angle = 0,
+      gyroAngle = 0;
+    for (let i = 0; i < n; i++) {
+      const x = i * dt;
+      const th = 22 * Math.sin(0.28 * x) + 7 * Math.sin(1.25 * x);
+      const dth = 22 * 0.28 * Math.cos(0.28 * x) + 7 * 1.25 * Math.cos(1.25 * x);
+      const g = dth + 0.8 + gauss(rnd) * 0.45;
+      const a = th + gauss(rnd) * 1.8;
+      gyroAngle += g * dt;
+      angle = (1 - alpha) * (angle + g * dt) + alpha * a;
+      t.push(x);
+      truth.push(th);
+      gyro.push(gyroAngle);
+      acc.push(a);
+      fused.push(angle);
+      integrated.push(gyroAngle);
+    }
+    const w = 800,
+      h = 240,
+      m = { l: 48, r: 12, t: 14, b: 26 };
+    const yMin = -35,
+      yMax = 35;
+    const sx = (x) => m.l + (x / t[n - 1]) * (w - m.l - m.r);
+    const sy = (v) => m.t + (1 - (v - yMin) / (yMax - yMin)) * (h - m.t - m.b);
+    const path = (arr) => arr.map((v, i) => (i ? "L" : "M") + sx(t[i]).toFixed(1) + "," + sy(v).toFixed(1)).join(" ");
+    let grid = "";
+    for (let v = -30; v <= 30; v += 15)
+      grid +=
+        '<line x1="' +
+        m.l +
+        '" y1="' +
+        sy(v).toFixed(1) +
+        '" x2="' +
+        (w - m.r) +
+        '" y2="' +
+        sy(v).toFixed(1) +
+        '" style="stroke:var(--grid)"/><text x="' +
+        (m.l - 6) +
+        '" y="' +
+        (sy(v) + 3).toFixed(1) +
+        '" text-anchor="end" style="fill:var(--muted);font:9px var(--mono)">' +
+        v +
+        "</text>";
+    el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="互补滤波姿态估计演示">
+      ${grid}
+      <path d="${path(truth)}" fill="none" style="stroke:var(--line);stroke-width:1;opacity:.8"/>
+      <path d="${path(integrated)}" fill="none" style="stroke:var(--chart-2);stroke-width:1;opacity:.65"/>
+      <path d="${path(fused)}" fill="none" style="stroke:var(--chart-1);stroke-width:1.8"/>
+      <text x="${m.l}" y="${m.t + 10}" style="fill:var(--muted);font:9px var(--mono)">truth / gyro integration / complementary</text>
+    </svg>`;
+  }
+
+  function initCalib() {
+    const btn = $("calib");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 5)));
+      if (!rows.length) return;
+      const mean = (k) => rows.reduce((s, r) => s + r[k], 0) / rows.length;
+      $("calib-info").textContent =
+        `gx=${mean("gx").toFixed(3)} · gy=${mean("gy").toFixed(3)} · gz=${mean("gz").toFixed(3)} °/s（前 ${rows.length} 帧）`;
+    });
+  }
+
+  function initFusion() {
+    const a = $("fusion-alpha");
+    if (!a) return;
+    a.addEventListener("input", drawFusion);
+    drawFusion();
+  }
+
   function init() {
     if (window.Worker) {
       try {
@@ -1061,6 +1146,8 @@ ${blocks}
     bind();
     prepare();
     draw();
+    initFusion();
+    initCalib();
     if (window.matchMedia) {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       if (mq.addEventListener) mq.addEventListener("change", draw);

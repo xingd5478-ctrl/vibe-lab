@@ -86,6 +86,12 @@
           <input id="kd" type="range" min="0" max="2" step="0.005" value="0.05" aria-label="微分增益 Kd" />
         </div>
 
+        <label class="switch"><input id="anti-windup" type="checkbox" checked /> 积分抗饱和 anti-windup</label>
+        <div class="field-row">
+          <div class="field"><label for="d-filter">微分滤波 Tf <output id="d-filter-val">0.02</output></label><input id="d-filter" type="range" min="0" max="0.2" step="0.005" value="0.02" /></div>
+          <div class="field"><label for="u-limit">执行器限幅 <output id="u-limit-val">20</output></label><input id="u-limit" type="range" min="2" max="50" step="1" value="20" /></div>
+        </div>
+
         <div class="metrics">
           <div>超调量（闭环） <b id="overshoot">—</b></div>
           <div>峰值时间 <b id="peak">—</b></div>

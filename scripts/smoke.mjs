@@ -252,6 +252,9 @@ async function main() {
     await check("model", httpUrl(base, "model-lab/static/index.html") + "?lang=en", async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#metrics .metric').length")) >= 4, 12000);
       if ((await e("document.getElementById('grade').textContent")).trim() === "F") throw new Error("model: grade F");
+      if (await e("document.querySelector('#validation').hidden")) throw new Error("model: validation hidden");
+      if (!(await e("document.querySelector('#validation').textContent")).includes("FIT"))
+        throw new Error("model: validation content");
       if (
         await e(
           "Array.from(document.body.innerText).some(function(c){var n=c.charCodeAt(0);return n>=0x4e00&&n<=0x9fff;})"

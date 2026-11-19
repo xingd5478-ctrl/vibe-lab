@@ -23,6 +23,7 @@
   const D = window.ModelData;
   const Q = window.ModelQuality;
   const I = window.ModelIdentify;
+  const V = window.ModelValidation;
   const P = window.ModelPlants;
 
   const state = {
@@ -202,6 +203,7 @@
       drawResidual(f);
       renderMetrics();
       renderWarnings();
+      renderValidation();
       $("actions").hidden = false;
       $("uncertainty").hidden = [
         "ETFE",
@@ -402,6 +404,30 @@
       p.style.margin = "4px 0";
       box.appendChild(p);
     });
+  }
+
+  function renderValidation() {
+    const box = $("validation");
+    const report = V && state.fit ? V.validate(state.fit, state.data, state.quality) : null;
+    if (!report) {
+      box.hidden = true;
+      return;
+    }
+    box.hidden = false;
+    const title = T("验证报告", "Validation report");
+    box.innerHTML = `<div class="validation-head"><h3>${title}</h3><b class="v-grade" data-grade="${report.grade}">${report.grade}</b></div>`;
+    const list = document.createElement("div");
+    list.className = "v-list";
+    report.checks.forEach((c) => {
+      const row = document.createElement("div");
+      row.className = "v-item " + c.level;
+      const mark = document.createElement("b");
+      mark.textContent = c.level === "ok" ? "OK" : c.level === "warn" ? "!" : "X";
+      row.appendChild(mark);
+      row.appendChild(document.createTextNode(" " + c.message));
+      list.appendChild(row);
+    });
+    box.appendChild(list);
   }
 
   function drawMainChart() {

@@ -347,3 +347,5 @@ code { font-family: var(--mono); font-size: 0.92em; background: var(--code-bg); 
 .lesson.read .n::after { content: " ✓"; color: var(--green); }
 
 @media (prefers-color-scheme: dark) { .continue { color: #8db3d8; } }
+
+.random-lesson { width: 100%; margin-top: 6px; padding: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); cursor: pointer; border-radius: 2px; font: 11px var(--mono); }

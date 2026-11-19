@@ -163,6 +163,26 @@ test("FIR/OE/ARMAX/Wiener fit common time-domain models", () => {
   assert.ok(wiener.fitTrain > 80, `Wiener ${wiener.fitTrain}`);
 });
 
+test("validation report flags a good and a biased model", () => {
+  const V = require("../model-lab/static/core/validation.js");
+  const t = [],
+    u = [],
+    y = [];
+  let yy = 0;
+  for (let k = 0; k < 200; k++) {
+    const uk = k > 20 ? 1 : 0;
+    yy = k ? 0.7 * yy + 0.3 * uk : 0;
+    t.push(k * 0.1);
+    u.push(uk);
+    y.push(yy);
+  }
+  const good = I.fitARX(t, u, y, { trainEnd: 160, na: 1, nb: 1, nk: 1 });
+  const ok = V.validate(good, { t, u, y }, null);
+  assert.ok(["A", "B"].includes(ok.grade), `grade ${ok.grade}`);
+  const bad = { ...good, yhat: y.map((v) => v + 0.5), fitTrain: 10, fitVal: 5, model: "ARX" };
+  assert.equal(V.validate(bad, { t, u, y }, null).grade, "F");
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

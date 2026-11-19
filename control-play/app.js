@@ -3,7 +3,19 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
-  const state = { order: 2, wn: 4, zeta: 0.4, K: 1, tau: 1, kp: 1.5, ki: 0.5, kd: 0.05 };
+  const state = {
+    order: 2,
+    wn: 4,
+    zeta: 0.4,
+    K: 1,
+    tau: 1,
+    kp: 1.5,
+    ki: 0.5,
+    kd: 0.05,
+    antiWindup: true,
+    tf: 0.02,
+    uMax: 20,
+  };
   const PAD = { l: 56, r: 56, t: 30, b: 38 };
 
   function logspace(a, b, n) {
@@ -36,21 +48,30 @@
     return { w, mag, phase };
   }
 
-  function simFirst(K, tau, closed, kp, ki, kd) {
+  function simFirst(K, tau, closed, kp, ki, kd, opts) {
     const dt = 0.002,
       T = 8,
       n = Math.floor(T / dt);
     let x = 0,
-      xi = 0;
+      xi = 0,
+      dF = 0,
+      prevE = 1;
     const t = new Float64Array(n),
       y = new Float64Array(n);
     for (let i = 0; i < n; i++) {
       let u = 1;
       if (closed) {
         const e = 1 - x;
-        xi = Math.max(-10, Math.min(10, xi + e * dt));
-        const dx = (K * u - x) / tau;
-        u = Math.max(-20, Math.min(20, kp * e + ki * xi + kd * -dx));
+        const dRaw = (e - prevE) / dt;
+        const tf = Math.max(0, (opts && opts.tf) || 0);
+        dF += ((dRaw - dF) * dt) / (tf + dt);
+        const candidate = Math.max(-10, Math.min(10, xi + e * dt));
+        const raw = kp * e + ki * candidate + kd * dF;
+        const lim = (opts && opts.uMax) || 20;
+        u = Math.max(-lim, Math.min(lim, raw));
+        const saturated = raw !== u;
+        if (!saturated || !(opts && opts.antiWindup === false)) xi = candidate;
+        prevE = e;
       }
       x += dt * ((K * u - x) / tau);
       t[i] = i * dt;
@@ -59,22 +80,31 @@
     return { t, y };
   }
 
-  function sim(wn, zeta, closed, kp, ki, kd) {
+  function sim(wn, zeta, closed, kp, ki, kd, opts) {
     const dt = 0.002,
       T = 8,
       n = Math.floor(T / dt);
     let x1 = 0,
       x2 = 0,
-      xi = 0;
+      xi = 0,
+      dF = 0,
+      prevE = 1;
     const t = new Float64Array(n),
       y = new Float64Array(n);
     for (let i = 0; i < n; i++) {
       let u = 1;
       if (closed) {
         const e = 1 - x1;
-        xi = Math.max(-10, Math.min(10, xi + e * dt));
-        const de = -x2;
-        u = Math.max(-20, Math.min(20, kp * e + ki * xi + kd * de));
+        const dRaw = (e - prevE) / dt;
+        const tf = Math.max(0, (opts && opts.tf) || 0);
+        dF += ((dRaw - dF) * dt) / (tf + dt);
+        const candidate = Math.max(-10, Math.min(10, xi + e * dt));
+        const raw = kp * e + ki * candidate + kd * dF;
+        const lim = (opts && opts.uMax) || 20;
+        u = Math.max(-lim, Math.min(lim, raw));
+        const saturated = raw !== u;
+        if (!saturated || !(opts && opts.antiWindup === false)) xi = candidate;
+        prevE = e;
       }
       const dx1 = x2;
       const dx2 = -wn * wn * x1 - 2 * zeta * wn * x2 + wn * wn * u;
@@ -260,6 +290,12 @@
     const kp = parseFloat($("kp").value);
     const ki = parseFloat($("ki").value);
     const kd = parseFloat($("kd").value);
+    const antiWindup = $("anti-windup").checked;
+    const tf = parseFloat($("d-filter").value);
+    const uMax = parseFloat($("u-limit").value);
+    const opts = { antiWindup, tf, uMax };
+    $("d-filter-val").textContent = tf.toFixed(3);
+    $("u-limit-val").textContent = uMax.toFixed(0);
     $("kp-val").textContent = kp.toFixed(2);
     $("ki-val").textContent = ki.toFixed(2);
     $("kd-val").textContent = kd.toFixed(3);
@@ -269,26 +305,26 @@
     if (order === 1) {
       const K = parseFloat($("K").value);
       const tau = parseFloat($("tau").value);
-      Object.assign(state, { order, K, tau, kp, ki, kd });
+      Object.assign(state, { order, K, tau, kp, ki, kd, antiWindup, tf, uMax });
       $("K-val").textContent = K.toFixed(1);
       $("tau-val").textContent = tau.toFixed(2);
       $("K").setAttribute("aria-valuetext", K.toFixed(1));
       $("tau").setAttribute("aria-valuetext", tau.toFixed(2));
       b = bodeFirst(K, tau);
-      open = simFirst(K, tau, false);
-      closed = simFirst(K, tau, true, kp, ki, kd);
+      open = simFirst(K, tau, false, kp, ki, kd, opts);
+      closed = simFirst(K, tau, true, kp, ki, kd, opts);
       $("meta-bode").textContent = `K=${K.toFixed(2)} · τ=${tau.toFixed(2)} s`;
     } else {
       const wn = parseFloat($("wn").value);
       const zeta = parseFloat($("zeta").value);
-      Object.assign(state, { order, wn, zeta, kp, ki, kd });
+      Object.assign(state, { order, wn, zeta, kp, ki, kd, antiWindup, tf, uMax });
       $("wn-val").textContent = wn.toFixed(1);
       $("zeta-val").textContent = zeta.toFixed(2);
       $("wn").setAttribute("aria-valuetext", wn.toFixed(1));
       $("zeta").setAttribute("aria-valuetext", zeta.toFixed(2));
       b = bode(wn, zeta);
-      open = sim(wn, zeta, false);
-      closed = sim(wn, zeta, true, kp, ki, kd);
+      open = sim(wn, zeta, false, kp, ki, kd, opts);
+      closed = sim(wn, zeta, true, kp, ki, kd, opts);
       $("meta-bode").textContent = `ωn=${wn.toFixed(1)} · ζ=${zeta.toFixed(2)}`;
     }
 
@@ -363,6 +399,9 @@
   function loadURL() {
     const p = new URLSearchParams(location.search);
     if (p.has("order")) $("order").value = p.get("order") === "1" ? "1" : "2";
+    if (p.has("aw")) $("anti-windup").checked = p.get("aw") !== "0";
+    if (p.has("tf")) $("d-filter").value = p.get("tf");
+    if (p.has("umax")) $("u-limit").value = p.get("umax");
     const map = { wn: "wn", zeta: "zeta", K: "K", tau: "tau", kp: "kp", ki: "ki", kd: "kd" };
     for (const k in map) {
       if (p.has(k)) {
@@ -372,9 +411,10 @@
     }
   }
 
-  ["order", "wn", "zeta", "K", "tau", "kp", "ki", "kd"].forEach((id) => {
+  ["order", "wn", "zeta", "K", "tau", "kp", "ki", "kd", "d-filter", "u-limit"].forEach((id) => {
     $(id).addEventListener(id === "order" ? "change" : "input", render);
   });
+  $("anti-windup").addEventListener("change", render);
   window.addEventListener("resize", () => render());
 
   loadURL();

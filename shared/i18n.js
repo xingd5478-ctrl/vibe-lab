@@ -263,6 +263,16 @@
     "噪声阶次 nc": "Noise order nc",
     "V1.0 边界：FOPDT/SOPDT/FIR/ARX/ARMAX/OE/ETFE/Wiener/MIMO/2SLS；完整非线性模型族与闭环频域仍未实现。":
       "V1.0 scope: FOPDT/SOPDT/FIR/ARX/ARMAX/OE/ETFE/Wiener/MIMO/2SLS; full nonlinear families and closed-loop frequency methods are not implemented.",
+    "姿态融合 · 互补滤波演示": "Attitude fusion · complementary filter demo",
+    "陀螺积分 vs 互补滤波": "Gyro integration vs complementary filter",
+    "加速度计权重 α": "Accelerometer weight α",
+    "演示用合成数据：陀螺有零偏和积分漂移，加速度计有噪声但是绝对参考。α 越大越信加速度计，越小越信陀螺。":
+      "Synthetic demo: the gyro has bias and integration drift, the accelerometer is noisy but absolute. Larger α trusts the accelerometer more.",
+    "估计零偏（前 5 s）": "Estimate bias (first 5 s)",
+    "假设前 5 s 静止；输出 gx/gy/gz 偏置。": "Assumes the first 5 s are static; prints gx/gy/gz bias.",
+    "积分抗饱和 anti-windup": "Integral anti-windup",
+    "微分滤波 Tf": "Derivative filter Tf",
+    执行器限幅: "Actuator limit",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

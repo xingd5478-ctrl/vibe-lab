@@ -405,6 +405,11 @@
     });
   }
 
+  $("random-lesson").addEventListener("click", () => {
+    const pool = lessons.filter((l) => !read.has(l.id));
+    const pick = (pool.length ? pool : lessons)[Math.floor(Math.random() * (pool.length || lessons.length))];
+    if (pick) load(pick.id);
+  });
   $("course-search").addEventListener("input", (e) => {
     const q = e.target.value.trim().toLowerCase();
     document.querySelectorAll(".lesson").forEach((b) => {

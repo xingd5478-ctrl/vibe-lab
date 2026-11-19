@@ -114,7 +114,9 @@
         </div>
 
         <div class="field" style="margin-top:14px">
-          <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;">重置为示例数据</button>
+          <button id="calib" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;margin-bottom:6px;">估计零偏（前 5 s）</button>
+        <div class="hint" id="calib-info">假设前 5 s 静止；输出 gx/gy/gz 偏置。</div>
+        <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;">重置为示例数据</button>
         </div>
 
         <p class="hint">CSV 列名：<code>gx_dps/gy_dps/gz_dps</code>，可选 <code>crc_ok</code>、<code>t</code>。没有表头时按 t,gx,gy,gz,crc 解析。</p>
