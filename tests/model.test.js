@@ -81,6 +81,17 @@ test("ETFE estimates a coherent first-order frequency response", () => {
   assert.match(I.toMatlab(f), /semilogx/);
 });
 
+test("bootstrap gives finite parameter intervals", () => {
+  const d = P.virtualStep({ plant: "thermal", amp: 2, noise: 0.08, seed: 5 });
+  const b = I.bootstrap(d.t, d.u, d.y, "FOPDT", { trainEnd: 294, B: 6 });
+  assert.equal(b.B, 6);
+  for (const key of ["K", "tau", "L"]) {
+    assert.ok(Number.isFinite(b.intervals[key][0]), key);
+    assert.ok(b.intervals[key][1] >= b.intervals[key][0], key);
+  }
+  assert.throws(() => I.bootstrap(d.t, d.u, d.y, "ETFE"), /ETFE/);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

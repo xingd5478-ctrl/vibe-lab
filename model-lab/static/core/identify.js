@@ -436,6 +436,84 @@
     return fitStats(y, yhat, 3);
   }
 
+  function percentile(values, p) {
+    const a = values
+      .filter(Number.isFinite)
+      .slice()
+      .sort((x, y) => x - y);
+    if (!a.length) return NaN;
+    const pos = (a.length - 1) * p;
+    const lo = Math.floor(pos),
+      hi = Math.ceil(pos);
+    return lo === hi ? a[lo] : a[lo] + (a[hi] - a[lo]) * (pos - lo);
+  }
+
+  function bootstrap(t, u, y, model, opts) {
+    if (model === "ETFE") throw new Error("Uncertainty is not available for ETFE yet.");
+    const B = Math.max(4, Math.min(30, (opts && opts.B) || 12));
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const fit =
+      model === "ARX"
+        ? fitARX(t, u, y, { ...opts, trainEnd })
+        : model === "SOPDT"
+          ? fitSOPDT(t, u, y, { trainEnd })
+          : fitFOPDT(t, u, y, { trainEnd });
+    const residual = [];
+    for (let i = 0; i < trainEnd; i++) residual.push(y[i] - fit.yhat[i]);
+    let seed = 1234567;
+    const rand = () => {
+      seed = (1664525 * seed + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    const samples = [];
+    for (let b = 0; b < B; b++) {
+      const yb = y.slice();
+      for (let i = 0; i < trainEnd; i++) yb[i] = fit.yhat[i] + residual[Math.floor(rand() * residual.length)];
+      try {
+        const fb =
+          model === "ARX"
+            ? fitARX(t, u, yb, { ...opts, trainEnd, na: fit.na, nb: fit.nb, nk: fit.nk })
+            : model === "SOPDT"
+              ? fitSOPDT(t, u, yb, { trainEnd })
+              : fitFOPDT(t, u, yb, { trainEnd });
+        samples.push(fb);
+      } catch (e) {}
+    }
+    const pick = (key) => samples.map((s) => s[key]).filter(Number.isFinite);
+    const interval = (key) => {
+      const a = pick(key);
+      return [percentile(a, 0.025), percentile(a, 0.975)];
+    };
+    const intervals =
+      model === "ARX"
+        ? {
+            a1: [
+              percentile(
+                samples.map((s) => s.coefA[0]),
+                0.025
+              ),
+              percentile(
+                samples.map((s) => s.coefA[0]),
+                0.975
+              ),
+            ],
+            b1: [
+              percentile(
+                samples.map((s) => s.coefB[0]),
+                0.025
+              ),
+              percentile(
+                samples.map((s) => s.coefB[0]),
+                0.975
+              ),
+            ],
+          }
+        : model === "SOPDT"
+          ? { K: interval("K"), wn: interval("wn"), zeta: interval("zeta"), L: interval("L") }
+          : { K: interval("K"), tau: interval("tau"), L: interval("L") };
+    return { model, B: samples.length, intervals, samples };
+  }
+
   function toMatlab(p) {
     if (p.model === "ETFE") {
       return [
@@ -482,6 +560,7 @@
     fitSOPDT,
     fitARX,
     fitETFE,
+    bootstrap,
     simulate,
     metrics,
     toMatlab,

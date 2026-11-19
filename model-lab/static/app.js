@@ -32,6 +32,7 @@
     source: "virtual",
     fileName: "",
     split: 0.7,
+    uncertainty: null,
   };
 
   const PLANT_IDS = P.list();
@@ -88,6 +89,7 @@
   function setData(d, label) {
     state.data = d;
     state.fit = null;
+    state.uncertainty = null;
     $("metrics").innerHTML = "";
     $("warnings").innerHTML = "";
     $("actions").hidden = true;
@@ -158,12 +160,14 @@
               ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
               : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
       state.fit = f;
+      state.uncertainty = null;
       if (f.model === "ETFE") state.split = 1;
       drawMainChart();
       drawResidual(f);
       renderMetrics();
       renderWarnings();
       $("actions").hidden = false;
+      $("uncertainty").hidden = f.model === "ETFE";
       $("fit-hint").textContent = T(
         "拟合完成。检查 FIT、残差和参数是否物理合理。",
         "Fit complete. Check FIT, residuals and physical plausibility."
@@ -227,6 +231,11 @@
           : fmt(real, 2);
       add(T("极点", "Pole"), pole);
       add(T("稳定", "Stable"), real < 0 ? T("是", "yes") : T("否", "no"));
+    }
+    if (state.uncertainty) {
+      const u = state.uncertainty.intervals;
+      const keys = Object.keys(u);
+      keys.forEach((key) => add(`${key} 95% CI`, `${fmt(u[key][0], 2)} – ${fmt(u[key][1], 2)}`));
     }
     if (state.source === "virtual" && d.truth) {
       const t = d.truth;
@@ -430,6 +439,34 @@
     el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" aria-hidden="true"><line x1="${m.l}" y1="${height - 8}" x2="${width - m.r}" y2="${height - 8}" style="stroke:var(--line)"/><polyline points="${points.join(" ")}" fill="none" style="stroke:var(--chart-1);stroke-width:2"/></svg>`;
   }
 
+  function estimateUncertainty() {
+    if (!state.fit || !state.data || state.fit.model === "ETFE") return;
+    const split = Math.max(0, Math.min(1, Number($("split").value) || 0.7));
+    const trainEnd = split < 1 ? Math.max(8, Math.floor(state.data.t.length * split)) : state.data.t.length;
+    $("uncertainty").disabled = true;
+    $("fit-hint").textContent = T("正在做 bootstrap…", "Running bootstrap…");
+    setTimeout(() => {
+      try {
+        state.uncertainty = I.bootstrap(state.data.t, state.data.u, state.data.y, state.fit.model, {
+          trainEnd,
+          B: 10,
+          na: 2,
+          nb: 2,
+          nk: 1,
+        });
+        renderMetrics();
+        $("fit-hint").textContent = T(
+          "不确定度是重采样估计，不是严格保证。",
+          "Intervals are resampling estimates, not a guarantee."
+        );
+      } catch (e) {
+        $("fit-hint").textContent = T("不确定度估计失败：", "Uncertainty failed: ") + e.message;
+      } finally {
+        $("uncertainty").disabled = false;
+      }
+    }, 30);
+  }
+
   function copyMatlab() {
     if (!state.fit) return;
     const text = I.toMatlab(state.fit);
@@ -540,6 +577,7 @@
           : T("全部数据训练，没有独立验证。", "All data for training; no independent validation.");
     });
     $("copy-matlab").addEventListener("click", copyMatlab);
+    $("uncertainty").addEventListener("click", estimateUncertainty);
     $("download-matlab").addEventListener("click", downloadMatlab);
     generate();
   }
