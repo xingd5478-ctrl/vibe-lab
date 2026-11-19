@@ -209,6 +209,8 @@
     "先读这五章，再看结果。": "Read these five chapters before interpreting the result.",
     "FOPDT 估 K、τ、L；SOPDT 估 K、ζ、ωn；ARX 估离散系数；ETFE 给频率响应。拟合失败会说明原因，不硬给结果。":
       "FOPDT estimates K, τ, L; SOPDT estimates K, ζ, ωn; ARX estimates discrete coefficients; ETFE gives a frequency response. Failures explain themselves instead of returning a fake result.",
+    "手册 · 十章": "Manual · ten chapters",
+    "十章：从数据、模型，到验证和控制器。": "Ten chapters: from data and models to validation and controllers.",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

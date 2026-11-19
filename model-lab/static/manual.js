@@ -21,6 +21,26 @@ window.MODEL_MANUAL = {
       title: "5. 二阶模型 SOPDT",
       body: "G(s)=Kωn²/(s²+2ζωn s+ωn²)。ζ<1 有超调，ζ=1 临界阻尼，ζ>1 过阻尼。可以从超调量和峰值时间粗估 ζ、ωn，再做最小二乘。二阶模型适合弹簧-质量-阻尼、位置系统和欠阻尼对象。",
     },
+    {
+      title: "6. 闭环数据与坏数据",
+      body: "如果输入 u 是控制器算出来的，u 和噪声相关，普通最小二乘会有偏。闭环辨识需要额外激励或专门方法；第一版 Model Lab 只支持开环。输入饱和、时间倒错、缺失、噪声过大，都会让模型看起来很好但不可信。",
+    },
+    {
+      title: "7. ARX 离散模型",
+      body: "ARX 用差分方程描述输入输出：y[k] 由过去的 y 和 u 决定。它用最小二乘估系数，适合数字控制和 MPC。需要选择 na、nb、nk，并用验证集、残差和稳定性检查。只有阶跃输入时，ARX 的信息不足，结果只能当参考。",
+    },
+    {
+      title: "8. ETFE 频域响应",
+      body: "ETFE 用 FFT 估计 H(ω)=Y(ω)/U(ω)，适合扫频、chirp 和多正弦。相干函数 γ² 接近 1 的频段可信；接近 0 的频段不要信。它不给传递函数参数，但能直接看带宽、谐振和相位。",
+    },
+    {
+      title: "9. 验证与过拟合",
+      body: "训练集拟合好不等于模型好。必须留出验证集，检查 FIT、残差是否白噪声、残差与输入是否相关、极点是否稳定、参数是否物理合理。模型阶次越高越容易过拟合；简单模型能解释数据时，优先简单模型。",
+    },
+    {
+      title: "10. 从模型到控制器",
+      body: "辨识结果不是终点。SOPDT 可以送进 Control Play 调 PID；FOPDT 可以导出 .m 或在后续的一阶模式里使用。进入控制器前要确认：模型适用范围、饱和、延迟、未建模动态和安全边界。教学模型不能替代真实标定。",
+    },
   ],
   en: [
     {
@@ -42,6 +62,26 @@ window.MODEL_MANUAL = {
     {
       title: "5. Second-order model (SOPDT)",
       body: "G(s)=Kωn²/(s²+2ζωn s+ωn²). ζ<1 overshoots, ζ=1 is critically damped, ζ>1 is overdamped. Overshoot and peak time give rough ζ/ωn estimates; refine with least squares. SOPDT suits spring-mass-damper, positioning and underdamped plants.",
+    },
+    {
+      title: "6. Closed-loop and bad data",
+      body: "If u is computed by a controller, u is correlated with noise and ordinary least squares is biased. Closed-loop identification needs extra excitation or dedicated methods; Model Lab v0.3 supports open loop only. Saturation, reversed time, missing rows or too much noise can make a model look good but be untrustworthy.",
+    },
+    {
+      title: "7. ARX discrete models",
+      body: "ARX describes the plant with a difference equation: y[k] depends on past y and u. It estimates coefficients by least squares and suits digital control and MPC. Choose na, nb, nk and check validation, residuals and stability. A step-only input is not informative enough; treat the result as a reference.",
+    },
+    {
+      title: "8. ETFE frequency response",
+      body: "ETFE estimates H(ω)=Y(ω)/U(ω) with an FFT and suits sweeps, chirps and multisine inputs. Trust bands where coherence γ² is near 1; ignore bands near 0. It gives no transfer-function parameters, but shows bandwidth, resonance and phase directly.",
+    },
+    {
+      title: "9. Validation and overfitting",
+      body: "A good training fit is not a good model. Hold out validation data and check FIT, residual whiteness, residual/input correlation, pole stability and physical plausibility. Higher orders overfit more easily; prefer the simplest model that explains the data.",
+    },
+    {
+      title: "10. From model to controller",
+      body: "Identification is not the endpoint. SOPDT can go to Control Play for PID tuning; FOPDT can export .m or use a first-order mode later. Before closing the loop, check the model's valid range, saturation, delay, unmodeled dynamics and safety limits. A teaching model does not replace real calibration.",
     },
   ],
 };
