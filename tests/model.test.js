@@ -54,6 +54,21 @@ test("SOPDT recovers spring damping and natural frequency", () => {
   assert.ok(f.fit > 90, `fit ${f.fit}`);
 });
 
+test("ARX recovers known coefficients on rich input", () => {
+  const t = [];
+  const u = [];
+  const y = [];
+  for (let k = 0; k < 240; k++) {
+    t.push(k * 0.1);
+    u.push(k % 7 < 3 ? 1 : -1);
+    y.push(k === 0 ? 0 : 0.7 * y[k - 1] + 0.2 * u[k - 1]);
+  }
+  const f = I.fitARX(t, u, y, { trainEnd: 160, na: 1, nb: 1, nk: 1 });
+  near(f.coefA[0], -0.7, 0.01);
+  near(f.coefB[0], 0.2, 0.02);
+  assert.ok(f.fitTrain > 95, `train fit ${f.fitTrain}`);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

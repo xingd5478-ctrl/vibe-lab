@@ -42,7 +42,7 @@
         </div>
         <ul class="proof" aria-label="Model Lab 能力">
           <li><b>3</b> 个虚拟对象</li>
-          <li><b>2</b> 种模型</li>
+          <li><b>3</b> 种模型</li>
           <li><b>0</b> 上传</li>
           <li><b>MIT</b> 源码</li>
         </ul>
@@ -100,8 +100,17 @@
                 <select id="model">
                   <option value="FOPDT">一阶 + 延迟 FOPDT</option>
                   <option value="SOPDT">二阶 SOPDT</option>
+                  <option value="ARX">ARX 离散</option>
                 </select>
               </label>
+              <label class="field">训练 / 验证
+                <select id="split">
+                  <option value="0.7">70% / 30%</option>
+                  <option value="0.8">80% / 20%</option>
+                  <option value="1">全部训练</option>
+                </select>
+              </label>
+              <p class="hint" id="split-hint">前 70% 训练，后 30% 验证。</p>
               <button class="btn primary wide" id="fit" type="button">辨识模型</button>
               <p class="hint" id="fit-hint">先体检数据；有硬性错误时不会拟合。</p>
             </section>
@@ -147,7 +156,7 @@
           <article class="panel">
             <div class="kicker">02 / IDENTIFY</div>
             <h3>再拟合</h3>
-            <p>FOPDT 估 K、τ、L；SOPDT 估 K、ζ、ωn。拟合失败会说明原因，不硬给结果。</p>
+            <p>FOPDT 估 K、τ、L；SOPDT 估 K、ζ、ωn；ARX 估离散系数。拟合失败会说明原因，不硬给结果。</p>
           </article>
           <article class="panel">
             <div class="kicker">03 / USE</div>

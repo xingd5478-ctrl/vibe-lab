@@ -253,6 +253,13 @@ async function main() {
       if (!/Data health|ready/i.test(title)) throw new Error("model: English quality title");
     });
 
+    await check("model-arx", httpUrl(base, "model-lab/static/index.html"), async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('#metrics .metric').length")) >= 4, 12000);
+      await e("document.querySelector('#model').value = 'ARX'; document.querySelector('#fit').click()");
+      await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("ARX"), 12000);
+      if (!(await e("document.querySelector('#split').value")) === "0.7") throw new Error("model: split default");
+    });
+
     await check("simulink", httpUrl(base, "simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#phases .phase-link').length")) === 8, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));

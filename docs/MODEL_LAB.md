@@ -14,6 +14,8 @@
 - CSV `t,u,y` import, local only
 - Data Quality Report (hard blockers + warnings)
 - FOPDT and SOPDT step identification
+- ARX (2/2/1) with 70/30 train/validation split
+- train/validation FIT and validation shading in the chart
 - FIT/residual/stability display, physical truth comparison for virtual plants
 - copy/download MATLAB `.m`
 - SOPDT link to Control Play
@@ -22,7 +24,8 @@
 
 ## Not in V0.1
 
-- ARX, ETFE, MIMO, closed-loop and nonlinear identification
+- ETFE, MIMO, closed-loop and nonlinear identification
+- manual chapters and full English guide
 - accounts/cloud sync
 - manual chapters and full English guide
 - bootstrap uncertainty

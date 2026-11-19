@@ -31,6 +31,7 @@
     fit: null,
     source: "virtual",
     fileName: "",
+    split: 0.7,
   };
 
   const PLANT_IDS = P.list();
@@ -141,13 +142,18 @@
   function fit() {
     if (!state.data || state.quality.blockers.length) return;
     const model = $("model").value;
+    const split = Math.max(0, Math.min(1, Number($("split").value) || 0.7));
+    state.split = split;
+    const trainEnd = split < 1 ? Math.max(8, Math.floor(state.data.t.length * split)) : state.data.t.length;
     $("fit").disabled = true;
     $("fit-hint").textContent = T("正在拟合…", "Fitting…");
     try {
       const f =
-        model === "SOPDT"
-          ? I.fitSOPDT(state.data.t, state.data.u, state.data.y)
-          : I.fitFOPDT(state.data.t, state.data.u, state.data.y);
+        model === "ARX"
+          ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na: 2, nb: 2, nk: 1 })
+          : model === "SOPDT"
+            ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
+            : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
       state.fit = f;
       drawMainChart();
       drawResidual(f);
@@ -162,13 +168,11 @@
       if (f.model === "SOPDT") {
         sc.hidden = false;
         sc.href = `${controlPath()}?wn=${encodeURIComponent(f.wn.toFixed(3))}&zeta=${encodeURIComponent(f.zeta.toFixed(3))}`;
-      } else {
-        sc.hidden = true;
-      }
+      } else sc.hidden = true;
     } catch (e) {
       state.fit = null;
       $("metrics").innerHTML = "";
-      $("warnings").innerHTML = `<span class="bad">拟合失败：${e.message}</span>`;
+      $("warnings").innerHTML = `<span class="bad">${T("拟合失败", "Fit failed")}：${e.message}</span>`;
       $("actions").hidden = true;
       $("fit-hint").textContent = T(
         "拟合失败；先检查数据是否有真实阶跃和足够长的响应。",
@@ -190,26 +194,32 @@
       el.innerHTML = `<span>${label}</span><b>${value}</b>`;
       box.appendChild(el);
     };
-    add("FIT", `${fmt(f.fit, 1)} %`);
-    add(
-      "K",
-      `${fmt(f.K, 3)} ${(isEn() ? d.meta.units?.yEn : d.meta.units?.y) || ""}/${(isEn() ? d.meta.units?.uEn : d.meta.units?.u) || ""}`
-    );
-    if (f.model === "SOPDT") {
-      add("ωn", `${fmt(f.wn, 3)} rad/s`);
-      add("ζ", fmt(f.zeta, 3));
+    add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain != null ? f.fitTrain : f.fit, 1)} %`);
+    if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
+    if (f.model === "ARX") {
+      add("ARX", `${f.na}/${f.nb}/${f.nk}`);
     } else {
-      add("τ", `${fmt(f.tau, 2)} s`);
+      add(
+        "K",
+        `${fmt(f.K, 3)} ${(isEn() ? d.meta.units?.yEn : d.meta.units?.y) || ""}/${(isEn() ? d.meta.units?.uEn : d.meta.units?.u) || ""}`
+      );
+      if (f.model === "SOPDT") {
+        add("ωn", `${fmt(f.wn, 3)} rad/s`);
+        add("ζ", fmt(f.zeta, 3));
+      } else {
+        add("τ", `${fmt(f.tau, 2)} s`);
+      }
+      add("L", `${fmt(f.L, 2)} s`);
     }
-    add("L", `${fmt(f.L, 2)} s`);
-    const real = f.model === "SOPDT" ? -f.zeta * f.wn : -1 / f.tau;
-    add(
-      T("极点", "Pole"),
-      f.model === "SOPDT"
-        ? `${fmt(real, 2)} ± j${fmt(f.wn * Math.sqrt(Math.max(0, 1 - f.zeta * f.zeta)), 2)}`
-        : fmt(real, 2)
-    );
-    add(T("稳定", "Stable"), real < 0 ? T("是", "yes") : T("否", "no"));
+    if (f.model !== "ARX") {
+      const real = f.model === "SOPDT" ? -f.zeta * f.wn : -1 / f.tau;
+      const pole =
+        f.model === "SOPDT"
+          ? `${fmt(real, 2)} ± j${fmt(f.wn * Math.sqrt(Math.max(0, 1 - f.zeta * f.zeta)), 2)}`
+          : fmt(real, 2);
+      add(T("极点", "Pole"), pole);
+      add(T("稳定", "Stable"), real < 0 ? T("是", "yes") : T("否", "no"));
+    }
     if (state.source === "virtual" && d.truth) {
       const t = d.truth;
       const truth =
@@ -237,14 +247,13 @@
           "FIT is low: the model may be insufficient, or unmodeled dynamics/disturbances remain."
         )
       );
-    if (f.model === "FOPDT" && state.data.truth && state.data.truth.kind === "SOPDT") {
+    if (f.model === "ARX" && new Set(state.data.u).size < 5)
       lines.push(
         T(
-          "这组虚拟对象本身是二阶；用 FOPDT 拟合会丢失振荡，试试 SOPDT。",
-          "This virtual plant is second order; FOPDT loses the oscillation — try SOPDT."
+          "ARX 需要丰富输入（PRBS/多阶跃）；只有阶跃时，结果只能当参考。",
+          "ARX needs rich input (PRBS/multi-step); with only a step, treat the result as a reference."
         )
       );
-    }
     if (f.model === "SOPDT" && f.zeta > 2.4)
       lines.push(
         T(
@@ -309,6 +318,11 @@
     const t0 = d.t[0];
     const t1 = d.t[d.t.length - 1];
     const sx = (t) => m.l + ((t - t0) / (t1 - t0 || 1)) * w;
+    let shade = "";
+    if (state.split < 1 && state.split > 0) {
+      const xv = sx(t0 + (t1 - t0) * state.split);
+      shade = `<rect x="${xv.toFixed(1)}" y="${m.t}" width="${(width - m.r - xv).toFixed(1)}" height="${plotH}" style="fill:var(--grid);opacity:.45"/><text x="${(xv + 4).toFixed(1)}" y="${(m.t + 10).toFixed(1)}" style="fill:var(--muted);font:9px var(--mono)">validation</text>`;
+    }
     const yPath = (arr) => arr.map((v, i) => `${i ? "L" : "M"}${sx(d.t[i]).toFixed(1)},${sy(v).toFixed(1)}`).join(" ");
     const uMin = Math.min(...d.u);
     const uMax = Math.max(...d.u);
@@ -329,6 +343,7 @@
       })
       .join("");
     el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" aria-hidden="true">
+      ${shade}
       ${grid}
       <path d="${yPath(d.y)}" fill="none" style="stroke:var(--chart-raw);stroke-width:1.1;opacity:.8"/>
       ${f ? `<path d="${yPath(f.yhat)}" fill="none" style="stroke:var(--chart-1);stroke-width:1.8"/>` : ""}
@@ -435,6 +450,16 @@
     initUpload();
     $("generate").addEventListener("click", generate);
     $("fit").addEventListener("click", fit);
+    $("split").addEventListener("change", () => {
+      const v = Number($("split").value);
+      $("split-hint").textContent =
+        v < 1
+          ? T(
+              `前 ${Math.round(v * 100)}% 训练，后 ${Math.round((1 - v) * 100)}% 验证。`,
+              `First ${Math.round(v * 100)}% train, last ${Math.round((1 - v) * 100)}% validation.`
+            )
+          : T("全部数据训练，没有独立验证。", "All data for training; no independent validation.");
+    });
     $("copy-matlab").addEventListener("click", copyMatlab);
     $("download-matlab").addEventListener("click", downloadMatlab);
     generate();

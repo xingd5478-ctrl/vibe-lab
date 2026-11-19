@@ -94,10 +94,14 @@
     return (t[t.length - 1] - b.stepTime) * 0.63;
   }
 
-  function fitFOPDT(t, u, y) {
-    const b = baseline(t, u, y);
-    const L0 = initialDelay(t, y, b);
-    const tau0 = Math.max(1e-6, crossingTime(t, y, b, 0.632) - L0);
+  function fitFOPDT(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const tF = t.slice(0, trainEnd),
+      uF = u.slice(0, trainEnd),
+      yF = y.slice(0, trainEnd);
+    const b = baseline(tF, uF, yF);
+    const L0 = initialDelay(tF, yF, b);
+    const tau0 = Math.max(1e-6, crossingTime(tF, yF, b, 0.632) - L0);
     const span = Math.max(1e-6, t[t.length - 1] - b.stepTime);
     let best = null;
     const taus = [];
@@ -108,13 +112,13 @@
         const p = { y0: b.y0, K: 1, du: b.du, tau, L, stepTime: b.stepTime };
         let num = 0;
         let den = 0;
-        for (let i = 0; i < t.length; i++) {
-          const base = b.du * stepShape((t[i] - b.stepTime - L) / tau);
-          num += (y[i] - b.y0) * base;
+        for (let i = 0; i < tF.length; i++) {
+          const base = b.du * stepShape((tF[i] - b.stepTime - L) / tau);
+          num += (yF[i] - b.y0) * base;
           den += base * base;
         }
         p.K = den > 0 ? num / den : (b.yEnd - b.y0) / b.du;
-        const e = sse(t, y, firstOrderValue, p);
+        const e = sse(tF, yF, firstOrderValue, p);
         if (!best || e < best.sse) best = { sse: e, p };
       }
     }
@@ -123,14 +127,25 @@
     for (let iter = 0; iter < 2; iter++) {
       for (const f of [0.7, 0.85, 1, 1.15, 1.3]) {
         const q = { ...p, tau: p.tau * f };
-        const e = sse(t, y, firstOrderValue, q);
+        const e = sse(tF, yF, firstOrderValue, q);
         if (e < best.sse) best = { sse: e, p: q };
       }
       p = { ...best.p };
     }
     const yhat = t.map((x) => firstOrderValue(x, best.p));
     const stats = fitStats(y, yhat, 3);
-    return { ...best.p, ...stats, model: "FOPDT", yhat, stepIndex: b.i };
+    const fitTrain = fitStats(yF, yhat.slice(0, trainEnd), 3);
+    const fitVal = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), 3) : null;
+    return {
+      ...best.p,
+      ...stats,
+      fitTrain: fitTrain.fit,
+      fitVal: fitVal ? fitVal.fit : null,
+      trainEnd,
+      model: "FOPDT",
+      yhat,
+      stepIndex: b.i,
+    };
   }
 
   function initialSecondOrder(t, y, b) {
@@ -153,10 +168,14 @@
     return { zeta, wn };
   }
 
-  function fitSOPDT(t, u, y) {
-    const b = baseline(t, u, y);
-    const L0 = initialDelay(t, y, b);
-    const init = initialSecondOrder(t, y, b);
+  function fitSOPDT(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const tF = t.slice(0, trainEnd),
+      uF = u.slice(0, trainEnd),
+      yF = y.slice(0, trainEnd);
+    const b = baseline(tF, uF, yF);
+    const L0 = initialDelay(tF, yF, b);
+    const init = initialSecondOrder(tF, yF, b);
     const span = Math.max(1e-6, t[t.length - 1] - b.stepTime);
     let best = null;
     const zetas = [];
@@ -171,20 +190,116 @@
           const p = { y0: b.y0, K: 1, du: b.du, zeta, wn, L, stepTime: b.stepTime };
           let num = 0;
           let den = 0;
-          for (let i = 0; i < t.length; i++) {
-            const base = b.du * secondOrderShape(t[i] - b.stepTime - L, zeta, wn);
-            num += (y[i] - b.y0) * base;
+          for (let i = 0; i < tF.length; i++) {
+            const base = b.du * secondOrderShape(tF[i] - b.stepTime - L, zeta, wn);
+            num += (yF[i] - b.y0) * base;
             den += base * base;
           }
           p.K = den > 0 ? num / den : (b.yEnd - b.y0) / b.du;
-          const e = sse(t, y, secondOrderValue, p);
+          const e = sse(tF, yF, secondOrderValue, p);
           if (!best || e < best.sse) best = { sse: e, p };
         }
       }
     }
     const yhat = t.map((x) => secondOrderValue(x, best.p));
     const stats = fitStats(y, yhat, 4);
-    return { ...best.p, ...stats, model: "SOPDT", yhat, stepIndex: b.i };
+    const fitTrain = fitStats(yF, yhat.slice(0, trainEnd), 4);
+    const fitVal = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), 4) : null;
+    return {
+      ...best.p,
+      ...stats,
+      fitTrain: fitTrain.fit,
+      fitVal: fitVal ? fitVal.fit : null,
+      trainEnd,
+      model: "SOPDT",
+      yhat,
+      stepIndex: b.i,
+    };
+  }
+
+  function qrSolve(A, b) {
+    const m = A.length;
+    const n = A[0].length;
+    const q = [];
+    const r = Array.from({ length: n }, () => new Array(n).fill(0));
+    const y = new Array(n).fill(0);
+    for (let j = 0; j < n; j++) {
+      const v = new Array(m);
+      for (let i = 0; i < m; i++) v[i] = A[i][j];
+      for (let k = 0; k < j; k++) {
+        let dot = 0;
+        for (let i = 0; i < m; i++) dot += q[k][i] * v[i];
+        r[k][j] = dot;
+        for (let i = 0; i < m; i++) v[i] -= dot * q[k][i];
+      }
+      let norm = 0;
+      for (let i = 0; i < m; i++) norm += v[i] * v[i];
+      norm = Math.sqrt(norm) || 1e-12;
+      r[j][j] = norm;
+      q.push(v.map((x) => x / norm));
+      let dot = 0;
+      for (let i = 0; i < m; i++) dot += q[j][i] * b[i];
+      y[j] = dot;
+    }
+    const theta = new Array(n).fill(0);
+    for (let i = n - 1; i >= 0; i--) {
+      let v = y[i];
+      for (let j = i + 1; j < n; j++) v -= r[i][j] * theta[j];
+      theta[i] = v / r[i][i];
+    }
+    return theta;
+  }
+
+  function fitARX(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const na = Math.max(1, Math.min(6, (opts && opts.na) || 2));
+    const nb = Math.max(1, Math.min(6, (opts && opts.nb) || 2));
+    const nk = Math.max(0, Math.min(5, opts && opts.nk != null ? opts.nk : 1));
+    const start = Math.max(na, nk + nb - 1);
+    if (start >= trainEnd - 2) throw new Error("Not enough samples for ARX orders.");
+    const A = [];
+    const B = [];
+    for (let k = start; k < trainEnd; k++) {
+      const row = [];
+      for (let i = 1; i <= na; i++) row.push(-y[k - i]);
+      for (let i = 0; i < nb; i++) row.push(u[k - nk - i]);
+      A.push(row);
+      B.push(y[k]);
+    }
+    const theta = qrSolve(A, B);
+    const coefA = theta.slice(0, na);
+    const coefB = theta.slice(na);
+    const predictFrom = (begin, end) => {
+      const out = y.slice();
+      for (let k = begin; k < end; k++) {
+        let v = 0;
+        for (let i = 1; i <= na; i++) v -= coefA[i - 1] * out[k - i];
+        for (let i = 0; i < nb; i++) v += coefB[i] * u[k - nk - i];
+        out[k] = v;
+      }
+      return out;
+    };
+    const trainHat = predictFrom(start, trainEnd);
+    const valHat = trainEnd < t.length ? predictFrom(trainEnd, t.length) : y.slice();
+    const yhat = y.map((v, i) => (i < trainEnd ? trainHat[i] : valHat[i]));
+    for (let i = 0; i < start; i++) yhat[i] = y[i];
+    const stats = fitStats(y, yhat, 2 + na + nb);
+    const ft = fitStats(y.slice(start, trainEnd), yhat.slice(start, trainEnd), 2 + na + nb);
+    const fv = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), 2 + na + nb) : null;
+    return {
+      model: "ARX",
+      na,
+      nb,
+      nk,
+      coefA,
+      coefB,
+      yhat,
+      fit: stats.fit,
+      fitTrain: ft.fit,
+      fitVal: fv ? fv.fit : null,
+      trainEnd,
+      start,
+    };
   }
 
   function metrics(y, yhat) {
@@ -192,6 +307,17 @@
   }
 
   function toMatlab(p) {
+    if (p.model === "ARX") {
+      return [
+        `a = [1, ${p.coefA.map((x) => x.toPrecision(6)).join(", ")}];`,
+        `b = [${Array(p.nk)
+          .fill(0)
+          .concat(p.coefB)
+          .map((x) => Number(x).toPrecision(6))
+          .join(", ")}];`,
+        `G = tf(b, a, 1, "Variable", "z^-1");`,
+      ].join("\n");
+    }
     if (p.model === "SOPDT") {
       return [
         `K = ${p.K.toPrecision(6)};`,
@@ -216,6 +342,7 @@
   return {
     fitFOPDT,
     fitSOPDT,
+    fitARX,
     simulate,
     metrics,
     toMatlab,
