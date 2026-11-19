@@ -5,7 +5,7 @@
 - **GoatCounter** page/event counts: `https://xingdong.goatcounter.com`.
 - **CTA events**: `cta-imu`, `cta-simulink`, `open-*`, `scope-replay`.
 - **JS errors**: `event/js-error` on `error` / `unhandledrejection`; no stack or user data is sent.
-- **Live smoke**: `npm run live` checks 9 endpoints; GitHub Actions opens an issue on failure.
+- **Live smoke**: `npm run live` checks 11 endpoints; GitHub Actions opens an issue on failure.
 - **Incidents**: [INCIDENTS.md](INCIDENTS.md).
 
 ## Error aggregation (optional, needs an account)

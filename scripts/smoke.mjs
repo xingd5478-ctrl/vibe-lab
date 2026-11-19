@@ -290,7 +290,7 @@ async function main() {
       if (!(await e("document.body.textContent")).includes("完整算例")) throw new Error("course: full case missing");
     });
 
-    console.log("SMOKE OK (landing + landing-en + imu + control + about + matlab + about-en + simulink)");
+    console.log("SMOKE OK (landing + landing-en + imu + control + model + about + matlab + about-en + simulink)");
   } finally {
     if (server) server.close();
     edge.kill();
