@@ -1,6 +1,6 @@
-# Model Lab (V0.5)
+# Model Lab (V0.6)
 
-**Status:** v0.5: FOPDT/SOPDT/ARX/ETFE, train/validation split, ten-chapter manual and bootstrap intervals; not the full V1 scope.
+**Status:** v0.6: SISO/open-loop/linear lab with FOPDT/SOPDT/ARX/ETFE, validation, bootstrap, ten-chapter manual, first-order Control link and adjustable ARX orders.
 
 ## Route
 
@@ -28,9 +28,10 @@
 
 ## Not in V0.1
 
-- MIMO, closed-loop and nonlinear identification
+- MIMO, closed-loop and nonlinear identification (explicitly out of scope for v0.6)
 - full English guide for the remaining course pages
-- FOPDT link to a first-order Control mode
+- FOPDT link to the first-order Control mode
+- adjustable ARX orders (na/nb/nk)
 - user-configurable ARX orders
 - accounts/cloud sync
 - manual chapters and full English guide

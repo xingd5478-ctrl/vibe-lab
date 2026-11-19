@@ -121,6 +121,15 @@
       fix: snr < 4 ? "增大信号幅值、降低噪声或多次平均。" : "",
     });
 
+    if (limits.extraColumns > 0) {
+      checks.push({
+        id: "mimo",
+        level: "warn",
+        message: `${limits.extraColumns} extra column(s); only the first u/y are used`,
+        fix: "MIMO identification is not supported in v0.6; select one input and one output.",
+      });
+    }
+
     if (limits.closedLoop) {
       checks.push({
         id: "loop",

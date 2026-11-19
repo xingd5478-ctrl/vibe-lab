@@ -39,7 +39,7 @@ window.MODEL_MANUAL = {
     },
     {
       title: "10. 从模型到控制器",
-      body: "辨识结果不是终点。SOPDT 可以送进 Control Play 调 PID；FOPDT 可以导出 .m 或在后续的一阶模式里使用。进入控制器前要确认：模型适用范围、饱和、延迟、未建模动态和安全边界。教学模型不能替代真实标定。",
+      body: "辨识结果不是终点。SOPDT 可以送进 Control Play 调 PID；FOPDT 可以直接送到 Control Play 的一阶模式，或导出 .m。进入控制器前要确认：模型适用范围、饱和、延迟、未建模动态和安全边界。教学模型不能替代真实标定。",
     },
   ],
   en: [
@@ -81,7 +81,7 @@ window.MODEL_MANUAL = {
     },
     {
       title: "10. From model to controller",
-      body: "Identification is not the endpoint. SOPDT can go to Control Play for PID tuning; FOPDT can export .m or use a first-order mode later. Before closing the loop, check the model's valid range, saturation, delay, unmodeled dynamics and safety limits. A teaching model does not replace real calibration.",
+      body: "Identification is not the endpoint. SOPDT can go to Control Play for PID tuning; FOPDT can go straight to the first-order Control mode or export .m. Before closing the loop, check the model's valid range, saturation, delay, unmodeled dynamics and safety limits. A teaching model does not replace real calibration.",
     },
   ],
 };

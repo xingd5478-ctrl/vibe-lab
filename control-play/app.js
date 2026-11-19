@@ -3,7 +3,7 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
-  const state = { wn: 4, zeta: 0.4, kp: 1.5, ki: 0.5, kd: 0.05 };
+  const state = { order: 2, wn: 4, zeta: 0.4, K: 1, tau: 1, kp: 1.5, ki: 0.5, kd: 0.05 };
   const PAD = { l: 56, r: 56, t: 30, b: 38 };
 
   function logspace(a, b, n) {
@@ -23,6 +23,40 @@
       phase.push((Math.atan2(-im, re) * 180) / Math.PI);
     }
     return { w, mag, phase };
+  }
+
+  function bodeFirst(K, tau) {
+    const w = logspace(0.1, 100, 320);
+    const mag = [],
+      phase = [];
+    for (const wi of w) {
+      mag.push(20 * Math.log10(K / Math.hypot(1, wi * tau)));
+      phase.push((-Math.atan(wi * tau) * 180) / Math.PI);
+    }
+    return { w, mag, phase };
+  }
+
+  function simFirst(K, tau, closed, kp, ki, kd) {
+    const dt = 0.002,
+      T = 8,
+      n = Math.floor(T / dt);
+    let x = 0,
+      xi = 0;
+    const t = new Float64Array(n),
+      y = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      let u = 1;
+      if (closed) {
+        const e = 1 - x;
+        xi = Math.max(-10, Math.min(10, xi + e * dt));
+        const dx = (K * u - x) / tau;
+        u = Math.max(-20, Math.min(20, kp * e + ki * xi + kd * -dx));
+      }
+      x += dt * ((K * u - x) / tau);
+      t[i] = i * dt;
+      y[i] = x;
+    }
+    return { t, y };
   }
 
   function sim(wn, zeta, closed, kp, ki, kd) {
@@ -220,33 +254,54 @@
   }
 
   function render() {
-    const wn = parseFloat($("wn").value);
-    const zeta = parseFloat($("zeta").value);
+    const order = Number($("order").value) || 2;
+    $("order-two").hidden = order !== 2;
+    $("order-one").hidden = order !== 1;
     const kp = parseFloat($("kp").value);
     const ki = parseFloat($("ki").value);
     const kd = parseFloat($("kd").value);
-    Object.assign(state, { wn, zeta, kp, ki, kd });
-
-    $("wn-val").textContent = wn.toFixed(1);
-    $("zeta-val").textContent = zeta.toFixed(2);
     $("kp-val").textContent = kp.toFixed(2);
     $("ki-val").textContent = ki.toFixed(2);
     $("kd-val").textContent = kd.toFixed(3);
-    [
-      ["wn", wn.toFixed(1)],
-      ["zeta", zeta.toFixed(2)],
-      ["kp", kp.toFixed(2)],
-      ["ki", ki.toFixed(2)],
-      ["kd", kd.toFixed(3)],
-    ].forEach(([id, v]) => {
-      $(id).setAttribute("aria-valuetext", v);
-    });
+    ["kp", "ki", "kd"].forEach((id) => $(id).setAttribute("aria-valuetext", $(id + "-val").textContent));
 
-    plotBode($("bode"), bode(wn, zeta));
-    const open = sim(wn, zeta, false);
-    const closed = sim(wn, zeta, true, kp, ki, kd);
+    let open, closed, b;
+    if (order === 1) {
+      const K = parseFloat($("K").value);
+      const tau = parseFloat($("tau").value);
+      Object.assign(state, { order, K, tau, kp, ki, kd });
+      $("K-val").textContent = K.toFixed(1);
+      $("tau-val").textContent = tau.toFixed(2);
+      $("K").setAttribute("aria-valuetext", K.toFixed(1));
+      $("tau").setAttribute("aria-valuetext", tau.toFixed(2));
+      b = bodeFirst(K, tau);
+      open = simFirst(K, tau, false);
+      closed = simFirst(K, tau, true, kp, ki, kd);
+      $("meta-bode").textContent = `K=${K.toFixed(2)} · τ=${tau.toFixed(2)} s`;
+    } else {
+      const wn = parseFloat($("wn").value);
+      const zeta = parseFloat($("zeta").value);
+      Object.assign(state, { order, wn, zeta, kp, ki, kd });
+      $("wn-val").textContent = wn.toFixed(1);
+      $("zeta-val").textContent = zeta.toFixed(2);
+      $("wn").setAttribute("aria-valuetext", wn.toFixed(1));
+      $("zeta").setAttribute("aria-valuetext", zeta.toFixed(2));
+      b = bode(wn, zeta);
+      open = sim(wn, zeta, false);
+      closed = sim(wn, zeta, true, kp, ki, kd);
+      $("meta-bode").textContent = `ωn=${wn.toFixed(1)} · ζ=${zeta.toFixed(2)}`;
+    }
+
+    const h1 = document.querySelector("header h1");
+    if (h1) h1.textContent = order === 1 ? tr("Control Play · 一阶系统") : tr("Control Play · 二阶系统");
+    const sub = document.querySelector("header .sub");
+    if (sub)
+      sub.textContent =
+        order === 1
+          ? tr("G(s) = K / (τs + 1) · 拖动滑杆，实时看一阶 Bode 与阶跃响应。")
+          : tr("G(s) = ωn² / (s² + 2ζωn·s + ωn²) · 拖动滑杆，实时看 Bode 与阶跃响应。");
+    plotBode($("bode"), b);
     plotStep($("step"), open, closed);
-
     const m = metrics(closed.t, closed.y);
     const tEnd = closed.t[closed.t.length - 1];
     const peakAtEnd = m.tPeak >= tEnd - 1e-9;
@@ -254,10 +309,20 @@
     $("peak").textContent = peakAtEnd ? `>${tEnd.toFixed(1)} s` : m.tPeak.toFixed(2) + " s";
     $("settle").textContent = m.settled ? m.settle.toFixed(2) + " s" : `>${tEnd.toFixed(1)} s`;
     $("ess").textContent = m.ess.toFixed(3);
-    $("meta-bode").textContent = `ωn=${wn.toFixed(1)} · ζ=${zeta.toFixed(2)}`;
     $("meta-step").textContent = `Kp=${kp.toFixed(2)} · Ki=${ki.toFixed(2)} · Kd=${kd.toFixed(3)}`;
-    const params = `?wn=${state.wn.toFixed(2)}&zeta=${state.zeta.toFixed(2)}&kp=${state.kp.toFixed(2)}&ki=${state.ki.toFixed(2)}&kd=${state.kd.toFixed(3)}`;
-    if ($("url-params")) $("url-params").textContent = params;
+    const p = new URLSearchParams();
+    p.set("order", String(order));
+    if (order === 1) {
+      p.set("K", state.K.toFixed(2));
+      p.set("tau", state.tau.toFixed(2));
+    } else {
+      p.set("wn", state.wn.toFixed(2));
+      p.set("zeta", state.zeta.toFixed(2));
+    }
+    p.set("kp", kp.toFixed(2));
+    p.set("ki", ki.toFixed(2));
+    p.set("kd", kd.toFixed(3));
+    if ($("url-params")) $("url-params").textContent = "?" + p.toString();
     syncURL();
   }
 
@@ -279,21 +344,26 @@
 
   function syncURL() {
     const p = new URLSearchParams();
-    p.set("wn", state.wn.toFixed(2));
-    p.set("zeta", state.zeta.toFixed(2));
+    p.set("order", String(state.order));
+    if (state.order === 1) {
+      p.set("K", state.K.toFixed(2));
+      p.set("tau", state.tau.toFixed(2));
+    } else {
+      p.set("wn", state.wn.toFixed(2));
+      p.set("zeta", state.zeta.toFixed(2));
+    }
     p.set("kp", state.kp.toFixed(2));
     p.set("ki", state.ki.toFixed(2));
     p.set("kd", state.kd.toFixed(3));
     try {
       history.replaceState(null, "", location.pathname + "?" + p.toString() + (location.hash || ""));
-    } catch (e) {
-      /* file:// */
-    }
+    } catch (e) {}
   }
 
   function loadURL() {
     const p = new URLSearchParams(location.search);
-    const map = { wn: "wn", zeta: "zeta", kp: "kp", ki: "ki", kd: "kd" };
+    if (p.has("order")) $("order").value = p.get("order") === "1" ? "1" : "2";
+    const map = { wn: "wn", zeta: "zeta", K: "K", tau: "tau", kp: "kp", ki: "ki", kd: "kd" };
     for (const k in map) {
       if (p.has(k)) {
         const v = parseFloat(p.get(k));
@@ -302,8 +372,8 @@
     }
   }
 
-  ["wn", "zeta", "kp", "ki", "kd"].forEach((id) => {
-    $(id).addEventListener("input", render);
+  ["order", "wn", "zeta", "K", "tau", "kp", "ki", "kd"].forEach((id) => {
+    $(id).addEventListener(id === "order" ? "change" : "input", render);
   });
   window.addEventListener("resize", () => render());
 

@@ -188,6 +188,15 @@ async function main() {
       if (cy1 === cy50) throw new Error("control: root locus poles did not move with K");
     });
 
+    await check("control-first", httpUrl(base, "control-play/index.html") + "?order=1&K=2&tau=1.5", async (e) => {
+      await waitFor(() => e("!!document.querySelector('#bode svg')"));
+      if ((await e("document.querySelector('#order').value")) !== "1") throw new Error("control-first: order");
+      if (!(await e("document.querySelector('#meta-bode').textContent")).includes("K=2"))
+        throw new Error("control-first: K meta");
+      if (!(await e("document.querySelector('#step').innerHTML")).includes("svg"))
+        throw new Error("control-first: step");
+    });
+
     await check("control-state", httpUrl(base, "control-play/index.html") + "#labs&K=50", async (e) => {
       await waitFor(async () => (await e("document.getElementById('labs').hidden")) === false);
       await waitFor(async () =>

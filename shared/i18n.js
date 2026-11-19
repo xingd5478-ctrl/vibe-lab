@@ -215,6 +215,21 @@
     "正在做 bootstrap…": "Running bootstrap…",
     "不确定度是重采样估计，不是严格保证。": "Intervals are resampling estimates, not a guarantee.",
     "不确定度估计失败：": "Uncertainty failed: ",
+    对象阶次: "Plant order",
+    二阶系统: "Second order",
+    一阶系统: "First order",
+    "稳态增益 K": "Steady-state gain K",
+    "时间常数 τ": "Time constant τ",
+    "Control Play · 一阶系统": "Control Play · first-order systems",
+    "G(s) = K / (τs + 1) · 拖动滑杆，实时看一阶 Bode 与阶跃响应。":
+      "G(s) = K / (τs + 1) · drag the sliders to see the first-order Bode and step response.",
+    "G(s) = ωn² / (s² + 2ζωn·s + ωn²) · 拖动滑杆，实时看 Bode 与阶跃响应。":
+      "G(s) = ωn² / (s² + 2ζωn·s + ωn²) · drag the sliders to see Bode and the step response.",
+    这组数据来自闭环实验: "This data comes from a closed-loop experiment",
+    "V0.6 边界：SISO / 开环 / 线性。MIMO、闭环辨识、非线性模型未实现；闭环数据只能做参考。":
+      "V0.6 scope: SISO / open-loop / linear. MIMO, closed-loop identification and nonlinear models are not implemented; closed-loop data is for reference only.",
+    "闭环数据：普通最小二乘可能有偏，结果只作参考。":
+      "Closed-loop data: ordinary least squares can be biased; treat the result as a reference.",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

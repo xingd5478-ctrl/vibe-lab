@@ -65,7 +65,7 @@
       y.push(yv);
     }
     if (t.length < 3) throw new Error("CSV needs at least 3 numeric rows.");
-    return { t, u, y, meta: { delimiter, rows: t.length } };
+    return { t, u, y, meta: { delimiter, rows: t.length, extraColumns: Math.max(0, header.length - 3) } };
   }
 
   function median(values) {

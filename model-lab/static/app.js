@@ -87,6 +87,8 @@
   }
 
   function setData(d, label) {
+    if (state.source === "csv") d.meta.closedLoop = $("closed-loop").checked;
+    else d.meta.closedLoop = false;
     state.data = d;
     state.fit = null;
     state.uncertainty = null;
@@ -151,11 +153,14 @@
     $("fit").disabled = true;
     $("fit-hint").textContent = T("正在拟合…", "Fitting…");
     try {
+      const na = Math.max(1, Math.min(6, Number($("arx-na").value) || 2));
+      const nb = Math.max(1, Math.min(6, Number($("arx-nb").value) || 2));
+      const nk = Math.max(0, Math.min(5, Number($("arx-nk").value) || 0));
       const f =
         model === "ETFE"
           ? I.fitETFE(state.data.t, state.data.u, state.data.y)
           : model === "ARX"
-            ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na: 2, nb: 2, nk: 1 })
+            ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
             : model === "SOPDT"
               ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
               : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
@@ -175,7 +180,10 @@
       const sc = $("send-control");
       if (f.model === "SOPDT") {
         sc.hidden = false;
-        sc.href = `${controlPath()}?wn=${encodeURIComponent(f.wn.toFixed(3))}&zeta=${encodeURIComponent(f.zeta.toFixed(3))}`;
+        sc.href = `${controlPath()}?order=2&wn=${encodeURIComponent(f.wn.toFixed(3))}&zeta=${encodeURIComponent(f.zeta.toFixed(3))}`;
+      } else if (f.model === "FOPDT") {
+        sc.hidden = false;
+        sc.href = `${controlPath()}?order=1&K=${encodeURIComponent(f.K.toFixed(3))}&tau=${encodeURIComponent(f.tau.toFixed(3))}`;
       } else sc.hidden = true;
     } catch (e) {
       state.fit = null;
@@ -264,6 +272,14 @@
           "FIT is low: the model may be insufficient, or unmodeled dynamics/disturbances remain."
         )
       );
+    if (state.data.meta?.closedLoop) {
+      lines.push(
+        T(
+          "闭环数据：普通最小二乘可能有偏，结果只作参考。",
+          "Closed-loop data: ordinary least squares can be biased; treat the result as a reference."
+        )
+      );
+    }
     if (f.model === "ETFE" && state.data.meta?.excitation === "step") {
       lines.push(
         T(
@@ -561,11 +577,19 @@
     $("generate").addEventListener("click", generate);
     $("fit").addEventListener("click", fit);
     $("model").addEventListener("change", () => {
+      $("arx-orders").hidden = $("model").value !== "ARX";
       if ($("model").value === "ETFE") $("excitation").value = "chirp";
       if ($("model").value === "ARX") $("excitation").value = "prbs";
       if ($("model").value === "ETFE" || $("model").value === "ARX") generate();
     });
+    $("arx-orders").hidden = $("model").value !== "ARX";
     renderManual();
+    $("closed-loop").addEventListener("change", () => {
+      if (!state.data) return;
+      state.data.meta.closedLoop = state.source === "csv" && $("closed-loop").checked;
+      state.quality = Q.analyze(state.data);
+      renderQuality();
+    });
     $("split").addEventListener("change", () => {
       const v = Number($("split").value);
       $("split-hint").textContent =
