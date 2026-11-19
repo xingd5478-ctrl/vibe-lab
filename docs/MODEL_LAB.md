@@ -1,6 +1,6 @@
-# Model Lab (V0.8)
+# Model Lab (V0.9)
 
-**Status:** v0.8: SISO FOPDT/SOPDT/ARX/ETFE plus 2×2 MIMO-ARX on virtual or mapped CSV data, validation, bootstrap, ten-chapter manual, first-order Control link and adjustable ARX orders.
+**Status:** v0.9: SISO FOPDT/SOPDT/ARX/ETFE, 2×2/CSV MIMO-ARX, closed-loop 2SLS, and a Hammerstein nonlinear prototype; validation, bootstrap, ten-chapter manual and first-order Control link included.
 
 ## Route
 
@@ -28,12 +28,14 @@
 
 ## Not in V0.1
 
-- closed-loop identification and nonlinear models (out of scope)
+- full nonlinear model families and closed-loop frequency-domain methods (out of scope)
 - full English guide for the remaining course pages
 - FOPDT link to the first-order Control mode
 - adjustable ARX orders (na/nb/nk)
 - virtual 2×2 MIMO-ARX experiment
 - CSV multi-column mapping (time, multiple inputs, multiple outputs)
+- closed-loop PRBS virtual experiment and 2SLS using setpoint r as instrument
+- nonlinear tank and Hammerstein ARX prototype
 - user-configurable ARX orders
 - accounts/cloud sync
 - manual chapters and full English guide

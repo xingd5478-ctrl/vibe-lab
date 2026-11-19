@@ -74,6 +74,9 @@
       fs: Number($("fs").value),
       duration: Number($("duration").value),
       seed: 42,
+      kp: Number($("loop-kp").value) || 1.2,
+      ki: Number($("loop-ki").value) || 0.05,
+      kd: Number($("loop-kd").value) || 0.01,
     };
     try {
       const ex = $("excitation").value;
@@ -82,9 +85,13 @@
           ? P.virtualMimo(opts)
           : ex === "chirp"
             ? P.virtualChirp(opts)
-            : ex === "prbs"
-              ? P.virtualPRBS(opts)
-              : P.virtualStep(opts);
+            : opts.plant === "tank"
+              ? P.virtualTank(opts)
+              : ex === "closed-loop"
+                ? P.virtualClosedLoop(opts)
+                : ex === "prbs"
+                  ? P.virtualPRBS(opts)
+                  : P.virtualStep(opts);
       state.source = "virtual";
       state.fileName = "";
       $("file-name").textContent = "";
@@ -166,15 +173,19 @@
       const nb = Math.max(1, Math.min(6, Number($("arx-nb").value) || 2));
       const nk = Math.max(0, Math.min(5, Number($("arx-nk").value) || 0));
       const f =
-        model === "MIMO-ARX"
-          ? I.fitMIMOARX(state.data.t, state.data.U, state.data.Y, { trainEnd, na, nb, nk })
-          : model === "ETFE"
-            ? I.fitETFE(state.data.t, state.data.u, state.data.y)
-            : model === "ARX"
-              ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
-              : model === "SOPDT"
-                ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
-                : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
+        model === "Hammerstein"
+          ? I.fitHammerstein(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
+          : model === "2SLS-ARX"
+            ? I.fit2SLS(state.data.t, state.data.u, state.data.y, state.data.r, { trainEnd, na, nb, nk })
+            : model === "MIMO-ARX"
+              ? I.fitMIMOARX(state.data.t, state.data.U, state.data.Y, { trainEnd, na, nb, nk })
+              : model === "ETFE"
+                ? I.fitETFE(state.data.t, state.data.u, state.data.y)
+                : model === "ARX"
+                  ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
+                  : model === "SOPDT"
+                    ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
+                    : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
       state.fit = f;
       state.uncertainty = null;
       if (f.model === "ETFE") state.split = 1;
@@ -183,7 +194,7 @@
       renderMetrics();
       renderWarnings();
       $("actions").hidden = false;
-      $("uncertainty").hidden = f.model === "ETFE" || f.model === "MIMO-ARX";
+      $("uncertainty").hidden = ["ETFE", "MIMO-ARX", "2SLS-ARX", "Hammerstein"].includes(f.model);
       $("fit-hint").textContent = T(
         "拟合完成。检查 FIT、残差和参数是否物理合理。",
         "Fit complete. Check FIT, residuals and physical plausibility."
@@ -223,7 +234,17 @@
     };
     add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain != null ? f.fitTrain : f.fit, 1)} %`);
     if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
-    if (f.model === "MIMO-ARX") {
+    if (f.model === "Hammerstein") {
+      add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain, 1)} %`);
+      if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
+      add("c2", fmt(f.c2, 3));
+      add("ARX", `${f.na}/${f.nb}/${f.nk}`);
+    } else if (f.model === "2SLS-ARX") {
+      add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain, 1)} %`);
+      if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
+      add("2SLS", `${f.na}/${f.nb}/${f.nk}`);
+      if (f.fitDirect != null) add(T("直接 LS", "Direct LS"), `${fmt(f.fitDirect, 1)} %`);
+    } else if (f.model === "MIMO-ARX") {
       add(T("FIT y1", "FIT y1"), `${fmt(f.fitOut[0], 1)} %`);
       add(T("FIT y2", "FIT y2"), `${fmt(f.fitOut[1], 1)} %`);
       add("ARX", `${f.na}/${f.nb}/${f.nk}`);
@@ -288,11 +309,34 @@
           "FIT is low: the model may be insufficient, or unmodeled dynamics/disturbances remain."
         )
       );
-    if (state.data.meta?.closedLoop) {
+    if (state.data.meta?.closedLoop && f.model !== "2SLS-ARX") {
       lines.push(
         T(
           "闭环数据：普通最小二乘可能有偏，结果只作参考。",
           "Closed-loop data: ordinary least squares can be biased; treat the result as a reference."
+        )
+      );
+    }
+    if (f.model === "Hammerstein") {
+      if (Math.abs(f.c2) > 0.9)
+        lines.push(
+          T(
+            "c2 接近搜索边界；输入非线性可能不可辨识。",
+            "c2 is near the search bound; the input nonlinearity may not be identifiable."
+          )
+        );
+      lines.push(
+        T(
+          "Hammerstein 只建模静态输入非线性，不是通用非线性辨识。",
+          "Hammerstein models static input nonlinearity only; this is not universal nonlinear identification."
+        )
+      );
+    }
+    if (f.model === "2SLS-ARX") {
+      lines.push(
+        T(
+          "2SLS 用设定值 r 作为工具变量；r 必须独立激励。",
+          "2SLS uses setpoint r as the instrument; r must be independently excited."
         )
       );
     }
@@ -582,8 +626,12 @@
     $("fit-hint").textContent = T("先修复数据，再拟合。", "Fix the data before fitting.");
   }
 
-  function applyColumns(parsed, timeIndex, ins, outs, name) {
+  function applyColumns(parsed, timeIndex, ins, outs, name, refIndex) {
     const d = D.selectColumns(parsed, timeIndex, ins, outs);
+    if (refIndex !== "" && refIndex != null) {
+      const ri = Number(refIndex);
+      if (Number.isInteger(ri) && parsed.meta.columns[ri]) d.r = parsed.meta.columns[ri].slice();
+    }
     d.meta = {
       ...(d.meta || {}),
       units: { u: "", y: "" },
@@ -650,7 +698,7 @@
     const ins = Array.from(document.querySelectorAll("#map-inputs input:checked")).map((x) => x.value);
     const outs = Array.from(document.querySelectorAll("#map-outputs input:checked")).map((x) => x.value);
     try {
-      applyColumns(state.csvParsed, $("map-time").value, ins, outs, state.csvName);
+      applyColumns(state.csvParsed, $("map-time").value, ins, outs, state.csvName, $("map-ref").value);
     } catch (e) {
       $("map-hint").textContent = e.message;
     }
@@ -667,7 +715,7 @@
           state.source = "csv";
           state.fileName = file.name;
           if (d.meta.headers.length > 3) showMapping(d, file.name);
-          else applyColumns(d, d.meta.timeIndex, [d.meta.inputIndex], [d.meta.outputIndex], file.name);
+          else applyColumns(d, d.meta.timeIndex, [d.meta.inputIndex], [d.meta.outputIndex], file.name, null);
         } catch (e) {
           showError(`CSV 解析失败：${e.message}`);
         }
@@ -706,18 +754,34 @@
     $("generate").addEventListener("click", generate);
     $("fit").addEventListener("click", fit);
     $("model").addEventListener("change", () => {
-      $("arx-orders").hidden = $("model").value !== "ARX" && $("model").value !== "MIMO-ARX";
+      $("arx-orders").hidden = !["ARX", "MIMO-ARX", "2SLS-ARX", "Hammerstein"].includes($("model").value);
+      $("loop-params").hidden = $("excitation").value !== "closed-loop";
       if ($("model").value === "MIMO-ARX") {
         $("plant").value = "mimo";
         $("excitation").value = "prbs";
+        generate();
+      }
+      if ($("model").value === "2SLS-ARX") {
+        $("excitation").value = "closed-loop";
+        $("loop-params").hidden = false;
+        generate();
+      }
+      if ($("model").value === "Hammerstein") {
+        $("plant").value = "tank";
+        applyPlantDefaults();
+        $("excitation").value = "step";
         generate();
       }
       if ($("model").value === "ETFE") $("excitation").value = "chirp";
       if ($("model").value === "ARX") $("excitation").value = "prbs";
       if ($("model").value === "ETFE" || $("model").value === "ARX") generate();
     });
-    $("arx-orders").hidden = $("model").value !== "ARX";
+    $("arx-orders").hidden = !["ARX", "MIMO-ARX", "2SLS-ARX", "Hammerstein"].includes($("model").value);
+    $("loop-params").hidden = $("excitation").value !== "closed-loop";
     renderManual();
+    $("excitation").addEventListener("change", () => {
+      $("loop-params").hidden = $("excitation").value !== "closed-loop";
+    });
     $("closed-loop").addEventListener("change", () => {
       if (!state.data) return;
       state.data.meta.closedLoop = state.source === "csv" && $("closed-loop").checked;

@@ -65,6 +65,19 @@
       noise: 0.005,
       prbs: { base: 0.8, amp: 0.6, hold: 10 },
     },
+    tank: {
+      id: "tank",
+      name: "非线性水箱",
+      nameEn: "Nonlinear tank",
+      unitIn: "流量",
+      unitInEn: "flow",
+      unitOut: "液位",
+      unitOutEn: "level",
+      truth: { kind: "NONLINEAR", K: 1, tau: 8, y0: 1, amp: 0.6, uMax: 2 },
+      fs: 5,
+      duration: 120,
+      noise: 0.004,
+    },
   };
 
   function rng(seed) {
@@ -210,6 +223,127 @@
     });
   }
 
+  function virtualTank(opts) {
+    const cfg = PLANTS.tank;
+    const fs = Number(opts.fs) || cfg.fs;
+    const duration = Number(opts.duration) || cfg.duration;
+    const n = Math.max(64, Math.round(duration * fs));
+    const dt = 1 / fs;
+    const r = rng(opts.seed || 42);
+    const noise = Math.max(0, Number(opts.noise) || 0);
+    const u = [],
+      y = [],
+      t = [];
+    let h = cfg.truth.y0;
+    for (let i = 0; i < n; i++) {
+      const ui = i < Math.round(n * 0.2) ? 0.4 : 1.0;
+      t.push(i * dt);
+      u.push(ui);
+      const dh = 0.55 * ui - 0.28 * Math.sqrt(Math.max(0, h));
+      h = Math.max(0, h + dh * dt);
+      y.push(h + (noise ? gauss(r) * noise : 0));
+    }
+    return {
+      t,
+      u,
+      y,
+      plant: "tank",
+      truth: { ...cfg.truth },
+      meta: {
+        units: { u: cfg.unitIn, uEn: cfg.unitInEn, y: cfg.unitOut, yEn: cfg.unitOutEn },
+        uMin: Math.min(...u),
+        uMax: Math.max(...u),
+        closedLoop: false,
+        source: "virtual",
+        excitation: "step",
+        fs,
+        duration,
+        noise,
+      },
+    };
+  }
+
+  function virtualClosedLoop(opts) {
+    const cfg = PLANTS[opts.plant];
+    if (!cfg) throw new Error("Unknown plant");
+    const fs = Number(opts.fs) || cfg.fs;
+    const duration = Number(opts.duration) || cfg.duration;
+    const n = Math.max(64, Math.round(duration * fs));
+    const dt = 1 / fs;
+    const r = [],
+      t = [];
+    const rnd = rng(opts.seed || 42);
+    const y0 = cfg.truth.y0;
+    const ampOut = Math.max(0.1, Math.abs(cfg.truth.K * (opts.amp || cfg.truth.amp)));
+    let hold = 0,
+      level = 0;
+    for (let i = 0; i < n; i++) {
+      t.push(i * dt);
+      if (hold <= 0) {
+        level = rnd() > 0.5 ? ampOut : 0;
+        hold = Math.max(3, Math.round(fs * 2));
+      }
+      hold--;
+      r.push(y0 + level);
+    }
+    const kp = Number(opts.kp ?? 1.2);
+    const ki = Number(opts.ki ?? 0.05);
+    const kd = Number(opts.kd ?? 0.01);
+    const uMin = cfg.id === "spring" ? -cfg.truth.uMax : 0;
+    const uMax = cfg.truth.uMax;
+    const delay = Math.max(0, Math.round((cfg.truth.L || 0) * fs));
+    const u = [],
+      y = [];
+    let x = 0,
+      v = 0,
+      integ = 0,
+      prevE = 0;
+    const uq = [];
+    for (let i = 0; i < n; i++) {
+      const e = r[i] - (y0 + x);
+      integ = Math.max(-20, Math.min(20, integ + e * dt));
+      const de = i ? (e - prevE) / dt : 0;
+      prevE = e;
+      let ui = kp * e + ki * integ + kd * de;
+      ui = Math.max(uMin, Math.min(uMax, ui));
+      u.push(ui);
+      uq.push(ui);
+      const ud = delay > 0 && i >= delay ? uq[i - delay] : delay > 0 ? 0 : ui;
+      if (cfg.truth.kind === "SOPDT") {
+        const acc =
+          cfg.truth.K * cfg.truth.wn * cfg.truth.wn * ud -
+          2 * cfg.truth.zeta * cfg.truth.wn * v -
+          cfg.truth.wn * cfg.truth.wn * x;
+        v += acc * dt;
+        x += v * dt;
+      } else {
+        x += (dt / cfg.truth.tau) * (cfg.truth.K * ud - x);
+      }
+      const noise = Math.max(0, Number(opts.noise) || 0);
+      y.push(y0 + x + (noise ? gauss(rnd) * noise : 0));
+    }
+    return {
+      t,
+      u,
+      y,
+      r,
+      plant: cfg.id,
+      truth: { ...cfg.truth },
+      meta: {
+        units: { u: cfg.unitIn, uEn: cfg.unitInEn, y: cfg.unitOut, yEn: cfg.unitOutEn },
+        uMin,
+        uMax,
+        closedLoop: true,
+        source: "closed-loop",
+        excitation: "closed-loop",
+        controller: { kp, ki, kd },
+        fs,
+        duration,
+        noise: Number(opts.noise) || 0,
+      },
+    };
+  }
+
   function virtualMimo(opts) {
     const cfg = PLANTS.mimo;
     const fs = Number(opts.fs) || cfg.fs;
@@ -350,5 +484,5 @@
     }));
   }
 
-  return { PLANTS, list, virtualStep, virtualChirp, virtualPRBS, virtualMimo };
+  return { PLANTS, list, virtualStep, virtualChirp, virtualPRBS, virtualMimo, virtualClosedLoop, virtualTank };
 });

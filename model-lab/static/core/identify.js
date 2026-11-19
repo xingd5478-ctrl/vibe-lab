@@ -249,6 +249,159 @@
     return v;
   }
 
+  function solveLinear(M, b) {
+    const n = M.length;
+    const A = M.map((row, i) => row.concat([b[i]]));
+    for (let i = 0; i < n; i++) {
+      let pivot = i;
+      for (let k = i + 1; k < n; k++) if (Math.abs(A[k][i]) > Math.abs(A[pivot][i])) pivot = k;
+      [A[i], A[pivot]] = [A[pivot], A[i]];
+      const d = A[i][i] || 1e-12;
+      for (let j = i; j <= n; j++) A[i][j] /= d;
+      for (let k = 0; k < n; k++) {
+        if (k === i) continue;
+        const f = A[k][i];
+        for (let j = i; j <= n; j++) A[k][j] -= f * A[i][j];
+      }
+    }
+    return A.map((row) => row[n]);
+  }
+
+  function fitIVARX(t, u, y, r, opts) {
+    if (!r || r.length !== y.length) throw new Error("IV-ARX needs a setpoint/reference column r.");
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const na = Math.max(1, Math.min(6, (opts && opts.na) || 2));
+    const nb = Math.max(1, Math.min(6, (opts && opts.nb) || 2));
+    const nk = Math.max(0, Math.min(5, opts && opts.nk != null ? opts.nk : 1));
+    const start = Math.max(na, nk + nb - 1);
+    if (start >= trainEnd - 2) throw new Error("Not enough samples for IV-ARX.");
+    const A = [],
+      B = [],
+      Z = [];
+    for (let k = start; k < trainEnd; k++) {
+      const row = [];
+      for (let i = 1; i <= na; i++) row.push(-y[k - i]);
+      for (let i = 0; i < nb; i++) row.push(u[k - nk - i]);
+      A.push(row);
+      B.push(y[k]);
+      const zrow = [];
+      for (let i = 0; i < row.length; i++) zrow.push(r[k - i] || 0);
+      Z.push(zrow);
+    }
+    const p = A[0].length;
+    const M = Array.from({ length: p }, () => new Array(p).fill(0));
+    const v = new Array(p).fill(0);
+    for (let k = 0; k < A.length; k++) {
+      for (let i = 0; i < p; i++) {
+        v[i] += Z[k][i] * B[k];
+        for (let j = 0; j < p; j++) M[i][j] += Z[k][i] * A[k][j];
+      }
+    }
+    for (let i = 0; i < p; i++) M[i][i] += 1e-6;
+    const theta = solveLinear(M, v);
+    const coefA = theta.slice(0, na);
+    const coefB = theta.slice(na);
+    const predict = (begin, end) => {
+      const out = y.slice();
+      for (let k = begin; k < end; k++) {
+        let val = 0;
+        for (let i = 1; i <= na; i++) val -= coefA[i - 1] * out[k - i];
+        for (let i = 0; i < nb; i++) val += coefB[i] * u[k - nk - i];
+        out[k] = val;
+      }
+      return out;
+    };
+    const trainHat = predict(start, trainEnd);
+    const valHat = trainEnd < t.length ? predict(trainEnd, t.length) : y.slice();
+    const yhat = y.map((val, i) => (i < trainEnd ? trainHat[i] : valHat[i]));
+    for (let i = 0; i < start; i++) yhat[i] = y[i];
+    const ft = fitStats(y.slice(start, trainEnd), yhat.slice(start, trainEnd), 2 + na + nb);
+    const fv = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), 2 + na + nb) : null;
+    let direct = null;
+    try {
+      direct = fitARX(t, u, y, { trainEnd, na, nb, nk });
+    } catch (e) {}
+    return {
+      model: "IV-ARX",
+      na,
+      nb,
+      nk,
+      coefA,
+      coefB,
+      yhat,
+      fit: fitStats(y, yhat, 2 + na + nb).fit,
+      fitTrain: ft.fit,
+      fitVal: fv ? fv.fit : null,
+      fitDirect: direct ? direct.fitTrain : null,
+      trainEnd,
+      start,
+    };
+  }
+
+  function fit2SLS(t, u, y, r, opts) {
+    if (!r || r.length !== y.length) throw new Error("2SLS needs a setpoint/reference column r.");
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const na = Math.max(1, Math.min(6, (opts && opts.na) || 2));
+    const nb = Math.max(1, Math.min(6, (opts && opts.nb) || 2));
+    const nk = Math.max(0, Math.min(5, opts && opts.nk != null ? opts.nk : 1));
+    const start = Math.max(na, nk + nb - 1);
+    if (start >= trainEnd - 2) throw new Error("Not enough samples for 2SLS.");
+    const K = Math.max(4, na + nb + 2);
+    const Z = [],
+      U = [];
+    for (let k = start; k < trainEnd; k++) {
+      const z = [1];
+      for (let i = 0; i < K; i++) z.push(r[k - i] || 0);
+      Z.push(z);
+      U.push(u[k]);
+    }
+    const pz = Z[0].length;
+    const M = Array.from({ length: pz }, () => new Array(pz).fill(0));
+    const v = new Array(pz).fill(0);
+    for (let i = 0; i < Z.length; i++) {
+      for (let a = 0; a < pz; a++) {
+        v[a] += Z[i][a] * U[i];
+        for (let b = 0; b < pz; b++) M[a][b] += Z[i][a] * Z[i][b];
+      }
+    }
+    for (let i = 0; i < pz; i++) M[i][i] += 1e-6;
+    const theta = solveLinear(M, v);
+    const uhat = u.slice();
+    for (let k = start; k < trainEnd; k++) {
+      let val = theta[0];
+      for (let i = 0; i < K; i++) val += theta[i + 1] * (r[k - i] || 0);
+      uhat[k] = val;
+    }
+    const fit = fitARX(t, uhat, y, { trainEnd, na, nb, nk });
+    let direct = null;
+    try {
+      direct = fitARX(t, u, y, { trainEnd, na, nb, nk });
+    } catch (e) {}
+    return { ...fit, model: "2SLS-ARX", uhat, fitDirect: direct ? direct.fitTrain : null };
+  }
+
+  function fitHammerstein(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const na = Math.max(1, Math.min(4, (opts && opts.na) || 1));
+    const nb = Math.max(1, Math.min(4, (opts && opts.nb) || 1));
+    const nk = Math.max(0, Math.min(3, opts && opts.nk != null ? opts.nk : 1));
+    let best = null;
+    for (let c2 = -1; c2 <= 1.0001; c2 += 0.04) {
+      const v = u.map((x) => x + c2 * x * x);
+      let f;
+      try {
+        f = fitARX(t, v, y, { trainEnd, na, nb, nk });
+      } catch (e) {
+        continue;
+      }
+      if (!best || f.fitTrain > best.fitTrain) best = { ...f, c2 };
+    }
+    if (!best) throw new Error("Hammerstein initialization failed.");
+    best.model = "Hammerstein";
+    best.inputPoly = (x) => x + best.c2 * x * x;
+    return best;
+  }
+
   function fitMIMOARX(t, U, Y, opts) {
     const n = t.length;
     const m = U.length;
@@ -621,6 +774,30 @@
   }
 
   function toMatlab(p) {
+    if (p.model === "Hammerstein") {
+      return [
+        "% Hammerstein ARX: v = u + c2*u^2, then ARX(v -> y)",
+        `c2 = ${p.c2.toPrecision(6)};`,
+        `a = [1, ${p.coefA.map((x) => x.toPrecision(6)).join(", ")}];`,
+        `b = [${Array(p.nk)
+          .fill(0)
+          .concat(p.coefB)
+          .map((x) => Number(x).toPrecision(6))
+          .join(", ")}];`,
+      ].join("\n");
+    }
+    if (p.model === "2SLS-ARX" || p.model === "IV-ARX") {
+      return [
+        "% IV-ARX (closed-loop, setpoint instrument)",
+        `a = [1, ${p.coefA.map((x) => x.toPrecision(6)).join(", ")}];`,
+        `b = [${Array(p.nk)
+          .fill(0)
+          .concat(p.coefB)
+          .map((x) => Number(x).toPrecision(6))
+          .join(", ")}];`,
+        'G = tf(b, a, 1, "Variable", "z^-1");',
+      ].join("\n");
+    }
     if (p.model === "MIMO-ARX") {
       const lines = ["% MIMO ARX: y_o(k) = A_o(z^-1) y(k) + B_o(z^-1) u(k), Ts = 1 sample"];
       for (let o = 0; o < p.p; o++) {
@@ -675,6 +852,9 @@
     fitARX,
     fitMIMOARX,
     fitETFE,
+    fitIVARX,
+    fit2SLS,
+    fitHammerstein,
     bootstrap,
     simulate,
     metrics,

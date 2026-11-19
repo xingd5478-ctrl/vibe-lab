@@ -72,6 +72,7 @@
                   <option value="step">阶跃</option>
                   <option value="chirp">正弦扫频 Chirp</option>
                   <option value="prbs">PRBS</option>
+                  <option value="closed-loop">闭环 PRBS（PID）</option>
                 </select>
               </label>
               <div class="field-row">
@@ -104,6 +105,7 @@
                 <h3>CSV 列映射</h3>
                 <p class="hint">多输入/多输出请选择列；单输入单输出也可以在这里改。</p>
                 <label class="field">时间列 <select id="map-time"></select></label>
+                <label class="field">参考/设定值 r（可选） <select id="map-ref"><option value="">无</option></select></label>
                 <fieldset class="map-field"><legend>输入列</legend><div id="map-inputs" class="map-list"></div></fieldset>
                 <fieldset class="map-field"><legend>输出列</legend><div id="map-outputs" class="map-list"></div></fieldset>
                 <button class="btn primary wide" id="apply-map" type="button">应用列映射</button>
@@ -120,6 +122,8 @@
                   <option value="ARX">ARX 离散</option>
                   <option value="ETFE">ETFE 频域</option>
                   <option value="MIMO-ARX">MIMO ARX · 2×2</option>
+                  <option value="2SLS-ARX">闭环 2SLS-ARX</option>
+                  <option value="Hammerstein">Hammerstein 非线性</option>
                 </select>
               </label>
               <div id="arx-orders" hidden>
@@ -128,6 +132,14 @@
                   <label class="field">nb <input id="arx-nb" type="number" min="1" max="6" step="1" value="2" /></label>
                 </div>
                 <label class="field">延迟 nk <input id="arx-nk" type="number" min="0" max="5" step="1" value="1" /></label>
+                <div id="loop-params" hidden>
+                  <p class="hint">闭环控制器（已知，用于 2SLS 参考）</p>
+                  <div class="field-row">
+                    <label class="field">Kp <input id="loop-kp" type="number" min="0" max="20" step="0.1" value="1.2" /></label>
+                    <label class="field">Ki <input id="loop-ki" type="number" min="0" max="20" step="0.01" value="0.05" /></label>
+                  </div>
+                  <label class="field">Kd <input id="loop-kd" type="number" min="0" max="20" step="0.01" value="0.01" /></label>
+                </div>
               </div>
               <label class="field">训练 / 验证
                 <select id="split">
@@ -193,7 +205,7 @@
         </div>
       </section>
 
-      <p class="hint scope">V0.7 边界：MIMO 支持 2×2 虚拟对象和 CSV 多列映射；闭环数据只警告，非线性未实现。</p>
+      <p class="hint scope">V0.9 边界：闭环 2SLS、MIMO CSV、Hammerstein 非线性原型；完整非线性/闭环频域仍未实现。</p>
 
       <section class="manual" id="manual">
         <div class="section-head"><h2>手册 · 十章</h2><span>十章：从数据、模型，到验证和控制器。</span></div>

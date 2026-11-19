@@ -23,11 +23,11 @@ window.MODEL_MANUAL = {
     },
     {
       title: "6. 闭环数据与坏数据",
-      body: "如果输入 u 是控制器算出来的，u 和噪声相关，普通最小二乘会有偏。闭环辨识需要额外激励或专门方法；第一版 Model Lab 只支持开环。输入饱和、时间倒错、缺失、噪声过大，都会让模型看起来很好但不可信。",
+      body: "如果输入 u 是控制器算出来的，u 和噪声相关，普通最小二乘会有偏。闭环辨识需要额外激励或专门方法；Model Lab 现在提供闭环 PRBS 虚拟实验和 2SLS（用设定值 r 作工具变量）。输入饱和、时间倒错、缺失、噪声过大，都会让模型看起来很好但不可信。",
     },
     {
       title: "7. ARX 离散模型",
-      body: "ARX 用差分方程描述输入输出：y[k] 由过去的 y 和 u 决定。它用最小二乘估系数，适合数字控制和 MPC。需要选择 na、nb、nk，并用验证集、残差和稳定性检查。只有阶跃输入时，ARX 的信息不足，结果只能当参考。",
+      body: "ARX 用差分方程描述输入输出：y[k] 由过去的 y 和 u 决定。它用最小二乘估系数，适合数字控制和 MPC。需要选择 na、nb、nk，并用验证集、残差和稳定性检查。只有阶跃输入时，ARX 的信息不足，结果只能当参考。ARX 的扩展 Hammerstein 会在输入端加一个静态多项式，用来起步处理非线性。",
     },
     {
       title: "8. ETFE 频域响应",
@@ -65,11 +65,11 @@ window.MODEL_MANUAL = {
     },
     {
       title: "6. Closed-loop and bad data",
-      body: "If u is computed by a controller, u is correlated with noise and ordinary least squares is biased. Closed-loop identification needs extra excitation or dedicated methods; Model Lab v0.3 supports open loop only. Saturation, reversed time, missing rows or too much noise can make a model look good but be untrustworthy.",
+      body: "If u is computed by a controller, u is correlated with noise and ordinary least squares is biased. Closed-loop identification needs extra excitation or dedicated methods; Model Lab now provides a closed-loop PRBS experiment and 2SLS using setpoint r as the instrument. Saturation, reversed time, missing rows or too much noise can make a model look good but be untrustworthy.",
     },
     {
       title: "7. ARX discrete models",
-      body: "ARX describes the plant with a difference equation: y[k] depends on past y and u. It estimates coefficients by least squares and suits digital control and MPC. Choose na, nb, nk and check validation, residuals and stability. A step-only input is not informative enough; treat the result as a reference.",
+      body: "ARX describes the plant with a difference equation: y[k] depends on past y and u. It estimates coefficients by least squares and suits digital control and MPC. Choose na, nb, nk and check validation, residuals and stability. A step-only input is not informative enough; treat the result as a reference. The Hammerstein extension adds a static input polynomial as a first step toward nonlinearity.",
     },
     {
       title: "8. ETFE frequency response",

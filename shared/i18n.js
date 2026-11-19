@@ -244,6 +244,19 @@
     "选择时间列、输入列和输出列，然后应用。": "Pick time, inputs and outputs, then apply.",
     "V0.7 边界：MIMO 支持 2×2 虚拟对象和 CSV 多列映射；闭环数据只警告，非线性未实现。":
       "V0.7 scope: MIMO supports the 2×2 virtual plant and CSV multi-column mapping; closed-loop data gets a warning; nonlinear models are not implemented.",
+    "闭环 PRBS（PID）": "Closed-loop PRBS (PID)",
+    "参考/设定值 r（可选）": "Reference/setpoint r (optional)",
+    无: "none",
+    "闭环 2SLS-ARX": "Closed-loop 2SLS-ARX",
+    "直接 LS": "Direct LS",
+    "闭环控制器（已知，用于 2SLS 参考）": "Closed-loop controller (known, for 2SLS reference)",
+    "2SLS 用设定值 r 作为工具变量；r 必须独立激励。":
+      "2SLS uses setpoint r as the instrument; r must be independently excited.",
+    "V0.8 边界：支持闭环 PRBS + 2SLS；MIMO 支持 2×2/CSV 多列；非线性未实现。":
+      "V0.8 scope: closed-loop PRBS + 2SLS supported; MIMO supports 2×2/CSV mapping; nonlinear models are not implemented.",
+    "Hammerstein 非线性": "Hammerstein nonlinear",
+    "V0.9 边界：闭环 2SLS、MIMO CSV、Hammerstein 非线性原型；完整非线性/闭环频域仍未实现。":
+      "V0.9 scope: closed-loop 2SLS, CSV MIMO and a Hammerstein nonlinear prototype; full nonlinear/closed-loop frequency methods are not implemented.",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

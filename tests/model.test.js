@@ -116,6 +116,31 @@ test("MIMO ARX identifies a 2x2 plant", () => {
   assert.match(I.toMatlab(f), /MIMO ARX/);
 });
 
+test("Hammerstein recovers a static input nonlinearity", () => {
+  const t = [],
+    u = [],
+    y = [];
+  let yy = 0;
+  for (let k = 0; k < 300; k++) {
+    const uk = k > 20 ? 1 : 0;
+    const vk = uk + 0.5 * uk * uk;
+    yy = k ? 0.7 * yy + 0.3 * vk : 0;
+    t.push(k * 0.1);
+    u.push(uk);
+    y.push(yy);
+  }
+  const f = I.fitHammerstein(t, u, y, { trainEnd: 210, na: 1, nb: 1, nk: 1 });
+  near(f.c2, 0.5, 0.08);
+  assert.ok(f.fitTrain > 80, `fit ${f.fitTrain}`);
+});
+
+test("2SLS uses the setpoint instrument on closed-loop data", () => {
+  const d = P.virtualClosedLoop({ plant: "motor", noise: 0.01, seed: 4 });
+  const f = I.fit2SLS(d.t, d.u, d.y, d.r, { trainEnd: Math.floor(d.t.length * 0.7), na: 1, nb: 1, nk: 1 });
+  assert.equal(f.model, "2SLS-ARX");
+  assert.ok(Number.isFinite(f.fitTrain));
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

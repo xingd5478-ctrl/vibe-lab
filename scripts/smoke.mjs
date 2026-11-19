@@ -306,6 +306,24 @@ async function main() {
       await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("MIMO"), 15000);
     });
 
+    await check("model-2sls", httpUrl(base, "model-lab/static/index.html"), async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('#metrics .metric').length")) >= 4, 12000);
+      await e(
+        "document.querySelector('#model').value = '2SLS-ARX'; document.querySelector('#model').dispatchEvent(new Event('change'))"
+      );
+      await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("2SLS"), 15000);
+      if (!(await e("!!document.querySelector('#loop-params') && !document.querySelector('#loop-params').hidden")))
+        throw new Error("model: loop params");
+    });
+
+    await check("model-hammer", httpUrl(base, "model-lab/static/index.html"), async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('#metrics .metric').length")) >= 4, 12000);
+      await e(
+        "document.querySelector('#model').value = 'Hammerstein'; document.querySelector('#model').dispatchEvent(new Event('change'))"
+      );
+      await waitFor(async () => (await e("document.querySelector('#metrics').textContent")).includes("c2"), 15000);
+    });
+
     await check("simulink", httpUrl(base, "simulink/index.html"), async (e) => {
       await waitFor(async () => (await e("document.querySelectorAll('#phases .phase-link').length")) === 8, 15000);
       await waitFor(() => e("!!document.querySelector('#chart-a svg')"));
