@@ -405,6 +405,68 @@
     });
   }
 
+  const QUIZ = [
+    {
+      q: "一阶系统阶跃响应达到 63.2% 的时间 approximately 是？",
+      a: 1,
+      opts: ["峰值时间", "时间常数 τ", "调节时间", "延迟 L"],
+      why: "一阶系统在 t=τ 达到 63.2%。",
+    },
+    {
+      q: "增大比例增益 Kp 通常会？",
+      a: 2,
+      opts: ["消除稳态误差", "降低超调", "加快响应但增大超调", "不影响稳定性"],
+      why: "Kp 加快响应，但过大导致超调和振荡。",
+    },
+    {
+      q: "积分作用的主要作用是？",
+      a: 0,
+      opts: ["消除稳态误差", "增加相位裕度", "降低噪声", "缩短采样周期"],
+      why: "积分累积误差，最终消除常值稳态误差。",
+    },
+    {
+      q: "采样周期变小通常会？",
+      a: 1,
+      opts: ["让系统更接近连续设计", "必然降低超调", "消除延迟", "不需要抗混叠"],
+      why: "采样更快更接近连续，但成本和噪声处理不同。",
+    },
+    {
+      q: "相位裕度很小通常意味着？",
+      a: 3,
+      opts: ["系统很稳定", "响应很慢", "没有稳态误差", "闭环容易振荡"],
+      why: "相位裕度小，闭环阻尼弱，容易振荡。",
+    },
+  ];
+
+  function renderQuiz() {
+    const box = $("quiz-body");
+    if (!box) return;
+    QUIZ.forEach((item, i) => {
+      const d = el("div", "q");
+      d.appendChild(el("p", "", i + 1 + ". " + item.q));
+      item.opts.forEach((opt, j) => {
+        const lab = el("label", "");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "quiz-" + i;
+        input.value = String(j);
+        lab.appendChild(input);
+        lab.appendChild(document.createTextNode(" " + opt));
+        d.appendChild(lab);
+      });
+      box.appendChild(d);
+    });
+    $("quiz-check").addEventListener("click", () => {
+      let score = 0;
+      QUIZ.forEach((item, i) => {
+        const sel = document.querySelector('input[name="quiz-' + i + '"]:checked');
+        if (sel && Number(sel.value) === item.a) score++;
+      });
+      $("quiz-result").textContent =
+        `得分 ${score} / ${QUIZ.length}。${score === QUIZ.length ? "全对。" : "回到对应章节再看一遍。"}`;
+    });
+  }
+
   $("random-lesson").addEventListener("click", () => {
     const pool = lessons.filter((l) => !read.has(l.id));
     const pick = (pool.length ? pool : lessons)[Math.floor(Math.random() * (pool.length || lessons.length))];
@@ -418,6 +480,7 @@
   });
 
   buildList();
+  renderQuiz();
   updateProgress();
   const initial = new URLSearchParams(location.search).get("id") || location.hash.replace(/^#/, "") || "t01";
   load(initial);

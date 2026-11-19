@@ -349,3 +349,10 @@ code { font-family: var(--mono); font-size: 0.92em; background: var(--code-bg); 
 @media (prefers-color-scheme: dark) { .continue { color: #8db3d8; } }
 
 .random-lesson { width: 100%; margin-top: 6px; padding: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); cursor: pointer; border-radius: 2px; font: 11px var(--mono); }
+
+.quiz { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+.quiz summary { cursor: pointer; font-weight: 600; font-size: 13px; }
+.quiz .q { margin: 12px 0; font-size: 12px; }
+.quiz .q p { margin: 0 0 5px; }
+.quiz .q label { display: block; color: var(--muted); font-size: 11px; margin: 3px 0; }
+.quiz button { padding: 7px 12px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; border-radius: 2px; }
