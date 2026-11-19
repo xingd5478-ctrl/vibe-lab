@@ -27,7 +27,7 @@ window.MODEL_MANUAL = {
     },
     {
       title: "7. ARX 离散模型",
-      body: "ARX 用差分方程描述输入输出：y[k] 由过去的 y 和 u 决定。它用最小二乘估系数，适合数字控制和 MPC。需要选择 na、nb、nk，并用验证集、残差和稳定性检查。只有阶跃输入时，ARX 的信息不足，结果只能当参考。ARX 的扩展 Hammerstein 会在输入端加一个静态多项式，用来起步处理非线性。",
+      body: "ARX 用差分方程描述输入输出：y[k] 由过去的 y 和 u 决定。它用最小二乘估系数，适合数字控制和 MPC。需要选择 na、nb、nk，并用验证集、残差和稳定性检查。只有阶跃输入时，ARX 的信息不足，结果只能当参考。ARX 之外还有 FIR（脉冲响应）、OE（输出误差）、ARMAX（噪声模型）和 Wiener（输出非线性）；Hammerstein 则在输入端加静态多项式。它们各有适用条件，不能只看训练 FIT。",
     },
     {
       title: "8. ETFE 频域响应",
@@ -69,7 +69,7 @@ window.MODEL_MANUAL = {
     },
     {
       title: "7. ARX discrete models",
-      body: "ARX describes the plant with a difference equation: y[k] depends on past y and u. It estimates coefficients by least squares and suits digital control and MPC. Choose na, nb, nk and check validation, residuals and stability. A step-only input is not informative enough; treat the result as a reference. The Hammerstein extension adds a static input polynomial as a first step toward nonlinearity.",
+      body: "ARX describes the plant with a difference equation: y[k] depends on past y and u. It estimates coefficients by least squares and suits digital control and MPC. Choose na, nb, nk and check validation, residuals and stability. A step-only input is not informative enough; treat the result as a reference. Beyond ARX there are FIR (impulse response), OE (output error), ARMAX (noise model) and Wiener (output nonlinearity); Hammerstein adds a static input polynomial. Each has assumptions; do not judge by training FIT alone.",
     },
     {
       title: "8. ETFE frequency response",

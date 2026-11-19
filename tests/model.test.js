@@ -141,6 +141,28 @@ test("2SLS uses the setpoint instrument on closed-loop data", () => {
   assert.ok(Number.isFinite(f.fitTrain));
 });
 
+test("FIR/OE/ARMAX/Wiener fit common time-domain models", () => {
+  const t = [],
+    u = [],
+    y = [];
+  let yy = 0;
+  for (let k = 0; k < 300; k++) {
+    const uk = k > 20 ? 1 : 0;
+    yy = k ? 0.7 * yy + 0.3 * uk : 0;
+    t.push(k * 0.1);
+    u.push(uk);
+    y.push(yy);
+  }
+  const fir = I.fitFIR(t, u, y, { trainEnd: 210, nh: 10 });
+  const oe = I.fitOE(t, u, y, { trainEnd: 210, na: 1, nb: 1, nk: 1 });
+  const armax = I.fitARMAX(t, u, y, { trainEnd: 210, na: 1, nb: 1, nc: 1, nk: 1 });
+  const wiener = I.fitWiener(t, u, y, { trainEnd: 210, na: 1, nb: 1, nk: 1 });
+  assert.ok(fir.fitTrain > 95, `FIR ${fir.fitTrain}`);
+  assert.ok(oe.fitTrain > 80, `OE ${oe.fitTrain}`);
+  assert.ok(armax.fitTrain > 80, `ARMAX ${armax.fitTrain}`);
+  assert.ok(wiener.fitTrain > 80, `Wiener ${wiener.fitTrain}`);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

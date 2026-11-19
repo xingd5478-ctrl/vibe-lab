@@ -1,6 +1,6 @@
-# Model Lab (V0.9)
+# Model Lab (V1.0)
 
-**Status:** v0.9: SISO FOPDT/SOPDT/ARX/ETFE, 2×2/CSV MIMO-ARX, closed-loop 2SLS, and a Hammerstein nonlinear prototype; validation, bootstrap, ten-chapter manual and first-order Control link included.
+**Status:** v1.0 model suite: FOPDT/SOPDT/FIR/ARX/ARMAX/OE/ETFE/Wiener, 2×2/CSV MIMO-ARX, closed-loop 2SLS, Hammerstein prototype, validation, bootstrap and ten-chapter manual.
 
 ## Route
 
@@ -36,6 +36,7 @@
 - CSV multi-column mapping (time, multiple inputs, multiple outputs)
 - closed-loop PRBS virtual experiment and 2SLS using setpoint r as instrument
 - nonlinear tank and Hammerstein ARX prototype
+- FIR, OE, ARMAX and Wiener time-domain models
 - user-configurable ARX orders
 - accounts/cloud sync
 - manual chapters and full English guide

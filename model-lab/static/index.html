@@ -42,7 +42,7 @@
         </div>
         <ul class="proof" aria-label="Model Lab 能力">
           <li><b>3</b> 个虚拟对象</li>
-          <li><b>5</b> 种模型</li>
+          <li><b>9</b> 种模型</li>
           <li><b>0</b> 上传</li>
           <li><b>MIT</b> 源码</li>
         </ul>
@@ -124,6 +124,10 @@
                   <option value="MIMO-ARX">MIMO ARX · 2×2</option>
                   <option value="2SLS-ARX">闭环 2SLS-ARX</option>
                   <option value="Hammerstein">Hammerstein 非线性</option>
+                  <option value="FIR">FIR 脉冲响应</option>
+                  <option value="OE">OE 输出误差</option>
+                  <option value="ARMAX">ARMAX</option>
+                  <option value="Wiener">Wiener 非线性</option>
                 </select>
               </label>
               <div id="arx-orders" hidden>
@@ -132,6 +136,7 @@
                   <label class="field">nb <input id="arx-nb" type="number" min="1" max="6" step="1" value="2" /></label>
                 </div>
                 <label class="field">延迟 nk <input id="arx-nk" type="number" min="0" max="5" step="1" value="1" /></label>
+                <label class="field" id="nc-field" hidden>噪声阶次 nc <input id="arx-nc" type="number" min="1" max="4" step="1" value="1" /></label>
                 <div id="loop-params" hidden>
                   <p class="hint">闭环控制器（已知，用于 2SLS 参考）</p>
                   <div class="field-row">
@@ -205,7 +210,7 @@
         </div>
       </section>
 
-      <p class="hint scope">V0.9 边界：闭环 2SLS、MIMO CSV、Hammerstein 非线性原型；完整非线性/闭环频域仍未实现。</p>
+      <p class="hint scope">V1.0 边界：FOPDT/SOPDT/FIR/ARX/ARMAX/OE/ETFE/Wiener/MIMO/2SLS；完整非线性模型族与闭环频域仍未实现。</p>
 
       <section class="manual" id="manual">
         <div class="section-head"><h2>手册 · 十章</h2><span>十章：从数据、模型，到验证和控制器。</span></div>

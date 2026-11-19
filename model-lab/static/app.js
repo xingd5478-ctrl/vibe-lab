@@ -172,20 +172,29 @@
       const na = Math.max(1, Math.min(6, Number($("arx-na").value) || 2));
       const nb = Math.max(1, Math.min(6, Number($("arx-nb").value) || 2));
       const nk = Math.max(0, Math.min(5, Number($("arx-nk").value) || 0));
+      const nc = Math.max(1, Math.min(4, Number($("arx-nc").value) || 1));
       const f =
-        model === "Hammerstein"
-          ? I.fitHammerstein(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
-          : model === "2SLS-ARX"
-            ? I.fit2SLS(state.data.t, state.data.u, state.data.y, state.data.r, { trainEnd, na, nb, nk })
-            : model === "MIMO-ARX"
-              ? I.fitMIMOARX(state.data.t, state.data.U, state.data.Y, { trainEnd, na, nb, nk })
-              : model === "ETFE"
-                ? I.fitETFE(state.data.t, state.data.u, state.data.y)
-                : model === "ARX"
-                  ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
-                  : model === "SOPDT"
-                    ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
-                    : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
+        model === "FIR"
+          ? I.fitFIR(state.data.t, state.data.u, state.data.y, { trainEnd, nh: 20 })
+          : model === "OE"
+            ? I.fitOE(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
+            : model === "ARMAX"
+              ? I.fitARMAX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nc, nk })
+              : model === "Wiener"
+                ? I.fitWiener(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
+                : model === "Hammerstein"
+                  ? I.fitHammerstein(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
+                  : model === "2SLS-ARX"
+                    ? I.fit2SLS(state.data.t, state.data.u, state.data.y, state.data.r, { trainEnd, na, nb, nk })
+                    : model === "MIMO-ARX"
+                      ? I.fitMIMOARX(state.data.t, state.data.U, state.data.Y, { trainEnd, na, nb, nk })
+                      : model === "ETFE"
+                        ? I.fitETFE(state.data.t, state.data.u, state.data.y)
+                        : model === "ARX"
+                          ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
+                          : model === "SOPDT"
+                            ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
+                            : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
       state.fit = f;
       state.uncertainty = null;
       if (f.model === "ETFE") state.split = 1;
@@ -194,7 +203,16 @@
       renderMetrics();
       renderWarnings();
       $("actions").hidden = false;
-      $("uncertainty").hidden = ["ETFE", "MIMO-ARX", "2SLS-ARX", "Hammerstein"].includes(f.model);
+      $("uncertainty").hidden = [
+        "ETFE",
+        "MIMO-ARX",
+        "2SLS-ARX",
+        "Hammerstein",
+        "FIR",
+        "OE",
+        "ARMAX",
+        "Wiener",
+      ].includes(f.model);
       $("fit-hint").textContent = T(
         "拟合完成。检查 FIT、残差和参数是否物理合理。",
         "Fit complete. Check FIT, residuals and physical plausibility."
@@ -234,14 +252,15 @@
     };
     add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain != null ? f.fitTrain : f.fit, 1)} %`);
     if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
-    if (f.model === "Hammerstein") {
-      add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain, 1)} %`);
-      if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
+    if (["FIR", "OE", "ARMAX", "Wiener"].includes(f.model)) {
+      if (f.model === "FIR") add("nh", String(f.nh));
+      else if (f.model === "ARMAX") add("ARMAX", `${f.na}/${f.nb}/${f.nc}/${f.nk}`);
+      else if (f.model === "Wiener") add("c2", fmt(f.c2, 3));
+      else add(f.model, `${f.na}/${f.nb}/${f.nk}`);
+    } else if (f.model === "Hammerstein") {
       add("c2", fmt(f.c2, 3));
       add("ARX", `${f.na}/${f.nb}/${f.nk}`);
     } else if (f.model === "2SLS-ARX") {
-      add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain, 1)} %`);
-      if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
       add("2SLS", `${f.na}/${f.nb}/${f.nk}`);
       if (f.fitDirect != null) add(T("直接 LS", "Direct LS"), `${fmt(f.fitDirect, 1)} %`);
     } else if (f.model === "MIMO-ARX") {
@@ -314,6 +333,14 @@
         T(
           "闭环数据：普通最小二乘可能有偏，结果只作参考。",
           "Closed-loop data: ordinary least squares can be biased; treat the result as a reference."
+        )
+      );
+    }
+    if (["FIR", "OE", "ARMAX", "Wiener"].includes(f.model)) {
+      lines.push(
+        T(
+          "这是时间域模型；验证集很差时不要用它外推。",
+          "Time-domain model; do not extrapolate when validation FIT is poor."
         )
       );
     }
@@ -754,7 +781,10 @@
     $("generate").addEventListener("click", generate);
     $("fit").addEventListener("click", fit);
     $("model").addEventListener("change", () => {
-      $("arx-orders").hidden = !["ARX", "MIMO-ARX", "2SLS-ARX", "Hammerstein"].includes($("model").value);
+      $("arx-orders").hidden = !["ARX", "MIMO-ARX", "2SLS-ARX", "Hammerstein", "OE", "ARMAX", "Wiener"].includes(
+        $("model").value
+      );
+      $("nc-field").hidden = $("model").value !== "ARMAX";
       $("loop-params").hidden = $("excitation").value !== "closed-loop";
       if ($("model").value === "MIMO-ARX") {
         $("plant").value = "mimo";

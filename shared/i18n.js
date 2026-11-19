@@ -257,6 +257,12 @@
     "Hammerstein 非线性": "Hammerstein nonlinear",
     "V0.9 边界：闭环 2SLS、MIMO CSV、Hammerstein 非线性原型；完整非线性/闭环频域仍未实现。":
       "V0.9 scope: closed-loop 2SLS, CSV MIMO and a Hammerstein nonlinear prototype; full nonlinear/closed-loop frequency methods are not implemented.",
+    "FIR 脉冲响应": "FIR impulse response",
+    "OE 输出误差": "OE output error",
+    "Wiener 非线性": "Wiener nonlinear",
+    "噪声阶次 nc": "Noise order nc",
+    "V1.0 边界：FOPDT/SOPDT/FIR/ARX/ARMAX/OE/ETFE/Wiener/MIMO/2SLS；完整非线性模型族与闭环频域仍未实现。":
+      "V1.0 scope: FOPDT/SOPDT/FIR/ARX/ARMAX/OE/ETFE/Wiener/MIMO/2SLS; full nonlinear families and closed-loop frequency methods are not implemented.",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

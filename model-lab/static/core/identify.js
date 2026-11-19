@@ -402,6 +402,227 @@
     return best;
   }
 
+  function nelderMead(fn, x0, opts) {
+    const n = x0.length;
+    const maxIter = (opts && opts.maxIter) || 220;
+    const step = (opts && opts.step) || 0.1;
+    let simplex = [x0.slice()];
+    for (let i = 0; i < n; i++) {
+      const x = x0.slice();
+      x[i] += (Math.abs(x[i]) || 1) * step;
+      simplex.push(x);
+    }
+    const score = (x) => {
+      try {
+        const v = fn(x);
+        return Number.isFinite(v) ? v : 1e12;
+      } catch (e) {
+        return 1e12;
+      }
+    };
+    let vals = simplex.map(score);
+    for (let iter = 0; iter < maxIter; iter++) {
+      const order = vals.map((v, i) => i).sort((a, b) => vals[a] - vals[b]);
+      simplex = order.map((i) => simplex[i]);
+      vals = order.map((i) => vals[i]);
+      if (Math.abs(vals[n] - vals[0]) < 1e-9) break;
+      const centroid = new Array(n).fill(0);
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) centroid[j] += simplex[i][j] / n;
+      const reflect = centroid.map((c, j) => c + (c - simplex[n][j]));
+      const fr = score(reflect);
+      if (fr < vals[0]) {
+        const expand = centroid.map((c, j) => c + 2 * (c - simplex[n][j]));
+        const fe = score(expand);
+        if (fe < fr) {
+          simplex[n] = expand;
+          vals[n] = fe;
+        } else {
+          simplex[n] = reflect;
+          vals[n] = fr;
+        }
+      } else if (fr < vals[n - 1]) {
+        simplex[n] = reflect;
+        vals[n] = fr;
+      } else {
+        const contract = centroid.map((c, j) => c + 0.5 * (simplex[n][j] - c));
+        const fc = score(contract);
+        if (fc < vals[n]) {
+          simplex[n] = contract;
+          vals[n] = fc;
+        } else {
+          for (let i = 1; i <= n; i++) {
+            simplex[i] = simplex[i].map((v, j) => simplex[0][j] + 0.5 * (v - simplex[0][j]));
+            vals[i] = score(simplex[i]);
+          }
+        }
+      }
+    }
+    const best = vals.indexOf(Math.min(...vals));
+    return simplex[best];
+  }
+
+  function fitFIR(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const nh = Math.max(2, Math.min(60, (opts && opts.nh) || 20));
+    const start = nh;
+    if (start >= trainEnd - 2) throw new Error("Not enough samples for FIR.");
+    const A = [],
+      B = [];
+    for (let k = start; k < trainEnd; k++) {
+      const row = [1];
+      for (let i = 0; i < nh; i++) row.push(u[k - i]);
+      A.push(row);
+      B.push(y[k]);
+    }
+    const theta = qrSolve(A, B);
+    const predict = (begin, end) => {
+      const out = y.slice();
+      for (let k = begin; k < end; k++) {
+        let v = theta[0];
+        for (let i = 0; i < nh; i++) v += theta[i + 1] * u[k - i];
+        out[k] = v;
+      }
+      return out;
+    };
+    const yhat = predict(start, t.length);
+    for (let i = 0; i < start; i++) yhat[i] = y[i];
+    const ft = fitStats(y.slice(start, trainEnd), yhat.slice(start, trainEnd), nh + 1);
+    const fv = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), nh + 1) : null;
+    return {
+      model: "FIR",
+      nh,
+      h: theta.slice(1),
+      bias: theta[0],
+      yhat,
+      fit: fitStats(y, yhat, nh + 1).fit,
+      fitTrain: ft.fit,
+      fitVal: fv ? fv.fit : null,
+      trainEnd,
+      start,
+    };
+  }
+
+  function fitOE(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const na = Math.max(1, Math.min(4, (opts && opts.na) || 2));
+    const nb = Math.max(1, Math.min(4, (opts && opts.nb) || 2));
+    const nk = Math.max(0, Math.min(3, opts && opts.nk != null ? opts.nk : 1));
+    const start = Math.max(na, nk + nb - 1);
+    const initARX = fitARX(t, u, y, { trainEnd, na, nb, nk });
+    const x0 = initARX.coefA.concat(initARX.coefB);
+    const simulate = (theta, end, begin) => {
+      const out = y.slice();
+      for (let k = begin; k < end; k++) {
+        let v = 0;
+        for (let i = 1; i <= na; i++) v -= theta[i - 1] * out[k - i];
+        for (let i = 0; i < nb; i++) v += theta[na + i] * u[k - nk - i];
+        out[k] = v;
+      }
+      return out;
+    };
+    const objective = (theta) => {
+      const out = simulate(theta, trainEnd, start);
+      let e = 0;
+      for (let k = start; k < trainEnd; k++) {
+        const d = y[k] - out[k];
+        e += d * d;
+      }
+      return e;
+    };
+    const theta = nelderMead(objective, x0, { maxIter: 180, step: 0.08 });
+    const yhat = simulate(theta, t.length, start);
+    const ft = fitStats(y.slice(start, trainEnd), yhat.slice(start, trainEnd), na + nb);
+    const fv = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), na + nb) : null;
+    return {
+      model: "OE",
+      na,
+      nb,
+      nk,
+      coefA: theta.slice(0, na),
+      coefB: theta.slice(na),
+      yhat,
+      fit: fitStats(y, yhat, na + nb).fit,
+      fitTrain: ft.fit,
+      fitVal: fv ? fv.fit : null,
+      trainEnd,
+      start,
+    };
+  }
+
+  function fitARMAX(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(8, opts.trainEnd)) : t.length;
+    const na = Math.max(1, Math.min(4, (opts && opts.na) || 1));
+    const nb = Math.max(1, Math.min(4, (opts && opts.nb) || 1));
+    const nc = Math.max(1, Math.min(4, (opts && opts.nc) || 1));
+    const nk = Math.max(0, Math.min(3, opts && opts.nk != null ? opts.nk : 1));
+    const start = Math.max(na, nc, nk + nb - 1);
+    const x0 = new Array(na + nb + nc).fill(0);
+    const predictSeq = (theta, end) => {
+      const out = y.slice(),
+        err = new Array(y.length).fill(0);
+      for (let k = start; k < end; k++) {
+        let v = 0;
+        for (let i = 1; i <= na; i++) v -= theta[i - 1] * y[k - i];
+        for (let i = 0; i < nb; i++) v += theta[na + i] * u[k - nk - i];
+        for (let i = 1; i <= nc; i++) v += theta[na + nb + i - 1] * err[k - i];
+        out[k] = v;
+        err[k] = y[k] - v;
+      }
+      return out;
+    };
+    const objective = (theta) => {
+      const out = predictSeq(theta, trainEnd);
+      let e = 0;
+      for (let k = start; k < trainEnd; k++) {
+        const d = y[k] - out[k];
+        e += d * d;
+      }
+      return e;
+    };
+    const theta = nelderMead(objective, x0, { maxIter: 220, step: 0.15 });
+    const yhat = predictSeq(theta, t.length);
+    const ft = fitStats(y.slice(start, trainEnd), yhat.slice(start, trainEnd), na + nb + nc);
+    const fv = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), na + nb + nc) : null;
+    return {
+      model: "ARMAX",
+      na,
+      nb,
+      nc,
+      nk,
+      coefA: theta.slice(0, na),
+      coefB: theta.slice(na, na + nb),
+      coefC: theta.slice(na + nb),
+      yhat,
+      fit: fitStats(y, yhat, na + nb + nc).fit,
+      fitTrain: ft.fit,
+      fitVal: fv ? fv.fit : null,
+      trainEnd,
+      start,
+    };
+  }
+
+  function fitWiener(t, u, y, opts) {
+    const base = fitARX(t, u, y, opts);
+    const x = base.yhat.slice(base.start, base.trainEnd);
+    const yy = y.slice(base.start, base.trainEnd);
+    const A = x.map((v) => [1, v, v * v]);
+    const c = qrSolve(A, yy);
+    const yhat = base.yhat.map((v) => c[0] + c[1] * v + c[2] * v * v);
+    const ft = fitStats(y.slice(base.start, base.trainEnd), yhat.slice(base.start, base.trainEnd), 4);
+    const fv = base.trainEnd < t.length ? fitStats(y.slice(base.trainEnd), yhat.slice(base.trainEnd), 4) : null;
+    return {
+      ...base,
+      model: "Wiener",
+      c0: c[0],
+      c1: c[1],
+      c2: c[2],
+      yhat,
+      fit: fitStats(y, yhat, 4).fit,
+      fitTrain: ft.fit,
+      fitVal: fv ? fv.fit : null,
+    };
+  }
+
   function fitMIMOARX(t, U, Y, opts) {
     const n = t.length;
     const m = U.length;
@@ -774,6 +995,48 @@
   }
 
   function toMatlab(p) {
+    if (p.model === "FIR") {
+      return [
+        `h = [${p.h.map((x) => x.toPrecision(6)).join(", ")}];`,
+        `bias = ${p.bias.toPrecision(6)};`,
+        "impulse(h);",
+      ].join("\n");
+    }
+    if (p.model === "OE") {
+      return [
+        `a = [1, ${p.coefA.map((x) => x.toPrecision(6)).join(", ")}];`,
+        `b = [${Array(p.nk)
+          .fill(0)
+          .concat(p.coefB)
+          .map((x) => Number(x).toPrecision(6))
+          .join(", ")}];`,
+        "G = tf(b, a, 1);",
+      ].join("\n");
+    }
+    if (p.model === "ARMAX") {
+      return [
+        `a = [1, ${p.coefA.map((x) => x.toPrecision(6)).join(", ")}];`,
+        `b = [${Array(p.nk)
+          .fill(0)
+          .concat(p.coefB)
+          .map((x) => Number(x).toPrecision(6))
+          .join(", ")}];`,
+        `c = [1, ${p.coefC.map((x) => x.toPrecision(6)).join(", ")}];`,
+        'G = tf(b, a, 1, "Variable", "z^-1");',
+      ].join("\n");
+    }
+    if (p.model === "Wiener") {
+      return [
+        "% Wiener: ARX linear part + static output polynomial",
+        `c = [${p.c0.toPrecision(6)}, ${p.c1.toPrecision(6)}, ${p.c2.toPrecision(6)}];`,
+        `a = [1, ${p.coefA.map((x) => x.toPrecision(6)).join(", ")}];`,
+        `b = [${Array(p.nk)
+          .fill(0)
+          .concat(p.coefB)
+          .map((x) => Number(x).toPrecision(6))
+          .join(", ")}];`,
+      ].join("\n");
+    }
     if (p.model === "Hammerstein") {
       return [
         "% Hammerstein ARX: v = u + c2*u^2, then ARX(v -> y)",
@@ -855,6 +1118,10 @@
     fitIVARX,
     fit2SLS,
     fitHammerstein,
+    fitFIR,
+    fitOE,
+    fitARMAX,
+    fitWiener,
     bootstrap,
     simulate,
     metrics,
