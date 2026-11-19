@@ -202,6 +202,14 @@
       add("τ", `${fmt(f.tau, 2)} s`);
     }
     add("L", `${fmt(f.L, 2)} s`);
+    const real = f.model === "SOPDT" ? -f.zeta * f.wn : -1 / f.tau;
+    add(
+      T("极点", "Pole"),
+      f.model === "SOPDT"
+        ? `${fmt(real, 2)} ± j${fmt(f.wn * Math.sqrt(Math.max(0, 1 - f.zeta * f.zeta)), 2)}`
+        : fmt(real, 2)
+    );
+    add(T("稳定", "Stable"), real < 0 ? T("是", "yes") : T("否", "no"));
     if (state.source === "virtual" && d.truth) {
       const t = d.truth;
       const truth =
