@@ -116,9 +116,22 @@
     const fv = fit.fitVal;
     add("simulation", ft >= 80 ? "ok" : ft >= 50 ? "warn" : "fail", `simulation FIT ${ft.toFixed(1)}%`, ft);
     if (fv != null) {
-      add("validation", fv >= 80 ? "ok" : fv >= 50 ? "warn" : "fail", `validation FIT ${fv.toFixed(1)}%`, fv);
-      const gap = ft - fv;
-      add("gap", gap <= 15 ? "ok" : gap <= 30 ? "warn" : "fail", `train/validation gap ${gap.toFixed(1)} points`, gap);
+      const valStart = fit.trainEnd != null ? fit.trainEnd : Math.floor(n * 0.7);
+      const valY = y.slice(valStart);
+      const vSpan = valY.length ? Math.max(...valY) - Math.min(...valY) : 0;
+      const fullSpan = y.length ? Math.max(...y) - Math.min(...y) : 0;
+      if (vSpan < Math.max(1e-9, fullSpan * 0.01)) {
+        add("validation", "warn", "validation segment is nearly flat; collect dynamic data", vSpan);
+      } else {
+        add("validation", fv >= 80 ? "ok" : fv >= 50 ? "warn" : "fail", `validation FIT ${fv.toFixed(1)}%`, fv);
+        const gap = ft - fv;
+        add(
+          "gap",
+          gap <= 15 ? "ok" : gap <= 30 ? "warn" : "fail",
+          `train/validation gap ${gap.toFixed(1)} points`,
+          gap
+        );
+      }
     }
     add("bias", Math.abs(m) <= Math.max(0.02, 0.1 * (sd || 1)) ? "ok" : "warn", `residual mean ${m.toPrecision(3)}`, m);
     add(
