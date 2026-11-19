@@ -137,6 +137,7 @@ async function main() {
       ["imu", "imu-lab/static/index.html", "!!document.querySelector('#chart-time svg')"],
       ["control", "control-play/index.html", "!!document.querySelector('#bode svg')"],
       ["simulink", "simulink/index.html", "!!document.querySelector('#chart-a svg')"],
+      ["model", "model-lab/static/index.html", "document.querySelectorAll('#metrics .metric').length >= 4"],
       ["about", "about/index.html", "!!document.querySelector('h1')"],
       ["matlab", "about/matlab.html", "document.querySelectorAll('#matlab-rows tr').length === 43"],
     ];

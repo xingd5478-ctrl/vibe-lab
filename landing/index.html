@@ -31,6 +31,7 @@
     <nav class="topnav" aria-label="全站导航">
       <a href="./" aria-current="page">首页</a>
       <a href="imu/">IMU</a>
+      <a href="model/">Model</a>
       <a href="control/">Control</a>
       <a href="simulink/">Simulink</a>
       <a href="about/">方法</a>
@@ -40,8 +41,8 @@
       <div class="hero-copy">
         <div class="kicker">vibe-lab / sensors &amp; control</div>
         <h1>把传感器噪声、控制曲线和 43 课 Simulink，<span class="accent">拖一遍</span>。</h1>
-        <p class="sub">三个零依赖的浏览器工具：把 MEMS 陀螺仪数据拆成 Allan 方差与 R/Q；把二阶系统与 PID 调参变成可拖动的曲线；
-        再用同一套控制数学复现 43 课 Simulink 教程的核心内容。全部本地计算，不上传数据。</p>
+        <p class="sub">四个零依赖的浏览器工具：把 MEMS 陀螺仪数据拆成 Allan 方差与 R/Q；把二阶系统与 PID 调参变成可拖动的曲线；
+        用一段阶跃数据估出一阶/二阶模型；再用同一套控制数学复现 43 课 Simulink 教程的核心内容。全部本地计算，不上传数据。</p>
         <div class="hero-actions"><a class="btn primary" href="imu/">打开 IMU 实验</a><a class="btn" href="simulink/">浏览 43 课</a></div>
         <ul class="proof" aria-label="项目数据"><li><b>43/43</b> MATLAB 模型</li><li><b>19</b> 个交互复现</li><li><b>0</b> 运行时依赖</li><li><b>MIT</b> 源码</li></ul>
       </div>
@@ -64,12 +65,13 @@
       <div class="paths-grid">
         <a data-path="imu" href="imu/"><b>① 我有一组传感器数据</b><span>IMU 数据实验室 · 10 章手册</span></a>
         <a data-path="control" href="control/"><b>② 我想调控制器</b><span>Control Play · 14 章手册 + 4 实验</span></a>
-        <a data-path="simulink" href="simulink/"><b>③ 我想系统学控制</b><span>Simulink 43 课 · 19 交互</span></a>
+        <a data-path="model" href="model/"><b>③ 我想从数据估模型</b><span>Model Lab · 数据体检 + 阶跃辨识</span></a>
+        <a data-path="simulink" href="simulink/"><b>④ 我想系统学控制</b><span>Simulink 43 课 · 19 交互</span></a>
       </div>
     </section>
 
     <main id="main">
-    <div class="section-head"><h2>三个工具</h2><span>打开即用，无需账号</span></div>
+    <div class="section-head"><h2>四个工具</h2><span>打开即用，无需账号</span></div>
     <section class="cards">
       <a class="card" data-target="imu" href="#">
         <div class="no">INSTRUMENT 01</div>
@@ -93,8 +95,22 @@
         <span class="go">打开 →</span>
       </a>
 
-      <a class="card" data-target="simulink" href="#">
-        <div class="no">TUTORIAL 03</div>
+            <a class="card" data-target="model" href="model/">
+        <div class="no">INSTRUMENT 03</div>
+        <h2>Model Lab · 从数据到模型</h2>
+        <svg viewBox="0 0 640 220" role="img" aria-label="阶跃响应与模型拟合示意">
+          <line x1="24" y1="190" x2="616" y2="190" style="stroke:var(--line)"/>
+          <line x1="24" y1="20" x2="24" y2="190" style="stroke:var(--line)"/>
+          <path d="M24 176 L96 176 C150 176 168 62 246 62 L616 62" fill="none" style="stroke:var(--chart-raw);stroke-width:2"/>
+          <path d="M24 176 L96 176 C150 176 168 46 246 46 L616 46" fill="none" style="stroke:var(--accent);stroke-width:2;stroke-dasharray:5 4"/>
+          <text x="34" y="36" style="fill:var(--muted);font:11px monospace">FOPDT</text>
+        </svg>
+        <p>数据体检 → 阶跃辨识 FOPDT/SOPDT → FIT/残差 → 送 Control Play 或导出 .m。3 个虚拟对象，也可上传自己的 CSV。</p>
+        <span class="go">打开 →</span>
+      </a>
+
+<a class="card" data-target="simulink" href="#">
+        <div class="no">TUTORIAL 04</div>
         <h2>Simulink 教程 · 交互复现</h2>
         <picture>
           <source srcset="preview-simulink-dark.png" media="(prefers-color-scheme: dark)" />
@@ -119,10 +135,11 @@
         var t = a.getAttribute("data-target") || a.getAttribute("data-path");
         if (isFile) {
           a.href = t === "imu" ? "../imu-lab/static/index.html"
+            : t === "model" ? "../model-lab/static/index.html"
             : t === "control" ? "../control-play/index.html"
             : "../simulink/index.html";
         } else {
-          a.href = base + (t === "imu" ? "imu/" : t === "control" ? "control/" : "simulink/");
+          a.href = base + (t === "imu" ? "imu/" : t === "model" ? "model/" : t === "control" ? "control/" : "simulink/");
         }
       });
     })();

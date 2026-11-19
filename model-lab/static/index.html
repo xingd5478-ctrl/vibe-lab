@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Model Lab · 从数据到模型 · vibe-lab</title>
+  <meta name="description" content="把阶跃实验数据变成一阶/二阶传递函数：数据体检、FOPDT/SOPDT 辨识、验证，并送到 Control Play。" />
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
+  <meta property="og:title" content="Model Lab · 从数据到模型" />
+  <meta property="og:description" content="数据体检 → 阶跃辨识 → 传递函数 → 控制器。浏览器内运行，不上传数据。" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4e79'/%3E%3Cpath d='M5 23 L11 13 L16 19 L21 9 L27 15' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
+  <link rel="manifest" href="../../manifest.webmanifest" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="canonical" href="https://xingd5478-ctrl.github.io/vibe-lab/model/" />
+  <meta property="og:image" content="https://xingd5478-ctrl.github.io/vibe-lab/icon-512.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script defer src="../../shared/sentry-config.js"></script>
+  <script defer src="../../shared/observability.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到内容</a>
+  <div class="wrap">
+    <nav class="topnav" aria-label="全站导航">
+      <a href="../">首页</a>
+      <a href="../imu/">IMU</a>
+      <a href="../model/" aria-current="page">Model</a>
+      <a href="../control/">Control</a>
+      <a href="../simulink/">Simulink</a>
+      <a href="../about/">方法</a>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="kicker">VIBE-LAB / MODEL LAB</div>
+        <h1>从一段数据，到能用的模型。</h1>
+        <p class="sub">上传阶跃实验数据，先看它能不能信，再估出一阶/二阶传递函数。全部在浏览器内计算，不上传数据。</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#lab">用一个虚拟对象试试</a>
+          <a class="btn" href="#lab">上传 CSV</a>
+        </div>
+        <ul class="proof" aria-label="Model Lab 能力">
+          <li><b>3</b> 个虚拟对象</li>
+          <li><b>2</b> 种模型</li>
+          <li><b>0</b> 上传</li>
+          <li><b>MIT</b> 源码</li>
+        </ul>
+      </div>
+      <figure class="hero-figure">
+        <div class="hero-chart" id="hero-chart" aria-hidden="true"></div>
+        <figcaption>阶跃响应 → 数据体检 → FOPDT / SOPDT</figcaption>
+      </figure>
+    </header>
+
+    <main id="main">
+      <section class="lab" id="lab" aria-labelledby="lab-title">
+        <div class="section-head">
+          <h2 id="lab-title">实验台</h2>
+          <span>先体检，再拟合。坏数据不会给你一个好模型。</span>
+        </div>
+
+        <div class="lab-grid">
+          <aside class="panel controls">
+            <section aria-labelledby="data-title">
+              <h3 id="data-title"><span class="step-no">1</span> 数据</h3>
+              <label class="field">虚拟对象
+                <select id="plant"></select>
+              </label>
+              <div class="field-row">
+                <label class="field">阶跃幅值
+                  <input id="amp" type="number" step="0.1" min="0.01" value="2" />
+                </label>
+                <label class="field">噪声 σ
+                  <input id="noise" type="number" step="0.01" min="0" value="0.02" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">采样率 Hz
+                  <input id="fs" type="number" step="1" min="1" value="1" />
+                </label>
+                <label class="field">时长 s
+                  <input id="duration" type="number" step="10" min="10" value="420" />
+                </label>
+              </div>
+              <button class="btn primary wide" id="generate" type="button">生成阶跃实验</button>
+
+              <div class="divider"><span>或者</span></div>
+              <label class="file-drop" for="csv">
+                <b>上传 CSV</b>
+                <span>t, u, y 三列 · 本地读取</span>
+                <input id="csv" type="file" accept=".csv,text/csv" />
+              </label>
+              <p class="hint" id="file-name"></p>
+            </section>
+
+            <section aria-labelledby="model-title">
+              <h3 id="model-title"><span class="step-no">2</span> 模型</h3>
+              <label class="field">模型结构
+                <select id="model">
+                  <option value="FOPDT">一阶 + 延迟 FOPDT</option>
+                  <option value="SOPDT">二阶 SOPDT</option>
+                </select>
+              </label>
+              <button class="btn primary wide" id="fit" type="button">辨识模型</button>
+              <p class="hint" id="fit-hint">先体检数据；有硬性错误时不会拟合。</p>
+            </section>
+          </aside>
+
+          <section class="panel results" aria-live="polite">
+            <div class="results-head">
+              <div>
+                <div class="kicker">DATA QUALITY</div>
+                <h3 id="quality-title">等待数据</h3>
+              </div>
+              <div class="grade" id="grade" data-grade="—">—</div>
+            </div>
+            <div id="quality" class="quality"></div>
+            <div class="chart-head">
+              <span id="chart-caption">实测输出</span>
+              <span class="legend"><i class="dot-measured"></i>实测 <i class="dot-fit"></i>模型</span>
+            </div>
+            <div id="chart" class="chart" role="img" aria-label="阶跃响应与模型拟合曲线"></div>
+            <div id="residual" class="residual" role="img" aria-label="残差曲线"></div>
+            <div id="metrics" class="metrics"></div>
+            <div id="warnings" class="warnings"></div>
+            <div class="actions" id="actions" hidden>
+              <button class="btn" id="copy-matlab" type="button">复制 .m</button>
+              <button class="btn" id="download-matlab" type="button">下载 .m</button>
+              <a class="btn" id="send-control" href="#" hidden>送到 Control Play →</a>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="explain">
+        <div class="section-head">
+          <h2>这页在做什么</h2>
+          <span>不是“拟合一条线”，是“判断这个模型能不能用”。</span>
+        </div>
+        <div class="explain-grid">
+          <article class="panel">
+            <div class="kicker">01 / CHECK</div>
+            <h3>先体检</h3>
+            <p>输入不动、时间倒序、饱和、噪声太大——这些问题会让模型看起来很好，但其实不可信。</p>
+          </article>
+          <article class="panel">
+            <div class="kicker">02 / IDENTIFY</div>
+            <h3>再拟合</h3>
+            <p>FOPDT 估 K、τ、L；SOPDT 估 K、ζ、ωn。拟合失败会说明原因，不硬给结果。</p>
+          </article>
+          <article class="panel">
+            <div class="kicker">03 / USE</div>
+            <h3>最后用</h3>
+            <p>SOPDT 可以直接送进 Control Play；所有模型都能导出 MATLAB .m。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><a href="../">← vibe-lab</a> · <a href="../imu/">IMU Lab</a> · <a href="../control/">Control Play</a> · <a href="../about/">方法说明</a>
+</footer>
+  </div>
+
+  <script src="../../shared/i18n.js"></script>
+  <script src="core/data.js"></script>
+  <script src="core/quality.js"></script>
+  <script src="core/identify.js"></script>
+  <script src="core/plants.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

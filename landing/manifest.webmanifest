@@ -1,7 +1,7 @@
 {
   "name": "vibe-lab · 传感器与控制可视化实验室",
   "short_name": "vibe-lab",
-  "description": "IMU 数据实验室与 Control Play：Allan 方差、R/Q、卡尔曼滤波与 PID 调参。",
+  "description": "IMU 数据实验室、Model Lab 与 Control Play：Allan、模型辨识与 PID 调参。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

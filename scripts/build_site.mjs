@@ -31,6 +31,7 @@ for (const name of fs.readdirSync(path.join(ROOT, "landing"))) {
 }
 
 for (const [from, to] of [
+  ["model-lab/static", "model"],
   ["imu-lab/static", "imu"],
   ["control-play", "control"],
   ["simulink", "simulink"],

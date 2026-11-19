@@ -226,9 +226,9 @@ async function main() {
     await client.send("Page.navigate", { url: `${base}/landing/en/index.html` });
     await sleep(700);
     if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("landing-en: lang");
-    if ((await evalJs("document.querySelectorAll('.topnav a').length")) !== 6)
+    if ((await evalJs("document.querySelectorAll('.topnav a').length")) !== 7)
       throw new Error("landing-en: global nav");
-    if ((await evalJs("document.querySelectorAll('.card').length")) !== 3) throw new Error("landing-en: cards");
+    if ((await evalJs("document.querySelectorAll('.card').length")) !== 4) throw new Error("landing-en: cards");
     if (!(await evalJs("document.title")).includes("sensors")) throw new Error("landing-en: title");
     if ((await evalJs("(document.body.innerText.match(/[\\u4e00-\\u9fff]/g) || []).length")) > 0)
       throw new Error("English text check failed");
@@ -264,6 +264,21 @@ async function main() {
     await audit("about-en", true);
     await evalJs("localStorage.setItem('vibe-lang', 'zh')");
 
+    await client.send("Page.navigate", { url: `${base}/model-lab/static/index.html?lang=en` });
+    await waitFor(async () => (await evalJs("document.querySelectorAll('#metrics .metric').length")) >= 4, 12000);
+    if ((await evalJs("document.documentElement.lang")) !== "en") throw new Error("model-en: lang");
+    if (
+      (await evalJs(
+        "Array.from(document.body.innerText).some(function(c){var n=c.charCodeAt(0);return n>=0x4e00&&n<=0x9fff;})"
+      )) === true
+    )
+      throw new Error("model-en: Chinese text");
+    if (!/Data health|ready/i.test(await evalJs("document.querySelector('#quality-title').textContent")))
+      throw new Error("model-en: quality title");
+    await audit("model-en");
+    await audit("model-en", true);
+
+    await evalJs("localStorage.setItem('vibe-lang', 'zh')");
     await client.send("Page.navigate", { url: `${base}/simulink/index.html` });
     await waitFor(async () => (await evalJs("document.querySelectorAll('#phases .phase-link').length")) === 8, 12000);
     await waitFor(() => evalJs("!!document.querySelector('#chart-a svg')"));

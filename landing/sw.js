@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v34";
+const CACHE = "vibe-lab-v35";
 const ASSETS = [
   "./",
   "./index.html",
@@ -48,6 +48,14 @@ const ASSETS = [
   "./shared/sentry-config.js",
   "./shared/observability.js",
   "./shared/i18n.js",
+  "./model/",
+  "./model/index.html",
+  "./model/style.css",
+  "./model/app.js",
+  "./model/core/data.js",
+  "./model/core/quality.js",
+  "./model/core/identify.js",
+  "./model/core/plants.js",
   "./imu/",
   "./imu/index.html",
   "./imu/style.css",

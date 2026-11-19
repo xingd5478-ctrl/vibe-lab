@@ -10,6 +10,8 @@ const checks = [
   ["/motion.js", "scope-canvas"],
   ["/data/feedback.json", '"total"'],
   ["/imu/manual-en.js", "IMU_MANUAL_EN"],
+  ["/model/", "Model Lab"],
+  ["/model/core/identify.js", "fitFOPDT"],
 ];
 
 let failed = 0;

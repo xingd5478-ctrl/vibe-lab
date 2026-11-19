@@ -1,6 +1,6 @@
 # vibe-lab
 
-传感器与控制的可视化实验室：三个零依赖的浏览器工具 + 方法页 + 英文首页 + 43/43 MATLAB 对照。
+传感器与控制的可视化实验室：四个零依赖的浏览器工具 + 方法页 + 英文首页 + 43/43 MATLAB 对照。
 
 架构是 **local-first**：CSV/Allan/Kalman/Control 在浏览器内计算，数据不上传；43 个 Simulink 模型由 MATLAB R2025a 离线仿真，结果和 SHA-256 随静态站分发。没有账号/云同步是取舍，不是缺失的后端。
 
@@ -93,7 +93,7 @@ imu-lab/static/
 
 **模型下载**：43 个 `.slx` 已托管在 `simulink/models/`（约 3.8 MB，MIT，见 `NOTICE.md`），每课讲义页提供同源 `download` 链接，`npm run smoke/e2e` 会校验下载文件是 zip。更新模型用 `node scripts/vendor_models.mjs`。
 
-## 三个工具
+## 四个工具
 
 - **IMU 数据实验室**（`/imu/`）：CSV → CRC 清洗 → Allan → ARW/RRW → R/Q → KF，附 **10 章实验手册**；页面用「实验台 / 手册」标签切换；
 - **Control Play**（`/control/`）：二阶 Bode/阶跃/PID + **状态反馈、观测器、根轨迹、离散化 4 个扩展实验**，附 **14 章实验手册**；页面用「实验台 / 扩展实验 / 手册」标签切换；

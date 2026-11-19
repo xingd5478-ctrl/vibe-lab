@@ -1,7 +1,7 @@
 /* Landing motion: scroll progress + interactive hero scope. No dependencies. */
 (function () {
   "use strict";
-  var noMotion = location.protocol === "file:";
+  var noMotion = location.protocol === "file:" || new URLSearchParams(location.search).get("static") === "1";
   if (noMotion) document.documentElement.classList.add("no-motion");
   var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var bar = document.querySelector(".scroll-progress");

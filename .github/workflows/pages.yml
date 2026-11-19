@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "model-lab/static/**"
       - "imu-lab/static/**"
       - "control-play/**"
       - "simulink/**"
@@ -41,6 +42,7 @@ jobs:
           cp -f imu-lab/static/chart.js simulink/chart.js
           mkdir -p _site
           cp -r landing/. _site/
+cp -r model-lab/static/. _site/model/
           mkdir -p _site/imu _site/control _site/about _site/simulink
           cp -r imu-lab/static/. _site/imu/
           cp -r control-play/. _site/control/

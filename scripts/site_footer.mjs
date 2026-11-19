@@ -26,6 +26,14 @@ export const FOOTERS = {
       '<a href="https://github.com/xingd5478-ctrl/vibe-lab" target="_blank" rel="noreferrer">源码</a>',
     ],
   },
+  "model-lab/static/index.html": {
+    links: [
+      '<a href="../">← vibe-lab</a>',
+      '<a href="../imu/">IMU Lab</a>',
+      '<a href="../control/">Control Play</a>',
+      '<a href="../about/">方法说明</a>',
+    ],
+  },
   "imu-lab/static/index.html": {
     lead: "vibe-lab · 数据与算法在浏览器内运行 · 工程近似：R=(ARW/60)²·Δt，Q=(RRW/60)²·Δt · 仅用于教学/演示，真实标定以论文流程为准。",
     links: [

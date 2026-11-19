@@ -36,6 +36,7 @@ const BUDGETS = {
   control: { ready: 900, longTask: 250, longTotal: 400, kp: 250, tab: 600, lcp: 1500, cls: 0.08 },
   simulink: { ready: 1100, longTask: 250, longTotal: 400, tab: 500, lcp: 1600, cls: 0.1 },
   about: { ready: 600, longTask: 250, longTotal: 400, lcp: 1000, cls: 0.03 },
+  model: { ready: 1800, longTask: 300, longTotal: 500, lcp: 1800, cls: 0.05 },
 };
 
 function serve() {
@@ -288,6 +289,11 @@ async function main() {
     });
 
     await measurePage("about", "about/index.html", null);
+    await measurePage(
+      "model",
+      "model-lab/static/index.html",
+      "document.querySelectorAll('#metrics .metric').length>=4"
+    );
 
     const pm = await client.send("Performance.getMetrics");
     const heap = Object.fromEntries(

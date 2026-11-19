@@ -40,8 +40,8 @@ try {
     Write-Output ("shot " + $name)
   }
 
-  $landing = "$base/landing/index.html"
-  $landingEn = "$base/landing/en/index.html"
+  $landing = "$base/landing/index.html?static=1"
+  $landingEn = "$base/landing/en/index.html?static=1"
   $imu = "$base/imu-lab/static/index.html"
   $control = "$base/control-play/index.html?kp=3&ki=1&kd=0.1"
   $controlIndex = "$base/control-play/index.html"
@@ -49,6 +49,7 @@ try {
   $aboutMatlab = "$base/about/matlab.html"
   $aboutEn = "$base/about/en.html"
   $sim = "$base/simulink/index.html"
+  $model = "$base/model-lab/static/index.html"
 
   Shot $landing "landing" "1400,1000"
   Shot $landingEn "landing-en" "1400,1000"
@@ -62,6 +63,7 @@ try {
   Shot $aboutMatlab "about-matlab" "1400,2200"
   Shot $aboutEn "about-en" "1200,1600"
   Shot $sim "simulink" "1400,1400"
+  Shot $model "model" "1400,1400"
   Shot $imu "imu-narrow" "520,900"
 } finally {
   if ($server -and -not $server.HasExited) { Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue }

@@ -6,6 +6,7 @@ const assets = [...sw.matchAll(/"\.\/([^"]*)"/g)].map((m) => m[1]).filter((x) =>
 const map = (a) => {
   if (a === "" || a.endsWith("/")) {
     if (a === "") return path.join(ROOT, "landing", "index.html");
+    if (a.startsWith("model/")) return path.join(ROOT, "model-lab/static", "index.html");
     if (a.startsWith("imu/")) return path.join(ROOT, "imu-lab/static", "index.html");
     if (a.startsWith("control/")) return path.join(ROOT, "control-play", "index.html");
     if (a.startsWith("simulink/")) return path.join(ROOT, "simulink", "index.html");
@@ -13,6 +14,7 @@ const map = (a) => {
     if (a.startsWith("en/")) return path.join(ROOT, "landing", a, "index.html");
     return path.join(ROOT, "landing", a, "index.html");
   }
+  if (a.startsWith("model/")) return path.join(ROOT, "model-lab/static", a.slice(6));
   if (a.startsWith("imu/")) return path.join(ROOT, "imu-lab/static", a.slice(4));
   if (a.startsWith("control/")) return path.join(ROOT, "control-play", a.slice(8));
   if (a.startsWith("simulink/")) return path.join(ROOT, "simulink", a.slice(9));

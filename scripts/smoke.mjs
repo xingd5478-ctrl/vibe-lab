@@ -198,18 +198,18 @@ async function main() {
     });
 
     await check("landing", httpUrl(base, "landing/index.html"), async (e) => {
-      await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 3);
-      if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 3)
+      await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 4);
+      if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 4)
         throw new Error("landing: path chooser");
-      if ((await e("document.querySelectorAll('.topnav a').length")) !== 6) throw new Error("landing: global nav");
+      if ((await e("document.querySelectorAll('.topnav a').length")) !== 7) throw new Error("landing: global nav");
       if (!(await e("document.title")).includes("vibe-lab")) throw new Error("landing: title");
     });
 
     await check("landing-en", httpUrl(base, "landing/en/index.html"), async (e) => {
-      await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 3);
+      await waitFor(async () => (await e("document.querySelectorAll('.card').length")) === 4);
       if ((await e("document.documentElement.lang")) !== "en") throw new Error("landing-en: lang");
-      if ((await e("document.querySelectorAll('.topnav a').length")) !== 6) throw new Error("landing-en: global nav");
-      if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 3)
+      if ((await e("document.querySelectorAll('.topnav a').length")) !== 7) throw new Error("landing-en: global nav");
+      if ((await e("document.querySelectorAll('.paths-grid a').length")) !== 4)
         throw new Error("landing-en: path chooser");
       if (!(await e("document.title")).includes("sensors")) throw new Error("landing-en: title");
       const zh = await e("document.querySelector('.topnav a[hreflang=\"zh-CN\"]').getAttribute('href')");
@@ -238,6 +238,19 @@ async function main() {
       if (!(await e("document.body.textContent")).includes("Methods & limitations"))
         throw new Error("about-en: content");
       if (!(await e("document.body.textContent")).includes("43/43")) throw new Error("about-en: matlab");
+    });
+
+    await check("model", httpUrl(base, "model-lab/static/index.html") + "?lang=en", async (e) => {
+      await waitFor(async () => (await e("document.querySelectorAll('#metrics .metric').length")) >= 4, 12000);
+      if ((await e("document.getElementById('grade').textContent")).trim() === "F") throw new Error("model: grade F");
+      if (
+        await e(
+          "Array.from(document.body.innerText).some(function(c){var n=c.charCodeAt(0);return n>=0x4e00&&n<=0x9fff;})"
+        )
+      )
+        throw new Error("model: Chinese text in English mode");
+      const title = await e("document.querySelector('#quality-title').textContent");
+      if (!/Data health|ready/i.test(title)) throw new Error("model: English quality title");
     });
 
     await check("simulink", httpUrl(base, "simulink/index.html"), async (e) => {
