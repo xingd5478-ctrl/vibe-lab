@@ -228,6 +228,32 @@ test("ARX order selection returns stable candidate", () => {
   assert.ok(Number.isFinite(b.score));
 });
 
+test("subspace recovers a rich-input state-space model", () => {
+  const t = [],
+    u = [],
+    y = [];
+  let y1 = 0,
+    y2 = 0,
+    seed = 1;
+  const rnd = () => {
+    seed = (1664525 * seed + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  for (let k = 0; k < 1200; k++) {
+    const uk = rnd() > 0.5 ? 1 : -1;
+    u.push(uk);
+    const yk = 1.5 * y1 - 0.7 * y2 + 0.3 * (k > 0 ? u[k - 1] : 0) + 0.1 * (k > 1 ? u[k - 2] : 0);
+    y.push(yk);
+    y2 = y1;
+    y1 = yk;
+    t.push(k / 100);
+  }
+  const f = I.fitSubspace(t, u, y, { trainEnd: 900 });
+  assert.equal(f.model, "Subspace");
+  assert.ok(f.fitTrain > 90);
+  assert.equal(f.A.length, f.n);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

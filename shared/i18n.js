@@ -326,6 +326,7 @@
     撤销联合: "Undo combined",
     "可选中 PDF / 打印": "Selectable PDF / print",
     "状态空间 SS": "State-space SS",
+    "子空间 Subspace": "Subspace",
     "延迟 nk": "Delay nk",
     导出项目: "Export project",
     导入项目: "Import project",

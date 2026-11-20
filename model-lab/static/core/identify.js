@@ -628,6 +628,87 @@
     };
   }
 
+  function matT(A) {
+    return A[0].map((_, j) => A.map((r) => r[j]));
+  }
+  function matMul(A, B) {
+    const C = Array.from({ length: A.length }, () => new Array(B[0].length).fill(0));
+    for (let i = 0; i < A.length; i++)
+      for (let k = 0; k < A[0].length; k++) for (let j = 0; j < B[0].length; j++) C[i][j] += A[i][k] * B[k][j];
+    return C;
+  }
+  function matInv(M) {
+    const n = M.length;
+    const A = M.map((r, i) => r.concat(Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))));
+    for (let i = 0; i < n; i++) {
+      let p = i;
+      for (let k = i + 1; k < n; k++) if (Math.abs(A[k][i]) > Math.abs(A[p][i])) p = k;
+      [A[i], A[p]] = [A[p], A[i]];
+      const d = A[i][i] || 1e-12;
+      for (let j = 0; j < 2 * n; j++) A[i][j] /= d;
+      for (let k = 0; k < n; k++) {
+        if (k === i) continue;
+        const f = A[k][i];
+        for (let j = 0; j < 2 * n; j++) A[k][j] -= f * A[i][j];
+      }
+    }
+    return A.map((r) => r.slice(n));
+  }
+  function matPinv(A) {
+    return A.length >= A[0].length
+      ? matMul(matInv(matMul(matT(A), A)), matT(A))
+      : matMul(matT(A), matInv(matMul(A, matT(A))));
+  }
+
+  function fitSubspace(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(20, opts.trainEnd)) : t.length;
+    const fir = fitFIR(t, u, y, { trainEnd, nh: 40 });
+    const h = fir.h;
+    if (!h.length || h.some((v) => !Number.isFinite(v))) throw new Error("Subspace: impulse response is not finite.");
+    const r = 8;
+    const c = Math.min(20, h.length - r - 1);
+    const H = Array.from({ length: r }, (_, i) => Array.from({ length: c }, (_, j) => h[1 + i + j] || 0));
+    const H1 = Array.from({ length: r }, (_, i) => Array.from({ length: c }, (_, j) => h[2 + i + j] || 0));
+    let best = null;
+    for (let n = 1; n <= 4; n++) {
+      const O = Array.from({ length: r }, (_, i) => Array.from({ length: n }, (_, j) => H[i][j]));
+      const Cmat = matMul(matPinv(O), H);
+      const A = matMul(matMul(matPinv(O), H1), matPinv(Cmat));
+      const B = Cmat.map((row) => row[0]);
+      const C = O[0].slice();
+      const D = h[0] || 0;
+      const sim = (end) => {
+        const out = y.slice();
+        const x = new Array(n).fill(0);
+        let bias = 0;
+        for (let k = 0; k < end; k++) {
+          let v = D * u[k];
+          for (let i = 0; i < n; i++) v += C[i] * x[i];
+          out[k] = v;
+          const nx = new Array(n).fill(0);
+          for (let i = 0; i < n; i++) {
+            let s2 = B[i] * u[k];
+            for (let j = 0; j < n; j++) s2 += A[i][j] * x[j];
+            nx[i] = s2;
+          }
+          x.splice(0, n, ...nx);
+          if (k < trainEnd) bias += y[k] - v;
+        }
+        bias /= Math.max(1, trainEnd);
+        for (let k = 0; k < end; k++) out[k] += bias;
+        return out;
+      };
+      const yhat = sim(t.length);
+      const ft = fitStats(y.slice(r, trainEnd), yhat.slice(r, trainEnd), n * n + 2 * n);
+      const fv = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), n * n + 2 * n) : null;
+      const score = fv && Number.isFinite(fv.fit) ? fv.fit : ft.fit;
+      if (!best || score > best.score)
+        best = { A, B, C, D, n, yhat, score, fitTrain: ft.fit, fitVal: fv ? fv.fit : null };
+    }
+    if (!best) throw new Error("Subspace realization failed.");
+    return { model: "Subspace", ...best, fit: fitStats(y, best.yhat, best.n * best.n + 2 * best.n).fit, trainEnd };
+  }
+
   function fitSS(t, u, y, opts) {
     const base = fitARX(t, u, y, opts);
     const na = base.na,
@@ -1038,7 +1119,7 @@
   }
 
   function toMatlab(p) {
-    if (p.model === "SS") {
+    if (p.model === "SS" || p.model === "Subspace") {
       const mat = (M) => "[" + M.map((r) => r.map((x) => Number(x).toPrecision(6)).join(", ")).join("; ") + "]";
       return [
         `A = ${mat(p.A)};`,
@@ -1176,6 +1257,7 @@
     fitARMAX,
     fitWiener,
     fitSS,
+    fitSubspace,
     selectARXOrder,
     bootstrap,
     simulate,

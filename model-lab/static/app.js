@@ -347,7 +347,7 @@
     };
     add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain != null ? f.fitTrain : f.fit, 1)} %`);
     if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
-    if (f.model === "SS") {
+    if (f.model === "SS" || f.model === "Subspace") {
       add("SS order", String(f.n));
       add("ARX", `${f.na}/${f.nb}/${f.nk}`);
     } else if (["FIR", "OE", "ARMAX", "Wiener"].includes(f.model)) {
@@ -531,7 +531,7 @@
     if (f.model === "SOPDT") return 4;
     if (f.model === "ARX" || f.model === "OE" || f.model === "2SLS-ARX") return f.na + f.nb;
     if (f.model === "ARMAX") return f.na + f.nb + f.nc;
-    if (f.model === "SS") return f.n * f.n + f.n * 2;
+    if (f.model === "SS" || f.model === "Subspace") return f.n * f.n + f.n * 2;
     if (f.model === "FIR") return f.nh + 1;
     if (f.model === "Wiener") return f.na + f.nb + 3;
     if (f.model === "Hammerstein") return f.na + f.nb + 1;
