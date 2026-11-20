@@ -103,14 +103,16 @@
           <div class="hint" id="fit-info" aria-live="polite">—</div>
         </div>
 
-        <div class="field" style="display:flex;gap:8px;">
-          <button id="export-csv" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">导出 CSV</button>
-          <button id="export-report" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">导出报告</button>
-        <button id="export-calib" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">导出标定 JSON</button>
-        <button id="save-project" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">保存标定项目</button>
-        <button id="export-calib-pdf" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">可选中 PDF / 打印</button>
-        <p class="hint" style="flex-basis:100%;margin:2px 0 0;">可选中 PDF 走浏览器打印；下载图像 PDF 文字不可选。</p>
-        <button id="download-calib-pdf" type="button" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">下载图像 PDF</button>
+        <div class="field export-block">
+          <div class="export-grid">
+            <button id="export-csv" type="button" class="export-btn">导出 CSV</button>
+          <button id="export-report" type="button" class="export-btn">导出报告</button>
+        <button id="export-calib" type="button" class="export-btn">导出标定 JSON</button>
+        <button id="save-project" type="button" class="export-btn">保存标定项目</button>
+        <button id="export-calib-pdf" type="button" class="export-btn">可选中 PDF / 打印</button>
+        <button id="download-calib-pdf" type="button" class="export-btn">下载图像 PDF</button>
+          </div>
+          <p class="hint" style="margin:6px 0 0;">可选中 PDF 走浏览器打印；下载图像 PDF 文字不可选。</p>
         </div>
         <div class="field" style="display:flex;gap:8px;">
           <button id="compare" type="button" aria-pressed="false" style="flex:1;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">保存对比</button>
