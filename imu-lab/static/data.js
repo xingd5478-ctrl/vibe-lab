@@ -242,6 +242,14 @@
     };
   }
 
+  function sixQualityGrade(q) {
+    if (!q || !q.count) return "F";
+    const m = Math.abs(q.normMean - 1);
+    if (m <= 0.03 && q.normStd <= 0.02 && q.rmsError <= 0.03) return "A";
+    if (m <= 0.08 && q.normStd <= 0.05 && q.rmsError <= 0.08) return "B";
+    return "F";
+  }
+
   function sixFace(faces) {
     const need = ["px", "nx", "py", "ny", "pz", "nz"];
     for (const k of need) if (!faces[k]) throw new Error("six-face: missing " + k);

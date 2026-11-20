@@ -265,6 +265,54 @@
     } catch (e) {}
   }
 
+  function startRandomQuiz() {
+    if (retry.active) exitRetry();
+    const bank = window.SIMULINK_QUIZ || {};
+    const ids = Object.keys(bank).filter((id) => byId[id]);
+    for (let i = ids.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ids[i], ids[j]] = [ids[j], ids[i]];
+    }
+    const picked = ids.slice(0, Math.min(5, ids.length));
+    const box = $("random-paper");
+    if (!picked.length || !box) return;
+    box.hidden = false;
+    box.innerHTML = "";
+    picked.forEach((id, qi) => {
+      const item = bank[id];
+      const d = el("div", "q");
+      d.appendChild(el("p", "", `${qi + 1}. [${id}] ${item.q}`));
+      item.opts.forEach((opt, oi) => {
+        const lab = el("label", "");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "paper-" + id;
+        input.value = String(oi);
+        lab.appendChild(input);
+        lab.appendChild(document.createTextNode(" " + opt));
+        d.appendChild(lab);
+      });
+      box.appendChild(d);
+    });
+    const btn = el("button", "", "交卷");
+    btn.type = "button";
+    const result = el("p", "hint", "");
+    btn.addEventListener("click", () => {
+      let score = 0;
+      picked.forEach((id) => {
+        const item = bank[id];
+        const sel = document.querySelector(`input[name="paper-${id}"]:checked`);
+        const ok = sel && Number(sel.value) === item.a;
+        if (ok) score++;
+        recordQuiz(byId[id], ok);
+      });
+      result.textContent = `得分 ${score} / ${picked.length}`;
+      box.appendChild(result);
+      btn.disabled = true;
+    });
+    box.appendChild(btn);
+  }
+
   function updateRetry() {
     const banner = $("retry-banner");
     if (!banner) return;
@@ -624,6 +672,7 @@
 
   $("retry-wrong").addEventListener("click", startRetry);
   $("retry-exit").addEventListener("click", exitRetry);
+  $("random-quiz").addEventListener("click", startRandomQuiz);
   buildList();
   renderQuiz();
   updateQuizPanel();

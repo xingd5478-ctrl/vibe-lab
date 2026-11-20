@@ -294,6 +294,7 @@
     "导出六面 JSON": "Export six-face JSON",
     "六面 JSON 已导出": "Six-face JSON exported",
     "批量上传六面 CSV": "Batch upload six-face CSV",
+    "标定报告 PDF": "Calibration report PDF",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

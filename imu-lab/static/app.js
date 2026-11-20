@@ -911,6 +911,38 @@ ${blocks}
     flash("融合 CSV 已导出");
   }
 
+  function printCalib() {
+    const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 5)));
+    const mean = (k) => (rows.length ? rows.reduce((s, r) => s + r[k], 0) / rows.length : NaN);
+    const fit = state.fit;
+    const cal = state.sixCalib;
+    const b = cal ? cal.bias : null,
+      sc = cal ? cal.scale : null,
+      q = cal ? cal.quality : null;
+    const faces = state.sixFace || {};
+    const faceRows = Object.keys(faces)
+      .map(
+        (k) =>
+          `<tr><td>${k}</td><td>${faces[k].x.toFixed(3)}</td><td>${faces[k].y.toFixed(3)}</td><td>${faces[k].z.toFixed(3)}</td></tr>`
+      )
+      .join("");
+    const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>IMU 标定报告</title><style>
+body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:32px auto;padding:0 20px;color:#1b1d22;background:#f4f2ec}h1{font-size:26px}h2{font-size:16px;margin-top:26px;border-bottom:1px solid #d8d3c7;padding-bottom:4px}table{border-collapse:collapse;width:100%;font-size:12px}td,th{border-bottom:1px solid #d8d3c7;padding:5px 6px;text-align:left}code{background:#e9e5dc;padding:1px 4px}.muted{color:#6f6a61;font-size:12px}</style></head><body>
+<h1>IMU 标定报告</h1><p class="muted">vibe-lab · 教学报告，不是认证标定 · ${new Date().toLocaleString()}</p>
+<h2>数据</h2><p>来源：${state.source} · 采样率：${state.fs} Hz · 有效帧：${rows.length}</p>
+<h2>陀螺零偏（前 5 s 均值）</h2><p><code>gx=${mean("gx").toFixed(3)} · gy=${mean("gy").toFixed(3)} · gz=${mean("gz").toFixed(3)} °/s</code></p>
+<h2>Allan / Kalman</h2><p>ARW：${fit ? fit.arw.toFixed(3) : "—"} · RRW：${fit ? fit.rrw.toFixed(3) : "—"} · R²：${fit ? fit.r2.toFixed(3) : "—"}<br>R=${state.r.toExponential(2)} · Q=${state.q.toExponential(2)}</p>
+<h2>六面标定</h2>${cal ? `<p>等级：<b>${cal.grade || "—"}</b> · |a| ${q.normMean.toFixed(3)} ± ${q.normStd.toFixed(3)} g · RMS ${q.rmsError.toFixed(3)} g</p><p>bias = [${b.x.toFixed(3)}, ${b.y.toFixed(3)}, ${b.z.toFixed(3)}] g<br>scale = [${sc.x.toFixed(3)}, ${sc.y.toFixed(3)}, ${sc.z.toFixed(3)}]</p><table><thead><tr><th>面</th><th>ax</th><th>ay</th><th>az</th></tr></thead><tbody>${faceRows}</tbody></table>` : "<p>未完成六面标定。</p>"}
+<h2>互补滤波</h2>${svgMarkup($("chart-fusion"))}
+<p class="muted">打印时选择“另存为 PDF”。</p></body></html>`;
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 350);
+  }
+
   function syncURL() {
     const p = new URLSearchParams();
     p.set("r", Math.log10(state.r).toFixed(2));
@@ -1078,6 +1110,7 @@ ${blocks}
     $("export-csv").addEventListener("click", exportCSV);
     $("export-report").addEventListener("click", exportReport);
     $("export-calib").addEventListener("click", exportCalib);
+    $("export-calib-pdf").addEventListener("click", printCalib);
     $("export-fusion").addEventListener("click", exportFusion);
     $("export-allan").addEventListener("click", exportAllanCSV);
 
@@ -1324,7 +1357,16 @@ ${blocks}
             found.push(`${file.name}: 缺少 ax/ay/az`);
             continue;
           }
+          const vals = [Math.abs(m.ax), Math.abs(m.ay), Math.abs(m.az)].sort((a, b) => b - a);
+          if (vals[0] < 0.5 || vals[1] / vals[0] > 0.6) {
+            found.push(`${file.name}: 方向不明确，跳过`);
+            continue;
+          }
           const key = IMUData.detectFace(m);
+          if (state.sixFace[key]) {
+            found.push(`${file.name}: ${labels[key]} 与已有方向冲突，跳过`);
+            continue;
+          }
           state.sixFace[key] = { x: m.ax, y: m.ay, z: m.az };
           found.push(`${file.name} → ${labels[key]}`);
           grid.querySelectorAll("button").forEach((b) => {
