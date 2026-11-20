@@ -211,6 +211,23 @@ test("state-space realization preserves ARX behavior", () => {
   assert.ok(f.fitTrain > 90);
 });
 
+test("ARX order selection returns stable candidate", () => {
+  const t = [],
+    u = [],
+    y = [];
+  let yy = 0;
+  for (let k = 0; k < 240; k++) {
+    const uk = k % 7 < 3 ? 1 : -1;
+    yy = k ? 0.7 * yy + 0.2 * uk : 0;
+    t.push(k * 0.1);
+    u.push(uk);
+    y.push(yy);
+  }
+  const b = I.selectARXOrder(t, u, y, { trainEnd: 160, maxNa: 2, maxNb: 2, maxNk: 1 });
+  assert.ok(b.na >= 1 && b.nb >= 1);
+  assert.ok(Number.isFinite(b.score));
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

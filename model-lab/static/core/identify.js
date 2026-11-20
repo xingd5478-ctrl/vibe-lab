@@ -645,6 +645,25 @@
     return { ...base, model: "SS", A, B, C, D, n };
   }
 
+  function selectARXOrder(t, u, y, opts) {
+    const trainEnd = opts && opts.trainEnd ? Math.min(t.length, Math.max(20, opts.trainEnd)) : t.length;
+    const maxNa = (opts && opts.maxNa) || 3;
+    const maxNb = (opts && opts.maxNb) || 3;
+    const maxNk = (opts && opts.maxNk) || 2;
+    let best = null;
+    for (let na = 1; na <= maxNa; na++)
+      for (let nb = 1; nb <= maxNb; nb++)
+        for (let nk = 0; nk <= maxNk; nk++) {
+          try {
+            const f = fitARX(t, u, y, { trainEnd, na, nb, nk });
+            const score = f.fitVal != null && Number.isFinite(f.fitVal) ? f.fitVal : f.fitTrain;
+            if (!best || score > best.score) best = { na, nb, nk, score, fit: f };
+          } catch (e) {}
+        }
+    if (!best) throw new Error("Order selection failed.");
+    return best;
+  }
+
   function fitMIMOARX(t, U, Y, opts) {
     const n = t.length;
     const m = U.length;
@@ -1157,6 +1176,7 @@
     fitARMAX,
     fitWiener,
     fitSS,
+    selectARXOrder,
     bootstrap,
     simulate,
     metrics,

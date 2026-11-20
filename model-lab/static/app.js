@@ -1215,6 +1215,30 @@
     });
     $("copy-matlab").addEventListener("click", copyMatlab);
     $("uncertainty").addEventListener("click", estimateUncertainty);
+    $("auto-order").addEventListener("click", () => {
+      if (!state.data) return;
+      const split = Math.max(0, Math.min(1, Number($("split").value) || 0.7));
+      const trainEnd = split < 1 ? Math.max(20, Math.floor(state.data.t.length * split)) : state.data.t.length;
+      try {
+        const b = I.selectARXOrder(state.data.t, state.data.u, state.data.y, {
+          trainEnd,
+          maxNa: 3,
+          maxNb: 3,
+          maxNk: 2,
+        });
+        $("arx-na").value = b.na;
+        $("arx-nb").value = b.nb;
+        $("arx-nk").value = b.nk;
+        if (!["ARX", "SS"].includes($("model").value)) $("model").value = "ARX";
+        $("fit-hint").textContent = T(
+          `自动定阶：na=${b.na} nb=${b.nb} nk=${b.nk}`,
+          `Auto order: na=${b.na} nb=${b.nb} nk=${b.nk}`
+        );
+        fit();
+      } catch (e) {
+        showError(e.message);
+      }
+    });
     $("export-project").addEventListener("click", exportProject);
     $("import-project").addEventListener("click", () => $("import-project-file").click());
     $("import-project-file").addEventListener("change", importProject);
