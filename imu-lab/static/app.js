@@ -2048,7 +2048,8 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
           lastFlush = 0,
           acceptRows = [],
           totalBytes = 0;
-        let binBuf = new Uint8Array(0),
+        let binBuf = new Uint8Array(65536),
+          binLen = 0,
           textBuf = "",
           decoder = new TextDecoder();
         const bstats = { frames: 0, crcErrors: 0, dropped: 0, seqGaps: 0 };
@@ -2057,14 +2058,31 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
           const { value, done } = await reader.read();
           if (done) break;
           if (mode === "binary") {
-            const chunk = value instanceof Uint8Array ? value : new Uint8Array(value);
+            let chunk = value instanceof Uint8Array ? value : new Uint8Array(value);
             totalBytes += chunk.length;
-            const merged = new Uint8Array(binBuf.length + chunk.length);
-            merged.set(binBuf, 0);
-            merged.set(chunk, binBuf.length);
-            binBuf = merged;
-            const parsed = IMUData.parseBinaryFrames(binBuf, { fs: state.fs, baseT: rows.length / state.fs });
-            binBuf = parsed.rest;
+            if (chunk.length > binBuf.length) chunk = chunk.slice(chunk.length - binBuf.length);
+            if (binLen + chunk.length > binBuf.length) {
+              const keep = Math.max(0, binBuf.length - chunk.length);
+              binBuf.copyWithin(0, binLen - keep, binLen);
+              binLen = keep;
+            }
+            binBuf.set(chunk, binLen);
+            binLen += chunk.length;
+            let parsed;
+            try {
+              parsed = IMUData.parseBinaryFrames(binBuf.subarray(0, binLen), {
+                fs: state.fs,
+                baseT: rows.length / state.fs,
+              });
+            } catch (err) {
+              $("serial-status").textContent =
+                "解析失败：" + err.message + " @" + String(err.stack || "").split("\n")[1];
+              binLen = 0;
+              continue;
+            }
+            const rest = parsed.rest;
+            binBuf.set(rest, 0);
+            binLen = rest.length;
             bstats.frames += parsed.stats.frames;
             bstats.crcErrors += parsed.stats.crcErrors;
             bstats.dropped += parsed.stats.dropped;

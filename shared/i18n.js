@@ -354,7 +354,7 @@
     "下载验收 JSON": "Download acceptance JSON",
     波特率: "Baud rate",
     协议: "Protocol",
-    "二进制（AA55/AADD）": "Binary (AA55/AADD)",
+    "二进制（BADD/AA55）": "Binary (BADD/AA55)",
     CSV: "CSV",
     未连接: "Not connected",
     串口诊断: "Serial diagnostics",

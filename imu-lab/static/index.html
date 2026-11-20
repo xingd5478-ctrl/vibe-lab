@@ -59,7 +59,7 @@
           </div>
           <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
         <label class="hint" style="display:block;margin-top:6px;">波特率 <select id="serial-baud"><option>460800</option><option>115200</option><option>921600</option><option>230400</option><option>9600</option></select></label>
-        <label class="hint" style="display:block;margin-top:4px;">协议 <select id="serial-protocol"><option value="binary">二进制（AA55/AADD）</option><option value="csv">CSV</option></select></label>
+        <label class="hint" style="display:block;margin-top:4px;">协议 <select id="serial-protocol"><option value="binary">二进制（BADD/AA55）</option><option value="csv">CSV</option></select></label>
         <button id="serial-connect" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">连接 STM32（Web Serial）</button>
         <button id="serial-accept" type="button" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">串口验收 10 s</button>
         <div class="hint" id="serial-status">未连接</div>
@@ -69,7 +69,7 @@
         <button id="send-model" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">送到 Model Lab</button>
         <details class="six-face" id="serial-help">
           <summary>串口协议</summary>
-          <p class="hint">默认 460800 二进制帧：<code>AA55</code> 四元数+加速度、<code>AADD</code> 六轴、<code>AACE</code> 欧拉角+加速度，尾 2 B CRC16-CCITT。CSV 模式仍支持 <code>gx,gy,gz</code> / <code>t,gx,gy,gz</code>。</p>
+          <p class="hint">默认 460800 二进制帧：<code>BADD</code> 40 B 遥测（ax/ay/az/gx/gy/gz、yaw、PWM、CRC）、<code>AA55</code> 四元数+加速度、<code>AADD</code> 六轴。CSV 模式仍支持 <code>gx,gy,gz</code> / <code>t,gx,gy,gz</code>。</p>
           <p class="hint">验收：连接后帧数递增；60 s 均值与静态参考一致；导出 CSV 可复现。</p>
         </details>
           <div class="hint">
@@ -261,11 +261,11 @@
   <script src="allan.js"></script>
   <script src="kf.js"></script>
   <script src="fit.js"></script>
-  <script src="data.js?v=20261121f"></script>
-  <script src="serial-protocol.js?v=20261121f"></script>
+  <script src="data.js?v=20261121g"></script>
+  <script src="serial-protocol.js?v=20261121g"></script>
   <script src="chart.js"></script>
-  <script src="../../shared/project.js?v=20261121f"></script>
-  <script src="app.js?v=20261121f"></script>
+  <script src="../../shared/project.js?v=20261121g"></script>
+  <script src="app.js?v=20261121g"></script>
   <script src="manual-en.js"></script>
   <script src="manual.js"></script>
   <script>
