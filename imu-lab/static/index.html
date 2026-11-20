@@ -54,6 +54,7 @@
           <label>AX（可选） <select id="map-ax"></select></label>
           <label>AY（可选） <select id="map-ay"></select></label>
           <label>AZ（可选） <select id="map-az"></select></label>
+          <label>TEMP（可选） <select id="map-temp"></select></label>
             <button id="map-apply" type="button" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">应用映射</button>
           </div>
           <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
@@ -145,6 +146,7 @@
           <summary>温度漂移标定</summary>
           <p class="hint">在多个温度点分别采集静态零偏，再拟合线性温度模型。</p>
           <label>当前温度 °C <input id="temp-now" type="number" min="-40" max="125" step="0.1" value="25" /></label>
+          <label class="six-batch-label">批量温度点 CSV <input id="temp-batch" type="file" accept=".csv,text/csv" multiple /></label>
           <div class="six-actions"><button id="temp-capture" type="button">采集当前温度点</button><button id="temp-fit" type="button">拟合</button></div>
           <div class="six-actions"><button id="temp-apply" type="button">应用温补</button><button id="temp-clear" type="button">清空</button></div>
           <div id="temp-points" class="temp-points"></div>

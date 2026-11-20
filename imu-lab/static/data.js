@@ -11,6 +11,7 @@
     ax: ["ax", "ax_g", "accel_x"],
     ay: ["ay", "ay_g", "accel_y"],
     az: ["az", "az_g", "accel_z"],
+    temp: ["temp", "temperature", "temp_c", "t_c", "degc"],
     crc: ["crc_ok", "crc", "crcok"],
   };
 
@@ -36,6 +37,7 @@
       ax: pick(ALIASES.ax),
       ay: pick(ALIASES.ay),
       az: pick(ALIASES.az),
+      temp: pick(ALIASES.temp),
       crc: pick(ALIASES.crc),
     };
     const raw = line.split(",").map((s) => s.trim());
@@ -88,7 +90,8 @@
       gz = new Float32Array(n);
     const ax = new Float32Array(n).fill(NaN),
       ay = new Float32Array(n).fill(NaN),
-      az = new Float32Array(n).fill(NaN);
+      az = new Float32Array(n).fill(NaN),
+      temp = new Float32Array(n).fill(NaN);
     const crc = new Uint8Array(n);
     let k = 0;
     for (let i = start; i < lines.length; i++) {
@@ -103,6 +106,7 @@
       if (idx.ax >= 0) ax[k] = Number(c[idx.ax]);
       if (idx.ay >= 0) ay[k] = Number(c[idx.ay]);
       if (idx.az >= 0) az[k] = Number(c[idx.az]);
+      if (idx.temp >= 0) temp[k] = Number(c[idx.temp]);
       t[k] = idx.t >= 0 ? Number(c[idx.t]) : NaN;
       crc[k] = idx.crc >= 0 ? Number(c[idx.crc]) : 1;
       k++;
@@ -115,6 +119,8 @@
       ax: ax.subarray(0, k),
       ay: ay.subarray(0, k),
       az: az.subarray(0, k),
+      temp: temp.subarray(0, k),
+      hasTemp: idx.temp >= 0,
       hasAccel: idx.ax >= 0 && idx.ay >= 0 && idx.az >= 0,
       crc: crc.subarray(0, k),
       n: k,
@@ -131,6 +137,8 @@
       ax: new Float32Array(n).fill(NaN),
       ay: new Float32Array(n).fill(NaN),
       az: new Float32Array(n).fill(NaN),
+      temp: new Float32Array(n).fill(NaN),
+      hasTemp: rows.some((r) => Number.isFinite(r.temp)),
       hasAccel: rows.some((r) => Number.isFinite(r.ax) && Number.isFinite(r.ay) && Number.isFinite(r.az)),
       crc: new Uint8Array(n),
       n,
@@ -319,7 +327,23 @@
       if (Math.abs(den) < 1e-12) throw new Error("temp bias: temperature points are identical");
       const k = (n * sxy - sx * sy) / den;
       const b0 = (sy - k * sx) / n;
-      return { b0, k };
+      let sse = 0,
+        sst = 0;
+      const my = sy / n;
+      for (const p of points) {
+        const pred = b0 + k * (p.T - T0);
+        sse += (p[key] - pred) ** 2;
+        sst += (p[key] - my) ** 2;
+      }
+      const xbar = sx / n,
+        sxxC = sxx - n * xbar * xbar;
+      return {
+        b0,
+        k,
+        r2: sst > 0 ? 1 - sse / sst : 1,
+        rmse: Math.sqrt(sse / Math.max(1, n - 2)),
+        seK: sxxC > 0 ? Math.sqrt(sse / Math.max(1, n - 2) / sxxC) : NaN,
+      };
     };
     return { T0, gx: fitAxis("gx"), gy: fitAxis("gy"), gz: fitAxis("gz") };
   }
@@ -335,6 +359,50 @@
     const f = measured / known;
     if (!Number.isFinite(f) || Math.abs(f) < 1e-6) throw new Error("gyro scale: invalid factor");
     return f;
+  }
+
+  function tempPoint(text) {
+    const lines = String(text)
+      .split(/\r?\n/)
+      .filter((l) => l.trim().length);
+    if (lines.length < 2) return null;
+    const norm = (x) =>
+      x
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "");
+    const head = lines[0].split(",").map(norm);
+    const pick = (names) => {
+      for (const n of names) {
+        const i = head.indexOf(n);
+        if (i >= 0) return i;
+      }
+      return -1;
+    };
+    const gx = pick(ALIASES.gx),
+      gy = pick(ALIASES.gy),
+      gz = pick(ALIASES.gz),
+      tp = pick(ALIASES.temp);
+    if (gx < 0 || gy < 0 || gz < 0 || tp < 0) return null;
+    let n = 0,
+      sx = 0,
+      sy = 0,
+      sz = 0,
+      st = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const c = lines[i].split(",");
+      const a = Number(c[gx]),
+        b = Number(c[gy]),
+        d = Number(c[gz]),
+        T = Number(c[tp]);
+      if (![a, b, d, T].every(Number.isFinite)) continue;
+      sx += a;
+      sy += b;
+      sz += d;
+      st += T;
+      n++;
+    }
+    return n ? { gx: sx / n, gy: sy / n, gz: sz / n, T: st / n, n } : null;
   }
 
   function sixFace(faces) {

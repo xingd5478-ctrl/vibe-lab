@@ -83,6 +83,7 @@
         ax: Math.sin(i / 40) * 0.05,
         ay: Math.sin(i / 160) * 0.1,
         az: 1,
+        temp: 25 + Math.sin(i / 300) * 0.5,
         crc: 1,
       });
     }
@@ -120,6 +121,7 @@
       ax: pick(["ax", "ax_g", "accel_x"]),
       ay: pick(["ay", "ay_g", "accel_y"]),
       az: pick(["az", "az_g", "accel_z"]),
+      temp: pick(["temp", "temperature", "temp_c", "t_c", "degc"]),
       crc: pick(["crc_ok", "crc", "crcok"]),
     };
     const rawHead = line.split(",").map((s) => s.trim());
@@ -127,7 +129,7 @@
     if (looksHeader && (idx.gx < 0 || idx.gy < 0 || idx.gz < 0)) return null;
     let start = 1;
     if (idx.gx < 0 || idx.gy < 0 || idx.gz < 0) {
-      idx = { t: 0, gx: 1, gy: 2, gz: 3, ax: -1, ay: -1, az: -1, crc: 4 };
+      idx = { t: 0, gx: 1, gy: 2, gz: 3, ax: -1, ay: -1, az: -1, temp: -1, crc: 4 };
       start = 0;
     }
     return { idx, start };
@@ -154,6 +156,7 @@
         row.ay = Number(c[idx.ay]);
         row.az = Number(c[idx.az]);
       }
+      if (idx.temp >= 0) row.temp = Number(c[idx.temp]);
       rows.push(row);
     }
     return rows;
@@ -180,6 +183,7 @@
           row.ay = Number(c[idx.ay]);
           row.az = Number(c[idx.az]);
         }
+        if (idx.temp >= 0) row.temp = Number(c[idx.temp]);
         rows.push(row);
       }
       if (i % 20000 === 0) {
@@ -210,7 +214,7 @@
       return;
     }
     const opts = head.map((h, i) => `<option value="${i}">${h || "列" + (i + 1)}</option>`).join("");
-    ["gx", "gy", "gz", "ax", "ay", "az"].forEach((k) => {
+    ["gx", "gy", "gz", "ax", "ay", "az", "temp"].forEach((k) => {
       $("map-" + k).innerHTML = opts;
     });
     const pick = (re) => head.findIndex((h) => re.test(h.toLowerCase()));
@@ -220,6 +224,7 @@
     $("map-ax").value = String(Math.max(0, pick(/ax/)));
     $("map-ay").value = String(Math.max(0, pick(/ay/)));
     $("map-az").value = String(Math.max(0, pick(/az/)));
+    $("map-temp").value = String(Math.max(0, pick(/temp|temperature/)));
     state.pendingText = text;
     state.pendingName = name;
     $("map-ui").style.display = "";
@@ -241,6 +246,7 @@
         row.ay = Number(c[map.ay]);
         row.az = Number(c[map.az]);
       }
+      if (map.temp != null) row.temp = Number(c[map.temp]);
       rows.push(row);
     }
     return rows;
@@ -263,6 +269,7 @@
           rows[i].ay = cols.ay[i];
           rows[i].az = cols.az[i];
         }
+        if (cols.hasTemp) rows[i].temp = cols.temp[i];
       }
       $("source-name").textContent = `解析中 ${Math.round((i / n) * 100)}%`;
       if (i < n) setTimeout(step, 0);
@@ -323,6 +330,8 @@
                 ay: m.ay,
                 az: m.az,
                 hasAccel: m.hasAccel,
+                temp: m.temp,
+                hasTemp: m.hasTemp,
                 crc: m.crc,
                 n: m.n,
               },
@@ -1670,7 +1679,10 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 2)));
       if (!rows.length) return;
       const mean = (k) => rows.reduce((s, r) => s + r[k], 0) / rows.length;
-      const T = Number($("temp-now").value);
+      const tempRows = rows.filter((r) => Number.isFinite(r.temp));
+      const T = tempRows.length
+        ? tempRows.reduce((s, r) => s + r.temp, 0) / tempRows.length
+        : Number($("temp-now").value);
       if (!Number.isFinite(T)) return;
       const p = { T, gx: mean("gx"), gy: mean("gy"), gz: mean("gz") };
       const i = state.tempPoints.findIndex((x) => Math.abs(x.T - T) < 1e-6);
@@ -1678,6 +1690,30 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       else state.tempPoints.push(p);
       renderTempPoints();
       $("temp-info").textContent = `已采集 ${T.toFixed(1)}°C，共 ${state.tempPoints.length} 个点。`;
+      saveCalibLocal();
+    });
+    $("temp-batch").addEventListener("change", async (ev) => {
+      const files = Array.from(ev.target.files || []);
+      if (!files.length) return;
+      const notes = [];
+      for (const file of files) {
+        try {
+          const p = IMUData.tempPoint(await file.text());
+          if (!p) {
+            notes.push(`${file.name}: 缺少 gx/gy/gz/temp`);
+            continue;
+          }
+          const i = state.tempPoints.findIndex((x) => Math.abs(x.T - p.T) < 1e-6);
+          const point = { T: p.T, gx: p.gx, gy: p.gy, gz: p.gz };
+          if (i >= 0) state.tempPoints[i] = point;
+          else state.tempPoints.push(point);
+          notes.push(`${file.name}: T=${p.T.toFixed(1)}°C`);
+        } catch (e) {
+          notes.push(`${file.name}: 读取失败`);
+        }
+      }
+      renderTempPoints();
+      $("temp-info").textContent = notes.join("；");
       saveCalibLocal();
     });
     $("temp-fit").addEventListener("click", () => {
