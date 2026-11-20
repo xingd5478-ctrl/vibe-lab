@@ -28,6 +28,12 @@
     compare: null,
     pendingText: null,
     pendingName: "",
+    sixFace: {},
+    sixCalib: null,
+    gyroScale: {},
+    tempPoints: [],
+    tempExcluded: new Set(),
+    tempFit: null,
     cols: null,
     mask: null,
     warnedVersion: 0,
@@ -1705,6 +1711,8 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
   function renderTempPoints() {
     const box = $("temp-points");
     if (!box) return;
+    if (!state.tempPoints) state.tempPoints = [];
+    if (!state.tempExcluded) state.tempExcluded = new Set();
     box.innerHTML = "";
     state.tempPoints
       .map((p, i) => ({ p, i }))
