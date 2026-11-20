@@ -2148,8 +2148,12 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
         }
       } catch (e) {
         console.error(e);
-        const line = String(e.stack || "").split("\n")[1] || "";
-        $("serial-status").textContent = "串口失败：" + e.message + (line ? " @" + line.trim() : "");
+        const lines = String(e.stack || "")
+          .split("\n")
+          .slice(1, 5)
+          .map((x) => x.trim())
+          .join(" | ");
+        $("serial-status").textContent = "串口失败：" + e.message + (lines ? " @" + lines : "");
       }
     };
     btn.addEventListener("click", () => start(false));
