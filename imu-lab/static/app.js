@@ -1957,6 +1957,133 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     drawFusion();
   }
 
+  function sendModelToLab() {
+    if (!window.VibeProject) {
+      flash("项目模块未加载");
+      return;
+    }
+    const rows = currentRows();
+    if (!rows.length) {
+      flash("没有数据");
+      return;
+    }
+    const t = [],
+      u = [],
+      y = [];
+    let angle = 0;
+    for (const r of rows) {
+      t.push(r.t);
+      u.push(r[state.channel]);
+      angle += r[state.channel] / state.fs;
+      y.push(angle);
+    }
+    try {
+      window.VibeProject.handoff({
+        kind: "dataset",
+        source: "IMU " + state.channel,
+        dataset: { t, u, y, meta: { units: { u: "°/s", y: "deg" }, source: "imu" } },
+      });
+      location.href = location.pathname.includes("/imu-lab/") ? "../model-lab/static/index.html" : "../model/";
+    } catch (e) {
+      flash("数据过大，无法送到 Model Lab");
+    }
+  }
+
+  function initSerial() {
+    const btn = $("serial-connect");
+    const acceptBtn = $("serial-accept");
+    if (!btn) return;
+    let port = null,
+      reader = null,
+      active = false;
+    const stop = async () => {
+      active = false;
+      try {
+        if (reader) await reader.cancel();
+      } catch (e) {}
+      try {
+        if (port) await port.close();
+      } catch (e) {}
+      reader = null;
+      port = null;
+      btn.textContent = "连接 STM32（Web Serial）";
+      $("serial-status").textContent = "已断开";
+    };
+    const start = async (acceptMode) => {
+      if (active) await stop();
+      if (!navigator.serial) {
+        $("serial-status").textContent = "当前浏览器不支持 Web Serial（需 Chrome/Edge + HTTPS/localhost）";
+        return;
+      }
+      try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+        const decoder = new TextDecoderStream();
+        port.readable.pipeTo(decoder.writable).catch(() => {});
+        reader = decoder.readable.getReader();
+        active = true;
+        btn.textContent = "停止串口采集";
+        $("serial-status").textContent = acceptMode ? "验收采集中（10 s）…" : "串口已连接，等待数据…";
+        let buf = "",
+          rows = [],
+          startAt = performance.now(),
+          lastFlush = 0,
+          acceptRows = [];
+        const acceptStart = performance.now();
+        while (active) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += value;
+          const lines = buf.split(/\r?\n/);
+          buf = lines.pop();
+          for (const line of lines) {
+            const parsed = IMUData.parseSerialLines(line, state.fs, (performance.now() - startAt) / 1000);
+            rows.push(...parsed);
+            if (acceptMode) acceptRows.push(...parsed);
+          }
+          const now = performance.now();
+          if (rows.length > 200 || now - lastFlush > 1200) {
+            lastFlush = now;
+            state.source = "serial";
+            applyRows(rows.slice(), "STM32 serial");
+            $("serial-status").textContent = `串口采集中：${rows.length} 帧`;
+          }
+          if (acceptMode && now - acceptStart >= 10000) {
+            const report = IMUData.serialAcceptance(acceptRows);
+            const el = $("serial-accept-result");
+            el.textContent = `${report.ok ? "PASS" : "FAIL"} · ${report.n} 帧 · fs ${Number.isFinite(report.fs) ? report.fs.toFixed(1) : "—"} Hz · jitter ${Number.isFinite(report.jitter) ? (report.jitter * 100).toFixed(0) : "—"}% · 非单调 ${report.nonmono} · 重复 ${report.dup}`;
+            const dl = document.createElement("button");
+            dl.type = "button";
+            dl.textContent = "下载验收 JSON";
+            dl.style.cssText =
+              "margin-left:8px;padding:2px 6px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);cursor:pointer;font:10px var(--mono)";
+            dl.addEventListener("click", () => {
+              const blob = new Blob([JSON.stringify({ report, rows: acceptRows }, null, 2)], {
+                type: "application/json",
+              });
+              const a = document.createElement("a");
+              a.href = URL.createObjectURL(blob);
+              a.download = "serial-acceptance.json";
+              a.click();
+              setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+            });
+            el.appendChild(dl);
+            await stop();
+            break;
+          }
+        }
+        if (rows.length) {
+          state.source = "serial";
+          applyRows(rows.slice(), "STM32 serial");
+        }
+      } catch (e) {
+        $("serial-status").textContent = "串口失败：" + e.message;
+      }
+    };
+    btn.addEventListener("click", () => start(false));
+    if (acceptBtn) acceptBtn.addEventListener("click", () => start(true));
+  }
+
   function init() {
     if (window.Worker) {
       try {
@@ -2004,6 +2131,8 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     initSixFace();
     initGyroScale();
     initTempCal();
+    initSerial();
+    if ($("send-model")) $("send-model").addEventListener("click", sendModelToLab);
     if (window.matchMedia) {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       if (mq.addEventListener) mq.addEventListener("change", draw);
