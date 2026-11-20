@@ -2046,7 +2046,8 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
         let rows = [],
           startAt = performance.now(),
           lastFlush = 0,
-          acceptRows = [];
+          acceptRows = [],
+          totalBytes = 0;
         let binBuf = new Uint8Array(0),
           textBuf = "",
           decoder = new TextDecoder();
@@ -2057,6 +2058,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
           if (done) break;
           if (mode === "binary") {
             const chunk = value instanceof Uint8Array ? value : new Uint8Array(value);
+            totalBytes += chunk.length;
             const merged = new Uint8Array(binBuf.length + chunk.length);
             merged.set(binBuf, 0);
             merged.set(chunk, binBuf.length);
@@ -2070,6 +2072,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
             rows.push(...parsed.rows);
             if (acceptMode) acceptRows.push(...parsed.rows);
           } else {
+            totalBytes += value.length || 0;
             textBuf += decoder.decode(value, { stream: true });
             const lines = textBuf.split(/\r?\n/);
             textBuf = lines.pop();
@@ -2085,7 +2088,8 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
             state.source = "serial";
             applyRows(rows.slice(), "STM32 serial");
             $("serial-status").textContent =
-              `串口采集中：${rows.length} 帧` + (mode === "binary" ? ` · CRC 错 ${bstats.crcErrors}` : "");
+              `串口采集中：${rows.length} 帧 · 收到 ${totalBytes} B` +
+              (mode === "binary" ? ` · CRC 错 ${bstats.crcErrors}` : "");
           }
           if (acceptMode && now - acceptStart >= 10000) {
             const report = IMUData.serialAcceptance(acceptRows);
@@ -2093,6 +2097,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
             const el = $("serial-accept-result");
             el.textContent =
               `${report.ok ? "PASS" : "FAIL"} · ${report.n} 帧 · fs ${Number.isFinite(report.fs) ? report.fs.toFixed(1) : "—"} Hz · jitter ${Number.isFinite(report.jitter) ? (report.jitter * 100).toFixed(0) : "—"}% · 非单调 ${report.nonmono} · 重复 ${report.dup}` +
+              ` · 收到 ${totalBytes} B` +
               (mode === "binary" ? ` · CRC 错 ${bstats.crcErrors} · seq 跳变 ${bstats.seqGaps}` : "");
             const dl = document.createElement("button");
             dl.type = "button";
@@ -2101,7 +2106,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
               "margin-left:8px;padding:2px 6px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);cursor:pointer;font:10px var(--mono)";
             dl.addEventListener("click", () => {
               const blob = new Blob(
-                [JSON.stringify({ report, baud, mode, stats: bstats, rows: acceptRows }, null, 2)],
+                [JSON.stringify({ report, baud, mode, bytes: totalBytes, stats: bstats, rows: acceptRows }, null, 2)],
                 { type: "application/json" }
               );
               const a = document.createElement("a");
