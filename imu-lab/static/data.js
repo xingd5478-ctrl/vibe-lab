@@ -512,7 +512,7 @@
       }
       stats.frames++;
       stats.types[type.toString(16)] = (stats.types[type.toString(16)] || 0) + 1;
-      if (row.gx !== undefined) rows.push(row);
+      if (row.gx !== undefined) rows[rows.length] = row;
       cursor += total;
     }
     return { rows, rest: bytes.slice(cursor), stats };
