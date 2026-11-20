@@ -37,18 +37,20 @@
     return { w, mag, phase };
   }
 
-  function bodeFirst(K, tau) {
+  function bodeFirst(K, tau, L) {
     const w = logspace(0.1, 100, 320);
     const mag = [],
       phase = [];
     for (const wi of w) {
       mag.push(20 * Math.log10(K / Math.hypot(1, wi * tau)));
-      phase.push((-Math.atan(wi * tau) * 180) / Math.PI);
+      phase.push(((-Math.atan(wi * tau) - wi * (L || 0)) * 180) / Math.PI);
     }
     return { w, mag, phase };
   }
 
   function simFirst(K, tau, closed, kp, ki, kd, opts) {
+    const delay = Math.max(0, Math.round(((opts && opts.L) || 0) / 0.002));
+    const uq = [];
     const dt = 0.002,
       T = 8,
       n = Math.floor(T / dt);
@@ -73,7 +75,9 @@
         if (!saturated || !(opts && opts.antiWindup === false)) xi = candidate;
         prevE = e;
       }
-      x += dt * ((K * u - x) / tau);
+      uq.push(u);
+      const ud = delay > 0 && i >= delay ? uq[i - delay] : delay > 0 ? 0 : u;
+      x += dt * ((K * ud - x) / tau);
       t[i] = i * dt;
       y[i] = x;
     }
@@ -321,7 +325,8 @@
     const antiWindup = $("anti-windup").checked;
     const tf = parseFloat($("d-filter").value);
     const uMax = parseFloat($("u-limit").value);
-    const opts = { antiWindup, tf, uMax };
+    const delay = parseFloat($("L").value);
+    const opts = { antiWindup, tf, uMax, L: delay };
     $("d-filter-val").textContent = tf.toFixed(3);
     $("u-limit-val").textContent = uMax.toFixed(0);
     $("kp-val").textContent = kp.toFixed(2);
@@ -333,15 +338,16 @@
     if (order === 1) {
       const K = parseFloat($("K").value);
       const tau = parseFloat($("tau").value);
-      Object.assign(state, { order, K, tau, kp, ki, kd, antiWindup, tf, uMax });
+      Object.assign(state, { order, K, tau, L: delay, kp, ki, kd, antiWindup, tf, uMax });
       $("K-val").textContent = K.toFixed(1);
       $("tau-val").textContent = tau.toFixed(2);
+      $("L-val").textContent = delay.toFixed(2);
       $("K").setAttribute("aria-valuetext", K.toFixed(1));
       $("tau").setAttribute("aria-valuetext", tau.toFixed(2));
-      b = bodeFirst(K, tau);
+      b = bodeFirst(K, tau, delay);
       open = simFirst(K, tau, false, kp, ki, kd, opts);
       closed = simFirst(K, tau, true, kp, ki, kd, opts);
-      $("meta-bode").textContent = `K=${K.toFixed(2)} · τ=${tau.toFixed(2)} s`;
+      $("meta-bode").textContent = `K=${K.toFixed(2)} · τ=${tau.toFixed(2)} s · L=${delay.toFixed(2)} s`;
     } else {
       const wn = parseFloat($("wn").value);
       const zeta = parseFloat($("zeta").value);
@@ -433,7 +439,7 @@
     if (p.has("aw")) $("anti-windup").checked = p.get("aw") !== "0";
     if (p.has("tf")) $("d-filter").value = p.get("tf");
     if (p.has("umax")) $("u-limit").value = p.get("umax");
-    const map = { wn: "wn", zeta: "zeta", K: "K", tau: "tau", kp: "kp", ki: "ki", kd: "kd" };
+    const map = { wn: "wn", zeta: "zeta", K: "K", tau: "tau", L: "L", kp: "kp", ki: "ki", kd: "kd" };
     for (const k in map) {
       if (p.has(k)) {
         const v = parseFloat(p.get(k));
@@ -442,7 +448,7 @@
     }
   }
 
-  ["order", "wn", "zeta", "K", "tau", "kp", "ki", "kd", "d-filter", "u-limit"].forEach((id) => {
+  ["order", "wn", "zeta", "K", "tau", "L", "kp", "ki", "kd", "d-filter", "u-limit"].forEach((id) => {
     $(id).addEventListener(id === "order" ? "change" : "input", render);
   });
   $("anti-windup").addEventListener("change", render);
@@ -460,7 +466,7 @@
       const K = parseFloat($("K").value),
         tau = parseFloat($("tau").value);
       if (!(K > 0) || !(tau > 0)) return;
-      const kp = tau / (K * Math.max(0.1, tau * 0.5));
+      const kp = tau / (K * Math.max(0.1, tau * 0.5 + parseFloat($("L").value)));
       $("kp").value = Math.min(10, kp);
       $("ki").value = Math.min(10, Math.max(0, kp / tau));
       $("kd").value = 0;
