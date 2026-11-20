@@ -813,6 +813,7 @@
       null
     );
     if (p.dataset.r) state.data.r = p.dataset.r.slice();
+    $("closed-freq").hidden = !state.data.r;
   }
 
   function renderProjects() {
@@ -1011,6 +1012,7 @@
     if (refIndex !== "" && refIndex != null) {
       const ri = Number(refIndex);
       if (Number.isInteger(ri) && parsed.meta.columns[ri]) d.r = parsed.meta.columns[ri].slice();
+      if ($("closed-freq")) $("closed-freq").hidden = !d.r;
     }
     d.meta = {
       ...(d.meta || {}),
@@ -1222,6 +1224,26 @@
     });
     $("copy-matlab").addEventListener("click", copyMatlab);
     $("uncertainty").addEventListener("click", estimateUncertainty);
+    $("closed-freq").addEventListener("click", () => {
+      if (!state.data || !state.data.r) return;
+      try {
+        const f = I.closedLoopFrequency(state.data.t, state.data.r, state.data.u, state.data.y, {
+          controller: state.data.meta.controller || { kp: 1, ki: 0, kd: 0 },
+        });
+        const rows = f.freq
+          .map(
+            (x, i) =>
+              `<tr><td>${x.toFixed(3)}</td><td>${f.tMag[i].toFixed(3)}</td><td>${f.gMag[i].toFixed(3)}</td><td>${f.coherence[i].toFixed(2)}</td></tr>`
+          )
+          .slice(0, 16)
+          .join("");
+        $("closed-freq-panel").hidden = false;
+        $("closed-freq-panel").innerHTML =
+          `<h3>${T("闭环频域", "Closed-loop frequency")}</h3><p class="recommend">${T("中位相干", "Median coherence")}：<b>${(f.medianCoherence * 100).toFixed(0)}%</b> · ${f.segments} ${T("段", "segments")}</p><div class="table-wrap"><table><thead><tr><th>Hz</th><th>|T|</th><th>|G|</th><th>coh</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      } catch (e) {
+        showError(e.message);
+      }
+    });
     $("auto-order").addEventListener("click", () => {
       if (!state.data) return;
       const split = Math.max(0, Math.min(1, Number($("split").value) || 0.7));

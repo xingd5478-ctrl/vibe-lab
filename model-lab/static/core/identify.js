@@ -745,6 +745,52 @@
     return best;
   }
 
+  function closedLoopFrequency(t, r, u, y, opts) {
+    const etfe = fitETFE(t, r, y, opts);
+    const c = (opts && opts.controller) || { kp: 1, ki: 0, kd: 0 };
+    const freq = [],
+      tMag = [],
+      tPhase = [],
+      gMag = [],
+      gPhase = [],
+      coherence = [];
+    for (let i = 0; i < etfe.freq.length; i++) {
+      const w = 2 * Math.PI * etfe.freq[i];
+      const tr = etfe.mag[i] * Math.cos(etfe.phase[i]);
+      const ti = etfe.mag[i] * Math.sin(etfe.phase[i]);
+      const cr = c.kp;
+      const ci = c.kd * w - c.ki / w;
+      const oneR = 1 - tr;
+      const oneI = -ti;
+      const denR = cr * oneR - ci * oneI;
+      const denI = cr * oneI + ci * oneR;
+      const den = denR * denR + denI * denI;
+      if (!(den > 1e-18)) continue;
+      const gr = (tr * denR + ti * denI) / den;
+      const gi = (ti * denR - tr * denI) / den;
+      if (!Number.isFinite(gr) || !Number.isFinite(gi)) continue;
+      freq.push(etfe.freq[i]);
+      tMag.push(etfe.mag[i]);
+      tPhase.push(etfe.phase[i]);
+      gMag.push(Math.hypot(gr, gi));
+      gPhase.push(Math.atan2(gi, gr));
+      coherence.push(etfe.coherence[i]);
+    }
+    return {
+      model: "CLFreq",
+      freq,
+      tMag,
+      tPhase,
+      gMag,
+      gPhase,
+      coherence,
+      medianCoherence: etfe.medianCoherence,
+      controller: c,
+      fit: etfe.fit,
+      segments: etfe.segments,
+    };
+  }
+
   function fitMIMOARX(t, U, Y, opts) {
     const n = t.length;
     const m = U.length;
@@ -1258,6 +1304,7 @@
     fitWiener,
     fitSS,
     fitSubspace,
+    closedLoopFrequency,
     selectARXOrder,
     bootstrap,
     simulate,

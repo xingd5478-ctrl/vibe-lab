@@ -254,6 +254,15 @@ test("subspace recovers a rich-input state-space model", () => {
   assert.equal(f.A.length, f.n);
 });
 
+test("closed-loop frequency identifies the plant", () => {
+  const P = require("../model-lab/static/core/plants.js");
+  const d = P.virtualClosedLoop({ plant: "thermal", duration: 80, fs: 50, noise: 0 });
+  const f = I.closedLoopFrequency(d.t, d.r, d.u, d.y, { controller: d.meta.controller });
+  assert.ok(f.freq.length > 0);
+  assert.ok(f.gMag.every(Number.isFinite));
+  assert.ok(f.medianCoherence >= 0);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });
