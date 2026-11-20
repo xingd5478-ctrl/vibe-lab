@@ -116,6 +116,7 @@
         <div class="field" style="margin-top:14px">
           <button id="calib" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;margin-bottom:6px;">估计零偏（前 5 s）</button>
         <div class="hint" id="calib-info">假设前 5 s 静止；输出 gx/gy/gz 偏置。</div>
+        <button id="calib-apply" type="button" style="width:100%;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;margin-bottom:6px;">应用零偏</button>
         <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;">重置为示例数据</button>
         </div>
 
@@ -155,6 +156,21 @@
           </div>
           <div class="chart" id="chart-kf"></div>
         </div>
+      </section>
+
+      <section class="panel fusion-panel">
+        <div class="panel-head">
+          <h2>姿态融合 · 互补滤波演示</h2>
+          <span class="meta">陀螺积分 vs 互补滤波</span>
+        </div>
+        <div class="fusion-controls">
+          <label for="fusion-alpha">加速度计权重 α <output id="fusion-alpha-val">0.02</output></label>
+          <input id="fusion-alpha" type="range" min="0.005" max="0.2" step="0.005" value="0.02" />
+          <label class="fusion-upload">加载真实融合 CSV <input id="fusion-file" type="file" accept=".csv,text/csv" /></label>
+        </div>
+        <p class="hint" id="fusion-source">当前：合成演示数据</p>
+        <div class="chart" id="chart-fusion"></div>
+        <p class="hint">演示用合成数据：陀螺有零偏和积分漂移，加速度计有噪声但是绝对参考。α 越大越信加速度计，越小越信陀螺。</p>
       </section>
     </div>
       <section class="manual" id="manual">

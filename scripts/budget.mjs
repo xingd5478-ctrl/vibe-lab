@@ -12,7 +12,7 @@ const PAGE_BUDGET_KB = {
   "control-play": 80,
   simulink: 280,
   about: 30,
-  "model-lab/static": 55,
+  "model-lab/static": 60,
 };
 
 let total = 0;

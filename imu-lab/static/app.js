@@ -3,6 +3,7 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
+  const T = (zh, en) => (document.documentElement.lang === "en" ? en : zh);
   const { allanDeviation, cleanFrames } = window.IMUAllan;
   const { integrate, kf1d } = window.IMUKF;
   const { fitAllan, quantile } = window.IMUFit;
@@ -1024,42 +1025,67 @@ ${blocks}
     if (!el) return;
     const alpha = Number($("fusion-alpha").value) || 0.02;
     $("fusion-alpha-val").textContent = alpha.toFixed(3);
-    const rnd = mulberry32(7);
-    const dt = 0.02,
-      n = 1500;
-    const t = [],
+    const real = state.fusionRows;
+    let t = [],
       truth = [],
-      gyro = [],
+      gyroRaw = [],
       acc = [],
       fused = [],
       integrated = [];
-    let angle = 0,
-      gyroAngle = 0;
-    for (let i = 0; i < n; i++) {
-      const x = i * dt;
-      const th = 22 * Math.sin(0.28 * x) + 7 * Math.sin(1.25 * x);
-      const dth = 22 * 0.28 * Math.cos(0.28 * x) + 7 * 1.25 * Math.cos(1.25 * x);
-      const g = dth + 0.8 + gauss(rnd) * 0.45;
-      const a = th + gauss(rnd) * 1.8;
-      gyroAngle += g * dt;
-      angle = (1 - alpha) * (angle + g * dt) + alpha * a;
-      t.push(x);
-      truth.push(th);
-      gyro.push(gyroAngle);
-      acc.push(a);
-      fused.push(angle);
-      integrated.push(gyroAngle);
+    if (real && real.length > 20) {
+      const dt = Math.max(1e-4, real[1].t - real[0].t || 0.01);
+      let angle = 0,
+        gyroAngle = 0;
+      for (const row of real) {
+        const g = row.gx;
+        const a = (Math.atan2(row.ay, row.az) * 180) / Math.PI;
+        gyroAngle += g * dt;
+        angle = (1 - alpha) * (angle + g * dt) + alpha * a;
+        t.push(row.t);
+        gyroRaw.push(gyroAngle);
+        acc.push(a);
+        fused.push(angle);
+        integrated.push(gyroAngle);
+      }
+      $("fusion-source").textContent = T("当前：真实 CSV · gx + ay/az 倾角", "Current: real CSV · gx + ay/az tilt");
+    } else {
+      const rnd = mulberry32(7);
+      const dt = 0.02,
+        n = 1500;
+      let angle = 0,
+        gyroAngle = 0;
+      for (let i = 0; i < n; i++) {
+        const x = i * dt;
+        const th = 22 * Math.sin(0.28 * x) + 7 * Math.sin(1.25 * x);
+        const dth = 22 * 0.28 * Math.cos(0.28 * x) + 7 * 1.25 * Math.cos(1.25 * x);
+        const g = dth + 0.8 + gauss(rnd) * 0.45;
+        const a = th + gauss(rnd) * 1.8;
+        gyroAngle += g * dt;
+        angle = (1 - alpha) * (angle + g * dt) + alpha * a;
+        t.push(x);
+        truth.push(th);
+        gyroRaw.push(gyroAngle);
+        acc.push(a);
+        fused.push(angle);
+        integrated.push(gyroAngle);
+      }
+      $("fusion-source").textContent = T("当前：合成演示数据", "Current: synthetic demo data");
     }
     const w = 800,
       h = 240,
       m = { l: 48, r: 12, t: 14, b: 26 };
-    const yMin = -35,
-      yMax = 35;
-    const sx = (x) => m.l + (x / t[n - 1]) * (w - m.l - m.r);
-    const sy = (v) => m.t + (1 - (v - yMin) / (yMax - yMin)) * (h - m.t - m.b);
+    const all = truth.concat(integrated, fused, acc);
+    const lo = Math.min(...all),
+      hi = Math.max(...all);
+    const pad = (hi - lo || 1) * 0.12;
+    const yMin = lo - pad,
+      yMax = hi + pad;
+    const sx = (x) => m.l + (x / (t[t.length - 1] || 1)) * (w - m.l - m.r);
+    const sy = (v) => m.t + (1 - (v - yMin) / (yMax - yMin || 1)) * (h - m.t - m.b);
     const path = (arr) => arr.map((v, i) => (i ? "L" : "M") + sx(t[i]).toFixed(1) + "," + sy(v).toFixed(1)).join(" ");
     let grid = "";
-    for (let v = -30; v <= 30; v += 15)
+    for (let k = 0; k <= 3; k++) {
+      const v = yMin + ((yMax - yMin) * k) / 3;
       grid +=
         '<line x1="' +
         m.l +
@@ -1074,14 +1100,16 @@ ${blocks}
         '" y="' +
         (sy(v) + 3).toFixed(1) +
         '" text-anchor="end" style="fill:var(--muted);font:9px var(--mono)">' +
-        v +
+        v.toFixed(0) +
         "</text>";
-    el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="互补滤波姿态估计演示">
+    }
+    el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="互补滤波姿态估计">
       ${grid}
-      <path d="${path(truth)}" fill="none" style="stroke:var(--line);stroke-width:1;opacity:.8"/>
+      ${truth.length ? `<path d="${path(truth)}" fill="none" style="stroke:var(--line);stroke-width:1;opacity:.8"/>` : ""}
       <path d="${path(integrated)}" fill="none" style="stroke:var(--chart-2);stroke-width:1;opacity:.65"/>
+      <path d="${path(acc)}" fill="none" style="stroke:var(--chart-3);stroke-width:.9;opacity:.5"/>
       <path d="${path(fused)}" fill="none" style="stroke:var(--chart-1);stroke-width:1.8"/>
-      <text x="${m.l}" y="${m.t + 10}" style="fill:var(--muted);font:9px var(--mono)">truth / gyro integration / complementary</text>
+      <text x="${m.l}" y="${m.t + 10}" style="fill:var(--muted);font:9px var(--mono)">${truth.length ? "truth" : "acc"} / gyro integration / complementary</text>
     </svg>`;
   }
 
@@ -1101,6 +1129,39 @@ ${blocks}
     const a = $("fusion-alpha");
     if (!a) return;
     a.addEventListener("input", drawFusion);
+    $("fusion-file").addEventListener("change", (ev) => {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const lines = String(reader.result)
+          .split(/\r?\n/)
+          .filter((l) => l.trim());
+        const head = (lines[0] || "").split(",").map((x) => x.trim().toLowerCase());
+        const ix = (names) => head.findIndex((h) => names.includes(h));
+        const iT = ix(["t", "time", "timestamp"]),
+          iG = ix(["gx", "gx_dps", "gyro_x"]);
+        const iAy = ix(["ay", "ay_g", "accel_y"]),
+          iAz = ix(["az", "az_g", "accel_z"]);
+        if (iT < 0 || iG < 0 || iAy < 0 || iAz < 0) {
+          flash("融合 CSV 需要 t,gx,ay,az 列");
+          return;
+        }
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const c = lines[i].split(",");
+          const t = Number(c[iT]),
+            gx = Number(c[iG]),
+            ay = Number(c[iAy]),
+            az = Number(c[iAz]);
+          if ([t, gx, ay, az].every(isFinite)) rows.push({ t, gx, ay, az });
+        }
+        state.fusionRows = rows;
+        drawFusion();
+        flash(`已加载 ${rows.length} 行融合数据`);
+      };
+      reader.readAsText(file);
+    });
     drawFusion();
   }
 

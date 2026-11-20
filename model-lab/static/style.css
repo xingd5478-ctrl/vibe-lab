@@ -188,3 +188,10 @@ footer a { color: var(--muted); }
 .v-item.fail b { color: #8a3b2e; }
 .v-item.warn b { color: #8a4a12; }
 @media (prefers-color-scheme: dark) { .v-item.fail b { color: #e08b78; } .v-item.warn b { color: #e0a36a; } }
+
+.comparison { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
+.comparison h3 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+.table-wrap { overflow-x: auto; }
+.comparison table { width: 100%; border-collapse: collapse; font: 10px var(--mono); color: var(--muted); }
+.comparison th, .comparison td { text-align: left; border-bottom: 1px solid var(--line); padding: 4px 6px; white-space: nowrap; }
+.comparison th { color: var(--ink); font-weight: 600; }

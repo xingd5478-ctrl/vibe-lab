@@ -34,6 +34,7 @@
     fileName: "",
     split: 0.7,
     uncertainty: null,
+    history: [],
     csvParsed: null,
     csvName: "",
   };
@@ -204,6 +205,7 @@
       renderMetrics();
       renderWarnings();
       renderValidation();
+      recordComparison(f);
       $("actions").hidden = false;
       $("uncertainty").hidden = [
         "ETFE",
@@ -428,6 +430,60 @@
       list.appendChild(row);
     });
     box.appendChild(list);
+  }
+
+  function paramCount(f) {
+    if (f.model === "FOPDT") return 3;
+    if (f.model === "SOPDT") return 4;
+    if (f.model === "ARX" || f.model === "OE" || f.model === "2SLS-ARX") return f.na + f.nb;
+    if (f.model === "ARMAX") return f.na + f.nb + f.nc;
+    if (f.model === "FIR") return f.nh + 1;
+    if (f.model === "Wiener") return f.na + f.nb + 3;
+    if (f.model === "Hammerstein") return f.na + f.nb + 1;
+    if (f.model === "MIMO-ARX") return f.p * (f.p * f.na + f.m * f.nb);
+    return null;
+  }
+
+  function recordComparison(f) {
+    if (!state.data || !f || !f.yhat || f.model === "ETFE" || f.model === "MIMO-ARX") return;
+    let sse = 0;
+    const n = state.data.y.length;
+    for (let i = 0; i < n; i++) {
+      const d = state.data.y[i] - f.yhat[i];
+      sse += d * d;
+    }
+    const k = paramCount(f);
+    const aic = k != null && sse > 0 ? n * Math.log(sse / n) + 2 * k : null;
+    const grade = (V && V.validate(f, state.data, state.quality)) || null;
+    const key = [f.model, f.na, f.nb, f.nk, f.fitTrain && f.fitTrain.toFixed(1)].join("|");
+    if (state.history.some((h) => h.key === key)) return;
+    state.history.unshift({
+      key,
+      model: f.model,
+      train: f.fitTrain,
+      val: f.fitVal,
+      aic,
+      grade: grade ? grade.grade : null,
+      k,
+    });
+    state.history = state.history.slice(0, 6);
+    renderComparison();
+  }
+
+  function renderComparison() {
+    const box = $("comparison");
+    if (!state.history.length) {
+      box.hidden = true;
+      return;
+    }
+    box.hidden = false;
+    const rows = state.history
+      .map(
+        (h) =>
+          `<tr><td>${h.model}</td><td>${h.train != null ? h.train.toFixed(1) : "—"}</td><td>${h.val != null ? h.val.toFixed(1) : "—"}</td><td>${h.aic != null ? h.aic.toFixed(0) : "—"}</td><td>${h.k != null ? h.k : "—"}</td><td>${h.grade || "—"}</td></tr>`
+      )
+      .join("");
+    box.innerHTML = `<h3>${T("模型对比", "Model comparison")}</h3><div class="table-wrap"><table><thead><tr><th>model</th><th>FIT train</th><th>FIT val</th><th>AIC</th><th>k</th><th>grade</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function drawMainChart() {
