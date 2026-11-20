@@ -155,6 +155,72 @@
     return { pm, gm };
   }
 
+  function relayTune(order, K, tau, L, wn, zeta) {
+    const dt = 0.002,
+      T = 30,
+      n = Math.floor(T / dt),
+      d = 0.5;
+    let x = 0,
+      v = 0,
+      prev = 1,
+      lastCross = -1,
+      periods = [],
+      peaks = [];
+    const delay = Math.max(0, Math.round((L || 0) / dt));
+    const uq = [];
+    for (let i = 0; i < n; i++) {
+      const y = order === 1 ? x : x;
+      const e = 1 - y;
+      const u = e >= 0 ? d : -d;
+      uq.push(u);
+      const ud = delay > 0 && i >= delay ? uq[i - delay] : delay > 0 ? 0 : u;
+      if (order === 1) x += dt * ((K * ud - x) / tau);
+      else {
+        const acc = wn * wn * ud - 2 * zeta * wn * v - wn * wn * x;
+        v += acc * dt;
+        x += v * dt;
+      }
+      if (i * dt > 5) {
+        if (prev < 0 && y >= 0) {
+          if (lastCross >= 0) periods.push(i * dt - lastCross);
+          lastCross = i * dt;
+        }
+        prev = y;
+      }
+    }
+    if (periods.length < 2) return null;
+    const Tu = periods.reduce((s, z) => s + z, 0) / periods.length;
+    // relay oscillation amplitude from last half period sample
+    const start = Math.max(0, n - Math.round((Tu / dt) * 2));
+    let lo = Infinity,
+      hi = -Infinity;
+    for (let i = start; i < n; i++) {
+      const y = order === 1 ? 0 : 0; // recompute not stored; use output history below
+    }
+    // rerun storing y (simple and deterministic)
+    x = 0;
+    v = 0;
+    const ys = [];
+    for (let i = 0; i < n; i++) {
+      const u = 1 - (ys.length ? ys[ys.length - 1] : 0) >= 0 ? d : -d;
+      const ud = delay > 0 && i >= delay ? uq[i - delay] : delay > 0 ? 0 : u;
+      if (order === 1) x += dt * ((K * ud - x) / tau);
+      else {
+        const acc = wn * wn * ud - 2 * zeta * wn * v - wn * wn * x;
+        v += acc * dt;
+        x += v * dt;
+      }
+      ys.push(x);
+    }
+    for (let i = Math.max(0, n - Math.round((Tu / dt) * 2)); i < n; i++) {
+      lo = Math.min(lo, ys[i]);
+      hi = Math.max(hi, ys[i]);
+    }
+    const a = Math.max(1e-6, (hi - lo) / 2);
+    const Ku = (4 * d) / (Math.PI * a);
+    return { Ku, Tu, a };
+  }
+
   function metrics(t, y) {
     let peak = -Infinity,
       tPeak = 0;

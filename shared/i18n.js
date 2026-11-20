@@ -343,6 +343,7 @@
     打开: "Open",
     "纯延迟 L": "Dead time L",
     "Smith 预估": "Smith predictor",
+    继电器自整定: "Relay auto-tuning",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",
