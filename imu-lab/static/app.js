@@ -880,6 +880,7 @@ ${blocks}
       kalman: { R: state.r, Q: state.q },
       sixFace: state.sixCalib,
       sixFaceRaw: state.sixFace,
+      gyroScale: state.gyroScale,
       note: "Teaching estimate; not a certified calibration.",
     };
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), "imu_calibration.json");
@@ -1388,6 +1389,57 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     });
   }
 
+  function initGyroScale() {
+    const capture = $("gyro-capture");
+    if (!capture) return;
+    capture.addEventListener("click", () => {
+      const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 2)));
+      const axis = $("gyro-axis").value,
+        known = Number($("gyro-known").value);
+      if (!rows.length) return;
+      const measured = rows.reduce((s, r) => s + r[axis], 0) / rows.length;
+      try {
+        const f = IMUData.gyroScale(measured, known);
+        state.gyroScale[axis] = f;
+        $("gyro-info").textContent =
+          `${axis.toUpperCase()} 实测 ${measured.toFixed(3)} °/s / 已知 ${known.toFixed(1)} °/s → scale ${f.toFixed(4)}`;
+      } catch (e) {
+        $("gyro-info").textContent = e.message;
+      }
+    });
+    $("gyro-apply").addEventListener("click", () => {
+      if ($("gyro-apply").textContent === "撤销刻度" && state.gyroBackup) {
+        state.rows.forEach((r, i) => {
+          const b = state.gyroBackup[i];
+          if (b) {
+            r.gx = b.gx;
+            r.gy = b.gy;
+            r.gz = b.gz;
+          }
+        });
+        state.gyroBackup = null;
+        $("gyro-apply").textContent = "应用刻度";
+        $("gyro-info").textContent = "已撤销陀螺刻度";
+      } else {
+        const axes = Object.keys(state.gyroScale);
+        if (!axes.length) {
+          $("gyro-info").textContent = "先采集至少一个轴。";
+          return;
+        }
+        state.gyroBackup = state.rows.map((r) => ({ gx: r.gx, gy: r.gy, gz: r.gz }));
+        state.rows.forEach((r) =>
+          axes.forEach((a) => {
+            if (state.gyroScale[a]) r[a] /= state.gyroScale[a];
+          })
+        );
+        $("gyro-apply").textContent = "撤销刻度";
+        $("gyro-info").textContent = `已应用：${axes.map((a) => `${a}=${state.gyroScale[a].toFixed(4)}`).join(" · ")}`;
+      }
+      prepare();
+      draw();
+    });
+  }
+
   function initFusion() {
     const a = $("fusion-alpha");
     if (!a) return;
@@ -1473,6 +1525,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     initFusion();
     initCalib();
     initSixFace();
+    initGyroScale();
     if (window.matchMedia) {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       if (mq.addEventListener) mq.addEventListener("change", draw);

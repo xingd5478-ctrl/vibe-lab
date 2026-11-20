@@ -8,7 +8,7 @@ const EXT = new Set([".js", ".mjs", ".css"]);
 const PAGE_BUDGET_KB = {
   landing: 26,
   shared: 45,
-  "imu-lab/static": 120,
+  "imu-lab/static": 128,
   "control-play": 80,
   simulink: 280,
   about: 30,

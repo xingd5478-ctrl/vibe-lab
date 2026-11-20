@@ -132,6 +132,14 @@
           <div class="six-actions"><button id="six-export" type="button">导出六面 JSON</button><button id="six-reset" type="button">清空</button></div>
           <p class="hint" id="six-result" role="status"></p>
         </details>
+        <details class="six-face" id="gyro-scale">
+          <summary>陀螺刻度标定</summary>
+          <p class="hint">把传感器放在已知角速度的转台/夹具上，记录该轴 2 s 均值。</p>
+          <label>轴 <select id="gyro-axis"><option value="gx">GX</option><option value="gy">GY</option><option value="gz">GZ</option></select></label>
+          <label>已知角速度 <input id="gyro-known" type="number" min="0.1" step="0.1" value="90" /> °/s</label>
+          <div class="six-actions"><button id="gyro-capture" type="button">采集并计算</button><button id="gyro-apply" type="button">应用刻度</button></div>
+          <p class="hint" id="gyro-info">未标定。</p>
+        </details>
         <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;">重置为示例数据</button>
         </div>
 

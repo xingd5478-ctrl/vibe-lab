@@ -214,16 +214,65 @@
     return (axes[0][1] >= 0 ? "p" : "n") + axes[0][0];
   }
 
+  function solve4(M, b) {
+    const A = M.map((r, i) => r.concat([b[i]]));
+    for (let i = 0; i < 4; i++) {
+      let p = i;
+      for (let k = i + 1; k < 4; k++) if (Math.abs(A[k][i]) > Math.abs(A[p][i])) p = k;
+      [A[i], A[p]] = [A[p], A[i]];
+      const d = A[i][i] || 1e-12;
+      for (let j = i; j < 5; j++) A[i][j] /= d;
+      for (let k = 0; k < 4; k++) {
+        if (k === i) continue;
+        const f = A[k][i];
+        for (let j = i; j < 5; j++) A[k][j] -= f * A[i][j];
+      }
+    }
+    return A.map((r) => r[4]);
+  }
+
+  function invert3(M) {
+    const a = M[0][0],
+      b = M[0][1],
+      c = M[0][2];
+    const d = M[1][0],
+      e = M[1][1],
+      f = M[1][2];
+    const g = M[2][0],
+      h = M[2][1],
+      i = M[2][2];
+    const det = a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
+    if (Math.abs(det) < 1e-12) throw new Error("six-face: singular matrix");
+    return [
+      [(e * i - f * h) / det, (c * h - b * i) / det, (b * f - c * e) / det],
+      [(f * g - d * i) / det, (a * i - c * g) / det, (c * d - a * f) / det],
+      [(d * h - e * g) / det, (b * g - a * h) / det, (a * e - b * d) / det],
+    ];
+  }
+
+  function correctSix(calib, x, y, z) {
+    const bx = x - calib.bias.x,
+      by = y - calib.bias.y,
+      bz = z - calib.bias.z;
+    if (calib.matrix) {
+      const M = calib.matrix;
+      return [
+        M[0][0] * bx + M[0][1] * by + M[0][2] * bz,
+        M[1][0] * bx + M[1][1] * by + M[1][2] * bz,
+        M[2][0] * bx + M[2][1] * by + M[2][2] * bz,
+      ];
+    }
+    return [bx / calib.scale.x, by / calib.scale.y, bz / calib.scale.z];
+  }
+
   function sixQuality(faces, calib) {
     const ideal = { px: [1, 0, 0], nx: [-1, 0, 0], py: [0, 1, 0], ny: [0, -1, 0], pz: [0, 0, 1], nz: [0, 0, -1] };
     const norms = [],
       errs = [];
     for (const k of Object.keys(ideal)) {
       if (!faces[k]) continue;
-      const f = faces[k],
-        b = calib.bias,
-        s = calib.scale;
-      const v = [(f.x - b.x) / s.x, (f.y - b.y) / s.y, (f.z - b.z) / s.z];
+      const f = faces[k];
+      const v = correctSix(calib, f.x, f.y, f.z);
       const norm = Math.hypot(v[0], v[1], v[2]);
       norms.push(norm);
       const e = ideal[k].map((x, i) => v[i] - x);
@@ -250,24 +299,40 @@
     return "F";
   }
 
+  function gyroScale(measured, known) {
+    if (!Number.isFinite(measured) || !Number.isFinite(known) || Math.abs(known) < 1e-9)
+      throw new Error("gyro scale: invalid rate");
+    const f = measured / known;
+    if (!Number.isFinite(f) || Math.abs(f) < 1e-6) throw new Error("gyro scale: invalid factor");
+    return f;
+  }
+
   function sixFace(faces) {
     const need = ["px", "nx", "py", "ny", "pz", "nz"];
     for (const k of need) if (!faces[k]) throw new Error("six-face: missing " + k);
+    const ideal = { px: [1, 0, 0], nx: [-1, 0, 0], py: [0, 1, 0], ny: [0, -1, 0], pz: [0, 0, 1], nz: [0, 0, -1] };
     const bias = {},
-      scale = {};
-    for (const [axis, p, n] of [
-      ["x", "px", "nx"],
-      ["y", "py", "ny"],
-      ["z", "pz", "nz"],
-    ]) {
-      const pos = faces[p],
-        neg = faces[n];
-      bias[axis] = (pos[axis] + neg[axis]) / 2;
-      scale[axis] = (pos[axis] - neg[axis]) / 2;
-      if (!Number.isFinite(bias[axis]) || !Number.isFinite(scale[axis]) || Math.abs(scale[axis]) < 1e-9)
-        throw new Error("six-face: invalid " + axis);
+      matrix = [];
+    for (const comp of ["x", "y", "z"]) {
+      const M = Array.from({ length: 4 }, () => new Array(4).fill(0));
+      const v = new Array(4).fill(0);
+      for (const k of need) {
+        const t = ideal[k],
+          val = faces[k][comp];
+        const row = [1, t[0], t[1], t[2]];
+        for (let i = 0; i < 4; i++) {
+          v[i] += row[i] * val;
+          for (let j = 0; j < 4; j++) M[i][j] += row[i] * row[j];
+        }
+      }
+      const c = solve4(M, v);
+      bias[comp] = c[0];
+      matrix.push(c.slice(1));
     }
-    return { bias, scale, g: 1 };
+    for (const comp of ["x", "y", "z"]) if (!Number.isFinite(bias[comp])) throw new Error("six-face: invalid " + comp);
+    const inv = invert3(matrix);
+    const scale = { x: 1 / matrix[0][0], y: 1 / matrix[1][1], z: 1 / matrix[2][2] };
+    return { bias, scale, matrix: inv, rawMatrix: matrix, g: 1 };
   }
 
   function cleanMask(cols, maxAbs = 5) {
