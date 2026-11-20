@@ -263,6 +263,15 @@ test("closed-loop frequency identifies the plant", () => {
   assert.ok(f.medianCoherence >= 0);
 });
 
+test("MIMO state-space realization simulates", () => {
+  const P = require("../model-lab/static/core/plants.js");
+  const d = P.virtualMimo({ fs: 50, duration: 30, noise: 0 });
+  const f = I.fitMIMOSS(d.t, d.U, d.Y, { trainEnd: Math.floor(d.t.length * 0.7), na: 2, nb: 2 });
+  assert.equal(f.model, "MIMO-SS");
+  assert.equal(f.A.length, f.n);
+  assert.ok(f.fit > 50);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

@@ -250,6 +250,7 @@
     if (model === "Hammerstein") return I.fitHammerstein(data.t, data.u, data.y, opts);
     if (model === "2SLS-ARX") return I.fit2SLS(data.t, data.u, data.y, data.r, opts);
     if (model === "MIMO-ARX") return I.fitMIMOARX(data.t, data.U, data.Y, opts);
+    if (model === "MIMO-SS") return I.fitMIMOSS(data.t, data.U, data.Y, opts);
     if (model === "ETFE") return I.fitETFE(data.t, data.u, data.y, opts);
     if (model === "ARX") return I.fitARX(data.t, data.u, data.y, opts);
     if (model === "SOPDT") return I.fitSOPDT(data.t, data.u, data.y, opts);
@@ -268,9 +269,17 @@
     renderValidation();
     recordComparison(f);
     $("actions").hidden = false;
-    $("uncertainty").hidden = ["ETFE", "MIMO-ARX", "2SLS-ARX", "Hammerstein", "FIR", "OE", "ARMAX", "Wiener"].includes(
-      f.model
-    );
+    $("uncertainty").hidden = [
+      "ETFE",
+      "MIMO-ARX",
+      "MIMO-SS",
+      "2SLS-ARX",
+      "Hammerstein",
+      "FIR",
+      "OE",
+      "ARMAX",
+      "Wiener",
+    ].includes(f.model);
     $("fit-hint").textContent = T(
       "拟合完成。检查 FIT、残差和参数是否物理合理。",
       "Fit complete. Check FIT, residuals and physical plausibility."
@@ -361,7 +370,7 @@
     } else if (f.model === "2SLS-ARX") {
       add("2SLS", `${f.na}/${f.nb}/${f.nk}`);
       if (f.fitDirect != null) add(T("直接 LS", "Direct LS"), `${fmt(f.fitDirect, 1)} %`);
-    } else if (f.model === "MIMO-ARX") {
+    } else if (f.model === "MIMO-ARX" || f.model === "MIMO-SS") {
       add(T("FIT y1", "FIT y1"), `${fmt(f.fitOut[0], 1)} %`);
       add(T("FIT y2", "FIT y2"), `${fmt(f.fitOut[1], 1)} %`);
       add("ARX", `${f.na}/${f.nb}/${f.nk}`);
@@ -536,11 +545,12 @@
     if (f.model === "Wiener") return f.na + f.nb + 3;
     if (f.model === "Hammerstein") return f.na + f.nb + 1;
     if (f.model === "MIMO-ARX") return f.p * (f.p * f.na + f.m * f.nb);
+    if (f.model === "MIMO-SS") return f.n * f.n + f.n * f.m + f.p * f.n + f.p * f.m;
     return null;
   }
 
   function recordComparison(f) {
-    if (!state.data || !f || !f.yhat || f.model === "ETFE" || f.model === "MIMO-ARX") return;
+    if (!state.data || !f || !f.yhat || f.model === "ETFE" || f.model === "MIMO-ARX" || f.model === "MIMO-SS") return;
     let sse = 0;
     const n = state.data.y.length;
     for (let i = 0; i < n; i++) {
@@ -597,13 +607,13 @@
     const d = state.data;
     const f = state.fit;
     if (f && f.model === "ETFE") drawBode(el, f);
-    else if (f && f.model === "MIMO-ARX") drawMimo(el, f, d);
+    else if (f && (f.model === "MIMO-ARX" || f.model === "MIMO-SS")) drawMimo(el, f, d);
     else drawSvg(el, 800, 300, d, f);
   }
 
   function drawResidual(fit) {
     const el = $("residual");
-    if (!fit || fit.model === "ETFE" || fit.model === "MIMO-ARX" || !state.data) {
+    if (!fit || fit.model === "ETFE" || fit.model === "MIMO-ARX" || fit.model === "MIMO-SS" || !state.data) {
       el.innerHTML = "";
       return;
     }
@@ -1027,7 +1037,7 @@
     if (mimo) {
       $("model").value = "MIMO-ARX";
       $("arx-orders").hidden = false;
-    } else if ($("model").value === "MIMO-ARX") {
+    } else if ($("model").value === "MIMO-ARX" || $("model").value === "MIMO-SS") {
       $("model").value = "FOPDT";
     }
     $("file-name").textContent =
@@ -1175,9 +1185,16 @@
       $("fit-hint").textContent = T("已取消拟合。", "Fit cancelled.");
     });
     $("model").addEventListener("change", () => {
-      $("arx-orders").hidden = !["ARX", "MIMO-ARX", "2SLS-ARX", "Hammerstein", "OE", "ARMAX", "Wiener"].includes(
-        $("model").value
-      );
+      $("arx-orders").hidden = ![
+        "ARX",
+        "MIMO-ARX",
+        "MIMO-SS",
+        "2SLS-ARX",
+        "Hammerstein",
+        "OE",
+        "ARMAX",
+        "Wiener",
+      ].includes($("model").value);
       $("nc-field").hidden = $("model").value !== "ARMAX";
       $("loop-params").hidden = $("excitation").value !== "closed-loop";
       if ($("model").value === "MIMO-ARX") {
@@ -1200,7 +1217,7 @@
       if ($("model").value === "ARX") $("excitation").value = "prbs";
       if ($("model").value === "ETFE" || $("model").value === "ARX") generate();
     });
-    $("arx-orders").hidden = !["ARX", "MIMO-ARX", "2SLS-ARX", "Hammerstein"].includes($("model").value);
+    $("arx-orders").hidden = !["ARX", "MIMO-ARX", "MIMO-SS", "2SLS-ARX", "Hammerstein"].includes($("model").value);
     $("loop-params").hidden = $("excitation").value !== "closed-loop";
     renderManual();
     $("excitation").addEventListener("change", () => {

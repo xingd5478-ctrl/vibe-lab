@@ -362,6 +362,7 @@
     闭环频域: "Closed-loop frequency",
     中位相干: "Median coherence",
     段: "segments",
+    "MIMO 状态空间": "MIMO state-space",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

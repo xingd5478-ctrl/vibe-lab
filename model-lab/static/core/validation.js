@@ -78,7 +78,7 @@
   function stable(fit) {
     if (["FOPDT"].includes(fit.model)) return fit.tau > 0;
     if (["SOPDT"].includes(fit.model)) return fit.wn > 0 && fit.zeta > 0;
-    if (fit.model === "ETFE" || fit.model === "FIR" || fit.model === "MIMO-ARX") return null;
+    if (fit.model === "ETFE" || fit.model === "FIR" || fit.model === "MIMO-ARX" || fit.model === "MIMO-SS") return null;
     if (fit.coefA && fit.coefA.length) {
       const rr = roots([1].concat(fit.coefA));
       return rr.every((x) => Math.hypot(x.re, x.im) < 1 - 1e-9);
@@ -108,7 +108,7 @@
       const warns = checks.filter((x) => x.level === "warn").length;
       return { grade: fails ? "F" : warns ? "B" : "A", checks };
     }
-    if (fit.model === "MIMO-ARX") {
+    if (fit.model === "MIMO-ARX" || fit.model === "MIMO-SS") {
       const checks = [];
       for (let o = 0; o < fit.p; o++) {
         const res = data.Y[o].map((v, i) => v - fit.yhat[o][i]);

@@ -867,6 +867,86 @@
     };
   }
 
+  function fitMIMOSS(t, U, Y, opts) {
+    const base = fitMIMOARX(t, U, Y, { ...(opts || {}), nk: 0 });
+    const p = base.p,
+      m = base.m,
+      na = base.na,
+      nb = base.nb;
+    const n = p * na + m * Math.max(0, nb - 1);
+    const A = Array.from({ length: n }, () => new Array(n).fill(0));
+    const B = Array.from({ length: n }, () => new Array(m).fill(0));
+    const C = Array.from({ length: p }, () => new Array(n).fill(0));
+    const D = Array.from({ length: p }, () => new Array(m).fill(0));
+    const Acoef = (o, i, j) => base.coefA[o][j * na + i];
+    const Bcoef = (o, i, j) => base.coefB[o][j * nb + i];
+    for (let o = 0; o < p; o++) {
+      for (let j = 0; j < p; j++)
+        for (let i = 0; i < na; i++) {
+          A[o][j * na + i] = -Acoef(o, i, j);
+          C[o][j * na + i] = -Acoef(o, i, j);
+        }
+      for (let j = 0; j < m; j++) {
+        for (let i = 0; i < nb; i++) {
+          D[o][j] = Bcoef(o, 0, j);
+          if (i >= 1) {
+            const col = p * na + j * (nb - 1) + (i - 1);
+            A[o][col] = Bcoef(o, i, j);
+            C[o][col] = Bcoef(o, i, j);
+          }
+        }
+      }
+    }
+    for (let b = 0; b < p; b++) for (let i = 1; i < na; i++) A[b * na + i][b * na + i - 1] = 1;
+    for (let j = 0; j < m; j++)
+      for (let i = 1; i < nb - 1; i++) A[p * na + j * (nb - 1) + i][p * na + j * (nb - 1) + i - 1] = 1;
+    for (let j = 0; j < m; j++) B[p * na + j * (nb - 1)][j] = 1;
+    const sim = (end) => {
+      const out = Y.map((r) => r.slice());
+      let x = new Array(n).fill(0);
+      for (let k = 0; k < end; k++) {
+        for (let o = 0; o < p; o++) {
+          let v = 0;
+          for (let j = 0; j < n; j++) v += C[o][j] * x[j];
+          for (let j = 0; j < m; j++) v += D[o][j] * U[j][k];
+          out[o][k] = v;
+        }
+        const nx = new Array(n).fill(0);
+        for (let i = 0; i < n; i++) {
+          let v = 0;
+          for (let j = 0; j < n; j++) v += A[i][j] * x[j];
+          for (let j = 0; j < m; j++) v += B[i][j] * U[j][k];
+          nx[i] = v;
+        }
+        x = nx;
+      }
+      return out;
+    };
+    const yhat = sim(t.length);
+    const avg = (key) => (base[key + "Out"] || []).reduce((s, v) => s + (v || 0), 0) / Math.max(1, p);
+    return {
+      model: "MIMO-SS",
+      A,
+      B,
+      C,
+      D,
+      n,
+      m,
+      p,
+      na,
+      nb,
+      yhat,
+      fit: base.fit,
+      fitTrain: base.fitTrain,
+      fitVal: base.fitVal,
+      fitOut: base.fitOut,
+      fitTrainOut: base.fitTrainOut,
+      fitValOut: base.fitValOut,
+      start: base.start,
+      trainEnd: base.trainEnd,
+    };
+  }
+
   function qrSolve(A, b) {
     const m = A.length;
     const n = A[0].length;
@@ -1294,6 +1374,7 @@
     fitSOPDT,
     fitARX,
     fitMIMOARX,
+    fitMIMOSS,
     fitETFE,
     fitIVARX,
     fit2SLS,
