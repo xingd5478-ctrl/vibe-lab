@@ -317,6 +317,7 @@
     "至少需要两个温度点。": "At least two temperature points are required.",
     "批量温度点 CSV": "Batch temperature-run CSV",
     "TEMP（可选）": "TEMP (optional)",
+    自动切温度平台: "Auto-segment temperature plateaus",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

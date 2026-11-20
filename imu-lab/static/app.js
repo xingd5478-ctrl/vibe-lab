@@ -1716,9 +1716,28 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       $("temp-info").textContent = notes.join("；");
       saveCalibLocal();
     });
+    $("temp-segment").addEventListener("click", () => {
+      const segs = IMUData.tempSegments(currentRows(), {
+        threshold: 0.6,
+        minSamples: Math.max(5, Math.round(state.fs * 2)),
+      });
+      if (!segs.length) {
+        $("temp-info").textContent = "没有检测到温度平台（需要 temp 列）。";
+        return;
+      }
+      segs.forEach((p) => {
+        const i = state.tempPoints.findIndex((x) => Math.abs(x.T - p.T) < 1e-6);
+        const point = { T: p.T, gx: p.gx, gy: p.gy, gz: p.gz };
+        if (i >= 0) state.tempPoints[i] = point;
+        else state.tempPoints.push(point);
+      });
+      renderTempPoints();
+      $("temp-info").textContent = `自动切出 ${segs.length} 个温度平台，共 ${state.tempPoints.length} 个点。`;
+      saveCalibLocal();
+    });
     $("temp-fit").addEventListener("click", () => {
       try {
-        state.tempFit = IMUData.fitTempBias(state.tempPoints, state.tempPoints[0].T);
+        state.tempFit = IMUData.robustTempBias(state.tempPoints, state.tempPoints[0].T);
         $("temp-info").textContent =
           `斜率 °/s/°C：gx ${state.tempFit.gx.k.toExponential(2)} · gy ${state.tempFit.gy.k.toExponential(2)} · gz ${state.tempFit.gz.k.toExponential(2)}`;
         saveCalibLocal();

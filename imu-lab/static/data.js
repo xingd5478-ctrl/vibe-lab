@@ -361,6 +361,60 @@
     return f;
   }
 
+  function tempSegments(rows, opts) {
+    const threshold = (opts && opts.threshold) || 0.5;
+    const minSamples = (opts && opts.minSamples) || 10;
+    const out = [];
+    let start = 0;
+    const push = (a, b) => {
+      const seg = rows
+        .slice(a, b)
+        .filter(
+          (r) => Number.isFinite(r.temp) && Number.isFinite(r.gx) && Number.isFinite(r.gy) && Number.isFinite(r.gz)
+        );
+      if (seg.length < minSamples) return;
+      const mean = (k) => seg.reduce((s, r) => s + r[k], 0) / seg.length;
+      const g = ["gx", "gy", "gz"].map((k) => {
+        const m = mean(k);
+        const sd = Math.sqrt(seg.reduce((s, r) => s + (r[k] - m) ** 2, 0) / seg.length);
+        return { m, sd };
+      });
+      out.push({
+        T: mean("temp"),
+        gx: g[0].m,
+        gy: g[1].m,
+        gz: g[2].m,
+        n: seg.length,
+        std: Math.max(g[0].sd, g[1].sd, g[2].sd),
+      });
+    };
+    for (let i = 1; i < rows.length; i++) {
+      if (Math.abs(rows[i].temp - rows[i - 1].temp) > threshold) {
+        push(start, i);
+        start = i;
+      }
+    }
+    push(start, rows.length);
+    return out;
+  }
+
+  function robustTempBias(points, t0) {
+    let fit = fitTempBias(points, t0);
+    const residual = (p) =>
+      Math.max(
+        Math.abs(p.gx - (fit.gx.b0 + fit.gx.k * (p.T - fit.T0))),
+        Math.abs(p.gy - (fit.gy.b0 + fit.gy.k * (p.T - fit.T0))),
+        Math.abs(p.gz - (fit.gz.b0 + fit.gz.k * (p.T - fit.T0)))
+      );
+    const res = points.map(residual);
+    const mean = res.reduce((s, x) => s + x, 0) / res.length;
+    const sd = Math.sqrt(res.reduce((s, x) => s + (x - mean) ** 2, 0) / res.length);
+    const keep = points.filter((p, i) => res[i] <= mean + 2.5 * sd || points.length <= 3);
+    const outliers = points.filter((p, i) => !keep.includes(p));
+    if (keep.length >= 2 && outliers.length) fit = fitTempBias(keep, fit.T0);
+    return { ...fit, used: keep.length, outliers };
+  }
+
   function tempPoint(text) {
     const lines = String(text)
       .split(/\r?\n/)
