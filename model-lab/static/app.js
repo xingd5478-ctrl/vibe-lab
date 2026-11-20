@@ -171,6 +171,9 @@
     box.hidden = false;
     const t0 = Date.now();
     $("fit-timer").textContent = "0.0 s";
+    $("fit-pct").textContent = "0%";
+    const bar = document.querySelector("#fit-progress .fit-bar i");
+    if (bar) bar.style.width = "0%";
     state.fitTimer = setInterval(() => {
       $("fit-timer").textContent = ((Date.now() - t0) / 1000).toFixed(1) + " s";
     }, 100);
@@ -188,6 +191,13 @@
       state.fitWorker.onmessage = (e) => {
         const m = e.data;
         if (!m || m.id !== state.fitSeq) return;
+        if (m.progress != null) {
+          const pct = Math.round(m.progress * 100);
+          $("fit-pct").textContent = pct + "%";
+          const bar = document.querySelector("#fit-progress .fit-bar i");
+          if (bar) bar.style.width = pct + "%";
+          return;
+        }
         stopFitProgress();
         if (m.ok) applyFit(m.fit);
         else fitFailed(m.error || "worker error");

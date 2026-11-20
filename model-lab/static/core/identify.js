@@ -386,7 +386,10 @@
     const nb = Math.max(1, Math.min(4, (opts && opts.nb) || 1));
     const nk = Math.max(0, Math.min(3, opts && opts.nk != null ? opts.nk : 1));
     let best = null;
+    let scan = 0;
     for (let c2 = -1; c2 <= 1.0001; c2 += 0.04) {
+      scan++;
+      if (opts && opts.onProgress) opts.onProgress(scan / 51);
       const v = u.map((x) => x + c2 * x * x);
       let f;
       try {
@@ -421,6 +424,7 @@
     };
     let vals = simplex.map(score);
     for (let iter = 0; iter < maxIter; iter++) {
+      if (opts && opts.onProgress && (iter % 5 === 0 || iter === maxIter - 1)) opts.onProgress((iter + 1) / maxIter);
       const order = vals.map((v, i) => i).sort((a, b) => vals[a] - vals[b]);
       simplex = order.map((i) => simplex[i]);
       vals = order.map((i) => vals[i]);
@@ -528,7 +532,7 @@
       }
       return e;
     };
-    const theta = nelderMead(objective, x0, { maxIter: 180, step: 0.08 });
+    const theta = nelderMead(objective, x0, { maxIter: 180, step: 0.08, onProgress: opts && opts.onProgress });
     const yhat = simulate(theta, t.length, start);
     const ft = fitStats(y.slice(start, trainEnd), yhat.slice(start, trainEnd), na + nb);
     const fv = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), na + nb) : null;
@@ -578,7 +582,7 @@
       }
       return e;
     };
-    const theta = nelderMead(objective, x0, { maxIter: 220, step: 0.15 });
+    const theta = nelderMead(objective, x0, { maxIter: 220, step: 0.15, onProgress: opts && opts.onProgress });
     const yhat = predictSeq(theta, t.length);
     const ft = fitStats(y.slice(start, trainEnd), yhat.slice(start, trainEnd), na + nb + nc);
     const fv = trainEnd < t.length ? fitStats(y.slice(trainEnd), yhat.slice(trainEnd), na + nb + nc) : null;
@@ -635,6 +639,7 @@
     const coefA = [],
       coefB = [];
     for (let out = 0; out < p; out++) {
+      if (opts && opts.onProgress) opts.onProgress((out + 1) / p);
       const A = [],
         B = [];
       for (let k = start; k < trainEnd; k++) {
