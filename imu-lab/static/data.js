@@ -299,6 +299,36 @@
     return "F";
   }
 
+  function fitTempBias(points, t0) {
+    if (!points || points.length < 2) throw new Error("temp bias: need at least 2 points");
+    const T0 = Number(t0 != null ? t0 : points.reduce((s, p) => s + p.T, 0) / points.length);
+    const fitAxis = (key) => {
+      let sx = 0,
+        sy = 0,
+        sxx = 0,
+        sxy = 0;
+      for (const p of points) {
+        const x = p.T - T0;
+        sx += x;
+        sy += p[key];
+        sxx += x * x;
+        sxy += x * p[key];
+      }
+      const n = points.length;
+      const den = n * sxx - sx * sx;
+      if (Math.abs(den) < 1e-12) throw new Error("temp bias: temperature points are identical");
+      const k = (n * sxy - sx * sy) / den;
+      const b0 = (sy - k * sx) / n;
+      return { b0, k };
+    };
+    return { T0, gx: fitAxis("gx"), gy: fitAxis("gy"), gz: fitAxis("gz") };
+  }
+
+  function tempBiasAt(fit, T) {
+    const x = Number(T) - fit.T0;
+    return { gx: fit.gx.b0 + fit.gx.k * x, gy: fit.gy.b0 + fit.gy.k * x, gz: fit.gz.b0 + fit.gz.k * x };
+  }
+
   function gyroScale(measured, known) {
     if (!Number.isFinite(measured) || !Number.isFinite(known) || Math.abs(known) < 1e-9)
       throw new Error("gyro scale: invalid rate");

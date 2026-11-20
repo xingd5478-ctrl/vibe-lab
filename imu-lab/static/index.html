@@ -141,6 +141,15 @@
           <div class="six-actions"><button id="gyro-capture" type="button">采集并计算</button><button id="gyro-apply" type="button">应用刻度</button></div>
           <p class="hint" id="gyro-info">未标定。</p>
         </details>
+        <details class="six-face" id="temp-cal">
+          <summary>温度漂移标定</summary>
+          <p class="hint">在多个温度点分别采集静态零偏，再拟合线性温度模型。</p>
+          <label>当前温度 °C <input id="temp-now" type="number" min="-40" max="125" step="0.1" value="25" /></label>
+          <div class="six-actions"><button id="temp-capture" type="button">采集当前温度点</button><button id="temp-fit" type="button">拟合</button></div>
+          <div class="six-actions"><button id="temp-apply" type="button">应用温补</button><button id="temp-clear" type="button">清空</button></div>
+          <div id="temp-points" class="temp-points"></div>
+          <p class="hint" id="temp-info">至少需要两个温度点。</p>
+        </details>
         <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;">重置为示例数据</button>
         </div>
 

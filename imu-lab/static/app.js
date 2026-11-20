@@ -882,6 +882,8 @@ ${blocks}
       sixFace: state.sixCalib,
       sixFaceRaw: state.sixFace,
       gyroScale: state.gyroScale,
+      tempFit: state.tempFit,
+      tempPoints: state.tempPoints,
       note: "Teaching estimate; not a certified calibration.",
     };
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), "imu_calibration.json");
@@ -968,6 +970,14 @@ ${blocks}
       line(`scale = [${cal.scale.x.toFixed(3)}, ${cal.scale.y.toFixed(3)}, ${cal.scale.z.toFixed(3)}]`, 18);
       line("3×3 矩阵已用于交叉轴补偿；应用/撤销见页面。", 16, false, "#6f6a61");
     } else line("未完成六面标定。", 18);
+    y += 8;
+    line("温度漂移", 24, true);
+    line(
+      state.tempFit
+        ? `斜率 °/s/°C：gx ${state.tempFit.gx.k.toExponential(2)} · gy ${state.tempFit.gy.k.toExponential(2)} · gz ${state.tempFit.gz.k.toExponential(2)} · 点 ${state.tempPoints.length}`
+        : "未拟合。",
+      18
+    );
     y += 8;
     line("陀螺刻度", 24, true);
     const gs = Object.keys(state.gyroScale);
@@ -1061,6 +1071,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
 <h2>数据</h2><p>来源：${state.source} · 采样率：${state.fs} Hz · 有效帧：${rows.length}</p>
 <h2>陀螺零偏（前 5 s 均值）</h2><p><code>gx=${mean("gx").toFixed(3)} · gy=${mean("gy").toFixed(3)} · gz=${mean("gz").toFixed(3)} °/s</code></p>
 <h2>Allan / Kalman</h2><p>ARW：${fit ? fit.arw.toFixed(3) : "—"} · RRW：${fit ? fit.rrw.toFixed(3) : "—"} · R²：${fit ? fit.r2.toFixed(3) : "—"}<br>R=${state.r.toExponential(2)} · Q=${state.q.toExponential(2)}</p>
+<h2>温度漂移</h2><p>${state.tempFit ? `斜率：gx ${state.tempFit.gx.k.toExponential(2)} · gy ${state.tempFit.gy.k.toExponential(2)} · gz ${state.tempFit.gz.k.toExponential(2)}` : "未拟合。"}</p>
 <h2>六面标定</h2>${cal ? `<p>等级：<b>${cal.grade || "—"}</b> · |a| ${q.normMean.toFixed(3)} ± ${q.normStd.toFixed(3)} g · RMS ${q.rmsError.toFixed(3)} g</p><p>bias = [${b.x.toFixed(3)}, ${b.y.toFixed(3)}, ${b.z.toFixed(3)}] g<br>scale = [${sc.x.toFixed(3)}, ${sc.y.toFixed(3)}, ${sc.z.toFixed(3)}]</p><table><thead><tr><th>面</th><th>ax</th><th>ay</th><th>az</th></tr></thead><tbody>${faceRows}</tbody></table>` : "<p>未完成六面标定。</p>"}
 <h2>互补滤波</h2>${svgMarkup($("chart-fusion"))}
 <p class="muted">打印时选择“另存为 PDF”。</p></body></html>`;
@@ -1397,7 +1408,13 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     try {
       localStorage.setItem(
         CALIB_KEY,
-        JSON.stringify({ sixFace: state.sixFace, sixCalib: state.sixCalib, gyroScale: state.gyroScale })
+        JSON.stringify({
+          sixFace: state.sixFace,
+          sixCalib: state.sixCalib,
+          gyroScale: state.gyroScale,
+          tempPoints: state.tempPoints,
+          tempFit: state.tempFit,
+        })
       );
     } catch (e) {}
   }
@@ -1409,6 +1426,8 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       state.sixFace = d.sixFace || {};
       state.sixCalib = d.sixCalib || null;
       state.gyroScale = d.gyroScale || {};
+      state.tempPoints = d.tempPoints || [];
+      state.tempFit = d.tempFit || null;
       const labels = { px: "+X", nx: "−X", py: "+Y", ny: "−Y", pz: "+Z", nz: "−Z" };
       Object.keys(state.sixFace).forEach((k) => {
         document.querySelectorAll("#six-grid button").forEach((b) => {
@@ -1630,6 +1649,104 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     });
   }
 
+  function renderTempPoints() {
+    const box = $("temp-points");
+    if (!box) return;
+    box.innerHTML = "";
+    state.tempPoints
+      .slice()
+      .sort((a, b) => a.T - b.T)
+      .forEach((p) => {
+        const row = document.createElement("div");
+        row.textContent = `T=${p.T.toFixed(1)}°C · gx=${p.gx.toFixed(3)} gy=${p.gy.toFixed(3)} gz=${p.gz.toFixed(3)}`;
+        box.appendChild(row);
+      });
+  }
+
+  function initTempCal() {
+    const cap = $("temp-capture");
+    if (!cap) return;
+    cap.addEventListener("click", () => {
+      const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 2)));
+      if (!rows.length) return;
+      const mean = (k) => rows.reduce((s, r) => s + r[k], 0) / rows.length;
+      const T = Number($("temp-now").value);
+      if (!Number.isFinite(T)) return;
+      const p = { T, gx: mean("gx"), gy: mean("gy"), gz: mean("gz") };
+      const i = state.tempPoints.findIndex((x) => Math.abs(x.T - T) < 1e-6);
+      if (i >= 0) state.tempPoints[i] = p;
+      else state.tempPoints.push(p);
+      renderTempPoints();
+      $("temp-info").textContent = `已采集 ${T.toFixed(1)}°C，共 ${state.tempPoints.length} 个点。`;
+      saveCalibLocal();
+    });
+    $("temp-fit").addEventListener("click", () => {
+      try {
+        state.tempFit = IMUData.fitTempBias(state.tempPoints, state.tempPoints[0].T);
+        $("temp-info").textContent =
+          `斜率 °/s/°C：gx ${state.tempFit.gx.k.toExponential(2)} · gy ${state.tempFit.gy.k.toExponential(2)} · gz ${state.tempFit.gz.k.toExponential(2)}`;
+        saveCalibLocal();
+      } catch (e) {
+        $("temp-info").textContent = e.message;
+      }
+    });
+    $("temp-apply").addEventListener("click", () => {
+      if (!state.tempFit) {
+        $("temp-info").textContent = "先拟合温度模型。";
+        return;
+      }
+      if (state.tempBackup) {
+        state.rows.forEach((r, i) => {
+          const b = state.tempBackup[i];
+          if (b) {
+            r.gx = b.gx;
+            r.gy = b.gy;
+            r.gz = b.gz;
+          }
+        });
+        state.tempBackup = null;
+        $("temp-apply").textContent = "应用温补";
+        $("temp-info").textContent = "已撤销温补";
+      } else {
+        const T = Number($("temp-now").value);
+        const bias = IMUData.tempBiasAt(state.tempFit, T);
+        state.tempBackup = state.rows.map((r) => ({ gx: r.gx, gy: r.gy, gz: r.gz }));
+        state.rows.forEach((r) => {
+          r.gx -= bias.gx;
+          r.gy -= bias.gy;
+          r.gz -= bias.gz;
+        });
+        $("temp-apply").textContent = "撤销温补";
+        $("temp-info").textContent =
+          `已应用 ${T.toFixed(1)}°C 温补：gx ${bias.gx.toFixed(3)} · gy ${bias.gy.toFixed(3)} · gz ${bias.gz.toFixed(3)} °/s`;
+      }
+      prepare();
+      draw();
+      saveCalibLocal();
+    });
+    $("temp-clear").addEventListener("click", () => {
+      if (state.tempBackup) {
+        state.rows.forEach((r, i) => {
+          const b = state.tempBackup[i];
+          if (b) {
+            r.gx = b.gx;
+            r.gy = b.gy;
+            r.gz = b.gz;
+          }
+        });
+        state.tempBackup = null;
+        prepare();
+        draw();
+      }
+      state.tempPoints = [];
+      state.tempFit = null;
+      renderTempPoints();
+      $("temp-info").textContent = "至少需要两个温度点。";
+      saveCalibLocal();
+    });
+    renderTempPoints();
+  }
+
   function initFusion() {
     const a = $("fusion-alpha");
     if (!a) return;
@@ -1716,6 +1833,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     initCalib();
     initSixFace();
     initGyroScale();
+    initTempCal();
     if (window.matchMedia) {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       if (mq.addEventListener) mq.addEventListener("change", draw);
