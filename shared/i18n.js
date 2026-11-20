@@ -325,6 +325,7 @@
     联合应用: "Apply combined",
     撤销联合: "Undo combined",
     "可选中 PDF / 打印": "Selectable PDF / print",
+    "下载图像 PDF": "Download image PDF",
     "状态空间 SS": "State-space SS",
     "子空间 Subspace": "Subspace",
     "延迟 nk": "Delay nk",
@@ -363,6 +364,8 @@
     中位相干: "Median coherence",
     段: "segments",
     "MIMO 状态空间": "MIMO state-space",
+    "可选中 PDF 走浏览器打印；下载图像 PDF 文字不可选。":
+      "Selectable PDF uses browser printing; the downloaded image PDF is not selectable. See docs/PDF.md.",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",
