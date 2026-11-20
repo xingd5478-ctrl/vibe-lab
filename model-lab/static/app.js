@@ -779,6 +779,78 @@
     }, 30);
   }
 
+  function loadProjectObject(p) {
+    if (!p || p.kind !== "vibe-lab-project" || !p.dataset || !p.dataset.t) throw new Error("Invalid project file.");
+    state.source = "csv";
+    state.fileName = p.name || "project";
+    const U = p.dataset.U || [p.dataset.u];
+    const Y = p.dataset.Y || [p.dataset.y];
+    const columns = [p.dataset.t].concat(U, Y);
+    const headers = ["t"].concat(
+      U.map((_, i) => "u" + (i + 1)),
+      Y.map((_, i) => "y" + (i + 1))
+    );
+    const ins = U.map((_, i) => 1 + i);
+    const outs = Y.map((_, i) => 1 + U.length + i);
+    applyColumns(
+      {
+        t: p.dataset.t,
+        u: U[0],
+        y: Y[0],
+        meta: { columns, headers, timeIndex: 0, inputIndex: ins[0], outputIndex: outs[0] },
+      },
+      0,
+      ins,
+      outs,
+      state.fileName,
+      null
+    );
+    if (p.dataset.r) state.data.r = p.dataset.r.slice();
+  }
+
+  function renderProjects() {
+    const box = $("projects-panel");
+    if (!box || !window.VibeProject) return;
+    const list = VibeProject.list();
+    box.hidden = false;
+    box.innerHTML = "";
+    if (!list.length) {
+      box.textContent = T(
+        "还没有本地项目。先拟合并导出项目。",
+        "No local projects yet. Fit and export a project first."
+      );
+      return;
+    }
+    list.forEach((p) => {
+      const row = document.createElement("div");
+      row.className = "project-row";
+      const label = document.createElement("span");
+      label.textContent = `${p.name} · ${p.dataset?.n || 0} 点`;
+      const load = document.createElement("button");
+      load.type = "button";
+      load.textContent = T("打开", "Open");
+      load.addEventListener("click", () => {
+        try {
+          loadProjectObject(p);
+          box.hidden = true;
+          $("fit-hint").textContent = T("项目已打开。", "Project opened.");
+        } catch (e) {
+          showError(e.message);
+        }
+      });
+      const del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "×";
+      del.setAttribute("aria-label", "delete project");
+      del.addEventListener("click", () => {
+        VibeProject.remove(p.id);
+        renderProjects();
+      });
+      row.append(label, load, del);
+      box.appendChild(row);
+    });
+  }
+
   function projectModel(f) {
     if (!f) return null;
     const out = {};
@@ -1146,6 +1218,7 @@
     $("export-project").addEventListener("click", exportProject);
     $("import-project").addEventListener("click", () => $("import-project-file").click());
     $("import-project-file").addEventListener("change", importProject);
+    $("project-list").addEventListener("click", renderProjects);
     $("download-matlab").addEventListener("click", downloadMatlab);
     if (!loadHandoff()) generate();
   }

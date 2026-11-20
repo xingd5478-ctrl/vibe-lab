@@ -202,3 +202,7 @@ footer a { color: var(--muted); }
 #fit-pct { font: 10px var(--mono); color: var(--accent); min-width: 30px; text-align: right; }
 #fit-timer { font: 10px var(--mono); color: var(--muted); min-width: 44px; text-align: right; }
 @keyframes fit-run { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+
+.projects-panel { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 8px; }
+.projects-panel .project-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 10px var(--mono); color: var(--muted); padding: 3px 0; border-bottom: 1px solid var(--line); }
+.projects-panel button { border: 0; background: none; color: var(--accent); cursor: pointer; font: 10px var(--mono); }

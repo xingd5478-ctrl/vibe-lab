@@ -339,6 +339,8 @@
     "ZN 初值（二阶）": "ZN initial values (second order)",
     "对应 Simulink 课 →": "Related Simulink lesson →",
     串口协议: "Serial protocol",
+    本地项目: "Local projects",
+    打开: "Open",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",
