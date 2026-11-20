@@ -59,16 +59,7 @@
           </div>
           <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
         <button id="send-model" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">送到 Model Lab</button>
-        <details class="six-face" id="serial-help">
-          <summary>串口协议</summary>
-          <p class="hint">默认 460800 二进制帧：<code>BADD</code> 40 B 遥测（ax/ay/az/gx/gy/gz、yaw、PWM、CRC）、<code>AA55</code> 四元数+加速度、<code>AADD</code> 六轴。CSV 模式仍支持 <code>gx,gy,gz</code> / <code>t,gx,gy,gz</code>。</p>
-          <p class="hint">验收：连接后帧数递增；60 s 均值与静态参考一致；导出 CSV 可复现。</p>
-        </details>
-          <div class="hint">
-            论文在审，仅作演示；完整数据待录用后按期刊政策公开，版权归作者/实验室。
-            <a href="sample_real_10min.csv" download>下载片段 CSV</a>
-          </div>
-        </div>
+        <div class="hint">论文在审，仅作演示；完整数据待录用后按期刊政策公开，版权归作者/实验室。 <a href="sample_real_10min.csv" download>下载片段 CSV</a></div>
 
         <div class="field">
           <label for="fs">采样率 (Hz)</label>
@@ -256,11 +247,10 @@
   <script src="allan.js"></script>
   <script src="kf.js"></script>
   <script src="fit.js"></script>
-  <script src="data.js?v=20261121o"></script>
-  <script src="serial-protocol-v2.js?v=20261121o"></script>
-  <script src="chart-v2.js?v=20261121o"></script>
-  <script src="../../shared/project.js?v=20261121o"></script>
-  <script src="app-v3.js?v=20261121o"></script>
+  <script src="data.js?v=20261121r"></script>
+  <script src="chart-v2.js?v=20261121r"></script>
+  <script src="../../shared/project.js?v=20261121r"></script>
+  <script src="app-v3.js?v=20261121r"></script>
   <script src="manual-en.js"></script>
   <script src="manual.js"></script>
   <script>

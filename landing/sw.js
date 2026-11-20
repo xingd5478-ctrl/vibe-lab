@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v60";
+const CACHE = "vibe-lab-v62";
 const ASSETS = [
   "./",
   "./index.html",
@@ -147,6 +147,7 @@ self.addEventListener("fetch", (event) => {
           return res;
         })
         .catch(() => hit || caches.match("./imu/"));
+      if (req.mode === "navigate") return network.catch(() => hit);
       return hit || network;
     })()
   );
