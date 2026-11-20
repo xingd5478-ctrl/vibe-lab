@@ -57,13 +57,16 @@
     let x = 0,
       xi = 0,
       dF = 0,
-      prevE = 1;
+      prevE = 1,
+      xm = 0,
+      xmd = 0;
+    const muq = [];
     const t = new Float64Array(n),
       y = new Float64Array(n);
     for (let i = 0; i < n; i++) {
       let u = 1;
       if (closed) {
-        const e = 1 - x;
+        const e = 1 - (opts && opts.smith ? x + (xm - xmd) : x);
         const dRaw = (e - prevE) / dt;
         const tf = Math.max(0, (opts && opts.tf) || 0);
         dF += ((dRaw - dF) * dt) / (tf + dt);
@@ -76,8 +79,12 @@
         prevE = e;
       }
       uq.push(u);
+      muq.push(u);
       const ud = delay > 0 && i >= delay ? uq[i - delay] : delay > 0 ? 0 : u;
+      const md = delay > 0 && i >= delay ? muq[i - delay] : delay > 0 ? 0 : u;
       x += dt * ((K * ud - x) / tau);
+      xm += dt * ((K * u - xm) / tau);
+      xmd += dt * ((K * md - xmd) / tau);
       t[i] = i * dt;
       y[i] = x;
     }
@@ -326,7 +333,7 @@
     const tf = parseFloat($("d-filter").value);
     const uMax = parseFloat($("u-limit").value);
     const delay = parseFloat($("L").value);
-    const opts = { antiWindup, tf, uMax, L: delay };
+    const opts = { antiWindup, tf, uMax, L: delay, smith: $("smith").checked };
     $("d-filter-val").textContent = tf.toFixed(3);
     $("u-limit-val").textContent = uMax.toFixed(0);
     $("kp-val").textContent = kp.toFixed(2);
@@ -388,6 +395,7 @@
     if (order === 1) {
       p.set("K", state.K.toFixed(2));
       p.set("tau", state.tau.toFixed(2));
+      p.set("L", String(state.L || 0));
     } else {
       p.set("wn", state.wn.toFixed(2));
       p.set("zeta", state.zeta.toFixed(2));
@@ -395,6 +403,10 @@
     p.set("kp", kp.toFixed(2));
     p.set("ki", ki.toFixed(2));
     p.set("kd", kd.toFixed(3));
+    p.set("aw", antiWindup ? "1" : "0");
+    p.set("tf", tf.toFixed(3));
+    p.set("umax", uMax.toFixed(0));
+    p.set("smith", opts.smith ? "1" : "0");
     if ($("url-params")) $("url-params").textContent = "?" + p.toString();
     syncURL();
   }
@@ -421,6 +433,7 @@
     if (state.order === 1) {
       p.set("K", state.K.toFixed(2));
       p.set("tau", state.tau.toFixed(2));
+      p.set("L", String(state.L || 0));
     } else {
       p.set("wn", state.wn.toFixed(2));
       p.set("zeta", state.zeta.toFixed(2));
@@ -428,6 +441,10 @@
     p.set("kp", state.kp.toFixed(2));
     p.set("ki", state.ki.toFixed(2));
     p.set("kd", state.kd.toFixed(3));
+    p.set("aw", state.antiWindup ? "1" : "0");
+    p.set("tf", state.tf.toFixed(3));
+    p.set("umax", state.uMax.toFixed(0));
+    p.set("smith", $("smith").checked ? "1" : "0");
     try {
       history.replaceState(null, "", location.pathname + "?" + p.toString() + (location.hash || ""));
     } catch (e) {}
@@ -437,6 +454,7 @@
     const p = new URLSearchParams(location.search);
     if (p.has("order")) $("order").value = p.get("order") === "1" ? "1" : "2";
     if (p.has("aw")) $("anti-windup").checked = p.get("aw") !== "0";
+    if (p.has("smith")) $("smith").checked = p.get("smith") === "1";
     if (p.has("tf")) $("d-filter").value = p.get("tf");
     if (p.has("umax")) $("u-limit").value = p.get("umax");
     const map = { wn: "wn", zeta: "zeta", K: "K", tau: "tau", L: "L", kp: "kp", ki: "ki", kd: "kd" };
