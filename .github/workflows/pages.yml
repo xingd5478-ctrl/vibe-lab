@@ -59,6 +59,8 @@ jobs:
           mkdir -p _site/data _site/shared
           cp data/matlab-probes.json data/feedback.json _site/data/
           cp -r shared/. _site/shared/
+          # Source pages live under <app>/static; deployed pages are one level shallower.
+          sed -i "s|\.\./\.\./shared/|\.\./shared/|g" _site/imu/index.html _site/model/index.html _site/control/index.html
           cp LICENSE _site/LICENSE
       - uses: actions/upload-pages-artifact@v3
         with:
