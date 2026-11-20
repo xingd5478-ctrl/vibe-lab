@@ -1227,9 +1227,12 @@
     $("closed-freq").addEventListener("click", () => {
       if (!state.data || !state.data.r) return;
       try {
-        const f = I.closedLoopFrequency(state.data.t, state.data.r, state.data.u, state.data.y, {
-          controller: state.data.meta.controller || { kp: 1, ki: 0, kd: 0 },
-        });
+        const controller = state.data.meta && state.data.meta.controller;
+        if (!controller) {
+          showError(T("闭环频域需要控制器参数 kp/ki/kd。", "Closed-loop frequency needs controller kp/ki/kd."));
+          return;
+        }
+        const f = I.closedLoopFrequency(state.data.t, state.data.r, state.data.u, state.data.y, { controller });
         const rows = f.freq
           .map(
             (x, i) =>
