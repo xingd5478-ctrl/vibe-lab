@@ -557,6 +557,45 @@
       render();
       $("copy-status").textContent = "已填入 IMC 初值";
     });
+  const projectSel = $("project-select");
+  if (projectSel && window.VibeProject) {
+    const projects = window.VibeProject.list();
+    projects.forEach((p) => {
+      const o = document.createElement("option");
+      o.value = p.id;
+      o.textContent = p.name;
+      projectSel.appendChild(o);
+    });
+    projectSel.addEventListener("change", () => {
+      const p = window.VibeProject.load(projectSel.value);
+      if (!p) return;
+      const c = p.control,
+        m = p.model;
+      if (c && c.order === 1) {
+        $("order").value = "1";
+        $("K").value = c.K;
+        $("tau").value = c.tau;
+        if (c.L != null) $("L").value = c.L;
+      } else if (c && c.order === 2) {
+        $("order").value = "2";
+        $("wn").value = c.wn;
+        $("zeta").value = c.zeta;
+      } else if (m && m.model === "FOPDT") {
+        $("order").value = "1";
+        $("K").value = m.K;
+        $("tau").value = m.tau;
+      } else if (m && m.model === "SOPDT") {
+        $("order").value = "2";
+        $("wn").value = m.wn;
+        $("zeta").value = m.zeta;
+      } else {
+        $("copy-status").textContent = "该项目没有可导入的模型";
+        return;
+      }
+      render();
+      $("copy-status").textContent = "已打开项目：" + p.name;
+    });
+  }
   const importBtn = $("import-model");
   if (importBtn) {
     importBtn.addEventListener("click", () => $("import-model-file").click());

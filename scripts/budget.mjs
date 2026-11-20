@@ -9,7 +9,7 @@ const PAGE_BUDGET_KB = {
   landing: 26,
   shared: 50,
   "imu-lab/static": 150,
-  "control-play": 86,
+  "control-play": 90,
   simulink: 280,
   about: 30,
   "model-lab/static": 70,

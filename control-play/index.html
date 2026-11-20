@@ -36,7 +36,7 @@
       <div class="kicker">vibe-lab / instrument 02</div>
       <h1>Control Play · 二阶系统</h1>
       <p class="sub">G(s) = ωn² / (s² + 2ζωn·s + ωn²) · 拖动滑杆，实时看 Bode 与阶跃响应。</p>
-      <div class="copy-row"><button type="button" id="import-model" class="copy-btn">导入模型 JSON</button><input id="import-model-file" type="file" accept=".json,application/json" hidden /><button type="button" id="copy-link" class="copy-btn">复制当前参数链接</button><span id="copy-status" role="status" class="hint"></span></div>
+      <div class="copy-row"><select id="project-select" class="project-select" aria-label="本地项目"><option value="">本地项目…</option></select><button type="button" id="import-model" class="copy-btn">导入模型 JSON</button><input id="import-model-file" type="file" accept=".json,application/json" hidden /><button type="button" id="copy-link" class="copy-btn">复制当前参数链接</button><span id="copy-status" role="status" class="hint"></span></div>
     </header>
 
     <main id="main">

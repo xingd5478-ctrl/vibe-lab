@@ -345,6 +345,7 @@
     "Smith 预估": "Smith predictor",
     继电器自整定: "Relay auto-tuning",
     自动定阶: "Auto order",
+    "本地项目…": "Local projects…",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",
