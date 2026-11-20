@@ -435,6 +435,27 @@
     return { ...fit, used: keep.length, outliers };
   }
 
+  function parseSerialLines(text, fs, t0) {
+    const rows = [];
+    let k = 0;
+    for (const line of String(text).split(/\r?\n/)) {
+      const c = line.trim().split(",").map(Number);
+      if (c.length < 3 || !c.every(Number.isFinite)) continue;
+      const off = c.length >= 4 ? 1 : 0;
+      const t = c.length >= 4 ? c[0] : (t0 || 0) + k / (fs || 100);
+      const row = { t, gx: c[off], gy: c[off + 1], gz: c[off + 2], crc: 1 };
+      if (c.length >= 6) {
+        row.ax = c[off + 3];
+        row.ay = c[off + 4];
+        row.az = c[off + 5];
+      }
+      if (c.length >= 7) row.temp = c[off + 6];
+      rows.push(row);
+      k++;
+    }
+    return rows;
+  }
+
   function tempPoint(text) {
     const lines = String(text)
       .split(/\r?\n/)

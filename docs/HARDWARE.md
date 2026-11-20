@@ -18,11 +18,16 @@ t,gx,gy,gz
 - Lines with fewer than 3 numeric fields are ignored
 - No CRC in the serial path; CRC is only supported in CSV import
 
-Future (not parsed by the v2.0 serial reader):
+Also accepted by the v2.0 serial reader:
 
 ```text
 t,gx,gy,gz,ax,ay,az,temp
 ```
+
+- 3 fields: gx,gy,gz; timestamp synthesized from sample rate
+- 4 fields: t,gx,gy,gz
+- 6 fields: t,gx,gy,gz,ax,ay,az
+- 7 fields: t,gx,gy,gz,ax,ay,az,temp
 
 ## Firmware checklist
 
