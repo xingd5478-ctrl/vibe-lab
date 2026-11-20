@@ -3,7 +3,7 @@
 (function (root) {
   "use strict";
   const D = root.IMUData || {};
-  const FRAMES = { 0xaa55: 30, 0xaadd: 20, 0xaace: 26, 0xbb66: 32, 0xcc77: 6 };
+  const FRAMES = { 0xbadd: 40, 0xaa55: 30, 0xaadd: 20, 0xaace: 26, 0xbb66: 32, 0xcc77: 6 };
 
   D.crc16ccitt = function (bytes) {
     let crc = 0xffff;
@@ -44,7 +44,18 @@
         crc: 1,
         seq: (bytes[cursor + 3] | (bytes[cursor + 4] << 8)) & 0x7fff,
       };
-      if (type === 0xaa55) {
+      if (type === 0xbadd) {
+        row.yaw = dv.getInt16(3, true) / 10;
+        row.target = dv.getInt16(5, true) / 10;
+        row.motorL = dv.getInt16(7, true);
+        row.motorR = dv.getInt16(9, true);
+        row.ax = dv.getInt16(11, true) / 16384;
+        row.ay = dv.getInt16(13, true) / 16384;
+        row.az = dv.getInt16(15, true) / 16384;
+        row.gx = dv.getInt16(17, true) / 131;
+        row.gy = dv.getInt16(19, true) / 131;
+        row.gz = dv.getInt16(21, true) / 131;
+      } else if (type === 0xaa55) {
         row.q = [dv.getFloat32(6, true), dv.getFloat32(10, true), dv.getFloat32(14, true), dv.getFloat32(18, true)];
         row.ax = dv.getInt16(22, true) / 16384;
         row.ay = dv.getInt16(24, true) / 16384;
@@ -70,7 +81,8 @@
         row.ay = dv.getInt16(24, true) / 16384;
         row.az = dv.getInt16(26, true) / 16384;
       }
-      if (stats.lastSeq != null && row.seq !== ((stats.lastSeq + 1) & 0x7fff)) stats.seqGaps++;
+      const seqMask = type === 0xbadd ? 0xff : 0x7fff;
+      if (stats.lastSeq != null && row.seq !== ((stats.lastSeq + 1) & seqMask)) stats.seqGaps++;
       stats.lastSeq = row.seq;
       stats.frames++;
       stats.types[type.toString(16)] = (stats.types[type.toString(16)] || 0) + 1;
