@@ -2015,52 +2015,78 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
         $("serial-status").textContent = "当前浏览器不支持 Web Serial（需 Chrome/Edge + HTTPS/localhost）";
         return;
       }
+      const baud = Number($("serial-baud").value) || 460800;
+      const mode = $("serial-protocol").value;
       try {
         port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 115200 });
-        const decoder = new TextDecoderStream();
-        port.readable.pipeTo(decoder.writable).catch(() => {});
-        reader = decoder.readable.getReader();
+        await port.open({ baudRate: baud });
+        reader = port.readable.getReader();
         active = true;
         btn.textContent = "停止串口采集";
-        $("serial-status").textContent = acceptMode ? "验收采集中（10 s）…" : "串口已连接，等待数据…";
-        let buf = "",
-          rows = [],
+        $("serial-status").textContent = acceptMode
+          ? `验收采集中（${baud} / ${mode} / 10 s）…`
+          : `串口已连接：${baud} / ${mode}`;
+        let rows = [],
           startAt = performance.now(),
           lastFlush = 0,
           acceptRows = [];
+        let binBuf = new Uint8Array(0),
+          textBuf = "",
+          decoder = new TextDecoder();
+        const bstats = { frames: 0, crcErrors: 0, dropped: 0, seqGaps: 0 };
         const acceptStart = performance.now();
         while (active) {
           const { value, done } = await reader.read();
           if (done) break;
-          buf += value;
-          const lines = buf.split(/\r?\n/);
-          buf = lines.pop();
-          for (const line of lines) {
-            const parsed = IMUData.parseSerialLines(line, state.fs, (performance.now() - startAt) / 1000);
-            rows.push(...parsed);
-            if (acceptMode) acceptRows.push(...parsed);
+          if (mode === "binary") {
+            const chunk = value instanceof Uint8Array ? value : new Uint8Array(value);
+            const merged = new Uint8Array(binBuf.length + chunk.length);
+            merged.set(binBuf, 0);
+            merged.set(chunk, binBuf.length);
+            binBuf = merged;
+            const parsed = IMUData.parseBinaryFrames(binBuf, { fs: state.fs, baseT: rows.length / state.fs });
+            binBuf = parsed.rest;
+            bstats.frames += parsed.stats.frames;
+            bstats.crcErrors += parsed.stats.crcErrors;
+            bstats.dropped += parsed.stats.dropped;
+            bstats.seqGaps += parsed.stats.seqGaps;
+            rows.push(...parsed.rows);
+            if (acceptMode) acceptRows.push(...parsed.rows);
+          } else {
+            textBuf += decoder.decode(value, { stream: true });
+            const lines = textBuf.split(/\r?\n/);
+            textBuf = lines.pop();
+            for (const line of lines) {
+              const parsed = IMUData.parseSerialLines(line, state.fs, (performance.now() - startAt) / 1000);
+              rows.push(...parsed);
+              if (acceptMode) acceptRows.push(...parsed);
+            }
           }
           const now = performance.now();
           if (rows.length > 200 || now - lastFlush > 1200) {
             lastFlush = now;
             state.source = "serial";
             applyRows(rows.slice(), "STM32 serial");
-            $("serial-status").textContent = `串口采集中：${rows.length} 帧`;
+            $("serial-status").textContent =
+              `串口采集中：${rows.length} 帧` + (mode === "binary" ? ` · CRC 错 ${bstats.crcErrors}` : "");
           }
           if (acceptMode && now - acceptStart >= 10000) {
             const report = IMUData.serialAcceptance(acceptRows);
+            if (mode === "binary" && (bstats.crcErrors > 0 || bstats.frames === 0)) report.ok = false;
             const el = $("serial-accept-result");
-            el.textContent = `${report.ok ? "PASS" : "FAIL"} · ${report.n} 帧 · fs ${Number.isFinite(report.fs) ? report.fs.toFixed(1) : "—"} Hz · jitter ${Number.isFinite(report.jitter) ? (report.jitter * 100).toFixed(0) : "—"}% · 非单调 ${report.nonmono} · 重复 ${report.dup}`;
+            el.textContent =
+              `${report.ok ? "PASS" : "FAIL"} · ${report.n} 帧 · fs ${Number.isFinite(report.fs) ? report.fs.toFixed(1) : "—"} Hz · jitter ${Number.isFinite(report.jitter) ? (report.jitter * 100).toFixed(0) : "—"}% · 非单调 ${report.nonmono} · 重复 ${report.dup}` +
+              (mode === "binary" ? ` · CRC 错 ${bstats.crcErrors} · seq 跳变 ${bstats.seqGaps}` : "");
             const dl = document.createElement("button");
             dl.type = "button";
             dl.textContent = "下载验收 JSON";
             dl.style.cssText =
               "margin-left:8px;padding:2px 6px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);cursor:pointer;font:10px var(--mono)";
             dl.addEventListener("click", () => {
-              const blob = new Blob([JSON.stringify({ report, rows: acceptRows }, null, 2)], {
-                type: "application/json",
-              });
+              const blob = new Blob(
+                [JSON.stringify({ report, baud, mode, stats: bstats, rows: acceptRows }, null, 2)],
+                { type: "application/json" }
+              );
               const a = document.createElement("a");
               a.href = URL.createObjectURL(blob);
               a.download = "serial-acceptance.json";

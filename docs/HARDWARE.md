@@ -3,10 +3,25 @@
 ## Transport
 
 - Browser: Chrome / Edge, secure context (`https://` or `localhost`)
-- Serial: 115200 baud, 8N1
-- Newline-delimited CSV, one sample per line
+- STM32 firmware: USART1 at **460800** baud, 8N1
+- Primary format: binary frames with CRC16-CCITT
+- Legacy/optional: newline-delimited CSV
 
-## Supported frames
+## Binary frames
+
+```text
+AA55  30 B  quaternion (4f) + accel (3i16)
+AADD  20 B  accel (3i16) + gyro (3i16)
+AACE  26 B  euler (3f) + accel (3i16)
+BB66  32 B  node quaternion + accel + timestamp
+CC77   6 B  sync
+```
+
+- Header: `type_hi type_lo payload_len seq_lo seq_hi extra`
+- CRC: 2 B little-endian at end, over all bytes before CRC
+- AADD raw gyro is scaled by `/16.4` to deg/s; accel by `/16384` to g
+
+## Legacy CSV frames
 
 ```text
 gx,gy,gz
