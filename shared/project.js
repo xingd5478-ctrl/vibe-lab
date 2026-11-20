@@ -72,6 +72,12 @@
     localStorage.setItem(HANDOFF, text);
   }
 
+  function clearHandoff() {
+    try {
+      localStorage.removeItem(HANDOFF);
+    } catch (e) {}
+  }
+
   function readHandoff() {
     try {
       return JSON.parse(localStorage.getItem(HANDOFF) || "null");
@@ -89,5 +95,17 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
 
-  root.VibeProject = { KEY, makeProject, safeDataset, save, list, load, remove, handoff, readHandoff, download };
+  root.VibeProject = {
+    KEY,
+    makeProject,
+    safeDataset,
+    save,
+    list,
+    load,
+    remove,
+    handoff,
+    readHandoff,
+    clearHandoff,
+    download,
+  };
 })(typeof window !== "undefined" ? window : globalThis);

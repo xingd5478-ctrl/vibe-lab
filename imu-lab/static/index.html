@@ -58,6 +58,9 @@
             <button id="map-apply" type="button" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">应用映射</button>
           </div>
           <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
+        <button id="serial-connect" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">连接 STM32（Web Serial）</button>
+        <button id="send-model" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">送到 Model Lab</button>
+        <div class="hint" id="serial-status">串口 CSV：gx,gy,gz 或 t,gx,gy,gz</div>
           <div class="hint">
             论文在审，仅作演示；完整数据待录用后按期刊政策公开，版权归作者/实验室。
             <a href="sample_real_10min.csv" download>下载片段 CSV</a>
@@ -248,6 +251,7 @@
   <script src="fit.js"></script>
   <script src="data.js"></script>
   <script src="chart.js"></script>
+  <script src="../../shared/project.js"></script>
   <script src="app.js"></script>
   <script src="manual-en.js"></script>
   <script src="manual.js"></script>

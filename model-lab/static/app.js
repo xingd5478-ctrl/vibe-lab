@@ -1044,6 +1044,28 @@
     });
   }
 
+  function loadHandoff() {
+    if (!window.VibeProject) return false;
+    const h = VibeProject.readHandoff();
+    if (!h || h.kind !== "dataset" || !h.dataset) return false;
+    VibeProject.clearHandoff();
+    const d = h.dataset;
+    d.meta = {
+      ...(d.meta || {}),
+      source: d.meta?.source || "handoff",
+      units: d.meta?.units || { u: "", y: "" },
+      closedLoop: false,
+    };
+    state.source = "csv";
+    state.fileName = h.source || "IMU handoff";
+    setData(d, h.source || "IMU handoff");
+    $("fit-hint").textContent = T(
+      "已从 IMU 导入数据，选择模型后重新拟合。",
+      "Data imported from IMU; choose a model and fit."
+    );
+    return true;
+  }
+
   function init() {
     initPlants();
     drawHero();
@@ -1121,7 +1143,7 @@
     $("import-project").addEventListener("click", () => $("import-project-file").click());
     $("import-project-file").addEventListener("change", importProject);
     $("download-matlab").addEventListener("click", downloadMatlab);
-    generate();
+    if (!loadHandoff()) generate();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
