@@ -58,14 +58,6 @@
             <button id="map-apply" type="button" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">应用映射</button>
           </div>
           <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
-        <label class="hint" style="display:block;margin-top:6px;">波特率 <select id="serial-baud"><option>460800</option><option>115200</option><option>921600</option><option>230400</option><option>9600</option></select></label>
-        <label class="hint" style="display:block;margin-top:4px;">协议 <select id="serial-protocol"><option value="binary">二进制（BADD/AA55）</option><option value="csv">CSV</option></select></label>
-        <button id="serial-connect" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">连接 STM32（Web Serial）</button>
-        <button id="serial-accept" type="button" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">串口验收 10 s</button>
-        <div class="hint" id="serial-status">未连接</div>
-        <div class="hint" id="serial-accept-result"></div>
-        <button id="serial-diag" type="button" style="width:100%;margin-top:6px;padding:5px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;font-size:10px;">串口诊断</button>
-        <pre class="hint" id="serial-diag-out" style="white-space:pre-wrap;margin:4px 0 0;"></pre>
         <button id="send-model" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">送到 Model Lab</button>
         <details class="six-face" id="serial-help">
           <summary>串口协议</summary>

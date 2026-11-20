@@ -19,14 +19,9 @@
 
 ### IMU Lab
 
-- BADD 40-byte STM32 telemetry
-  - 460800 baud
-  - CRC16
-  - ax/ay/az, gx/gy/gz
-- Web Serial acceptance: byte count, frame count, fs, jitter, non-monotonic, duplicate, CRC errors, sequence gaps
-- Acceptance JSON download
-- Binary/CSV protocol switch
+- CSV upload, CRC cleanup, Allan variance, R/Q, Kalman, six-face and temperature calibration
 - Calibration projects (`vibe-lab-project`)
+- Real-time STM32 serial acquisition is intentionally kept in host software, not in the web UI
 - Selectable-text PDF via browser print
   - direct download is image-only and documented
 
@@ -57,7 +52,7 @@
 - MIMO state-space is a **MIMO-ARX realization**, not MIMO subspace.
 - Closed-loop frequency needs controller metadata and uniform sampling.
 - PDF direct download is image-only; selectable text requires browser print.
-- Web Serial acceptance depends on Chrome/Edge and a user gesture.
+- Real-time serial acquisition is not part of the web UI; use host tooling and import CSV.
 - Calibration is teaching-grade, not a certified metrology workflow.
 
 ## Verification

@@ -1,4 +1,8 @@
-# STM32 Web Serial Protocol (v2.0)
+# STM32 serial protocol (host software)
+
+## Scope
+
+Real-time serial acquisition is handled by the host-side tooling, not by the web UI. The web lab accepts exported CSV files. The protocol below documents the firmware stream for host-side use.
 
 ## Transport
 
