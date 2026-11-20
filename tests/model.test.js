@@ -183,6 +183,16 @@ test("validation report flags a good and a biased model", () => {
   assert.equal(V.validate(bad, { t, u, y }, null).grade, "F");
 });
 
+test("ETFE/MIMO validation reports are available", () => {
+  const V = require("../model-lab/static/core/validation.js");
+  const e = P.virtualChirp({ plant: "thermal", noise: 0.01, seed: 4 });
+  const ef = I.fitETFE(e.t, e.u, e.y);
+  assert.notEqual(V.validate(ef, e, null).grade, "F");
+  const m = P.virtualMimo({ noise: 0.005, seed: 3 });
+  const mf = I.fitMIMOARX(m.t, m.U, m.Y, { trainEnd: 210, na: 1, nb: 1, nk: 1 });
+  assert.notEqual(V.validate(mf, m, null).grade, "F");
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

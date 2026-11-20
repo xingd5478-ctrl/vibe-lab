@@ -87,8 +87,51 @@
   }
 
   function validate(fit, data, quality) {
-    if (!fit || !data || !fit.yhat) return null;
-    if (fit.model === "ETFE" || fit.model === "MIMO-ARX") return null;
+    if (!fit || !data) return null;
+    if (fit.model === "ETFE") {
+      const c = fit.medianCoherence;
+      const checks = [
+        {
+          id: "coherence",
+          level: c >= 0.8 ? "ok" : c >= 0.5 ? "warn" : "fail",
+          message: `median coherence ${c.toFixed(2)}`,
+          value: c,
+        },
+        {
+          id: "bins",
+          level: fit.freq.length >= 20 ? "ok" : "warn",
+          message: `${fit.freq.length} frequency bins`,
+          value: fit.freq.length,
+        },
+      ];
+      const fails = checks.filter((x) => x.level === "fail").length;
+      const warns = checks.filter((x) => x.level === "warn").length;
+      return { grade: fails ? "F" : warns ? "B" : "A", checks };
+    }
+    if (fit.model === "MIMO-ARX") {
+      const checks = [];
+      for (let o = 0; o < fit.p; o++) {
+        const res = data.Y[o].map((v, i) => v - fit.yhat[o][i]);
+        const ft = fit.fitTrainOut[o];
+        const fv = fit.fitValOut[o];
+        checks.push({
+          id: "y" + (o + 1),
+          level: ft >= 80 ? "ok" : ft >= 50 ? "warn" : "fail",
+          message: `y${o + 1}: train FIT ${ft.toFixed(1)}%${fv != null ? `, val ${fv.toFixed(1)}%` : ""}`,
+          value: ft,
+        });
+        checks.push({
+          id: "res" + (o + 1),
+          level: Math.abs(mean(res)) < 0.05 ? "ok" : "warn",
+          message: `y${o + 1}: residual mean ${mean(res).toPrecision(3)}`,
+          value: mean(res),
+        });
+      }
+      const fails = checks.filter((x) => x.level === "fail").length;
+      const warns = checks.filter((x) => x.level === "warn").length;
+      return { grade: fails ? "F" : warns > 1 ? "C" : warns ? "B" : "A", checks };
+    }
+    if (!fit.yhat) return null;
     const y = data.y;
     const n = y.length;
     const start = fit.start || 0;
