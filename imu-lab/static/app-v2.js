@@ -2087,8 +2087,10 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
             bstats.crcErrors += parsed.stats.crcErrors;
             bstats.dropped += parsed.stats.dropped;
             bstats.seqGaps += parsed.stats.seqGaps;
-            rows.push(...parsed.rows);
-            if (acceptMode) acceptRows.push(...parsed.rows);
+            for (const r of parsed.rows) {
+              rows.push(r);
+              if (acceptMode) acceptRows.push(r);
+            }
           } else {
             totalBytes += value.length || 0;
             textBuf += decoder.decode(value, { stream: true });
@@ -2096,8 +2098,10 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
             textBuf = lines.pop();
             for (const line of lines) {
               const parsed = IMUData.parseSerialLines(line, state.fs, (performance.now() - startAt) / 1000);
-              rows.push(...parsed);
-              if (acceptMode) acceptRows.push(...parsed);
+              for (const r of parsed) {
+                rows.push(r);
+                if (acceptMode) acceptRows.push(r);
+              }
             }
           }
           const now = performance.now();
