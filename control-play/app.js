@@ -116,6 +116,34 @@
     return { t, y };
   }
 
+  function margins(b, kp, ki, kd) {
+    const mag = [],
+      ph = [];
+    for (let i = 0; i < b.w.length; i++) {
+      const w = b.w[i];
+      const cr = kp,
+        ci = kd * w - ki / w;
+      const cm = Math.hypot(cr, ci);
+      const cp = (Math.atan2(ci, cr) * 180) / Math.PI;
+      mag.push(b.mag[i] + 20 * Math.log10(Math.max(cm, 1e-12)));
+      ph.push(b.phase[i] + cp);
+    }
+    const cross = (arr, target) => {
+      for (let i = 1; i < arr.length; i++) {
+        if ((arr[i - 1] - target) * (arr[i] - target) <= 0) {
+          const f = (target - arr[i - 1]) / (arr[i] - arr[i - 1] || 1);
+          return i - 1 + f;
+        }
+      }
+      return -1;
+    };
+    const gi = cross(mag, 0);
+    const pm = gi >= 0 ? 180 + ph[Math.round(gi)] : null;
+    const pi = cross(ph, -180);
+    const gm = pi >= 0 ? -mag[Math.round(pi)] : null;
+    return { pm, gm };
+  }
+
   function metrics(t, y) {
     let peak = -Infinity,
       tPeak = 0;
@@ -339,6 +367,9 @@
     plotBode($("bode"), b);
     plotStep($("step"), open, closed);
     const m = metrics(closed.t, closed.y);
+    const mm = margins(b, kp, ki, kd);
+    $("pm").textContent = mm.pm != null ? mm.pm.toFixed(1) + " °" : "—";
+    $("gm").textContent = mm.gm != null ? mm.gm.toFixed(1) + " dB" : "—";
     const tEnd = closed.t[closed.t.length - 1];
     const peakAtEnd = m.tPeak >= tEnd - 1e-9;
     $("overshoot").textContent = m.overshoot.toFixed(1) + " %";
@@ -419,6 +450,61 @@
 
   loadURL();
   render();
+  const tune = $("tune-imc");
+  if (tune)
+    tune.addEventListener("click", () => {
+      if ($("order").value !== "1") {
+        $("copy-status").textContent = "IMC 初值仅支持一阶模式";
+        return;
+      }
+      const K = parseFloat($("K").value),
+        tau = parseFloat($("tau").value);
+      if (!(K > 0) || !(tau > 0)) return;
+      const kp = tau / (K * Math.max(0.1, tau * 0.5));
+      $("kp").value = Math.min(10, kp);
+      $("ki").value = Math.min(10, Math.max(0, kp / tau));
+      $("kd").value = 0;
+      render();
+      $("copy-status").textContent = "已填入 IMC 初值";
+    });
+  const importBtn = $("import-model");
+  if (importBtn) {
+    importBtn.addEventListener("click", () => $("import-model-file").click());
+    $("import-model-file").addEventListener("change", (ev) => {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const p = JSON.parse(String(reader.result));
+          const m = p.model || (p.control ? null : null);
+          const c = p.control;
+          if (c && c.order === 1) {
+            $("order").value = "1";
+            $("K").value = c.K;
+            $("tau").value = c.tau;
+          } else if (c && c.order === 2) {
+            $("order").value = "2";
+            $("wn").value = c.wn;
+            $("zeta").value = c.zeta;
+          } else if (m && m.model === "FOPDT") {
+            $("order").value = "1";
+            $("K").value = m.K;
+            $("tau").value = m.tau;
+          } else if (m && m.model === "SOPDT") {
+            $("order").value = "2";
+            $("wn").value = m.wn;
+            $("zeta").value = m.zeta;
+          } else throw new Error("项目里没有可导入的一阶/二阶模型");
+          render();
+          $("copy-status").textContent = "模型已导入";
+        } catch (e) {
+          $("copy-status").textContent = e.message;
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
   if (window.matchMedia) {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     if (mq.addEventListener) mq.addEventListener("change", render);

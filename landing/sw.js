@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v39";
+const CACHE = "vibe-lab-v40";
 const ASSETS = [
   "./",
   "./index.html",
@@ -45,6 +45,7 @@ const ASSETS = [
   "./simulink/guide/t41-t43.js",
   "./simulink/guide/examples.js",
   "./simulink/guide/cases.js",
+  "./shared/project.js",
   "./shared/sentry-config.js",
   "./shared/observability.js",
   "./shared/i18n.js",

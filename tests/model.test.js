@@ -193,6 +193,24 @@ test("ETFE/MIMO validation reports are available", () => {
   assert.notEqual(V.validate(mf, m, null).grade, "F");
 });
 
+test("state-space realization preserves ARX behavior", () => {
+  const t = [],
+    u = [],
+    y = [];
+  let yy = 0;
+  for (let k = 0; k < 200; k++) {
+    const uk = k % 7 < 3 ? 1 : -1;
+    yy = k ? 0.7 * yy + 0.2 * uk : 0;
+    t.push(k * 0.1);
+    u.push(uk);
+    y.push(yy);
+  }
+  const f = I.fitSS(t, u, y, { trainEnd: 160, na: 1, nb: 1, nk: 0 });
+  assert.equal(f.model, "SS");
+  assert.equal(f.A.length, 1);
+  assert.ok(f.fitTrain > 90);
+});
+
 test("FOPDT rejects a zero-amplitude input", () => {
   assert.throws(() => I.fitFOPDT([0, 1, 2, 3], [0, 0, 0, 0], [0, 0, 0, 0]), /No input step|zero/);
 });

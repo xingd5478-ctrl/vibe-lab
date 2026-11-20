@@ -628,6 +628,23 @@
     };
   }
 
+  function fitSS(t, u, y, opts) {
+    const base = fitARX(t, u, y, opts);
+    const na = base.na,
+      nb = base.nb,
+      nk = base.nk;
+    const n = Math.max(na, nk + nb);
+    const A = Array.from({ length: n }, () => new Array(n).fill(0));
+    for (let i = 0; i < na; i++) A[0][i] = -base.coefA[i];
+    for (let i = 1; i < n; i++) A[i][i - 1] = 1;
+    const B = new Array(n).fill(0);
+    B[0] = 1;
+    const C = new Array(n).fill(0);
+    for (let i = 0; i < nb; i++) if (nk + i < n) C[nk + i] = base.coefB[i];
+    const D = 0;
+    return { ...base, model: "SS", A, B, C, D, n };
+  }
+
   function fitMIMOARX(t, U, Y, opts) {
     const n = t.length;
     const m = U.length;
@@ -1002,6 +1019,16 @@
   }
 
   function toMatlab(p) {
+    if (p.model === "SS") {
+      const mat = (M) => "[" + M.map((r) => r.map((x) => Number(x).toPrecision(6)).join(", ")).join("; ") + "]";
+      return [
+        `A = ${mat(p.A)};`,
+        `B = [${p.B.map((x) => Number(x).toPrecision(6)).join("; ")}];`,
+        `C = [${p.C.map((x) => Number(x).toPrecision(6)).join(", ")}];`,
+        `D = ${p.D};`,
+        "sys = ss(A,B,C,D,1);",
+      ].join("\n");
+    }
     if (p.model === "FIR") {
       return [
         `h = [${p.h.map((x) => x.toPrecision(6)).join(", ")}];`,
@@ -1129,6 +1156,7 @@
     fitOE,
     fitARMAX,
     fitWiener,
+    fitSS,
     bootstrap,
     simulate,
     metrics,

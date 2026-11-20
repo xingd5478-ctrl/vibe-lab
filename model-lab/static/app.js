@@ -343,7 +343,10 @@
     };
     add(T("FIT 训练", "FIT train"), `${fmt(f.fitTrain != null ? f.fitTrain : f.fit, 1)} %`);
     if (f.fitVal != null) add(T("FIT 验证", "FIT validation"), `${fmt(f.fitVal, 1)} %`);
-    if (["FIR", "OE", "ARMAX", "Wiener"].includes(f.model)) {
+    if (f.model === "SS") {
+      add("SS order", String(f.n));
+      add("ARX", `${f.na}/${f.nb}/${f.nk}`);
+    } else if (["FIR", "OE", "ARMAX", "Wiener"].includes(f.model)) {
       if (f.model === "FIR") add("nh", String(f.nh));
       else if (f.model === "ARMAX") add("ARMAX", `${f.na}/${f.nb}/${f.nc}/${f.nk}`);
       else if (f.model === "Wiener") add("c2", fmt(f.c2, 3));
@@ -427,7 +430,7 @@
         )
       );
     }
-    if (["FIR", "OE", "ARMAX", "Wiener"].includes(f.model)) {
+    if (["FIR", "OE", "ARMAX", "Wiener", "SS"].includes(f.model)) {
       lines.push(
         T(
           "这是时间域模型；验证集很差时不要用它外推。",
@@ -524,6 +527,7 @@
     if (f.model === "SOPDT") return 4;
     if (f.model === "ARX" || f.model === "OE" || f.model === "2SLS-ARX") return f.na + f.nb;
     if (f.model === "ARMAX") return f.na + f.nb + f.nc;
+    if (f.model === "SS") return f.n * f.n + f.n * 2;
     if (f.model === "FIR") return f.nh + 1;
     if (f.model === "Wiener") return f.na + f.nb + 3;
     if (f.model === "Hammerstein") return f.na + f.nb + 1;
@@ -771,6 +775,103 @@
     }, 30);
   }
 
+  function projectModel(f) {
+    if (!f) return null;
+    const out = {};
+    for (const k of [
+      "model",
+      "na",
+      "nb",
+      "nc",
+      "nk",
+      "nh",
+      "m",
+      "p",
+      "K",
+      "tau",
+      "L",
+      "wn",
+      "zeta",
+      "coefA",
+      "coefB",
+      "coefC",
+      "c2",
+      "fit",
+      "fitTrain",
+      "fitVal",
+    ]) {
+      if (f[k] !== undefined) out[k] = f[k];
+    }
+    return out;
+  }
+
+  function exportProject() {
+    if (!state.data || !window.VibeProject) return;
+    const p = VibeProject.makeProject({
+      name: state.fileName || "Model Lab project",
+      dataset: VibeProject.safeDataset(state.data),
+      model: projectModel(state.fit),
+      control:
+        state.fit && ["FOPDT", "SOPDT"].includes(state.fit.model)
+          ? {
+              order: state.fit.model === "FOPDT" ? 1 : 2,
+              K: state.fit.K,
+              tau: state.fit.tau,
+              wn: state.fit.wn,
+              zeta: state.fit.zeta,
+            }
+          : null,
+    });
+    p.id = "p-" + Date.now().toString(36);
+    VibeProject.save(p);
+    VibeProject.download(p);
+    $("fit-hint").textContent = T("项目已保存并导出。", "Project saved and exported.");
+  }
+
+  function importProject(ev) {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const p = JSON.parse(String(reader.result));
+        if (!p || p.kind !== "vibe-lab-project" || !p.dataset || !p.dataset.t) throw new Error("Invalid project file.");
+        state.source = "csv";
+        state.fileName = p.name || "imported";
+        applyColumns(
+          {
+            t: p.dataset.t,
+            u: p.dataset.u,
+            y: p.dataset.y,
+            meta: {
+              columns: [p.dataset.t, p.dataset.u, p.dataset.y],
+              headers: ["t", "u", "y"],
+              timeIndex: 0,
+              inputIndex: 1,
+              outputIndex: 2,
+            },
+          },
+          0,
+          [1],
+          [2],
+          state.fileName,
+          null
+        );
+        if (p.model && p.model.model) {
+          const sel = $("model");
+          if (Array.from(sel.options).some((o) => o.value === p.model.model)) sel.value = p.model.model;
+        }
+        $("fit-hint").textContent = T(
+          "项目已导入；点击“辨识模型”重新拟合。",
+          "Project imported; click Identify to refit."
+        );
+      } catch (e) {
+        showError(e.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
   function copyMatlab() {
     if (!state.fit) return;
     const text = I.toMatlab(state.fit);
@@ -1016,6 +1117,9 @@
     });
     $("copy-matlab").addEventListener("click", copyMatlab);
     $("uncertainty").addEventListener("click", estimateUncertainty);
+    $("export-project").addEventListener("click", exportProject);
+    $("import-project").addEventListener("click", () => $("import-project-file").click());
+    $("import-project-file").addEventListener("change", importProject);
     $("download-matlab").addEventListener("click", downloadMatlab);
     generate();
   }

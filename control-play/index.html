@@ -19,6 +19,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <script defer src="../shared/sentry-config.js"></script>
   <script defer src="../shared/observability.js"></script>
+  <script src="../shared/project.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到内容</a>
@@ -35,7 +36,7 @@
       <div class="kicker">vibe-lab / instrument 02</div>
       <h1>Control Play · 二阶系统</h1>
       <p class="sub">G(s) = ωn² / (s² + 2ζωn·s + ωn²) · 拖动滑杆，实时看 Bode 与阶跃响应。</p>
-      <div class="copy-row"><button type="button" id="copy-link" class="copy-btn">复制当前参数链接</button><span id="copy-status" role="status" class="hint"></span></div>
+      <div class="copy-row"><button type="button" id="import-model" class="copy-btn">导入模型 JSON</button><input id="import-model-file" type="file" accept=".json,application/json" hidden /><button type="button" id="copy-link" class="copy-btn">复制当前参数链接</button><span id="copy-status" role="status" class="hint"></span></div>
     </header>
 
     <main id="main">
@@ -97,8 +98,11 @@
           <div>峰值时间 <b id="peak">—</b></div>
           <div>调节时间（±2%） <b id="settle">—</b></div>
           <div>稳态误差 <b id="ess">—</b></div>
+          <div>相位裕度 <b id="pm">—</b></div>
+          <div>增益裕度 <b id="gm">—</b></div>
         </div>
 
+        <button id="tune-imc" type="button" class="copy-btn" style="width:100%;margin-bottom:8px;">IMC 初值（一阶）</button>
         <p class="hint">Kp 加快响应但增大超调；Ki 消除稳态误差但易振荡；Kd 抑制超调、放大噪声。拖滑杆对比开环/闭环。</p>
       </aside>
 
