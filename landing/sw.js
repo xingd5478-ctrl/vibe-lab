@@ -1,5 +1,5 @@
 /* vibe-lab service worker: precache shell, offline fallback */
-const CACHE = "vibe-lab-v62";
+const CACHE = "vibe-lab-v63";
 const ASSETS = [
   "./",
   "./index.html",
