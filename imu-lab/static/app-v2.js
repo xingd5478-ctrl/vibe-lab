@@ -2143,7 +2143,9 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
           applyRows(rows.slice(), "STM32 serial");
         }
       } catch (e) {
-        $("serial-status").textContent = "串口失败：" + e.message;
+        console.error(e);
+        const line = String(e.stack || "").split("\n")[1] || "";
+        $("serial-status").textContent = "串口失败：" + e.message + (line ? " @" + line.trim() : "");
       }
     };
     btn.addEventListener("click", () => start(false));
