@@ -2117,6 +2117,38 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     };
     btn.addEventListener("click", () => start(false));
     if (acceptBtn) acceptBtn.addEventListener("click", () => start(true));
+    const diag = $("serial-diag");
+    if (diag)
+      diag.addEventListener("click", async () => {
+        const out = [];
+        out.push(`secureContext=${window.isSecureContext}`);
+        out.push(`navigator.serial=${typeof navigator.serial}`);
+        out.push(`ua=${navigator.userAgent}`);
+        if (navigator.serial) {
+          try {
+            const granted = await navigator.serial.getPorts();
+            out.push(`granted=${granted.length}`);
+            granted.forEach((p, i) => {
+              const info = p.getInfo ? p.getInfo() : {};
+              out.push(
+                `  [${i}] usb=${info.usbVendorId || "-"}:${info.usbProductId || "-"} bt=${info.bluetoothServiceClassId || "-"}`
+              );
+            });
+          } catch (e) {
+            out.push(`getPorts error=${e.name}: ${e.message}`);
+          }
+          try {
+            const p = await navigator.serial.requestPort();
+            const info = p.getInfo ? p.getInfo() : {};
+            out.push(
+              `requestPort OK usb=${info.usbVendorId || "-"}:${info.usbProductId || "-"} bt=${info.bluetoothServiceClassId || "-"}`
+            );
+          } catch (e) {
+            out.push(`requestPort error=${e.name}: ${e.message}`);
+          }
+        }
+        $("serial-diag-out").textContent = out.join("\n");
+      });
   }
 
   function init() {
