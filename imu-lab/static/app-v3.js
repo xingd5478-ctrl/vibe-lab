@@ -538,8 +538,16 @@
         height: 230,
         xLabel: "时间 (s)",
         yLabel: "角速度 (°/s)",
-        yMin: -6,
-        yMax: 6,
+        yMin: (() => {
+          let lo = Infinity;
+          for (const r of clean) lo = Math.min(lo, r[ch]);
+          return Number.isFinite(lo) ? Math.min(-1, lo - Math.max(0.5, Math.abs(lo) * 0.1)) : -6;
+        })(),
+        yMax: (() => {
+          let hi = -Infinity;
+          for (const r of clean) hi = Math.max(hi, r[ch]);
+          return Number.isFinite(hi) ? Math.max(1, hi + Math.max(0.5, Math.abs(hi) * 0.1)) : 6;
+        })(),
         aria: `时域图：${clean.length} 帧角速度，原始与清洗后对比`,
         series: [
           { name: "原始", color: "#b9b3a5", width: 0.8, points: raw.map((r) => [r.t, r[ch]]) },

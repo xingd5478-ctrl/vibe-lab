@@ -37,12 +37,27 @@
 
   function cleanFrames(rows, maxAbs) {
     maxAbs = maxAbs || 5;
+    const limits = {};
+    for (const key of ["gx", "gy", "gz"]) {
+      const vals = rows
+        .map((r) => Math.abs(r[key]))
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b);
+      if (!vals.length) {
+        limits[key] = maxAbs;
+        continue;
+      }
+      const med = vals[vals.length >> 1];
+      const dev = vals.map((v) => Math.abs(v - med)).sort((a, b) => a - b);
+      const mad = dev[dev.length >> 1] || 0;
+      limits[key] = Math.max(maxAbs, med + 12 * 1.4826 * mad);
+    }
     return rows.filter(
       (r) =>
         (r.crc === undefined || r.crc === 1 || r.crc === true) &&
-        Math.abs(r.gx) <= maxAbs &&
-        Math.abs(r.gy) <= maxAbs &&
-        Math.abs(r.gz) <= maxAbs
+        Math.abs(r.gx) <= limits.gx &&
+        Math.abs(r.gy) <= limits.gy &&
+        Math.abs(r.gz) <= limits.gz
     );
   }
 
