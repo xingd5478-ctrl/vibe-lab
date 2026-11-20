@@ -4,6 +4,7 @@
 
   const $ = (id) => document.getElementById(id);
   const T = (zh, en) => (document.documentElement.lang === "en" ? en : zh);
+  const CALIB_KEY = "vibe-imu-calib-v1";
   const { allanDeviation, cleanFrames } = window.IMUAllan;
   const { integrate, kf1d } = window.IMUKF;
   const { fitAllan, quantile } = window.IMUFit;
@@ -912,6 +913,133 @@ ${blocks}
     flash("融合 CSV 已导出");
   }
 
+  function downloadCalibPDF() {
+    const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 5)));
+    const mean = (k) => (rows.length ? rows.reduce((s, r) => s + r[k], 0) / rows.length : NaN);
+    const cal = state.sixCalib;
+    const canvas = document.createElement("canvas");
+    canvas.width = 1240;
+    canvas.height = 1754;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#f4f2ec";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#1b1d22";
+    let y = 90;
+    const line = (text, size = 20, bold = false, color = "#1b1d22") => {
+      ctx.font = `${bold ? "600 " : ""}${size}px "Microsoft YaHei", "Segoe UI", sans-serif`;
+      ctx.fillStyle = color;
+      const max = 1100;
+      let cur = "";
+      for (const ch of String(text)) {
+        if (ctx.measureText(cur + ch).width > max) {
+          ctx.fillText(cur, 70, y);
+          y += size * 1.5;
+          cur = "";
+        }
+        cur += ch;
+      }
+      if (cur) {
+        ctx.fillText(cur, 70, y);
+        y += size * 1.5;
+      }
+    };
+    line("IMU 标定报告", 36, true);
+    line(`vibe-lab · 教学报告，不是认证标定 · ${new Date().toLocaleString()}`, 16, false, "#6f6a61");
+    y += 12;
+    line("数据", 24, true);
+    line(`来源：${state.source} · 采样率：${state.fs} Hz · 有效帧：${rows.length}`, 18);
+    y += 8;
+    line("陀螺零偏（前 5 s 均值）", 24, true);
+    line(`gx=${mean("gx").toFixed(3)} · gy=${mean("gy").toFixed(3)} · gz=${mean("gz").toFixed(3)} °/s`, 18);
+    const fit = state.fit;
+    line(
+      `Allan：ARW ${fit ? fit.arw.toFixed(3) : "—"} · RRW ${fit ? fit.rrw.toFixed(3) : "—"} · R² ${fit ? fit.r2.toFixed(3) : "—"}`,
+      18
+    );
+    line(`Kalman：R=${state.r.toExponential(2)} · Q=${state.q.toExponential(2)}`, 18);
+    y += 8;
+    line("六面标定", 24, true);
+    if (cal) {
+      line(
+        `质量：${cal.beforeGrade || "—"} → ${cal.grade || "—"} · |a| ${cal.quality.normMean.toFixed(3)} ± ${cal.quality.normStd.toFixed(3)} g · RMS ${cal.quality.rmsError.toFixed(3)} g`,
+        18
+      );
+      line(`bias = [${cal.bias.x.toFixed(3)}, ${cal.bias.y.toFixed(3)}, ${cal.bias.z.toFixed(3)}] g`, 18);
+      line(`scale = [${cal.scale.x.toFixed(3)}, ${cal.scale.y.toFixed(3)}, ${cal.scale.z.toFixed(3)}]`, 18);
+      line("3×3 矩阵已用于交叉轴补偿；应用/撤销见页面。", 16, false, "#6f6a61");
+    } else line("未完成六面标定。", 18);
+    y += 8;
+    line("陀螺刻度", 24, true);
+    const gs = Object.keys(state.gyroScale);
+    line(gs.length ? gs.map((a) => `${a}=${state.gyroScale[a].toFixed(4)}`).join(" · ") : "未标定。", 18);
+    y += 20;
+    line("说明", 24, true);
+    line(
+      "本报告由浏览器内数据生成；PDF 为图像型 PDF，文字不可选中。标定前请确认静态、单 g 与已知角速度条件。",
+      16,
+      false,
+      "#6f6a61"
+    );
+    const jpeg = dataUrlBytes(canvas.toDataURL("image/jpeg", 0.92));
+    const pdf = pdfFromJpeg(jpeg, canvas.width, canvas.height);
+    downloadBlob(new Blob([pdf], { type: "application/pdf" }), "imu_calibration.pdf");
+    flash("PDF 已生成");
+  }
+
+  function dataUrlBytes(url) {
+    const b64 = url.split(",")[1];
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  function pdfFromJpeg(jpeg, iw, ih) {
+    const enc = (s) => new TextEncoder().encode(s);
+    const chunks = [];
+    let len = 0,
+      offsets = [];
+    const add = (u) => {
+      chunks.push(u);
+      len += u.length;
+    };
+    add(enc("%PDF-1.4\n"));
+    const obj = (n, parts) => {
+      offsets[n] = len;
+      add(enc(`${n} 0 obj\n`));
+      parts.forEach(add);
+      add(enc("endobj\n"));
+    };
+    obj(1, [enc("<< /Type /Catalog /Pages 2 0 R >>\n")]);
+    obj(2, [enc("<< /Type /Pages /Kids [3 0 R] /Count 1 >>\n")]);
+    obj(3, [
+      enc(
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\n"
+      ),
+    ]);
+    obj(4, [
+      enc(
+        `<< /Type /XObject /Subtype /Image /Width ${iw} /Height ${ih} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`
+      ),
+      jpeg,
+      enc("\nendstream\n"),
+    ]);
+    const content = enc("q\n595 0 0 842 0 0 cm\n/Im0 Do\nQ\n");
+    obj(5, [enc(`<< /Length ${content.length} >>\nstream\n`), content, enc("endstream\n")]);
+    const xref = len;
+    let x = "xref\n0 6\n0000000000 65535 f \n";
+    for (let i = 1; i <= 5; i++) x += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+    add(enc(x));
+    add(enc(`trailer << /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
+    const out = new Uint8Array(len);
+    let p = 0;
+    chunks.forEach((c) => {
+      out.set(c, p);
+      p += c.length;
+    });
+    return out;
+  }
+
   function printCalib() {
     const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 5)));
     const mean = (k) => (rows.length ? rows.reduce((s, r) => s + r[k], 0) / rows.length : NaN);
@@ -1112,6 +1240,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     $("export-report").addEventListener("click", exportReport);
     $("export-calib").addEventListener("click", exportCalib);
     $("export-calib-pdf").addEventListener("click", printCalib);
+    $("download-calib-pdf").addEventListener("click", downloadCalibPDF);
     $("export-fusion").addEventListener("click", exportFusion);
     $("export-allan").addEventListener("click", exportAllanCSV);
 
@@ -1264,6 +1393,44 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     });
   }
 
+  function saveCalibLocal() {
+    try {
+      localStorage.setItem(
+        CALIB_KEY,
+        JSON.stringify({ sixFace: state.sixFace, sixCalib: state.sixCalib, gyroScale: state.gyroScale })
+      );
+    } catch (e) {}
+  }
+
+  function loadCalibLocal() {
+    try {
+      const d = JSON.parse(localStorage.getItem(CALIB_KEY) || "null");
+      if (!d) return;
+      state.sixFace = d.sixFace || {};
+      state.sixCalib = d.sixCalib || null;
+      state.gyroScale = d.gyroScale || {};
+      const labels = { px: "+X", nx: "−X", py: "+Y", ny: "−Y", pz: "+Z", nz: "−Z" };
+      Object.keys(state.sixFace).forEach((k) => {
+        document.querySelectorAll("#six-grid button").forEach((b) => {
+          if (b.textContent === labels[k]) b.classList.add("done");
+        });
+      });
+      if (Object.keys(state.gyroScale).length)
+        $("gyro-info").textContent = `已加载：${Object.entries(state.gyroScale)
+          .map(([a, v]) => `${a}=${Number(v).toFixed(4)}`)
+          .join(" · ")}`;
+      if (state.sixCalib) {
+        $("six-apply").disabled = false;
+        const b = state.sixCalib.bias,
+          sc = state.sixCalib.scale,
+          q = state.sixCalib.quality;
+        if (b && sc && q)
+          $("six-result").textContent =
+            `[已加载] [${state.sixCalib.grade || "—"}] bias = [${b.x.toFixed(3)}, ${b.y.toFixed(3)}, ${b.z.toFixed(3)}] · |a| ${q.normMean.toFixed(3)} g · RMS ${q.rmsError.toFixed(3)} g`;
+      }
+    } catch (e) {}
+  }
+
   function initSixFace() {
     const grid = $("six-grid");
     if (!grid) return;
@@ -1298,11 +1465,21 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     $("six-calc").addEventListener("click", () => {
       try {
         state.sixCalib = IMUData.sixFace(state.sixFace);
+        state.sixCalib.quality = IMUData.sixQuality(state.sixFace, state.sixCalib);
+        state.sixCalib.grade = IMUData.sixQualityGrade(state.sixCalib.quality);
+        state.sixCalib.before = IMUData.sixQuality(state.sixFace, {
+          bias: { x: 0, y: 0, z: 0 },
+          scale: { x: 1, y: 1, z: 1 },
+        });
+        state.sixCalib.beforeGrade = IMUData.sixQualityGrade(state.sixCalib.before);
+        $("six-apply").disabled = false;
         const b = state.sixCalib.bias,
-          sc = state.sixCalib.scale;
+          sc = state.sixCalib.scale,
+          q = state.sixCalib.quality;
         $("six-result").textContent =
-          `bias = [${b.x.toFixed(3)}, ${b.y.toFixed(3)}, ${b.z.toFixed(3)}] g · scale = [${sc.x.toFixed(3)}, ${sc.y.toFixed(3)}, ${sc.z.toFixed(3)}]`;
-        flash("六面标定完成，可在标定 JSON 中导出");
+          `[${state.sixCalib.beforeGrade} → ${state.sixCalib.grade}] bias = [${b.x.toFixed(3)}, ${b.y.toFixed(3)}, ${b.z.toFixed(3)}] g · scale = [${sc.x.toFixed(3)}, ${sc.y.toFixed(3)}, ${sc.z.toFixed(3)}] · |a| ${q.normMean.toFixed(3)}±${q.normStd.toFixed(3)} g · RMS ${q.rmsError.toFixed(3)} g`;
+        saveCalibLocal();
+        flash("六面标定完成并已保存到本机");
       } catch (e) {
         $("six-result").textContent = "还缺面：" + e.message;
       }
@@ -1323,22 +1500,29 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
         $("six-result").textContent = "已撤销六面标定";
       } else {
         state.accelBackup = state.rows.map((r) => ({ ax: r.ax, ay: r.ay, az: r.az }));
-        const b = state.sixCalib.bias,
-          sc = state.sixCalib.scale;
         state.rows.forEach((r) => {
-          if (Number.isFinite(r.ax)) r.ax = (r.ax - b.x) / sc.x;
-          if (Number.isFinite(r.ay)) r.ay = (r.ay - b.y) / sc.y;
-          if (Number.isFinite(r.az)) r.az = (r.az - b.z) / sc.z;
+          if (Number.isFinite(r.ax) && Number.isFinite(r.ay) && Number.isFinite(r.az)) {
+            const v = IMUData.correctSix(state.sixCalib, r.ax, r.ay, r.az);
+            r.ax = v[0];
+            r.ay = v[1];
+            r.az = v[2];
+          }
         });
         $("six-apply").textContent = "撤销标定";
-        $("six-result").textContent = "已应用六面标定";
+        $("six-result").textContent = "已应用六面标定（3×3 矩阵）";
       }
       prepare();
       draw();
       drawFusion();
+      saveCalibLocal();
     });
     $("six-export").addEventListener("click", () => {
-      const data = { faces: state.sixFace, result: state.sixCalib, note: "six-face static calibration, teaching use" };
+      const data = {
+        faces: state.sixFace,
+        result: state.sixCalib,
+        gyroScale: state.gyroScale,
+        note: "six-face static calibration, teaching use",
+      };
       downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), "imu_six_face.json");
       flash("六面 JSON 已导出");
     });
@@ -1386,7 +1570,11 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       state.sixCalib = null;
       grid.querySelectorAll("button").forEach((b) => b.classList.remove("done"));
       $("six-result").textContent = "";
+      try {
+        localStorage.removeItem(CALIB_KEY);
+      } catch (e) {}
     });
+    loadCalibLocal();
   }
 
   function initGyroScale() {
@@ -1403,6 +1591,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
         state.gyroScale[axis] = f;
         $("gyro-info").textContent =
           `${axis.toUpperCase()} 实测 ${measured.toFixed(3)} °/s / 已知 ${known.toFixed(1)} °/s → scale ${f.toFixed(4)}`;
+        saveCalibLocal();
       } catch (e) {
         $("gyro-info").textContent = e.message;
       }
@@ -1437,6 +1626,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       }
       prepare();
       draw();
+      saveCalibLocal();
     });
   }
 

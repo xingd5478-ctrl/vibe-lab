@@ -304,6 +304,8 @@
     应用刻度: "Apply scale",
     撤销刻度: "Undo scale",
     "未标定。": "Not calibrated.",
+    打印标定报告: "Print calibration report",
+    "下载 PDF": "Download PDF",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",
