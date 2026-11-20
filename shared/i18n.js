@@ -351,6 +351,7 @@
     标定: "calibration",
     推荐: "Recommended",
     "串口验收 10 s": "Serial acceptance 10 s",
+    "下载验收 JSON": "Download acceptance JSON",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",
