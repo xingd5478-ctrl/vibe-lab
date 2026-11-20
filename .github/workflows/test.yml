@@ -75,7 +75,7 @@ jobs:
         run: node scripts/dark_shots.mjs
       - name: Mobile 390px layout regression
         run: node scripts/mobile_shots.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: visual-baselines
