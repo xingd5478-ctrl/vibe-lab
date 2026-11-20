@@ -60,7 +60,11 @@
           <button id="load-real" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">加载 10 min 真实片段</button>
         <button id="serial-connect" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">连接 STM32（Web Serial）</button>
         <button id="send-model" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">送到 Model Lab</button>
-        <div class="hint" id="serial-status">串口 CSV：gx,gy,gz 或 t,gx,gy,gz</div>
+        <details class="six-face" id="serial-help">
+          <summary>串口协议</summary>
+          <p class="hint">115200 / 8N1，逐行 CSV：<code>gx,gy,gz</code> 或 <code>t,gx,gy,gz</code>，单位 °/s。不要混入调试文本。Web Serial 需要 Chrome/Edge + HTTPS/localhost。</p>
+          <p class="hint">验收：连接后帧数递增；60 s 均值与静态参考一致；导出 CSV 可复现。</p>
+        </details>
           <div class="hint">
             论文在审，仅作演示；完整数据待录用后按期刊政策公开，版权归作者/实验室。
             <a href="sample_real_10min.csv" download>下载片段 CSV</a>

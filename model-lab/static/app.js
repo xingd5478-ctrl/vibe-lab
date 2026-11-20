@@ -51,6 +51,10 @@
     return location.pathname.includes("/model-lab/") ? "../control-play/" : "../control/";
   }
 
+  function simulinkCoursePath() {
+    return location.pathname.includes("/model-lab/") ? "../../simulink/course.html" : "../simulink/course.html";
+  }
+
   function initPlants() {
     const sel = $("plant");
     PLANT_IDS.forEach((p) => {
