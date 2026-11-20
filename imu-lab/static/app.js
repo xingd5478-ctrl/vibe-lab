@@ -876,6 +876,29 @@ ${blocks}
     flash("报告已导出");
   }
 
+  function saveCalibrationProject() {
+    if (!window.VibeProject) return;
+    const p = window.VibeProject.makeProject({
+      name: "IMU calibration " + new Date().toISOString().slice(0, 10),
+      notes: "IMU calibration project",
+      calibration: {
+        sixFace: state.sixFace,
+        sixCalib: state.sixCalib,
+        gyroScale: state.gyroScale,
+        tempPoints: state.tempPoints,
+        tempFit: state.tempFit,
+      },
+    });
+    p.id = "cal-" + Date.now().toString(36);
+    try {
+      window.VibeProject.save(p);
+      window.VibeProject.download(p);
+      flash("标定项目已保存并导出");
+    } catch (e) {
+      flash("项目过大或保存失败：" + e.message);
+    }
+  }
+
   function exportCalib() {
     const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 5)));
     if (!rows.length) return;
@@ -1262,6 +1285,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     $("export-csv").addEventListener("click", exportCSV);
     $("export-report").addEventListener("click", exportReport);
     $("export-calib").addEventListener("click", exportCalib);
+    $("save-project").addEventListener("click", saveCalibrationProject);
     $("export-calib-pdf").addEventListener("click", printCalib);
     $("download-calib-pdf").addEventListener("click", downloadCalibPDF);
     $("export-fusion").addEventListener("click", exportFusion);

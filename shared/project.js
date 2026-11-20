@@ -21,6 +21,7 @@
       dataset: input.dataset || null,
       model: input.model || null,
       control: input.control || null,
+      calibration: input.calibration || null,
       notes: input.notes || "",
     };
   }
