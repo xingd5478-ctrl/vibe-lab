@@ -164,6 +164,84 @@
     return rows;
   }
 
+  function accelMean(text) {
+    const lines = String(text)
+      .split(/\r?\n/)
+      .filter((l) => l.trim().length);
+    if (lines.length < 2) return null;
+    const norm = (x) =>
+      x
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "");
+    const head = lines[0].split(",").map(norm);
+    const pick = (names) => {
+      for (const n of names) {
+        const i = head.indexOf(n);
+        if (i >= 0) return i;
+      }
+      return -1;
+    };
+    const ix = pick(["ax", "ax_g", "accel_x"]),
+      iy = pick(["ay", "ay_g", "accel_y"]),
+      iz = pick(["az", "az_g", "accel_z"]);
+    if (ix < 0 || iy < 0 || iz < 0) return null;
+    let n = 0,
+      sx = 0,
+      sy = 0,
+      sz = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const c = lines[i].split(",");
+      const x = Number(c[ix]),
+        y = Number(c[iy]),
+        z = Number(c[iz]);
+      if (![x, y, z].every(Number.isFinite)) continue;
+      sx += x;
+      sy += y;
+      sz += z;
+      n++;
+    }
+    return n ? { ax: sx / n, ay: sy / n, az: sz / n, n } : null;
+  }
+
+  function detectFace(v) {
+    const axes = [
+      ["x", v.ax],
+      ["y", v.ay],
+      ["z", v.az],
+    ];
+    axes.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+    return (axes[0][1] >= 0 ? "p" : "n") + axes[0][0];
+  }
+
+  function sixQuality(faces, calib) {
+    const ideal = { px: [1, 0, 0], nx: [-1, 0, 0], py: [0, 1, 0], ny: [0, -1, 0], pz: [0, 0, 1], nz: [0, 0, -1] };
+    const norms = [],
+      errs = [];
+    for (const k of Object.keys(ideal)) {
+      if (!faces[k]) continue;
+      const f = faces[k],
+        b = calib.bias,
+        s = calib.scale;
+      const v = [(f.x - b.x) / s.x, (f.y - b.y) / s.y, (f.z - b.z) / s.z];
+      const norm = Math.hypot(v[0], v[1], v[2]);
+      norms.push(norm);
+      const e = ideal[k].map((x, i) => v[i] - x);
+      errs.push(Math.hypot(e[0], e[1], e[2]));
+    }
+    const mean = (a) => a.reduce((x, y) => x + y, 0) / Math.max(1, a.length);
+    const nm = mean(norms);
+    const nstd = Math.sqrt(mean(norms.map((x) => (x - nm) * (x - nm))));
+    return {
+      normMean: nm,
+      normStd: nstd,
+      normMin: Math.min(...norms),
+      normMax: Math.max(...norms),
+      rmsError: Math.sqrt(mean(errs.map((x) => x * x))),
+      count: norms.length,
+    };
+  }
+
   function sixFace(faces) {
     const need = ["px", "nx", "py", "ny", "pz", "nz"];
     for (const k of need) if (!faces[k]) throw new Error("six-face: missing " + k);

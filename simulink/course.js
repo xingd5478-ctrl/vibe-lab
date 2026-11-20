@@ -28,6 +28,7 @@
   let read = new Set();
   let lastRead = null;
   let quizStats = { attempted: {}, wrong: {} };
+  const retry = { active: false, queue: [], index: 0 };
   try {
     quizStats = JSON.parse(localStorage.getItem(QUIZ_KEY) || "{}");
   } catch (e) {}
@@ -264,6 +265,42 @@
     } catch (e) {}
   }
 
+  function updateRetry() {
+    const banner = $("retry-banner");
+    if (!banner) return;
+    banner.hidden = !retry.active;
+    if (retry.active)
+      $("retry-text").textContent = `错题重练 ${Math.min(retry.index + 1, retry.queue.length)} / ${retry.queue.length}`;
+  }
+
+  function startRetry() {
+    const ids = Object.keys(quizStats.wrong).sort();
+    if (!ids.length) return;
+    Object.assign(retry, { active: true, queue: ids, index: 0 });
+    updateRetry();
+    load(ids[0]);
+  }
+
+  function exitRetry() {
+    retry.active = false;
+    retry.queue = [];
+    retry.index = 0;
+    updateRetry();
+  }
+
+  function advanceRetry(ok) {
+    if (!retry.active || !ok) return;
+    setTimeout(() => {
+      retry.index += 1;
+      if (retry.index >= retry.queue.length) {
+        exitRetry();
+        return;
+      }
+      load(retry.queue[retry.index]);
+      updateRetry();
+    }, 650);
+  }
+
   function updateQuizPanel() {
     const attempted = Object.keys(quizStats.attempted).length;
     const wrong = Object.keys(quizStats.wrong).length;
@@ -292,6 +329,7 @@
       });
     }
     if ($("wrong-count")) $("wrong-count").textContent = String(wrong);
+    if ($("retry-wrong")) $("retry-wrong").disabled = wrong === 0;
     list.innerHTML = "";
     Object.keys(quizStats.wrong)
       .sort()
@@ -309,6 +347,7 @@
     else quizStats.wrong[lesson.id] = true;
     saveQuiz();
     updateQuizPanel();
+    advanceRetry(ok);
   }
 
   function selfCheck(lesson) {
@@ -583,6 +622,8 @@
     });
   });
 
+  $("retry-wrong").addEventListener("click", startRetry);
+  $("retry-exit").addEventListener("click", exitRetry);
   buildList();
   renderQuiz();
   updateQuizPanel();

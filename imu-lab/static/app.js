@@ -1309,6 +1309,35 @@ ${blocks}
       flash("六面 JSON 已导出");
     });
 
+    $("six-batch").addEventListener("change", async (ev) => {
+      const files = Array.from(ev.target.files || []);
+      if (!files.length) return;
+      const info = $("six-batch-info");
+      info.textContent = `读取 ${files.length} 个文件…`;
+      const labels = { px: "+X", nx: "−X", py: "+Y", ny: "−Y", pz: "+Z", nz: "−Z" };
+      const found = [];
+      for (const file of files) {
+        try {
+          const text = await file.text();
+          const m = IMUData.accelMean(text);
+          if (!m) {
+            found.push(`${file.name}: 缺少 ax/ay/az`);
+            continue;
+          }
+          const key = IMUData.detectFace(m);
+          state.sixFace[key] = { x: m.ax, y: m.ay, z: m.az };
+          found.push(`${file.name} → ${labels[key]}`);
+          grid.querySelectorAll("button").forEach((b) => {
+            if (b.textContent === labels[key]) b.classList.add("done");
+          });
+        } catch (e) {
+          found.push(`${file.name}: 读取失败`);
+        }
+      }
+      info.textContent = found.join("；");
+      if (Object.keys(state.sixFace).length >= 6) $("six-calc").click();
+    });
+
     $("six-reset").addEventListener("click", () => {
       state.sixFace = {};
       state.sixCalib = null;

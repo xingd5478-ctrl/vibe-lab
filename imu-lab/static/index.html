@@ -124,6 +124,8 @@
         <details class="six-face" id="six-face">
           <summary>六面加速度计标定</summary>
           <p class="hint">分别加载 +X/−X/+Y/−Y/+Z/−Z 六个方向的静态数据，点对应“采集”。</p>
+          <label class="six-batch-label">批量上传六面 CSV <input id="six-batch" type="file" accept=".csv,text/csv" multiple /></label>
+          <div class="hint" id="six-batch-info"></div>
           <div id="six-grid" class="six-grid"></div>
           <div class="six-actions"><button id="six-calc" type="button">计算标定</button><button id="six-apply" type="button" disabled>应用标定</button></div>
           <div class="six-actions"><button id="six-export" type="button">导出六面 JSON</button><button id="six-reset" type="button">清空</button></div>
