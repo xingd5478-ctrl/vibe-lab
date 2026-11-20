@@ -156,6 +156,11 @@
               <p class="hint" id="split-hint">前 70% 训练，后 30% 验证。</p>
               <button class="btn primary wide" id="fit" type="button">辨识模型</button>
               <p class="hint" id="fit-hint">先体检数据；有硬性错误时不会拟合。</p>
+            <div class="fit-progress" id="fit-progress" hidden>
+              <div class="fit-bar"><i></i></div>
+              <span id="fit-timer">0.0 s</span>
+              <button class="btn" id="cancel-fit" type="button">取消</button>
+            </div>
             </section>
           </aside>
 

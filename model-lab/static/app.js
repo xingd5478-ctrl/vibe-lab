@@ -37,6 +37,7 @@
     history: [],
     fitWorker: null,
     fitSeq: 0,
+    fitTimer: null,
     csvParsed: null,
     csvName: "",
   };
@@ -164,6 +165,43 @@
     $("quality-title").textContent = blockers ? "这组数据还不能用来辨识" : "数据体检";
   }
 
+  function startFitProgress() {
+    const box = $("fit-progress");
+    if (!box) return;
+    box.hidden = false;
+    const t0 = Date.now();
+    $("fit-timer").textContent = "0.0 s";
+    state.fitTimer = setInterval(() => {
+      $("fit-timer").textContent = ((Date.now() - t0) / 1000).toFixed(1) + " s";
+    }, 100);
+  }
+
+  function stopFitProgress() {
+    if (state.fitTimer) clearInterval(state.fitTimer);
+    state.fitTimer = null;
+    if ($("fit-progress")) $("fit-progress").hidden = true;
+  }
+
+  function createFitWorker() {
+    try {
+      state.fitWorker = new Worker("core/fit-worker.js");
+      state.fitWorker.onmessage = (e) => {
+        const m = e.data;
+        if (!m || m.id !== state.fitSeq) return;
+        stopFitProgress();
+        if (m.ok) applyFit(m.fit);
+        else fitFailed(m.error || "worker error");
+      };
+      state.fitWorker.onerror = () => {
+        state.fitWorker = null;
+        stopFitProgress();
+        if ($("fit").disabled) fitFailed("worker failed; retry");
+      };
+    } catch (e) {
+      state.fitWorker = null;
+    }
+  }
+
   function computeFit(model, data, opts) {
     if (model === "FIR") return I.fitFIR(data.t, data.u, data.y, { trainEnd: opts.trainEnd, nh: 20 });
     if (model === "OE") return I.fitOE(data.t, data.u, data.y, opts);
@@ -179,6 +217,7 @@
   }
 
   function applyFit(f) {
+    stopFitProgress();
     state.fit = f;
     state.uncertainty = null;
     if (f.model === "ETFE") state.split = 1;
@@ -208,6 +247,7 @@
   }
 
   function fitFailed(message) {
+    stopFitProgress();
     state.fit = null;
     $("metrics").innerHTML = "";
     $("warnings").innerHTML = `<span class="bad">${T("拟合失败", "Fit failed")}：${message}</span>`;
@@ -236,6 +276,7 @@
     $("fit-hint").textContent = T("正在拟合…", "Fitting…");
     const heavy = ["OE", "ARMAX", "MIMO-ARX", "Hammerstein"].includes(model);
     if (heavy && state.fitWorker) {
+      startFitProgress();
       state.fitSeq += 1;
       state.fitWorker.postMessage({ id: state.fitSeq, model, opts, data: state.data });
       return;
@@ -864,23 +905,18 @@
     initPlants();
     drawHero();
     initUpload();
-    try {
-      state.fitWorker = new Worker("core/fit-worker.js");
-      state.fitWorker.onmessage = (e) => {
-        const m = e.data;
-        if (!m || m.id !== state.fitSeq) return;
-        if (m.ok) applyFit(m.fit);
-        else fitFailed(m.error || "worker error");
-      };
-      state.fitWorker.onerror = () => {
-        state.fitWorker = null;
-        if ($("fit").disabled) fitFailed("worker failed; retry synchronously");
-      };
-    } catch (e) {
-      state.fitWorker = null;
-    }
+    createFitWorker();
     $("generate").addEventListener("click", generate);
     $("fit").addEventListener("click", fit);
+    $("cancel-fit").addEventListener("click", () => {
+      if (!state.fitWorker) return;
+      state.fitSeq += 1;
+      state.fitWorker.terminate();
+      createFitWorker();
+      stopFitProgress();
+      $("fit").disabled = false;
+      $("fit-hint").textContent = T("已取消拟合。", "Fit cancelled.");
+    });
     $("model").addEventListener("change", () => {
       $("arx-orders").hidden = !["ARX", "MIMO-ARX", "2SLS-ARX", "Hammerstein", "OE", "ARMAX", "Wiener"].includes(
         $("model").value

@@ -251,6 +251,47 @@
     return wrap;
   }
 
+  function selfCheck(lesson) {
+    const wrap = el("section", "self-check");
+    wrap.appendChild(el("h3", "", "本课自测"));
+    const pool = lessons.filter((l) => l.id !== lesson.id && l.phase === lesson.phase);
+    const distractors = pool.slice(0, 2);
+    const opts = [lesson.desc].concat(distractors.map((l) => l.desc));
+    const seed = lesson.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+    const answer = seed % opts.length;
+    if (answer) {
+      const tmp = opts[0];
+      opts[0] = opts[answer];
+      opts[answer] = tmp;
+    }
+    const q = el("p", "self-q", `本课（${lesson.id} · ${lesson.title}）的核心目标是？`);
+    wrap.appendChild(q);
+    opts.forEach((opt, i) => {
+      const lab = el("label", "self-opt");
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "self-" + lesson.id;
+      input.value = String(i);
+      lab.appendChild(input);
+      lab.appendChild(document.createTextNode(" " + opt));
+      wrap.appendChild(lab);
+    });
+    const btn = el("button", "self-btn", "检查");
+    btn.type = "button";
+    const result = el("p", "hint self-result", "");
+    btn.addEventListener("click", () => {
+      const sel = document.querySelector(`input[name="self-${lesson.id}"]:checked`);
+      if (!sel) {
+        result.textContent = "先选一个答案。";
+        return;
+      }
+      result.textContent = Number(sel.value) === answer ? "答对了。" : "再读一遍本课目标。";
+    });
+    wrap.appendChild(btn);
+    wrap.appendChild(result);
+    return wrap;
+  }
+
   function render(lesson, text) {
     const body = $("lesson-body");
     $("lesson-title").textContent = `${lesson.id} · ${lesson.title}`;
@@ -287,6 +328,7 @@
       imgs.appendChild(fig);
     });
     body.appendChild(imgs);
+    body.appendChild(selfCheck(lesson));
 
     const sections = parseM(text);
     if (!sections.length) {

@@ -862,6 +862,27 @@ ${blocks}
     flash("报告已导出");
   }
 
+  function exportCalib() {
+    const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 5)));
+    if (!rows.length) return;
+    const mean = (k) => rows.reduce((s, r) => s + r[k], 0) / rows.length;
+    const fit = state.fit;
+    const data = {
+      source: state.source,
+      fs: state.fs,
+      calibration: {
+        method: "static mean, first 5 s",
+        samples: rows.length,
+        bias_dps: { gx: mean("gx"), gy: mean("gy"), gz: mean("gz") },
+      },
+      allanFit: fit ? { arw: fit.arw, rrw: fit.rrw, r2: fit.r2 } : null,
+      kalman: { R: state.r, Q: state.q },
+      note: "Teaching estimate; not a certified calibration.",
+    };
+    downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), "imu_calibration.json");
+    flash("标定 JSON 已导出");
+  }
+
   function syncURL() {
     const p = new URLSearchParams();
     p.set("r", Math.log10(state.r).toFixed(2));
@@ -1028,6 +1049,7 @@ ${blocks}
 
     $("export-csv").addEventListener("click", exportCSV);
     $("export-report").addEventListener("click", exportReport);
+    $("export-calib").addEventListener("click", exportCalib);
     $("export-allan").addEventListener("click", exportAllanCSV);
 
     $("compare").addEventListener("click", () => {
