@@ -456,6 +456,25 @@
     return rows;
   }
 
+  function serialAcceptance(rows) {
+    const n = rows.length;
+    if (n < 10) return { ok: false, reason: "fewer than 10 frames", n };
+    let nonmono = 0,
+      dup = 0;
+    const dts = [];
+    for (let i = 1; i < n; i++) {
+      const d = rows[i].t - rows[i - 1].t;
+      if (d <= 0) nonmono++;
+      if (d === 0) dup++;
+      if (d > 0) dts.push(d);
+    }
+    const med = dts.length ? dts.slice().sort((a, b) => a - b)[Math.floor(dts.length / 2)] : NaN;
+    const jitter = dts.length ? (Math.max(...dts) - Math.min(...dts)) / med : NaN;
+    const duration = rows[n - 1].t - rows[0].t;
+    const ok = nonmono === 0 && med > 0 && jitter < 0.5 && duration > 1;
+    return { ok, n, duration, med, jitter, nonmono, dup, fs: med > 0 ? 1 / med : NaN };
+  }
+
   function tempPoint(text) {
     const lines = String(text)
       .split(/\r?\n/)
