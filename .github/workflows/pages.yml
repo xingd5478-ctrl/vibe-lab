@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Clone tutorial content
         run: git clone --depth 1 https://github.com/xingd5478-ctrl/simulink-control-tutorial.git "$RUNNER_TEMP/simtut" || echo "clone failed"
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - name: Assemble site
         run: |
           cp -f imu-lab/static/chart.js control-play/chart.js
