@@ -45,6 +45,23 @@ for (const f of ["matlab-probes.json", "feedback.json"]) {
 }
 copyDir(path.join(ROOT, "shared"), path.join(OUT, "shared"));
 
+// Deployed app pages live one level shallower than their source static dirs.
+const deployPathFix = (dir) => {
+  for (const name of fs.readdirSync(dir)) {
+    const p = path.join(dir, name);
+    const st = fs.statSync(p);
+    if (st.isDirectory()) deployPathFix(p);
+    else if (name.endsWith(".html")) {
+      const html = fs.readFileSync(p, "utf8").replaceAll("../../shared/", "../shared/");
+      fs.writeFileSync(p, html);
+    }
+  }
+};
+for (const to of ["model", "imu", "control", "simulink", "about"]) {
+  const dir = path.join(OUT, to);
+  if (fs.existsSync(dir)) deployPathFix(dir);
+}
+
 const count = (dir) =>
   fs
     .readdirSync(dir, { withFileTypes: true })
