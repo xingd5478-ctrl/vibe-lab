@@ -2027,7 +2027,15 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       const baud = Number($("serial-baud").value) || 460800;
       const mode = $("serial-protocol").value;
       try {
-        port = await navigator.serial.requestPort();
+        let ports = [];
+        try {
+          ports = await navigator.serial.getPorts();
+        } catch (e) {}
+        const usbPort = ports.find((p) => {
+          const info = p.getInfo ? p.getInfo() : {};
+          return info.usbVendorId && !info.bluetoothServiceClassId;
+        });
+        port = usbPort || (await navigator.serial.requestPort());
         await port.open({ baudRate: baud });
         reader = port.readable.getReader();
         active = true;
