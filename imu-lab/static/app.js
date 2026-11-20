@@ -877,10 +877,36 @@ ${blocks}
       },
       allanFit: fit ? { arw: fit.arw, rrw: fit.rrw, r2: fit.r2 } : null,
       kalman: { R: state.r, Q: state.q },
+      sixFace: state.sixCalib,
       note: "Teaching estimate; not a certified calibration.",
     };
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), "imu_calibration.json");
     flash("标定 JSON 已导出");
+  }
+
+  function exportFusion() {
+    let rows = state.fusionRows;
+    if (!rows) {
+      const main = currentRows().filter((r) => Number.isFinite(r.ax) && Number.isFinite(r.ay) && Number.isFinite(r.az));
+      if (main.length) rows = main;
+    }
+    if (!rows || !rows.length) {
+      flash("当前没有可导出的融合数据");
+      return;
+    }
+    const alpha = Number($("fusion-alpha").value) || 0.02;
+    const dt = Math.max(1e-4, rows[1] ? rows[1].t - rows[0].t : 0.01);
+    let gyroAngle = 0,
+      fused = 0;
+    const out = ["t,gx_dps,acc_deg,fused_deg"];
+    for (const r of rows) {
+      const a = (Math.atan2(r.ay, r.az) * 180) / Math.PI;
+      gyroAngle += r.gx * dt;
+      fused = (1 - alpha) * (fused + r.gx * dt) + alpha * a;
+      out.push([r.t.toFixed(4), r.gx.toFixed(4), a.toFixed(4), fused.toFixed(4)].join(","));
+    }
+    downloadBlob(new Blob(["\ufeff" + out.join("\n")], { type: "text/csv;charset=utf-8" }), "imu_fusion.csv");
+    flash("融合 CSV 已导出");
   }
 
   function syncURL() {
@@ -1050,6 +1076,7 @@ ${blocks}
     $("export-csv").addEventListener("click", exportCSV);
     $("export-report").addEventListener("click", exportReport);
     $("export-calib").addEventListener("click", exportCalib);
+    $("export-fusion").addEventListener("click", exportFusion);
     $("export-allan").addEventListener("click", exportAllanCSV);
 
     $("compare").addEventListener("click", () => {
@@ -1201,6 +1228,57 @@ ${blocks}
     });
   }
 
+  function initSixFace() {
+    const grid = $("six-grid");
+    if (!grid) return;
+    const faces = [
+      ["px", "+X"],
+      ["nx", "−X"],
+      ["py", "+Y"],
+      ["ny", "−Y"],
+      ["pz", "+Z"],
+      ["nz", "−Z"],
+    ];
+    grid.innerHTML = "";
+    faces.forEach(([key, label]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = label;
+      b.addEventListener("click", () => {
+        const rows = currentRows()
+          .filter((r) => Number.isFinite(r.ax) && Number.isFinite(r.ay) && Number.isFinite(r.az))
+          .slice(0, Math.min(500, Math.round(state.fs * 2)));
+        if (!rows.length) {
+          $("six-result").textContent = "当前数据没有 ax/ay/az，先加载带加速度的 CSV。";
+          return;
+        }
+        const mean = (k) => rows.reduce((s, r) => s + r[k], 0) / rows.length;
+        state.sixFace[key] = { x: mean("ax"), y: mean("ay"), z: mean("az") };
+        b.classList.add("done");
+        $("six-result").textContent = `已采集 ${label}：${rows.length} 帧`;
+      });
+      grid.appendChild(b);
+    });
+    $("six-calc").addEventListener("click", () => {
+      try {
+        state.sixCalib = IMUData.sixFace(state.sixFace);
+        const b = state.sixCalib.bias,
+          sc = state.sixCalib.scale;
+        $("six-result").textContent =
+          `bias = [${b.x.toFixed(3)}, ${b.y.toFixed(3)}, ${b.z.toFixed(3)}] g · scale = [${sc.x.toFixed(3)}, ${sc.y.toFixed(3)}, ${sc.z.toFixed(3)}]`;
+        flash("六面标定完成，可在标定 JSON 中导出");
+      } catch (e) {
+        $("six-result").textContent = "还缺面：" + e.message;
+      }
+    });
+    $("six-reset").addEventListener("click", () => {
+      state.sixFace = {};
+      state.sixCalib = null;
+      grid.querySelectorAll("button").forEach((b) => b.classList.remove("done"));
+      $("six-result").textContent = "";
+    });
+  }
+
   function initFusion() {
     const a = $("fusion-alpha");
     if (!a) return;
@@ -1285,6 +1363,7 @@ ${blocks}
     draw();
     initFusion();
     initCalib();
+    initSixFace();
     if (window.matchMedia) {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       if (mq.addEventListener) mq.addEventListener("change", draw);

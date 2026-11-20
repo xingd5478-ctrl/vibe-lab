@@ -2,11 +2,12 @@
 importScripts("data.js", "identify.js");
 
 self.onmessage = function (e) {
-  const { id, model, data, opts } = e.data;
+  const { id, model, data, opts, abortBuffer } = e.data;
   try {
     const I = self.ModelIdentify;
     const progress = (p) => self.postMessage({ id, progress: Math.max(0, Math.min(1, p)) });
-    const o = { ...opts, onProgress: progress };
+    const shouldAbort = abortBuffer ? () => Atomics.load(new Int32Array(abortBuffer), 0) !== 0 : null;
+    const o = { ...opts, onProgress: progress, shouldAbort };
     const t = data.t,
       u = data.u,
       y = data.y;

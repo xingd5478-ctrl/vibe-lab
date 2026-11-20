@@ -388,6 +388,7 @@
     let best = null;
     let scan = 0;
     for (let c2 = -1; c2 <= 1.0001; c2 += 0.04) {
+      if (opts && opts.shouldAbort && opts.shouldAbort()) throw new Error("ABORTED");
       scan++;
       if (opts && opts.onProgress) opts.onProgress(scan / 51);
       const v = u.map((x) => x + c2 * x * x);
@@ -424,6 +425,7 @@
     };
     let vals = simplex.map(score);
     for (let iter = 0; iter < maxIter; iter++) {
+      if (opts && opts.shouldAbort && opts.shouldAbort()) throw new Error("ABORTED");
       if (opts && opts.onProgress && (iter % 5 === 0 || iter === maxIter - 1)) opts.onProgress((iter + 1) / maxIter);
       const order = vals.map((v, i) => i).sort((a, b) => vals[a] - vals[b]);
       simplex = order.map((i) => simplex[i]);
@@ -639,6 +641,7 @@
     const coefA = [],
       coefB = [];
     for (let out = 0; out < p; out++) {
+      if (opts && opts.shouldAbort && opts.shouldAbort()) throw new Error("ABORTED");
       if (opts && opts.onProgress) opts.onProgress((out + 1) / p);
       const A = [],
         B = [];

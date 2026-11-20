@@ -24,8 +24,15 @@
   const cache = new Map();
   let current = null;
   const PROGRESS_KEY = "vibe-course-read-v1";
+  const QUIZ_KEY = "vibe-course-quiz-v1";
   let read = new Set();
   let lastRead = null;
+  let quizStats = { attempted: {}, wrong: {} };
+  try {
+    quizStats = JSON.parse(localStorage.getItem(QUIZ_KEY) || "{}");
+  } catch (e) {}
+  if (!quizStats.attempted) quizStats.attempted = {};
+  if (!quizStats.wrong) quizStats.wrong = {};
   try {
     const saved = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
     if (Array.isArray(saved.ids)) read = new Set(saved.ids);
@@ -251,6 +258,45 @@
     return wrap;
   }
 
+  function saveQuiz() {
+    try {
+      localStorage.setItem(QUIZ_KEY, JSON.stringify(quizStats));
+    } catch (e) {}
+  }
+
+  function updateQuizPanel() {
+    const attempted = Object.keys(quizStats.attempted).length;
+    const wrong = Object.keys(quizStats.wrong).length;
+    const correct = Math.max(0, attempted - wrong);
+    if ($("quiz-count")) $("quiz-count").textContent = `${correct} / ${attempted}`;
+    if ($("quiz-summary"))
+      $("quiz-summary").textContent = attempted
+        ? `已做 ${attempted} 课，答对 ${correct}，错 ${wrong}。`
+        : "还没有做题。";
+    const book = $("wrong-book");
+    const list = $("wrong-list");
+    if (!book || !list) return;
+    book.hidden = wrong === 0;
+    if ($("wrong-count")) $("wrong-count").textContent = String(wrong);
+    list.innerHTML = "";
+    Object.keys(quizStats.wrong)
+      .sort()
+      .forEach((id) => {
+        const b = el("button", "", `${id.toUpperCase()} · ${byId[id] ? byId[id].title : ""} →`);
+        b.type = "button";
+        b.addEventListener("click", () => load(id));
+        list.appendChild(b);
+      });
+  }
+
+  function recordQuiz(lesson, ok) {
+    quizStats.attempted[lesson.id] = true;
+    if (ok) delete quizStats.wrong[lesson.id];
+    else quizStats.wrong[lesson.id] = true;
+    saveQuiz();
+    updateQuizPanel();
+  }
+
   function selfCheck(lesson) {
     const wrap = el("section", "self-check");
     wrap.appendChild(el("h3", "", "本课自测"));
@@ -285,7 +331,9 @@
         result.textContent = "先选一个答案。";
         return;
       }
-      result.textContent = Number(sel.value) === answer ? "答对了。" : "再读一遍本课目标。";
+      const ok = Number(sel.value) === answer;
+      result.textContent = ok ? "答对了。" : "再读一遍本课目标。";
+      recordQuiz(lesson, ok);
     });
     wrap.appendChild(btn);
     wrap.appendChild(result);
@@ -523,6 +571,7 @@
 
   buildList();
   renderQuiz();
+  updateQuizPanel();
   updateProgress();
   const initial = new URLSearchParams(location.search).get("id") || location.hash.replace(/^#/, "") || "t01";
   load(initial);

@@ -363,3 +363,12 @@ code { font-family: var(--mono); font-size: 0.92em; background: var(--code-bg); 
 .self-opt { display: block; font-size: 11px; color: var(--muted); margin: 4px 0; }
 .self-btn { margin-top: 8px; padding: 6px 10px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; border-radius: 2px; }
 .self-result { margin: 6px 0 0; }
+
+.quiz-panel { border: 1px solid var(--line); background: var(--panel); padding: 10px; margin: 10px 0; }
+.quiz-top { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; color: var(--muted); }
+.quiz-top b { color: var(--ink); }
+.quiz-panel .hint { font-size: 10px; margin: 5px 0 0; }
+#wrong-book { margin-top: 6px; font-size: 11px; }
+#wrong-book summary { cursor: pointer; color: var(--muted); }
+#wrong-list { display: grid; gap: 3px; margin-top: 5px; }
+#wrong-list button { text-align: left; border: 0; background: none; color: var(--ink); font: 10px var(--mono); cursor: pointer; padding: 2px 0; }

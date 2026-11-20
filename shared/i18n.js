@@ -284,6 +284,11 @@
     "已取消拟合。": "Fit cancelled.",
     "导出标定 JSON": "Export calibration JSON",
     "标定 JSON 已导出": "Calibration JSON exported",
+    六面加速度计标定: "Six-face accelerometer calibration",
+    "分别加载 +X/−X/+Y/−Y/+Z/−Z 六个方向的静态数据，点对应“采集”。":
+      "Load static data for +X/−X/+Y/−Y/+Z/−Z, then capture each face.",
+    计算标定: "Compute calibration",
+    清空: "Clear",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

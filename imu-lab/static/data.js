@@ -164,6 +164,26 @@
     return rows;
   }
 
+  function sixFace(faces) {
+    const need = ["px", "nx", "py", "ny", "pz", "nz"];
+    for (const k of need) if (!faces[k]) throw new Error("six-face: missing " + k);
+    const bias = {},
+      scale = {};
+    for (const [axis, p, n] of [
+      ["x", "px", "nx"],
+      ["y", "py", "ny"],
+      ["z", "pz", "nz"],
+    ]) {
+      const pos = faces[p],
+        neg = faces[n];
+      bias[axis] = (pos[axis] + neg[axis]) / 2;
+      scale[axis] = (pos[axis] - neg[axis]) / 2;
+      if (!Number.isFinite(bias[axis]) || !Number.isFinite(scale[axis]) || Math.abs(scale[axis]) < 1e-9)
+        throw new Error("six-face: invalid " + axis);
+    }
+    return { bias, scale, g: 1 };
+  }
+
   function cleanMask(cols, maxAbs = 5) {
     const m = new Uint8Array(cols.n);
     for (let i = 0; i < cols.n; i++) {
@@ -280,7 +300,20 @@
     return warns;
   }
 
-  const api = { AXES, parseText, parseWithMapping, fromRows, toRows, cleanMask, stats, allan, kf, csv, validate };
+  const api = {
+    AXES,
+    parseText,
+    sixFace,
+    parseWithMapping,
+    fromRows,
+    toRows,
+    cleanMask,
+    stats,
+    allan,
+    kf,
+    csv,
+    validate,
+  };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.IMUData = api;
 })(typeof window !== "undefined" ? window : globalThis);

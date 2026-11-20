@@ -38,6 +38,8 @@
     fitWorker: null,
     fitSeq: 0,
     fitTimer: null,
+    abortView: null,
+    fitCancelled: false,
     csvParsed: null,
     csvName: "",
   };
@@ -186,11 +188,28 @@
   }
 
   function createFitWorker() {
+    state.fitCancelled = false;
+    state.abortView = null;
+    let abortBuffer = null;
+    try {
+      abortBuffer = new SharedArrayBuffer(4);
+      state.abortView = new Int32Array(abortBuffer);
+    } catch (e) {
+      abortBuffer = null;
+    }
     try {
       state.fitWorker = new Worker("core/fit-worker.js");
+      state.fitWorker.abortBuffer = abortBuffer;
       state.fitWorker.onmessage = (e) => {
         const m = e.data;
         if (!m || m.id !== state.fitSeq) return;
+        if (!m.ok && m.error === "ABORTED" && state.fitCancelled) {
+          stopFitProgress();
+          createFitWorker();
+          $("fit").disabled = false;
+          $("fit-hint").textContent = T("已取消拟合。", "Fit cancelled.");
+          return;
+        }
         if (m.progress != null) {
           const pct = Math.round(m.progress * 100);
           $("fit-pct").textContent = pct + "%";
@@ -205,6 +224,13 @@
       state.fitWorker.onerror = () => {
         state.fitWorker = null;
         stopFitProgress();
+        if (state.fitCancelled) {
+          state.fitCancelled = false;
+          createFitWorker();
+          $("fit").disabled = false;
+          $("fit-hint").textContent = T("已取消拟合。", "Fit cancelled.");
+          return;
+        }
         if ($("fit").disabled) fitFailed("worker failed; retry");
       };
     } catch (e) {
@@ -288,7 +314,13 @@
     if (heavy && state.fitWorker) {
       startFitProgress();
       state.fitSeq += 1;
-      state.fitWorker.postMessage({ id: state.fitSeq, model, opts, data: state.data });
+      state.fitWorker.postMessage({
+        id: state.fitSeq,
+        model,
+        opts,
+        data: state.data,
+        abortBuffer: state.fitWorker.abortBuffer,
+      });
       return;
     }
     try {
@@ -921,6 +953,13 @@
     $("cancel-fit").addEventListener("click", () => {
       if (!state.fitWorker) return;
       state.fitSeq += 1;
+      if (state.abortView) {
+        state.fitCancelled = true;
+        Atomics.store(state.abortView, 0, 1);
+        $("fit-hint").textContent = T("正在取消…", "Cancelling…");
+        return;
+      }
+      state.fitCancelled = true;
       state.fitWorker.terminate();
       createFitWorker();
       stopFitProgress();

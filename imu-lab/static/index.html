@@ -121,6 +121,13 @@
           <button id="calib" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;margin-bottom:6px;">估计零偏（前 5 s）</button>
         <div class="hint" id="calib-info">假设前 5 s 静止；输出 gx/gy/gz 偏置。</div>
         <button id="calib-apply" type="button" style="width:100%;padding:7px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;margin-bottom:6px;">应用零偏</button>
+        <details class="six-face" id="six-face">
+          <summary>六面加速度计标定</summary>
+          <p class="hint">分别加载 +X/−X/+Y/−Y/+Z/−Z 六个方向的静态数据，点对应“采集”。</p>
+          <div id="six-grid" class="six-grid"></div>
+          <div class="six-actions"><button id="six-calc" type="button">计算标定</button><button id="six-reset" type="button">清空</button></div>
+          <p class="hint" id="six-result" role="status"></p>
+        </details>
         <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;">重置为示例数据</button>
         </div>
 
@@ -165,7 +172,7 @@
       <section class="panel fusion-panel">
         <div class="panel-head">
           <h2>姿态融合 · 互补滤波演示</h2>
-          <span class="meta">陀螺积分 vs 互补滤波</span>
+          <div class="panel-actions"><span class="meta">陀螺积分 vs 互补滤波</span><button class="mini" id="export-fusion">CSV</button></div>
         </div>
         <div class="fusion-controls">
           <label for="fusion-alpha">加速度计权重 α <output id="fusion-alpha-val">0.02</output></label>
