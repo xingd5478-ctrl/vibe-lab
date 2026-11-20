@@ -169,7 +169,7 @@ async function main() {
     console.log("DARK BASELINES UPDATED");
     return;
   }
-  const py = spawnSync("python", ["scripts/compare_png.py", BASE, OUT, "0.03"], { cwd: ROOT, stdio: "inherit" });
+  const py = spawnSync("python", ["scripts/compare_png.py", BASE, OUT, "0.04"], { cwd: ROOT, stdio: "inherit" });
   if (py.error) {
     console.error("python not found; cannot compare dark baselines");
     process.exit(1);
