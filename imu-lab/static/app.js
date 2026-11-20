@@ -193,6 +193,7 @@
   function applyRows(rows, source) {
     state.rows = rows;
     state.fusionRows = null;
+    state.accelBackup = null;
     state.source = source;
     state.pendingText = null;
     $("map-ui").style.display = "none";
@@ -878,6 +879,7 @@ ${blocks}
       allanFit: fit ? { arw: fit.arw, rrw: fit.rrw, r2: fit.r2 } : null,
       kalman: { R: state.r, Q: state.q },
       sixFace: state.sixCalib,
+      sixFaceRaw: state.sixFace,
       note: "Teaching estimate; not a certified calibration.",
     };
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), "imu_calibration.json");
@@ -1271,6 +1273,42 @@ ${blocks}
         $("six-result").textContent = "还缺面：" + e.message;
       }
     });
+    $("six-apply").addEventListener("click", () => {
+      if (!state.sixCalib) return;
+      if (state.accelBackup) {
+        state.rows.forEach((r, i) => {
+          const b = state.accelBackup[i];
+          if (b) {
+            r.ax = b.ax;
+            r.ay = b.ay;
+            r.az = b.az;
+          }
+        });
+        state.accelBackup = null;
+        $("six-apply").textContent = "应用标定";
+        $("six-result").textContent = "已撤销六面标定";
+      } else {
+        state.accelBackup = state.rows.map((r) => ({ ax: r.ax, ay: r.ay, az: r.az }));
+        const b = state.sixCalib.bias,
+          sc = state.sixCalib.scale;
+        state.rows.forEach((r) => {
+          if (Number.isFinite(r.ax)) r.ax = (r.ax - b.x) / sc.x;
+          if (Number.isFinite(r.ay)) r.ay = (r.ay - b.y) / sc.y;
+          if (Number.isFinite(r.az)) r.az = (r.az - b.z) / sc.z;
+        });
+        $("six-apply").textContent = "撤销标定";
+        $("six-result").textContent = "已应用六面标定";
+      }
+      prepare();
+      draw();
+      drawFusion();
+    });
+    $("six-export").addEventListener("click", () => {
+      const data = { faces: state.sixFace, result: state.sixCalib, note: "six-face static calibration, teaching use" };
+      downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), "imu_six_face.json");
+      flash("六面 JSON 已导出");
+    });
+
     $("six-reset").addEventListener("click", () => {
       state.sixFace = {};
       state.sixCalib = null;

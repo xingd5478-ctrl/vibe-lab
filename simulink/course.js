@@ -277,6 +277,20 @@
     const list = $("wrong-list");
     if (!book || !list) return;
     book.hidden = wrong === 0;
+    const phases = $("quiz-phases");
+    if (phases) {
+      phases.innerHTML = "";
+      DATA.phases.forEach((ph) => {
+        const ids = ph.items.map((x) => x.id);
+        const att = ids.filter((id) => quizStats.attempted[id]).length;
+        const wr = ids.filter((id) => quizStats.wrong[id]).length;
+        if (!att) return;
+        const row = el("div", "", "");
+        row.appendChild(el("span", "", ph.title.replace(/^Phase /, "P")));
+        row.appendChild(el("b", "", `${att - wr}/${att}`));
+        phases.appendChild(row);
+      });
+    }
     if ($("wrong-count")) $("wrong-count").textContent = String(wrong);
     list.innerHTML = "";
     Object.keys(quizStats.wrong)

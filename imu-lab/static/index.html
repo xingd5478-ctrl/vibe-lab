@@ -125,7 +125,8 @@
           <summary>六面加速度计标定</summary>
           <p class="hint">分别加载 +X/−X/+Y/−Y/+Z/−Z 六个方向的静态数据，点对应“采集”。</p>
           <div id="six-grid" class="six-grid"></div>
-          <div class="six-actions"><button id="six-calc" type="button">计算标定</button><button id="six-reset" type="button">清空</button></div>
+          <div class="six-actions"><button id="six-calc" type="button">计算标定</button><button id="six-apply" type="button" disabled>应用标定</button></div>
+          <div class="six-actions"><button id="six-export" type="button">导出六面 JSON</button><button id="six-reset" type="button">清空</button></div>
           <p class="hint" id="six-result" role="status"></p>
         </details>
         <button id="reset" type="button" style="width:100%;padding:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;">重置为示例数据</button>
