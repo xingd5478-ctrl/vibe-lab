@@ -278,11 +278,19 @@
     if (!picked.length || !box) return;
     box.hidden = false;
     box.innerHTML = "";
+    const answers = {};
     picked.forEach((id, qi) => {
       const item = bank[id];
+      const opts = item.opts.slice();
+      const correct = opts[item.a];
+      for (let i = opts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [opts[i], opts[j]] = [opts[j], opts[i]];
+      }
+      answers[id] = opts.indexOf(correct);
       const d = el("div", "q");
       d.appendChild(el("p", "", `${qi + 1}. [${id}] ${item.q}`));
-      item.opts.forEach((opt, oi) => {
+      opts.forEach((opt, oi) => {
         const lab = el("label", "");
         const input = document.createElement("input");
         input.type = "radio";
@@ -302,7 +310,7 @@
       picked.forEach((id) => {
         const item = bank[id];
         const sel = document.querySelector(`input[name="paper-${id}"]:checked`);
-        const ok = sel && Number(sel.value) === item.a;
+        const ok = sel && Number(sel.value) === answers[id];
         if (ok) score++;
         recordQuiz(byId[id], ok);
       });
