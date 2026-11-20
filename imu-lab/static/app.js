@@ -199,6 +199,9 @@
     state.rows = rows;
     state.fusionRows = null;
     state.accelBackup = null;
+    state.gyroBackup = null;
+    state.tempBackup = null;
+    state.combinedBackup = null;
     state.source = source;
     state.pendingText = null;
     $("map-ui").style.display = "none";
@@ -1436,6 +1439,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       state.sixCalib = d.sixCalib || null;
       state.gyroScale = d.gyroScale || {};
       state.tempPoints = d.tempPoints || [];
+      state.tempExcluded = new Set(d.tempExcluded || []);
       state.tempFit = d.tempFit || null;
       const labels = { px: "+X", nx: "−X", py: "+Y", ny: "−Y", pz: "+Z", nz: "−Z" };
       Object.keys(state.sixFace).forEach((k) => {
@@ -1505,7 +1509,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
           sc = state.sixCalib.scale,
           q = state.sixCalib.quality;
         $("six-result").textContent =
-          `[${state.sixCalib.beforeGrade} → ${state.sixCalib.grade}] bias = [${b.x.toFixed(3)}, ${b.y.toFixed(3)}, ${b.z.toFixed(3)}] g · scale = [${sc.x.toFixed(3)}, ${sc.y.toFixed(3)}, ${sc.z.toFixed(3)}] · |a| ${q.normMean.toFixed(3)}±${q.normStd.toFixed(3)} g · RMS ${q.rmsError.toFixed(3)} g`;
+          `[${state.sixCalib.beforeGrade} → ${state.sixCalib.grade}] 最差面 ${q.perFace[0].face} ${q.perFace[0].error.toFixed(3)}g · bias = [${b.x.toFixed(3)}, ${b.y.toFixed(3)}, ${b.z.toFixed(3)}] g · scale = [${sc.x.toFixed(3)}, ${sc.y.toFixed(3)}, ${sc.z.toFixed(3)}] · |a| ${q.normMean.toFixed(3)}±${q.normStd.toFixed(3)} g · RMS ${q.rmsError.toFixed(3)} g`;
         saveCalibLocal();
         flash("六面标定完成并已保存到本机");
       } catch (e) {
@@ -1608,17 +1612,33 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
   function initGyroScale() {
     const capture = $("gyro-capture");
     if (!capture) return;
+    $("gyro-axis").addEventListener("change", () => {
+      $("gyro-three-fields").hidden = $("gyro-axis").value !== "all";
+    });
     capture.addEventListener("click", () => {
       const rows = currentRows().slice(0, Math.min(500, Math.round(state.fs * 2)));
-      const axis = $("gyro-axis").value,
-        known = Number($("gyro-known").value);
+      const axis = $("gyro-axis").value;
       if (!rows.length) return;
-      const measured = rows.reduce((s, r) => s + r[axis], 0) / rows.length;
+      const mean = (a) => rows.reduce((s, r) => s + r[a], 0) / rows.length;
       try {
-        const f = IMUData.gyroScale(measured, known);
-        state.gyroScale[axis] = f;
-        $("gyro-info").textContent =
-          `${axis.toUpperCase()} 实测 ${measured.toFixed(3)} °/s / 已知 ${known.toFixed(1)} °/s → scale ${f.toFixed(4)}`;
+        if (axis === "all") {
+          const gains = [];
+          for (const a of ["gx", "gy", "gz"]) {
+            const known = Number($(`gyro-known-${a}`).value);
+            if (!(known > 0)) continue;
+            const f = IMUData.gyroScale(mean(a), known);
+            state.gyroScale[a] = f;
+            gains.push(`${a}=${f.toFixed(4)}`);
+          }
+          if (!gains.length) throw new Error("至少输入一个已知角速度");
+          $("gyro-info").textContent = `三轴：${gains.join(" · ")}`;
+        } else {
+          const known = Number($("gyro-known").value);
+          const f = IMUData.gyroScale(mean(axis), known);
+          state.gyroScale[axis] = f;
+          $("gyro-info").textContent =
+            `${axis.toUpperCase()} 实测 ${mean(axis).toFixed(3)} °/s / 已知 ${known.toFixed(1)} °/s → scale ${f.toFixed(4)}`;
+        }
         saveCalibLocal();
       } catch (e) {
         $("gyro-info").textContent = e.message;
@@ -1663,11 +1683,27 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     if (!box) return;
     box.innerHTML = "";
     state.tempPoints
-      .slice()
-      .sort((a, b) => a.T - b.T)
-      .forEach((p) => {
-        const row = document.createElement("div");
-        row.textContent = `T=${p.T.toFixed(1)}°C · gx=${p.gx.toFixed(3)} gy=${p.gy.toFixed(3)} gz=${p.gz.toFixed(3)}`;
+      .map((p, i) => ({ p, i }))
+      .sort((a, b) => a.p.T - b.p.T)
+      .forEach(({ p, i }) => {
+        const row = document.createElement("label");
+        row.className = "temp-point" + (state.tempExcluded.has(i) ? " excluded" : "");
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = !state.tempExcluded.has(i);
+        cb.addEventListener("change", () => {
+          if (cb.checked) state.tempExcluded.delete(i);
+          else state.tempExcluded.add(i);
+          row.classList.toggle("excluded", !cb.checked);
+          saveCalibLocal();
+          $("temp-info").textContent = "已修改参与拟合的点，请重新拟合。";
+        });
+        row.appendChild(cb);
+        row.appendChild(
+          document.createTextNode(
+            `T=${p.T.toFixed(1)}°C · gx=${p.gx.toFixed(3)} gy=${p.gy.toFixed(3)} gz=${p.gz.toFixed(3)}`
+          )
+        );
         box.appendChild(row);
       });
   }
@@ -1736,8 +1772,18 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       saveCalibLocal();
     });
     $("temp-fit").addEventListener("click", () => {
+      const usedPoints = state.tempPoints.filter((_, i) => !state.tempExcluded.has(i));
+      if (usedPoints.length < 2) {
+        $("temp-info").textContent = "至少需要两个未剔除的温度点。";
+        return;
+      }
       try {
-        state.tempFit = IMUData.robustTempBias(state.tempPoints, state.tempPoints[0].T);
+        state.tempFit = IMUData.robustTempBias(usedPoints, usedPoints[0].T);
+        state.tempFit.outliers.forEach((p) => {
+          const idx = state.tempPoints.indexOf(p);
+          if (idx >= 0) state.tempExcluded.add(idx);
+        });
+        renderTempPoints();
         $("temp-info").textContent =
           `斜率 °/s/°C：gx ${state.tempFit.gx.k.toExponential(2)} · gy ${state.tempFit.gy.k.toExponential(2)} · gz ${state.tempFit.gz.k.toExponential(2)}`;
         saveCalibLocal();
@@ -1779,6 +1825,51 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
       draw();
       saveCalibLocal();
     });
+    $("combined-apply").addEventListener("click", () => {
+      if (!state.sixCalib || !state.tempFit) {
+        $("temp-info").textContent = "需要先完成六面标定和温度拟合。";
+        return;
+      }
+      if (state.combinedBackup) {
+        state.rows.forEach((r, i) => {
+          const b = state.combinedBackup[i];
+          if (b) {
+            r.gx = b.gx;
+            r.gy = b.gy;
+            r.gz = b.gz;
+            r.ax = b.ax;
+            r.ay = b.ay;
+            r.az = b.az;
+          }
+        });
+        state.combinedBackup = null;
+        $("combined-apply").textContent = "联合应用";
+        $("temp-info").textContent = "已撤销联合补偿";
+      } else {
+        const T0 = Number($("temp-now").value);
+        state.combinedBackup = state.rows.map((r) => ({ gx: r.gx, gy: r.gy, gz: r.gz, ax: r.ax, ay: r.ay, az: r.az }));
+        state.rows.forEach((r) => {
+          if (Number.isFinite(r.ax) && Number.isFinite(r.ay) && Number.isFinite(r.az)) {
+            const v = IMUData.correctSix(state.sixCalib, r.ax, r.ay, r.az);
+            r.ax = v[0];
+            r.ay = v[1];
+            r.az = v[2];
+          }
+          const t = Number.isFinite(r.temp) ? r.temp : T0;
+          const b = IMUData.tempBiasAt(state.tempFit, t);
+          r.gx -= b.gx;
+          r.gy -= b.gy;
+          r.gz -= b.gz;
+        });
+        $("combined-apply").textContent = "撤销联合";
+        $("temp-info").textContent = "已按六面矩阵 + 温度模型联合补偿";
+      }
+      prepare();
+      draw();
+      drawFusion();
+      saveCalibLocal();
+    });
+
     $("temp-clear").addEventListener("click", () => {
       if (state.tempBackup) {
         state.rows.forEach((r, i) => {

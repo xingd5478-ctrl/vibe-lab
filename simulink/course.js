@@ -268,7 +268,8 @@
   function startRandomQuiz() {
     if (retry.active) exitRetry();
     const bank = window.SIMULINK_QUIZ || {};
-    const ids = Object.keys(bank).filter((id) => byId[id]);
+    const phase = $("random-phase").value;
+    const ids = Object.keys(bank).filter((id) => byId[id] && (!phase || byId[id].phase === phase));
     for (let i = ids.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [ids[i], ids[j]] = [ids[j], ids[i]];
@@ -678,6 +679,12 @@
     });
   });
 
+  DATA.phases.forEach((ph) => {
+    const o = document.createElement("option");
+    o.value = ph.title;
+    o.textContent = ph.title;
+    $("random-phase").appendChild(o);
+  });
   $("retry-wrong").addEventListener("click", startRetry);
   $("retry-exit").addEventListener("click", exitRetry);
   $("random-quiz").addEventListener("click", startRandomQuiz);

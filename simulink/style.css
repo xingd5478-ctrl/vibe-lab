@@ -385,3 +385,5 @@ code { font-family: var(--mono); font-size: 0.92em; background: var(--code-bg); 
 .random-paper .q { margin: 6px 0; font-size: 10px; }
 .random-paper label { display: block; color: var(--muted); margin: 2px 0; }
 .random-paper button { margin-top: 5px; padding: 4px 7px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; font-size: 10px; }
+
+.random-phase { width: 100%; min-height: 36px; margin-top: 6px; padding: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); font-size: 10px; }

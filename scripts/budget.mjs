@@ -8,7 +8,7 @@ const EXT = new Set([".js", ".mjs", ".css"]);
 const PAGE_BUDGET_KB = {
   landing: 26,
   shared: 45,
-  "imu-lab/static": 145,
+  "imu-lab/static": 150,
   "control-play": 80,
   simulink: 280,
   about: 30,
@@ -45,7 +45,7 @@ rows.slice(0, 6).forEach(([f, s]) => console.log(`  ${(s / 1024).toFixed(1)} KB 
 for (const [dir, size] of perDir)
   console.log(`  page ${dir.padEnd(16)} ${(size / 1024).toFixed(1)} KB / ${PAGE_BUDGET_KB[dir]} KB`);
 
-const MAX_TOTAL = 580 * 1024;
+const MAX_TOTAL = 600 * 1024;
 const MAX_FILE = 160 * 1024;
 let failed = false;
 if (total > MAX_TOTAL) {

@@ -286,6 +286,10 @@
       const e = ideal[k].map((x, i) => v[i] - x);
       errs.push(Math.hypot(e[0], e[1], e[2]));
     }
+    const perFace = Object.keys(ideal)
+      .filter((k) => faces[k])
+      .map((k, i) => ({ face: k, norm: norms[i], error: errs[i] }))
+      .sort((a, b) => b.error - a.error);
     const mean = (a) => a.reduce((x, y) => x + y, 0) / Math.max(1, a.length);
     const nm = mean(norms);
     const nstd = Math.sqrt(mean(norms.map((x) => (x - nm) * (x - nm))));
@@ -396,6 +400,22 @@
     }
     push(start, rows.length);
     return out;
+  }
+
+  function tempSegmentsAuto(rows, opts) {
+    const temps = rows.map((r) => r.temp).filter(Number.isFinite);
+    if (temps.length < 4) return [];
+    const diffs = [];
+    for (let i = 1; i < rows.length; i++) {
+      if (Number.isFinite(rows[i].temp) && Number.isFinite(rows[i - 1].temp))
+        diffs.push(Math.abs(rows[i].temp - rows[i - 1].temp));
+    }
+    diffs.sort((a, b) => a - b);
+    const med = diffs.length ? diffs[diffs.length >> 1] : 0;
+    const mad = diffs.length ? diffs[Math.floor(diffs.length * 0.75)] : 0;
+    const range = Math.max(...temps) - Math.min(...temps);
+    const threshold = Math.max(0.05, Math.min(med + 4 * Math.max(0.01, mad - med), Math.max(0.1, range / 8)));
+    return tempSegments(rows, { threshold, minSamples: (opts && opts.minSamples) || 10 });
   }
 
   function robustTempBias(points, t0) {
