@@ -14,12 +14,16 @@ self.onmessage = function (e) {
     const gy = cols.gy.slice();
     const gz = cols.gz.slice();
     const crc = cols.crc.slice();
-    self.postMessage({ id, ok: true, n: cols.n, t, gx, gy, gz, crc }, [
+    const ax = cols.hasAccel ? cols.ax.slice() : null;
+    const ay = cols.hasAccel ? cols.ay.slice() : null;
+    const az = cols.hasAccel ? cols.az.slice() : null;
+    self.postMessage({ id, ok: true, n: cols.n, t, gx, gy, gz, ax, ay, az, hasAccel: !!cols.hasAccel, crc }, [
       t.buffer,
       gx.buffer,
       gy.buffer,
       gz.buffer,
       crc.buffer,
+      ...(ax ? [ax.buffer, ay.buffer, az.buffer] : []),
     ]);
   } catch (err) {
     self.postMessage({ id, ok: false, error: String(err && err.message ? err.message : err) });

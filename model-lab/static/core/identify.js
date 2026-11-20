@@ -398,7 +398,6 @@
     }
     if (!best) throw new Error("Hammerstein initialization failed.");
     best.model = "Hammerstein";
-    best.inputPoly = (x) => x + best.c2 * x * x;
     return best;
   }
 

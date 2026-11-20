@@ -8,6 +8,9 @@
     gx: ["gx_dps", "gx", "gyro_x", "gyrox", "gx_deg_s"],
     gy: ["gy_dps", "gy", "gyro_y", "gyroy", "gy_deg_s"],
     gz: ["gz_dps", "gz", "gyro_z", "gyroz", "gz_deg_s"],
+    ax: ["ax", "ax_g", "accel_x"],
+    ay: ["ay", "ay_g", "accel_y"],
+    az: ["az", "az_g", "accel_z"],
     crc: ["crc_ok", "crc", "crcok"],
   };
 
@@ -30,6 +33,9 @@
       gx: pick(ALIASES.gx),
       gy: pick(ALIASES.gy),
       gz: pick(ALIASES.gz),
+      ax: pick(ALIASES.ax),
+      ay: pick(ALIASES.ay),
+      az: pick(ALIASES.az),
       crc: pick(ALIASES.crc),
     };
     const raw = line.split(",").map((s) => s.trim());
@@ -58,7 +64,20 @@
   function parseWithMapping(text, map) {
     const lines = text.split(/\r?\n/).filter((l) => l.trim().length);
     if (lines.length < 2) return null;
-    return parseLines(lines, { t: -1, gx: map.gx, gy: map.gy, gz: map.gz, crc: -1 }, 1);
+    return parseLines(
+      lines,
+      {
+        t: -1,
+        gx: map.gx,
+        gy: map.gy,
+        gz: map.gz,
+        ax: map.ax != null ? map.ax : -1,
+        ay: map.ay != null ? map.ay : -1,
+        az: map.az != null ? map.az : -1,
+        crc: -1,
+      },
+      1
+    );
   }
 
   function parseLines(lines, idx, start) {
@@ -67,6 +86,9 @@
     const gx = new Float32Array(n),
       gy = new Float32Array(n),
       gz = new Float32Array(n);
+    const ax = new Float32Array(n).fill(NaN),
+      ay = new Float32Array(n).fill(NaN),
+      az = new Float32Array(n).fill(NaN);
     const crc = new Uint8Array(n);
     let k = 0;
     for (let i = start; i < lines.length; i++) {
@@ -78,6 +100,9 @@
       gx[k] = a;
       gy[k] = b;
       gz[k] = d;
+      if (idx.ax >= 0) ax[k] = Number(c[idx.ax]);
+      if (idx.ay >= 0) ay[k] = Number(c[idx.ay]);
+      if (idx.az >= 0) az[k] = Number(c[idx.az]);
       t[k] = idx.t >= 0 ? Number(c[idx.t]) : NaN;
       crc[k] = idx.crc >= 0 ? Number(c[idx.crc]) : 1;
       k++;
@@ -87,6 +112,10 @@
       gx: gx.subarray(0, k),
       gy: gy.subarray(0, k),
       gz: gz.subarray(0, k),
+      ax: ax.subarray(0, k),
+      ay: ay.subarray(0, k),
+      az: az.subarray(0, k),
+      hasAccel: idx.ax >= 0 && idx.ay >= 0 && idx.az >= 0,
       crc: crc.subarray(0, k),
       n: k,
     };
@@ -99,6 +128,10 @@
       gx: new Float32Array(n),
       gy: new Float32Array(n),
       gz: new Float32Array(n),
+      ax: new Float32Array(n).fill(NaN),
+      ay: new Float32Array(n).fill(NaN),
+      az: new Float32Array(n).fill(NaN),
+      hasAccel: rows.some((r) => Number.isFinite(r.ax) && Number.isFinite(r.ay) && Number.isFinite(r.az)),
       crc: new Uint8Array(n),
       n,
     };
@@ -108,6 +141,11 @@
       cols.gx[i] = r.gx;
       cols.gy[i] = r.gy;
       cols.gz[i] = r.gz;
+      if (cols.hasAccel) {
+        cols.ax[i] = r.ax;
+        cols.ay[i] = r.ay;
+        cols.az[i] = r.az;
+      }
       cols.crc[i] = r.crc === 1 ? 1 : 0;
     }
     return cols;
@@ -117,6 +155,11 @@
     const rows = new Array(cols.n);
     for (let i = 0; i < cols.n; i++) {
       rows[i] = { t: cols.t[i], gx: cols.gx[i], gy: cols.gy[i], gz: cols.gz[i], crc: cols.crc[i] };
+      if (cols.hasAccel) {
+        rows[i].ax = cols.ax[i];
+        rows[i].ay = cols.ay[i];
+        rows[i].az = cols.az[i];
+      }
     }
     return rows;
   }

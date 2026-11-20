@@ -79,6 +79,9 @@
         gx: gauss(rnd) * 0.35 + bias,
         gy: gauss(rnd) * 0.35 + bias,
         gz: gauss(rnd) * 0.35 + bias,
+        ax: Math.sin(i / 40) * 0.05,
+        ay: Math.sin(i / 160) * 0.1,
+        az: 1,
         crc: 1,
       });
     }
@@ -113,6 +116,9 @@
       gx: pick(["gx_dps", "gx", "gyro_x", "gyrox", "gx_deg_s"]),
       gy: pick(["gy_dps", "gy", "gyro_y", "gyroy", "gy_deg_s"]),
       gz: pick(["gz_dps", "gz", "gyro_z", "gyroz", "gz_deg_s"]),
+      ax: pick(["ax", "ax_g", "accel_x"]),
+      ay: pick(["ay", "ay_g", "accel_y"]),
+      az: pick(["az", "az_g", "accel_z"]),
       crc: pick(["crc_ok", "crc", "crcok"]),
     };
     const rawHead = line.split(",").map((s) => s.trim());
@@ -120,7 +126,7 @@
     if (looksHeader && (idx.gx < 0 || idx.gy < 0 || idx.gz < 0)) return null;
     let start = 1;
     if (idx.gx < 0 || idx.gy < 0 || idx.gz < 0) {
-      idx = { t: 0, gx: 1, gy: 2, gz: 3, crc: 4 };
+      idx = { t: 0, gx: 1, gy: 2, gz: 3, ax: -1, ay: -1, az: -1, crc: 4 };
       start = 0;
     }
     return { idx, start };
@@ -141,7 +147,13 @@
       if (!isFinite(gx) || !isFinite(gy) || !isFinite(gz)) continue;
       const t = idx.t >= 0 ? Number(c[idx.t]) : NaN;
       const crc = idx.crc >= 0 ? Number(c[idx.crc]) : 1;
-      rows.push({ t, gx, gy, gz, crc: isFinite(crc) ? crc : 1 });
+      const row = { t, gx, gy, gz, crc: isFinite(crc) ? crc : 1 };
+      if (idx.ax >= 0 && idx.ay >= 0 && idx.az >= 0) {
+        row.ax = Number(c[idx.ax]);
+        row.ay = Number(c[idx.ay]);
+        row.az = Number(c[idx.az]);
+      }
+      rows.push(row);
     }
     return rows;
   }
@@ -161,7 +173,13 @@
       if (isFinite(gx) && isFinite(gy) && isFinite(gz)) {
         const t = idx.t >= 0 ? Number(c[idx.t]) : NaN;
         const crc = idx.crc >= 0 ? Number(c[idx.crc]) : 1;
-        rows.push({ t, gx, gy, gz, crc: isFinite(crc) ? crc : 1 });
+        const row = { t, gx, gy, gz, crc: isFinite(crc) ? crc : 1 };
+        if (idx.ax >= 0 && idx.ay >= 0 && idx.az >= 0) {
+          row.ax = Number(c[idx.ax]);
+          row.ay = Number(c[idx.ay]);
+          row.az = Number(c[idx.az]);
+        }
+        rows.push(row);
       }
       if (i % 20000 === 0) {
         if (onProgress) onProgress(Math.round((i / lines.length) * 100));
@@ -174,6 +192,7 @@
 
   function applyRows(rows, source) {
     state.rows = rows;
+    state.fusionRows = null;
     state.source = source;
     state.pendingText = null;
     $("map-ui").style.display = "none";
@@ -189,13 +208,16 @@
       return;
     }
     const opts = head.map((h, i) => `<option value="${i}">${h || "列" + (i + 1)}</option>`).join("");
-    ["gx", "gy", "gz"].forEach((k) => {
+    ["gx", "gy", "gz", "ax", "ay", "az"].forEach((k) => {
       $("map-" + k).innerHTML = opts;
     });
     const pick = (re) => head.findIndex((h) => re.test(h.toLowerCase()));
     $("map-gx").value = String(Math.max(0, pick(/gx|x/)));
     $("map-gy").value = String(Math.max(0, pick(/gy|y/)));
     $("map-gz").value = String(Math.max(0, pick(/gz|z/)));
+    $("map-ax").value = String(Math.max(0, pick(/ax/)));
+    $("map-ay").value = String(Math.max(0, pick(/ay/)));
+    $("map-az").value = String(Math.max(0, pick(/az/)));
     state.pendingText = text;
     state.pendingName = name;
     $("map-ui").style.display = "";
@@ -211,7 +233,13 @@
         gy = Number(c[map.gy]),
         gz = Number(c[map.gz]);
       if (!isFinite(gx) || !isFinite(gy) || !isFinite(gz)) continue;
-      rows.push({ t: NaN, gx, gy, gz, crc: 1 });
+      const row = { t: NaN, gx, gy, gz, crc: 1 };
+      if (map.ax != null && map.ay != null && map.az != null) {
+        row.ax = Number(c[map.ax]);
+        row.ay = Number(c[map.ay]);
+        row.az = Number(c[map.az]);
+      }
+      rows.push(row);
     }
     return rows;
   }
@@ -228,6 +256,11 @@
       const end = Math.min(n, i + 50000);
       for (; i < end; i++) {
         rows[i] = { t: cols.t[i], gx: cols.gx[i], gy: cols.gy[i], gz: cols.gz[i], crc: cols.crc[i] };
+        if (cols.hasAccel) {
+          rows[i].ax = cols.ax[i];
+          rows[i].ay = cols.ay[i];
+          rows[i].az = cols.az[i];
+        }
       }
       $("source-name").textContent = `解析中 ${Math.round((i / n) * 100)}%`;
       if (i < n) setTimeout(step, 0);
@@ -278,7 +311,22 @@
               $("source-name").textContent = state.source;
               return;
             }
-            buildRowsChunked({ t: m.t, gx: m.gx, gy: m.gy, gz: m.gz, crc: m.crc, n: m.n }, f, text);
+            buildRowsChunked(
+              {
+                t: m.t,
+                gx: m.gx,
+                gy: m.gy,
+                gz: m.gz,
+                ax: m.ax,
+                ay: m.ay,
+                az: m.az,
+                hasAccel: m.hasAccel,
+                crc: m.crc,
+                n: m.n,
+              },
+              f,
+              text
+            );
           };
           parseWorker.postMessage({ id, text });
         } else {
@@ -1025,7 +1073,11 @@ ${blocks}
     if (!el) return;
     const alpha = Number($("fusion-alpha").value) || 0.02;
     $("fusion-alpha-val").textContent = alpha.toFixed(3);
-    const real = state.fusionRows;
+    let real = state.fusionRows;
+    if (!real) {
+      const main = currentRows().filter((r) => Number.isFinite(r.ax) && Number.isFinite(r.ay) && Number.isFinite(r.az));
+      if (main.length > 20) real = main;
+    }
     let t = [],
       truth = [],
       gyroRaw = [],
@@ -1047,7 +1099,9 @@ ${blocks}
         fused.push(angle);
         integrated.push(gyroAngle);
       }
-      $("fusion-source").textContent = T("当前：真实 CSV · gx + ay/az 倾角", "Current: real CSV · gx + ay/az tilt");
+      $("fusion-source").textContent = state.fusionRows
+        ? T("当前：真实融合 CSV · gx + ay/az 倾角", "Current: real fusion CSV · gx + ay/az tilt")
+        : T("当前：主数据 · gx + ay/az 倾角", "Current: main data · gx + ay/az tilt");
     } else {
       const rnd = mulberry32(7);
       const dt = 0.02,

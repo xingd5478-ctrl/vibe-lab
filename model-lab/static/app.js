@@ -35,6 +35,8 @@
     split: 0.7,
     uncertainty: null,
     history: [],
+    fitWorker: null,
+    fitSeq: 0,
     csvParsed: null,
     csvName: "",
   };
@@ -162,84 +164,86 @@
     $("quality-title").textContent = blockers ? "这组数据还不能用来辨识" : "数据体检";
   }
 
+  function computeFit(model, data, opts) {
+    if (model === "FIR") return I.fitFIR(data.t, data.u, data.y, { trainEnd: opts.trainEnd, nh: 20 });
+    if (model === "OE") return I.fitOE(data.t, data.u, data.y, opts);
+    if (model === "ARMAX") return I.fitARMAX(data.t, data.u, data.y, opts);
+    if (model === "Wiener") return I.fitWiener(data.t, data.u, data.y, opts);
+    if (model === "Hammerstein") return I.fitHammerstein(data.t, data.u, data.y, opts);
+    if (model === "2SLS-ARX") return I.fit2SLS(data.t, data.u, data.y, data.r, opts);
+    if (model === "MIMO-ARX") return I.fitMIMOARX(data.t, data.U, data.Y, opts);
+    if (model === "ETFE") return I.fitETFE(data.t, data.u, data.y, opts);
+    if (model === "ARX") return I.fitARX(data.t, data.u, data.y, opts);
+    if (model === "SOPDT") return I.fitSOPDT(data.t, data.u, data.y, opts);
+    return I.fitFOPDT(data.t, data.u, data.y, opts);
+  }
+
+  function applyFit(f) {
+    state.fit = f;
+    state.uncertainty = null;
+    if (f.model === "ETFE") state.split = 1;
+    drawMainChart();
+    drawResidual(f);
+    renderMetrics();
+    renderWarnings();
+    renderValidation();
+    recordComparison(f);
+    $("actions").hidden = false;
+    $("uncertainty").hidden = ["ETFE", "MIMO-ARX", "2SLS-ARX", "Hammerstein", "FIR", "OE", "ARMAX", "Wiener"].includes(
+      f.model
+    );
+    $("fit-hint").textContent = T(
+      "拟合完成。检查 FIT、残差和参数是否物理合理。",
+      "Fit complete. Check FIT, residuals and physical plausibility."
+    );
+    const sc = $("send-control");
+    if (f.model === "SOPDT") {
+      sc.hidden = false;
+      sc.href = `${controlPath()}?order=2&wn=${encodeURIComponent(f.wn.toFixed(3))}&zeta=${encodeURIComponent(f.zeta.toFixed(3))}`;
+    } else if (f.model === "FOPDT") {
+      sc.hidden = false;
+      sc.href = `${controlPath()}?order=1&K=${encodeURIComponent(f.K.toFixed(3))}&tau=${encodeURIComponent(f.tau.toFixed(3))}`;
+    } else sc.hidden = true;
+    $("fit").disabled = false;
+  }
+
+  function fitFailed(message) {
+    state.fit = null;
+    $("metrics").innerHTML = "";
+    $("warnings").innerHTML = `<span class="bad">${T("拟合失败", "Fit failed")}：${message}</span>`;
+    $("actions").hidden = true;
+    $("fit-hint").textContent = T(
+      "拟合失败；先检查数据是否有真实阶跃和足够长的响应。",
+      "Fit failed; check for a real step and a long enough response."
+    );
+    $("fit").disabled = false;
+  }
+
   function fit() {
     if (!state.data || state.quality.blockers.length) return;
     const model = $("model").value;
     const split = Math.max(0, Math.min(1, Number($("split").value) || 0.7));
     state.split = split;
     const trainEnd = split < 1 ? Math.max(8, Math.floor(state.data.t.length * split)) : state.data.t.length;
+    const opts = {
+      trainEnd,
+      na: Math.max(1, Math.min(6, Number($("arx-na").value) || 2)),
+      nb: Math.max(1, Math.min(6, Number($("arx-nb").value) || 2)),
+      nk: Math.max(0, Math.min(5, Number($("arx-nk").value) || 0)),
+      nc: Math.max(1, Math.min(4, Number($("arx-nc").value) || 1)),
+    };
     $("fit").disabled = true;
     $("fit-hint").textContent = T("正在拟合…", "Fitting…");
+    const heavy = ["OE", "ARMAX", "MIMO-ARX", "Hammerstein"].includes(model);
+    if (heavy && state.fitWorker) {
+      state.fitSeq += 1;
+      state.fitWorker.postMessage({ id: state.fitSeq, model, opts, data: state.data });
+      return;
+    }
     try {
-      const na = Math.max(1, Math.min(6, Number($("arx-na").value) || 2));
-      const nb = Math.max(1, Math.min(6, Number($("arx-nb").value) || 2));
-      const nk = Math.max(0, Math.min(5, Number($("arx-nk").value) || 0));
-      const nc = Math.max(1, Math.min(4, Number($("arx-nc").value) || 1));
-      const f =
-        model === "FIR"
-          ? I.fitFIR(state.data.t, state.data.u, state.data.y, { trainEnd, nh: 20 })
-          : model === "OE"
-            ? I.fitOE(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
-            : model === "ARMAX"
-              ? I.fitARMAX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nc, nk })
-              : model === "Wiener"
-                ? I.fitWiener(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
-                : model === "Hammerstein"
-                  ? I.fitHammerstein(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
-                  : model === "2SLS-ARX"
-                    ? I.fit2SLS(state.data.t, state.data.u, state.data.y, state.data.r, { trainEnd, na, nb, nk })
-                    : model === "MIMO-ARX"
-                      ? I.fitMIMOARX(state.data.t, state.data.U, state.data.Y, { trainEnd, na, nb, nk })
-                      : model === "ETFE"
-                        ? I.fitETFE(state.data.t, state.data.u, state.data.y)
-                        : model === "ARX"
-                          ? I.fitARX(state.data.t, state.data.u, state.data.y, { trainEnd, na, nb, nk })
-                          : model === "SOPDT"
-                            ? I.fitSOPDT(state.data.t, state.data.u, state.data.y, { trainEnd })
-                            : I.fitFOPDT(state.data.t, state.data.u, state.data.y, { trainEnd });
-      state.fit = f;
-      state.uncertainty = null;
-      if (f.model === "ETFE") state.split = 1;
-      drawMainChart();
-      drawResidual(f);
-      renderMetrics();
-      renderWarnings();
-      renderValidation();
-      recordComparison(f);
-      $("actions").hidden = false;
-      $("uncertainty").hidden = [
-        "ETFE",
-        "MIMO-ARX",
-        "2SLS-ARX",
-        "Hammerstein",
-        "FIR",
-        "OE",
-        "ARMAX",
-        "Wiener",
-      ].includes(f.model);
-      $("fit-hint").textContent = T(
-        "拟合完成。检查 FIT、残差和参数是否物理合理。",
-        "Fit complete. Check FIT, residuals and physical plausibility."
-      );
-      const sc = $("send-control");
-      if (f.model === "SOPDT") {
-        sc.hidden = false;
-        sc.href = `${controlPath()}?order=2&wn=${encodeURIComponent(f.wn.toFixed(3))}&zeta=${encodeURIComponent(f.zeta.toFixed(3))}`;
-      } else if (f.model === "FOPDT") {
-        sc.hidden = false;
-        sc.href = `${controlPath()}?order=1&K=${encodeURIComponent(f.K.toFixed(3))}&tau=${encodeURIComponent(f.tau.toFixed(3))}`;
-      } else sc.hidden = true;
+      applyFit(computeFit(model, state.data, opts));
     } catch (e) {
-      state.fit = null;
-      $("metrics").innerHTML = "";
-      $("warnings").innerHTML = `<span class="bad">${T("拟合失败", "Fit failed")}：${e.message}</span>`;
-      $("actions").hidden = true;
-      $("fit-hint").textContent = T(
-        "拟合失败；先检查数据是否有真实阶跃和足够长的响应。",
-        "Fit failed; check for a real step and a long enough response."
-      );
-    } finally {
-      $("fit").disabled = false;
+      fitFailed(e.message);
     }
   }
 
@@ -860,6 +864,21 @@
     initPlants();
     drawHero();
     initUpload();
+    try {
+      state.fitWorker = new Worker("core/fit-worker.js");
+      state.fitWorker.onmessage = (e) => {
+        const m = e.data;
+        if (!m || m.id !== state.fitSeq) return;
+        if (m.ok) applyFit(m.fit);
+        else fitFailed(m.error || "worker error");
+      };
+      state.fitWorker.onerror = () => {
+        state.fitWorker = null;
+        if ($("fit").disabled) fitFailed("worker failed; retry synchronously");
+      };
+    } catch (e) {
+      state.fitWorker = null;
+    }
     $("generate").addEventListener("click", generate);
     $("fit").addEventListener("click", fit);
     $("model").addEventListener("change", () => {
