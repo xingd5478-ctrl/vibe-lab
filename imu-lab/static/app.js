@@ -2011,6 +2011,7 @@ body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:
     };
     const start = async (acceptMode) => {
       if (active) await stop();
+      $("serial-status").textContent = "正在请求串口…";
       if (!navigator.serial) {
         $("serial-status").textContent = "当前浏览器不支持 Web Serial（需 Chrome/Edge + HTTPS/localhost）";
         return;
