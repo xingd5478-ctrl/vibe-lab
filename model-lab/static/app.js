@@ -572,13 +572,20 @@
       return;
     }
     box.hidden = false;
+    const scored = state.history.filter((h) => Number.isFinite(h.val) || Number.isFinite(h.train));
+    const best = scored.slice().sort((a, b) => {
+      const av = Number.isFinite(a.val) ? a.val : a.train;
+      const bv = Number.isFinite(b.val) ? b.val : b.train;
+      if (Math.abs(bv - av) > 2) return bv - av;
+      return (a.k || 999) - (b.k || 999);
+    })[0];
     const rows = state.history
       .map(
         (h) =>
-          `<tr><td>${h.model}</td><td>${h.train != null ? h.train.toFixed(1) : "—"}</td><td>${h.val != null ? h.val.toFixed(1) : "—"}</td><td>${h.aic != null ? h.aic.toFixed(0) : "—"}</td><td>${h.k != null ? h.k : "—"}</td><td>${h.grade || "—"}</td></tr>`
+          `<tr${best && h.key === best.key ? ' class="best"' : ""}><td>${h.model}</td><td>${h.train != null ? h.train.toFixed(1) : "—"}</td><td>${h.val != null ? h.val.toFixed(1) : "—"}</td><td>${h.aic != null ? h.aic.toFixed(0) : "—"}</td><td>${h.k != null ? h.k : "—"}</td><td>${h.grade || "—"}</td></tr>`
       )
       .join("");
-    box.innerHTML = `<h3>${T("模型对比", "Model comparison")}</h3><div class="table-wrap"><table><thead><tr><th>model</th><th>FIT train</th><th>FIT val</th><th>AIC</th><th>k</th><th>grade</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    box.innerHTML = `<h3>${T("模型对比", "Model comparison")}</h3>${best ? `<p class="recommend">${T("推荐", "Recommended")}：<b>${best.model}</b> · ${Number.isFinite(best.val) ? "val " + best.val.toFixed(1) : "train " + best.train.toFixed(1)}</p>` : ""}<div class="table-wrap"><table><thead><tr><th>model</th><th>FIT train</th><th>FIT val</th><th>AIC</th><th>k</th><th>grade</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function drawMainChart() {

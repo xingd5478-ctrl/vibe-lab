@@ -206,3 +206,7 @@ footer a { color: var(--muted); }
 .projects-panel { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 8px; }
 .projects-panel .project-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 10px var(--mono); color: var(--muted); padding: 3px 0; border-bottom: 1px solid var(--line); }
 .projects-panel button { border: 0; background: none; color: var(--accent); cursor: pointer; font: 10px var(--mono); }
+
+.recommend { font: 11px var(--mono); color: var(--muted); margin: 0 0 6px; }
+.recommend b { color: var(--ink); }
+.comparison tr.best td { color: var(--ink); background: var(--panel-2); }

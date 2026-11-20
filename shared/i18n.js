@@ -349,6 +349,7 @@
     保存标定项目: "Save calibration project",
     下载: "Download",
     标定: "calibration",
+    推荐: "Recommended",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",
