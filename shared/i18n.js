@@ -356,6 +356,7 @@
     协议: "Protocol",
     "二进制（AA55/AADD）": "Binary (AA55/AADD)",
     CSV: "CSV",
+    未连接: "Not connected",
     "Control Play · 二阶系统": "Control Play · second-order systems",
     课程阅读进度: "Course reading progress",
     继续上次: "Continue where you left off",

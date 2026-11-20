@@ -62,6 +62,7 @@
         <label class="hint" style="display:block;margin-top:4px;">协议 <select id="serial-protocol"><option value="binary">二进制（AA55/AADD）</option><option value="csv">CSV</option></select></label>
         <button id="serial-connect" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">连接 STM32（Web Serial）</button>
         <button id="serial-accept" type="button" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;border-radius:2px;">串口验收 10 s</button>
+        <div class="hint" id="serial-status">未连接</div>
         <div class="hint" id="serial-accept-result"></div>
         <button id="send-model" type="button" style="width:100%;margin-top:8px;padding:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;border-radius:2px;">送到 Model Lab</button>
         <details class="six-face" id="serial-help">
