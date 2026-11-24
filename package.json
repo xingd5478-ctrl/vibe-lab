@@ -39,7 +39,7 @@
     "sentry:set": "node scripts/set_sentry.mjs"
   },
   "devDependencies": {
-    "axe-core": "^4.14.0",
+    "axe-core": "^4.14.1",
     "eslint": "^10.15.0",
     "globals": "^17.14.0",
     "prettier": "^3.10.1"
